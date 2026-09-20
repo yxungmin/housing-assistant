@@ -74,8 +74,11 @@ export default function Cost() {
   const cashLabel = manwon(cost.required_cash).replace(/ ?원$/, "");
 
   return (
-    <Screen padded={false}>
-      <Header onBack={() => (auto ? router.replace("/(tabs)") : router.back())} title="예상 주거비" right={<IconButton name="more" label="더보기" color={colors.text2} />} />
+    <Screen
+      padded={false}
+      header={<Header onBack={() => (auto ? router.replace("/(tabs)") : router.back())} title="예상 주거비" right={<IconButton name="more" label="더보기" color={colors.text2} />} />}
+      footer={<BottomCTA label={conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"} onPress={() => setScenario(true)} />}
+    >
       <View style={{ paddingHorizontal: space.screen, gap: space.section }}>
         <View style={{ gap: 16 }}>
           {auto ? <Notice icon="check">조건이 가장 잘 맞는 공고의 주거비를 먼저 계산했어요. 이 공고는 계속 무료예요.</Notice> : null}
@@ -135,8 +138,6 @@ export default function Cost() {
         <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>공고문과 {cost.loan?.as_of_date ?? LOANS[0]!.as_of_date} 기준 대출 조건으로 계산한 예상값이에요. 실제 계약 조건과 다를 수 있어요.</Sub>
         <View style={{ height: 24 }} />
       </View>
-
-      <BottomCTA label={conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"} onPress={() => setScenario(true)} />
 
       <BottomSheet visible={scenario} onClose={() => setScenario(false)}>
         {conv ? (

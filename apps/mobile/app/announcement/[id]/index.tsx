@@ -44,8 +44,11 @@ export default function AnnouncementDetail() {
   };
 
   return (
-    <Screen padded={false}>
-      <Header onBack={() => router.back()} right={<IconButton name={saved ? "heart-filled" : "heart"} label={saved ? "관심 해제" : "관심 등록"} onPress={() => toggleSaved(a.id)} color={saved ? colors.danger : colors.text} />} />
+    <Screen
+      padded={false}
+      header={<Header onBack={() => router.back()} right={<IconButton pop name={saved ? "heart-filled" : "heart"} label={saved ? "관심 해제" : "관심 등록"} onPress={() => toggleSaved(a.id)} color={saved ? colors.danger : colors.text} />} />}
+      footer={a.status === "VERIFIED" ? <BottomCTA label={hasRental ? "예상 주거비 보기" : "분양 공고는 계산을 아직 지원하지 않아요"} onPress={openCost} disabled={!hasRental} /> : undefined}
+    >
       <View style={{ paddingHorizontal: space.screen, gap: space.section }}>
         <View style={{ gap: 12, paddingTop: 4 }}>
           <View style={{ flexDirection: "row", gap: 6 }}>
@@ -126,9 +129,6 @@ export default function AnnouncementDetail() {
         <View style={{ height: 24 }} />
       </View>
 
-      {a.status === "VERIFIED" ? (
-        <BottomCTA label={hasRental ? "예상 주거비 보기" : "분양 공고는 계산을 아직 지원하지 않아요"} onPress={openCost} disabled={!hasRental} />
-      ) : null}
       <SubscriptionSheet visible={sheet} onClose={() => setSheet(false)} onStarted={() => router.push(`/announcement/${a.id}/cost`)} />
     </Screen>
   );

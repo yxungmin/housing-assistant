@@ -4,8 +4,8 @@
  *  ConditionRow · ListRow · KeyValue · BottomCTA · PrimaryButton · BottomSheet · Notice
  * 원칙: 흰 화면 + grey50 카드, 헤어라인 대신 간격, 아이콘은 연한 타일 안에, 색은 CTA·상태에만.
  */
-import { useEffect, useRef, type PropsWithChildren, type ReactNode } from "react";
-import { Animated, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { useEffect, useRef, useState, type PropsWithChildren, type ReactNode } from "react";
+import { Animated, Easing, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space, type } from "@/theme/tokens";
@@ -31,18 +31,24 @@ export function FadeIn({ children, style, delay = 0, distance = 12 }: PropsWithC
   return <Animated.View style={[{ opacity, transform: [{ translateY }] }, style]}>{children}</Animated.View>;
 }
 
-export function Screen({ children, scroll = true, padded = true, style, bottomInset = 140 }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number }>) {
+/**
+ * 화면 틀. header·footer는 스크롤 밖에 두어 항상 고정된다 (스크롤 안에 두면 같이 밀려 올라간다).
+ * 본문만 스크롤하고, footer가 있으면 아래 여백을 줄인다.
+ */
+export function Screen({ children, scroll = true, padded = true, style, bottomInset = 140, header, footer }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number; header?: ReactNode; footer?: ReactNode }>) {
   const { colors } = useTheme();
   const inner = padded ? { paddingHorizontal: space.screen } : undefined;
   return (
     <SafeAreaView style={[{ flex: 1, backgroundColor: colors.surface }, style]} edges={["top", "left", "right"]}>
+      {header}
       {scroll ? (
-        <ScrollView contentContainerStyle={[inner, { paddingBottom: bottomInset, gap: space.xl }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={[inner, { paddingBottom: footer ? space.xl : bottomInset, gap: space.xl }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           {children}
         </ScrollView>
       ) : (
         <View style={[{ flex: 1 }, inner]}>{children}</View>
       )}
+      {footer}
     </SafeAreaView>
   );
 }
@@ -59,25 +65,58 @@ export function Header({ onBack, title, right }: { onBack?: () => void; title?: 
           </Pressable>
         ) : null}
       </View>
-      {title ? <Text style={[type.subheading, { color: colors.text }]}>{title}</Text> : <View />}
+      {title ? <Text {...wordWrap} style={[type.subheading, { color: colors.text }]}>{title}</Text> : <View />}
       <View style={{ width: 48, alignItems: "flex-end" }}>{right}</View>
     </View>
   );
 }
 
-export function IconButton({ name, onPress, label, color }: { name: IconName; onPress?: () => void; label: string; color?: string }) {
+/** 아이콘 버튼. pop을 켜면 아이콘이 바뀔 때 한 번 튀어오른다 (관심 등록 등). */
+export function IconButton({ name, onPress, label, color, pop }: { name: IconName; onPress?: () => void; label: string; color?: string; pop?: boolean }) {
   const { colors } = useTheme();
+  const scale = useRef(new Animated.Value(1)).current;
+  const first = useRef(true);
+  useEffect(() => {
+    if (!pop) return;
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    Animated.sequence([
+      Animated.timing(scale, { toValue: 1.35, duration: 130, easing: Easing.out(Easing.quad), useNativeDriver: Platform.OS !== "web" }),
+      Animated.spring(scale, { toValue: 1, friction: 3.5, tension: 160, useNativeDriver: Platform.OS !== "web" }),
+    ]).start();
+  }, [name, pop, scale]);
   return (
     <Pressable onPress={onPress} hitSlop={12} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => ({ padding: 8, borderRadius: radius.pill, backgroundColor: pressed ? colors.cardSoft : "transparent" })}>
-      <Icon name={name} size={24} color={color ?? colors.text} strokeWidth={2} />
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <Icon name={name} size={24} color={color ?? colors.text} strokeWidth={2} />
+      </Animated.View>
     </Pressable>
   );
+}
+
+/**
+ * 한글은 기본값이 글자 단위 줄바꿈이라 어절 중간이 끊긴다. 어절(띄어쓰기) 단위로 끊는다.
+ * iOS는 hangul-word, Android는 balanced, 웹은 data 속성 + 전역 CSS(word-break: keep-all).
+ * 웹에서 style로 준 wordBreak은 react-native-web이 걸러내므로 dataSet을 쓴다.
+ */
+const wordWrap =
+  Platform.OS === "web"
+    ? ({ dataSet: { wordwrap: "keep-all" } } as object)
+    : ({ lineBreakStrategyIOS: "hangul-word", textBreakStrategy: "balanced" } as object);
+
+if (Platform.OS === "web" && typeof document !== "undefined" && !document.getElementById("ha-wordwrap")) {
+  const style = document.createElement("style");
+  style.id = "ha-wordwrap";
+  style.textContent = '[data-wordwrap="keep-all"]{word-break:keep-all;overflow-wrap:break-word;}';
+  document.head.appendChild(style);
 }
 
 export function T({ children, variant = "body", color, style, numeric, lines }: PropsWithChildren<{ variant?: keyof typeof type; color?: string; style?: StyleProp<TextStyle>; numeric?: boolean; lines?: number }>) {
   const { colors } = useTheme();
   return (
-    <Text numberOfLines={lines} ellipsizeMode="tail" style={[type[variant], { color: color ?? colors.text }, numeric && { fontFamily: fonts.num, fontVariant: ["tabular-nums"] }, style]}>
+    <Text {...wordWrap} numberOfLines={lines} ellipsizeMode="tail" style={[type[variant], { color: color ?? colors.text }, numeric && { fontFamily: fonts.num, fontVariant: ["tabular-nums"] }, style]}>
       {children}
     </Text>
   );
@@ -165,7 +204,7 @@ export function Tag({ children, tone = "primary", icon }: PropsWithChildren<{ to
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: bg, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 }}>
       {icon ? <Icon name={icon} size={12} color={fg} strokeWidth={3} /> : null}
-      <Text style={{ fontFamily: fonts.bold, fontSize: 12, color: fg, lineHeight: 16, letterSpacing: -0.1 }}>{children}</Text>
+      <Text {...wordWrap} style={[{ fontFamily: fonts.bold, fontSize: 12, color: fg, lineHeight: 16, letterSpacing: -0.1 }]}>{children}</Text>
     </View>
   );
 }
@@ -176,7 +215,7 @@ export function Chip({ children, on, onPress }: PropsWithChildren<{ on?: boolean
   return (
     <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}
       style={({ pressed }) => ({ paddingHorizontal: 14, paddingVertical: 9, borderRadius: radius.pill, backgroundColor: on ? colors.text : pressed ? colors.cardStrong : colors.cardSoft })}>
-      <Text style={{ fontFamily: fonts.semiBold, fontSize: 14, color: on ? colors.surface : colors.text2, letterSpacing: -0.2 }}>{children}</Text>
+      <Text {...wordWrap} style={[{ fontFamily: fonts.semiBold, fontSize: 14, color: on ? colors.surface : colors.text2, letterSpacing: -0.2 }]}>{children}</Text>
     </Pressable>
   );
 }
@@ -234,15 +273,15 @@ export function KeyValue({ label, value, src, strong }: { label: string; value: 
   );
 }
 
-/** 하단 고정 CTA: 높이 56, 라운드 16 */
+/** 하단 고정 CTA: 높이 56, 라운드 16. Screen의 footer 슬롯에 넣으면 스크롤과 무관하게 고정된다. */
 export function BottomCTA({ label, onPress, disabled, secondary, secondaryLabel, onSecondary }: { label: string; onPress: () => void; disabled?: boolean; secondary?: boolean; secondaryLabel?: string; onSecondary?: () => void }) {
   const { colors } = useTheme();
   return (
-    <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, paddingHorizontal: space.xl, paddingTop: 12, paddingBottom: 28, gap: 4, backgroundColor: colors.surface }}>
+    <View style={{ paddingHorizontal: space.xl, paddingTop: 12, paddingBottom: 28, gap: 4, backgroundColor: colors.surface }}>
       <PrimaryButton label={label} onPress={onPress} disabled={disabled} />
       {secondary && secondaryLabel ? (
         <Pressable onPress={onSecondary} style={{ paddingVertical: 12, alignItems: "center" }} accessibilityRole="button">
-          <Text style={{ fontFamily: fonts.medium, fontSize: 15, color: colors.text3 }}>{secondaryLabel}</Text>
+          <Text {...wordWrap} style={[{ fontFamily: fonts.medium, fontSize: 15, color: colors.text3 }]}>{secondaryLabel}</Text>
         </Pressable>
       ) : null}
     </View>
@@ -257,19 +296,81 @@ export function PrimaryButton({ label, onPress, disabled, tone = "primary" }: { 
         const bg = disabled ? colors.cardStrong : tone === "dark" ? colors.text : tone === "soft" ? (pressed ? colors.cardStrong : colors.cardSoft) : pressed ? colors.primaryPressed : colors.primary;
         return { height: 56, borderRadius: 16, backgroundColor: bg, alignItems: "center", justifyContent: "center", opacity: pressed && tone === "dark" ? 0.85 : 1 };
       }}>
-      <Text style={{ fontFamily: fonts.bold, fontSize: 17, letterSpacing: -0.3, color: disabled ? colors.text3 : tone === "dark" ? colors.surface : tone === "soft" ? colors.text : colors.onPrimary }}>{label}</Text>
+      <Text {...wordWrap} numberOfLines={1} style={[{ fontFamily: fonts.bold, fontSize: 17, letterSpacing: -0.3, color: disabled ? colors.text3 : tone === "dark" ? colors.surface : tone === "soft" ? colors.text : colors.onPrimary }]}>{label}</Text>
     </Pressable>
   );
 }
 
-/** 시트: 손잡이 없이 큰 제목으로 시작 */
+const fill = { position: "absolute" as const, top: 0, left: 0, right: 0, bottom: 0 };
+const SHEET_IN = 300;
+const SHEET_OUT = 200;
+
+/**
+ * 시트: 손잡이 없이 큰 제목으로 시작.
+ * 딤은 제자리에서 밝기만 바뀌고 패널만 아래에서 올라온다 (Modal의 slide는 딤까지 같이 밀어올려 어색하다).
+ * 닫힐 때는 역재생이 끝난 뒤에 언마운트한다.
+ */
 export function BottomSheet({ visible, onClose, children }: PropsWithChildren<{ visible: boolean; onClose: () => void }>) {
   const { colors } = useTheme();
+  const [mounted, setMounted] = useState(visible);
+  const [height, setHeight] = useState(0);
+  const anim = useRef(new Animated.Value(visible ? 1 : 0)).current;
+
+  useEffect(() => {
+    if (visible) setMounted(true);
+    const to = visible ? 1 : 0;
+    const duration = visible ? SHEET_IN : SHEET_OUT;
+    const animation = Animated.timing(anim, {
+      toValue: to,
+      duration,
+      easing: visible ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
+      useNativeDriver: Platform.OS !== "web",
+    });
+    animation.start(({ finished }) => {
+      if (finished && !visible) setMounted(false);
+    });
+    // 웹에서 Animated는 requestAnimationFrame에 기댄다. 탭이 그려지지 않아 프레임이 멈추면
+    // 시트가 화면 밖에 그대로 남으므로, 시간이 지나면 최종 상태로 맞춘다.
+    const settle =
+      Platform.OS === "web"
+        ? setTimeout(() => {
+            anim.setValue(to);
+            if (!visible) setMounted(false);
+          }, duration + 80)
+        : undefined;
+    return () => {
+      animation.stop();
+      if (settle !== undefined) clearTimeout(settle);
+    };
+  }, [visible, anim]);
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    const h = e.nativeEvent.layout.height;
+    if (h > 0 && h !== height) setHeight(h);
+  };
+
+  if (!mounted) return null;
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={{ flex: 1, backgroundColor: colors.dim }} onPress={onClose} accessibilityLabel="닫기" />
-      <View style={{ backgroundColor: colors.surface, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl, paddingHorizontal: space.screen, paddingTop: 28, paddingBottom: 32, gap: space.xl }}>
-        {children}
+    <Modal visible transparent animationType="none" onRequestClose={onClose}>
+      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+        <Animated.View style={{ ...fill, backgroundColor: colors.dim, opacity: anim }}>
+          <Pressable style={{ flex: 1 }} onPress={onClose} accessibilityLabel="닫기" />
+        </Animated.View>
+        <Animated.View
+          onLayout={onLayout}
+          style={{
+            backgroundColor: colors.surface,
+            borderTopLeftRadius: radius.xl,
+            borderTopRightRadius: radius.xl,
+            paddingHorizontal: space.screen,
+            paddingTop: 28,
+            paddingBottom: 32,
+            gap: space.xl,
+            transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [height || 520, 0] }) }],
+          }}
+        >
+          {children}
+        </Animated.View>
       </View>
     </Modal>
   );
