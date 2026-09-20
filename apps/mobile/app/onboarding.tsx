@@ -4,9 +4,9 @@ import { KeyboardAvoidingView, Platform, Pressable, TextInput, View } from "reac
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/Icon";
-import { BottomCTA, Header, IconButton, Screen, Sub, T } from "@/components/ui";
+import { BottomCTA, FadeIn, Header, IconButton, Screen, Sub, T } from "@/components/ui";
 import { matchAll, pickBest } from "@/data/announcements";
-import { isComplete, visibleSteps, type Step } from "@/lib/onboarding";
+import { isComplete, stepOptions, stepTitle, visibleSteps, type Step } from "@/lib/onboarding";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space } from "@/theme/tokens";
@@ -38,13 +38,10 @@ export default function Onboarding() {
     if (!isComplete(p)) return;
     const profile: UserProfile = { ...p, subscription_deposits: p.subscription_deposits ?? p.subscription_months };
     setProfile(profile, true);
+    // 첫 무료 계산 대상만 정해 두고, 결과는 홈 목록에서 먼저 보게 한다 (사용자 피드백: 바로 상세로 가면 인지가 어렵다)
     const best = state.freeUnlockId ? null : pickBest(matchAll(profile));
-    if (best) {
-      setFreeUnlock(best.announcement.id);
-      router.replace(`/announcement/${best.announcement.id}/cost?auto=1`);
-    } else {
-      router.replace("/(tabs)");
-    }
+    if (best) setFreeUnlock(best.announcement.id);
+    router.replace("/(tabs)");
   };
 
   const numeric = step.kind === "won" || step.kind === "count" || step.kind === "age" || step.kind === "months" || step.kind === "date";
@@ -65,7 +62,8 @@ export default function Onboarding() {
     const next = selected.includes(v) ? selected.filter((x) => x !== v) : [...selected, v];
     setDraft((d) => step.apply(d, next.length ? next.join(",") : null));
   };
-  const grid = (step.options?.length ?? 0) > 6;
+  const options = stepOptions(step, draft);
+  const grid = options.length > 6;
 
   return (
     <Screen scroll={false} padded={false}>
@@ -75,20 +73,20 @@ export default function Onboarding() {
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-        <View style={{ flex: 1, paddingHorizontal: space.screen, paddingTop: 32, gap: space.md }}>
+        <FadeIn key={step.id} style={{ flex: 1, paddingHorizontal: space.screen, paddingTop: 32, gap: space.md }}>
           <Sub tone="3">{index + 1} / {steps.length}</Sub>
-          <T variant="title">{step.title}</T>
+          <T variant="title">{stepTitle(step, draft)}</T>
           {step.hint ? <T variant="body" color={colors.text2}>{step.hint}</T> : null}
 
           {(step.kind === "select" || step.kind === "multi") && (
             <View style={{ flexDirection: grid ? "row" : "column", flexWrap: grid ? "wrap" : "nowrap", gap: 10, marginTop: 12 }}>
-              {step.options!.map((o) => {
+              {options.map((o) => {
                 const on = step.kind === "multi" ? selected.includes(o.value) : value === o.value;
                 return (
                   <Pressable key={o.value} onPress={() => (step.kind === "multi" ? toggleMulti(o.value) : setDraft((d) => step.apply(d, o.value)))} accessibilityRole="button" accessibilityLabel={o.label} accessibilityState={{ selected: on }}
                     style={({ pressed }) => ({
                       paddingHorizontal: 18, paddingVertical: grid ? 14 : 18, borderRadius: radius.md, backgroundColor: on ? colors.primarySoft : colors.card, opacity: pressed ? 0.85 : 1,
-                      flexDirection: "row", alignItems: "center", justifyContent: grid ? "center" : "space-between", minWidth: grid ? "22%" : undefined, flexGrow: grid ? 1 : 0,
+                      flexDirection: "row", alignItems: "center", justifyContent: grid ? "center" : "space-between", minWidth: grid ? (options.length > 20 ? "30%" : "22%") : undefined, flexGrow: grid ? 1 : 0,
                     })}>
                     <View style={{ gap: 2, alignItems: grid ? "center" : "flex-start" }}>
                       <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{o.label}</T>
@@ -109,7 +107,7 @@ export default function Onboarding() {
               <Sub tone="3">{step.helper}</Sub>
             </View>
           ) : null}
-        </View>
+        </FadeIn>
       </KeyboardAvoidingView>
 
       <BottomCTA
@@ -145,10 +143,12 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
           autoFocus
           placeholder={isDate ? "1998.03.15" : "0"}
           placeholderTextColor={colors.line}
-          style={{ flex: 1, fontFamily: fonts.bold, fontSize: 36, lineHeight: 44, color: colors.text, padding: 0, letterSpacing: -1, fontVariant: ["tabular-nums"] }}
-          accessibilityLabel={step.title}
+          numberOfLines={1}
+          selectionColor={colors.primary}
+          style={[{ flex: 1, minWidth: 0, fontFamily: fonts.bold, fontSize: display.length > 12 ? 28 : display.length > 9 ? 32 : 36, lineHeight: 44, color: colors.text, padding: 0, letterSpacing: -1, fontVariant: ["tabular-nums"] }, Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : null]}
+          accessibilityLabel={typeof step.title === "string" ? step.title : step.id}
         />
-        {!isDate ? <T variant="subheading" color={colors.text2}>{unitLabel}</T> : null}
+        {!isDate ? <T variant="subheading" color={colors.text2} style={{ flexShrink: 0 }}>{unitLabel}</T> : null}
       </View>
       {isDate ? <T variant="bodyMedium" color={valid ? colors.primary : colors.text3}>{ageNote}</T> : null}
       {isWon && manwon ? <T variant="bodyMedium" color={colors.primary}>{manwon}</T> : null}

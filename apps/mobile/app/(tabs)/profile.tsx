@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
-import { ageFromBirthDate } from "@housing/engine";
+import { ageFromBirthDate, monthsBetween } from "@housing/engine";
 import { Card, Chip, ListRow, PageTitle, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { LOAN_AS_OF } from "@/data/loans";
 import { longDate, manwon } from "@/lib/format";
@@ -34,9 +34,9 @@ export default function Profile() {
         </View>
         {p ? (
           <View style={{ gap: 6 }}>
-            <T variant="bodyMedium">{age} · {p.household_size}인 가구 · {MARRIAGE[p.marriage ?? ""]}{p.income_type === "dual" ? " 맞벌이" : ""} · {REGIONS.find((r) => r.value === p.region_code)?.label}</T>
+            <T variant="bodyMedium">{age} · {p.household_size}인 가구 · {MARRIAGE[p.marriage ?? ""]}{p.income_type === "dual" ? " 맞벌이" : ""} · {p.region_sigungu ?? REGIONS.find((r) => r.value === p.region_code)?.label}</T>
             <Sub>월 소득 {manwon(p.monthly_income)} · 자산 {manwon(p.total_assets)} · 현금 {manwon(p.cash_on_hand)}</Sub>
-            <Sub>{p.is_homeless ? `무주택 ${Math.floor((p.homeless_months ?? 0) / 12)}년` : "유주택"} · 청약통장 {p.subscription_months ?? 0}개월</Sub>
+            <Sub>{p.is_homeless ? `무주택 ${Math.floor((p.homeless_months ?? 0) / 12)}년` : "유주택"} · 청약통장 {(p.subscription_months ?? 0) + (p.subscription_active && p.subscription_as_of ? monthsBetween(p.subscription_as_of) : 0)}개월{p.subscription_active ? " (납입 중)" : ""}</Sub>
           </View>
         ) : (
           <Sub>아직 조건을 입력하지 않았어요.</Sub>

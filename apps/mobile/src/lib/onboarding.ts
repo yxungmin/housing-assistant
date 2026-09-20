@@ -1,5 +1,6 @@
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
+import { REGION_LIST, regionByCode, sigunguValue } from "./regions";
 
 export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "date" | "skip-info";
 
@@ -12,10 +13,10 @@ export interface Option {
 export interface Step {
   id: string;
   kind: StepKind;
-  title: string;
+  title: string | ((p: Partial<UserProfile>) => string);
   hint?: string;
   helper?: string;
-  options?: Option[];
+  options?: Option[] | ((p: Partial<UserProfile>) => Option[]);
   optional?: boolean;
   /** 이 단계를 보여줄 조건 */
   when?: (p: Partial<UserProfile>) => boolean;
@@ -25,24 +26,35 @@ export interface Step {
   read: (p: Partial<UserProfile>) => string | number | null;
 }
 
-export const REGIONS: Option[] = [
-  { value: "11", label: "서울" }, { value: "41", label: "경기" }, { value: "28", label: "인천" }, { value: "26", label: "부산" },
-  { value: "27", label: "대구" }, { value: "29", label: "광주" }, { value: "30", label: "대전" }, { value: "31", label: "울산" },
-  { value: "36", label: "세종" }, { value: "42", label: "강원" }, { value: "43", label: "충북" }, { value: "44", label: "충남" },
-  { value: "45", label: "전북" }, { value: "46", label: "전남" }, { value: "47", label: "경북" }, { value: "48", label: "경남" }, { value: "50", label: "제주" },
-];
+export const REGIONS: Option[] = REGION_LIST.map((r) => ({ value: r.code, label: r.label }));
+
+export const stepTitle = (s: Step, p: Partial<UserProfile>) => (typeof s.title === "function" ? s.title(p) : s.title);
+export const stepOptions = (s: Step, p: Partial<UserProfile>) => (typeof s.options === "function" ? s.options(p) : s.options ?? []);
 
 const isCouple = (p: Partial<UserProfile>) => p.marriage === "married" || p.marriage === "pre_marriage";
+const todayIso = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 
 export const STEPS: Step[] = [
   {
     id: "region", kind: "select", title: "지금 어디에 살고 있나요?", hint: "공고 대부분이 거주지 기준으로 신청 자격을 봅니다.",
     options: REGIONS,
-    apply: (p, v) => ({ ...p, region_code: String(v) }), read: (p) => p.region_code ?? null,
+    apply: (p, v) => ({ ...p, region_code: String(v), region_sigungu: p.region_code === String(v) ? p.region_sigungu : undefined }),
+    read: (p) => p.region_code ?? null,
+  },
+  {
+    id: "sigungu", kind: "select",
+    title: (p) => `${regionByCode(p.region_code)?.label ?? ""} 어느 시·군·구인가요?`,
+    hint: "우선공급은 해당 시·군·구 거주자에게 주는 경우가 많아요.",
+    when: (p) => !!p.region_code && (regionByCode(p.region_code)?.sigungu.length ?? 0) > 1,
+    options: (p) => (regionByCode(p.region_code)?.sigungu ?? []).map((s) => ({ value: s, label: s })),
+    apply: (p, v) => ({ ...p, region_sigungu: v === null ? undefined : sigunguValue(p.region_code ?? "", String(v)) }),
+    read: (p) => (p.region_sigungu ? p.region_sigungu.split(" ").slice(1).join(" ") : null),
   },
   {
     id: "birth_date", kind: "date", title: "생년월일을 알려주세요", hint: "공고는 출생일 기준으로 청년·고령자 계층을 나눕니다. 만 나이는 자동으로 계산해요.",
-    // value = "YYYYMMDD"
     apply: (p, v) => {
       const s = String(v ?? "").replace(/[^0-9]/g, "");
       if (s.length !== 8) return p;
@@ -127,7 +139,15 @@ export const STEPS: Step[] = [
   },
   {
     id: "subscription_months", kind: "months", title: "청약통장은 얼마나 넣었나요?", hint: "가입 기간(개월). 없으면 0.",
-    apply: (p, v) => ({ ...p, subscription_months: Number(v), subscription_deposits: p.subscription_deposits ?? Number(v) }), read: (p) => p.subscription_months ?? null,
+    apply: (p, v) => ({ ...p, subscription_months: Number(v), subscription_deposits: p.subscription_deposits ?? Number(v), subscription_as_of: todayIso() }),
+    read: (p) => p.subscription_months ?? null,
+  },
+  {
+    id: "subscription_active", kind: "select", title: "지금도 매달 넣고 있나요?", hint: "납입 중이면 가입 기간과 납입 횟수를 매달 자동으로 올려 드려요.",
+    when: (p) => (p.subscription_months ?? 0) > 0,
+    options: [{ value: "yes", label: "네, 매달 넣고 있어요" }, { value: "no", label: "아니요, 중단했어요" }],
+    apply: (p, v) => ({ ...p, subscription_active: v === "yes", subscription_as_of: todayIso() }),
+    read: (p) => (p.subscription_active === undefined ? null : p.subscription_active ? "yes" : "no"),
   },
   {
     id: "cash", kind: "won", title: "지금 바로 쓸 수 있는 현금은 얼마인가요?", hint: "보증금에 넣을 수 있는 돈. 부족액 계산에 씁니다.",

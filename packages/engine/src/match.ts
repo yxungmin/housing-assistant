@@ -18,11 +18,20 @@ export function ageFromBirthDate(birthDate: string, today = new Date()): number 
   return Math.max(0, age);
 }
 
+/** fromIso(YYYY-MM-DD)부터 today까지 지난 달수 (해당 일이 안 지났으면 한 달 덜 센다) */
+export function monthsBetween(fromIso: string, today = new Date()): number {
+  const [y, m, d] = fromIso.split("-").map(Number) as [number, number, number];
+  let months = (today.getFullYear() - y) * 12 + (today.getMonth() + 1 - m);
+  if (today.getDate() < d) months -= 1;
+  return Math.max(0, months);
+}
+
 /** 프로필에서 category에 대응하는 값을 꺼낸다. 없으면 undefined → NEEDS_CHECK. */
 export function profileValueFor(
   category: RuleCategory,
   profile: UserProfile,
   unit?: string,
+  today = new Date(),
 ): number | string | boolean | number[] | string[] | undefined {
   switch (category) {
     case "income":
@@ -33,8 +42,11 @@ export function profileValueFor(
       return profile.car_value;
     case "debt":
       return profile.monthly_debt_payment;
-    case "residence":
-      return profile.region_code;
+    case "residence": {
+      // 룰 값은 시도 코드("41") 또는 "경기 과천시" 형식. 둘 중 하나라도 목록에 있으면 일치.
+      const vals = [profile.region_code, profile.region_sigungu].filter((v): v is string => !!v);
+      return vals.length ? vals : undefined;
+    }
     case "housing":
       if (profile.is_homeless === false) return -1; // 유주택: 어떤 무주택 기간 조건도 불일치
       return profile.homeless_months ?? (profile.is_homeless ? 0 : undefined);
@@ -48,10 +60,13 @@ export function profileValueFor(
       if (unit === "child_age") return profile.children_ages;
       return profile.children_count;
     case "age":
-      return profile.birth_date ? ageFromBirthDate(profile.birth_date) : profile.age;
-    case "subscription":
-      if (unit === "count") return profile.subscription_deposits;
-      return profile.subscription_months;
+      return profile.birth_date ? ageFromBirthDate(profile.birth_date, today) : profile.age;
+    case "subscription": {
+      // 납입 중이면 입력일 이후 지난 달수를 더한다 (매달 자동 +1)
+      const elapsed = profile.subscription_active && profile.subscription_as_of ? monthsBetween(profile.subscription_as_of, today) : 0;
+      if (unit === "count") return profile.subscription_deposits === undefined ? undefined : profile.subscription_deposits + elapsed;
+      return profile.subscription_months === undefined ? undefined : profile.subscription_months + elapsed;
+    }
     case "commute":
       return profile.commute_limit_min;
     case "status":

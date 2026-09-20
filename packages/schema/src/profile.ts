@@ -6,7 +6,8 @@ import { IncomeType, MarriageStatus, SpecialStatus } from "./enums";
  * 각 필드는 RuleCategory와 대응한다 (profileValueFor 참고).
  */
 export const UserProfile = z.object({
-  region_code: z.string().min(2).optional().describe("거주 시도 코드"),
+  region_code: z.string().min(2).optional().describe("거주 시도 코드 (11 서울, 41 경기 …)"),
+  region_sigungu: z.string().optional().describe('거주 시군구 "시도약칭 시군구" 형식 (예: "경기 과천시")'),
   /** 생년월일 YYYY-MM-DD. 공고는 출생일 범위로 나이를 정하므로 원본은 이것이고 age는 여기서 계산한다 */
   birth_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   /** 만 나이. birth_date가 있으면 엔진이 그날 기준으로 다시 계산한다 */
@@ -23,8 +24,10 @@ export const UserProfile = z.object({
   monthly_debt_payment: z.number().int().min(0).optional().describe("기존 부채 월 상환액 (원)"),
   homeless_months: z.number().int().min(0).optional().describe("무주택 기간 (개월). 유주택자는 undefined"),
   is_homeless: z.boolean().optional(),
-  subscription_months: z.number().int().min(0).optional().describe("청약통장 가입기간 (개월)"),
-  subscription_deposits: z.number().int().min(0).optional().describe("납입 횟수"),
+  subscription_months: z.number().int().min(0).optional().describe("청약통장 가입기간 (개월, subscription_as_of 기준)"),
+  subscription_deposits: z.number().int().min(0).optional().describe("납입 횟수 (subscription_as_of 기준)"),
+  subscription_as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe("위 두 값을 입력한 날. 납입 중이면 이후 지난 달수를 더한다"),
+  subscription_active: z.boolean().optional().describe("지금도 매달 납입 중인가"),
   cash_on_hand: z.number().int().min(0).optional().describe("보유 현금 (원)"),
   statuses: z.array(SpecialStatus).optional().describe("해당하는 계층 자격. 빈 배열 = 해당 없음, undefined = 미입력"),
   workplace: z

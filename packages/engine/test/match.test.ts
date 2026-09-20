@@ -160,3 +160,25 @@ describe("ageFromBirthDate", () => {
     expect(ageFromBirthDate("2026-12-01", today)).toBe(0);
   });
 });
+
+describe("residence with 시군구 and subscription auto-increment", () => {
+  const src = { page: 1, text: "x" };
+  const mk = (category: "residence" | "subscription", value: unknown, unit?: string) => ({
+    name: "t", unit_types: [], rule_groups: [{ id: "g", mode: "all_of" as const, label: "기본" }],
+    rules: [{ group_id: "g", category, applies_to: {}, operator: (category === "residence" ? "in" : "gte") as "in" | "gte", value: value as never, unit, source: src, confidence: 1, verified: true }], pricing: [],
+  });
+  it("matches a 시군구 rule when the profile lives there, and mismatches another 시군구", () => {
+    const p: UserProfile = { region_code: "41", region_sigungu: "경기 과천시" };
+    expect(matchTrack(mk("residence", ["경기 과천시"]), p).summary.matched).toBe(1);
+    expect(matchTrack(mk("residence", ["41"]), p).summary.matched).toBe(1);
+    expect(matchTrack(mk("residence", ["경기 안양시"]), p).summary.mismatched).toBe(1);
+  });
+  it("adds elapsed months to subscription when still paying", async () => {
+    const { profileValueFor } = await import("../src/index");
+    const today = new Date(2026, 8, 20);
+    const p: UserProfile = { subscription_months: 24, subscription_deposits: 24, subscription_as_of: "2026-03-05", subscription_active: true };
+    expect(profileValueFor("subscription", p, undefined, today)).toBe(30);
+    expect(profileValueFor("subscription", p, "count", today)).toBe(30);
+    expect(profileValueFor("subscription", { ...p, subscription_active: false }, undefined, today)).toBe(24);
+  });
+});

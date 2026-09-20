@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/Icon";
-import { BigNumber, Card, Chip, IconTile, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ANNOUNCEMENTS, matchAll, matching, type Matched } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { REGIONS } from "@/lib/onboarding";
@@ -40,18 +40,21 @@ export default function Home() {
 
   return (
     <Screen>
-      <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingTop: 28 }}>
+      <FadeIn style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingTop: 28 }}>
         <View style={{ gap: 6 }}>
           <T variant="body" color={colors.text2}>내 조건에 맞는 공고</T>
           <BigNumber value={String(matched.length)} unit="개" size={44} />
           <Sub tone="3">{today.getMonth() + 1}월 {today.getDate()}일 기준 · 전체 공고 {ANNOUNCEMENTS.length}개</Sub>
         </View>
         <IconTile name="house" tone="primary" size={56} />
-      </View>
+      </FadeIn>
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-        <Chip on={myRegionOnly} onPress={() => setMyRegionOnly((v) => !v)}>{regionLabel}만</Chip>
-        <Chip on={rentalOnly} onPress={() => setRentalOnly((v) => !v)}>임대만</Chip>
+        <Chip on={myRegionOnly} onPress={() => { animateLayout(); setMyRegionOnly((v) => !v); }}>{regionLabel}만</Chip>
+        <Chip on={rentalOnly} onPress={() => { animateLayout(); setRentalOnly((v) => !v); }}>임대만</Chip>
       </View>
+      {state.freeUnlockId && matched.some((m) => m.announcement.id === state.freeUnlockId) ? (
+        <Notice icon="check">조건이 가장 잘 맞는 공고 1건은 예상 주거비를 무료로 볼 수 있어요. 아래 "첫 계산 무료" 표시를 눌러 보세요.</Notice>
+      ) : null}
 
       {soon.length > 0 ? <Section title="접수 임박" items={soon} onOpen={open} /> : null}
       {rest.length > 0 ? <Section title={soon.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} /> : null}
@@ -65,7 +68,7 @@ export default function Home() {
       {pending.length > 0 ? <Section title="조건 분석 중" items={pending} onOpen={open} /> : null}
 
       {others.length > 0 ? (
-        <Pressable onPress={() => setShowOthers((v) => !v)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
+        <Pressable onPress={() => { animateLayout(); setShowOthers((v) => !v); }} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
           <T variant="bodyMedium" color={colors.text2}>조건이 맞지 않는 공고 {others.length}개</T>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
             <T variant="small" color={colors.text3}>{showOthers ? "숨기기" : "보기"}</T>
@@ -94,6 +97,8 @@ function Section({ title, items, onOpen }: { title?: string; items: Matched[]; o
 
 export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => void }) {
   const { colors } = useTheme();
+  const { state } = useAppState();
+  const free = state.freeUnlockId === m.announcement.id && state.subscription.status === "none";
   const a = m.announcement;
   const days = daysUntil(a.apply_end);
   const units = [...new Set(a.extraction.tracks.flatMap((t) => t.unit_types.map((u) => u.name)))];
@@ -118,8 +123,9 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
         <T variant="subheading" style={{ fontSize: 18, lineHeight: 26 }}>{a.title}</T>
         {place ? <Sub tone="3">{place}</Sub> : null}
       </View>
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
         <Tag tone={status.tone} icon={status.icon}>{status.text}</Tag>
+        {free ? <Tag tone="info">첫 계산 무료</Tag> : null}
       </View>
     </Card>
   );

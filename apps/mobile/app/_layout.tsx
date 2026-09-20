@@ -29,7 +29,7 @@ function Root() {
   return (
     <>
       <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface }, animation: "slide_from_right" }}>
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface }, animation: "slide_from_right", animationDuration: 260 }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="onboarding" options={{ animation: "fade" }} />
         <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />

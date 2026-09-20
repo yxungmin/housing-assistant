@@ -4,12 +4,32 @@
  *  ConditionRow · ListRow · KeyValue · BottomCTA · PrimaryButton · BottomSheet · Notice
  * 원칙: 흰 화면 + grey50 카드, 헤어라인 대신 간격, 아이콘은 연한 타일 안에, 색은 CTA·상태에만.
  */
-import { type PropsWithChildren, type ReactNode } from "react";
-import { Modal, Pressable, ScrollView, Text, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { useEffect, useRef, type PropsWithChildren, type ReactNode } from "react";
+import { Animated, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space, type } from "@/theme/tokens";
 import { Icon, type IconName } from "./Icon";
+
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) UIManager.setLayoutAnimationEnabledExperimental(true);
+
+/** 목록·카드 크기 변화를 부드럽게. 상태를 바꾸기 직전에 호출한다. */
+export function animateLayout(duration = 220) {
+  LayoutAnimation.configureNext({ duration, create: { type: "easeInEaseOut", property: "opacity" }, update: { type: "easeInEaseOut" }, delete: { type: "easeInEaseOut", property: "opacity" } });
+}
+
+/** 마운트 시 살짝 올라오며 나타남. key를 바꾸면 다시 재생된다 (단계 전환, 컴포넌트 교체). */
+export function FadeIn({ children, style, delay = 0, distance = 12 }: PropsWithChildren<{ style?: StyleProp<ViewStyle>; delay?: number; distance?: number }>) {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(distance)).current;
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacity, { toValue: 1, duration: 260, delay, useNativeDriver: true }),
+      Animated.timing(translateY, { toValue: 0, duration: 320, delay, useNativeDriver: true }),
+    ]).start();
+  }, [opacity, translateY, delay]);
+  return <Animated.View style={[{ opacity, transform: [{ translateY }] }, style]}>{children}</Animated.View>;
+}
 
 export function Screen({ children, scroll = true, padded = true, style, bottomInset = 140 }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number }>) {
   const { colors } = useTheme();

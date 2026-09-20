@@ -1,5 +1,5 @@
 import type { EligibilityRule, UserProfile } from "@housing/schema";
-import { ageFromBirthDate, type RuleResult } from "@housing/engine";
+import { ageFromBirthDate, monthsBetween, type RuleResult } from "@housing/engine";
 import { REGIONS } from "./onboarding";
 import { manwon, won } from "./format";
 
@@ -63,7 +63,7 @@ export function ruleTitle(r: EligibilityRule): string {
       if (r.operator === "gte" && num(v) === 0) return "무주택세대구성원";
       return `무주택 기간 ${num(v)}개월 이상`;
     case "residence":
-      if (Array.isArray(v)) return `거주지: ${(v as string[]).map((c) => REGIONS.find((x) => x.value === c)?.label ?? c).join("·")}`;
+      if (Array.isArray(v)) return `거주지: ${(v as string[]).map((c) => REGIONS.find((x) => x.value === c)?.label ?? c).join(" · ")}`;
       return `거주지 조건`;
     case "subscription":
       if (r.unit === "count") return `청약통장 납입 ${num(v)}회 이상`;
@@ -88,8 +88,11 @@ export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: 
     case "marriage": return r.unit === "status" ? `입력: ${MARRIAGE_LABEL[p.marriage ?? ""] ?? "-"}` : `입력: 혼인 ${p.marriage_years ?? 0}년`;
     case "children": return r.unit === "child_age" ? `입력: 자녀 ${p.children_ages?.join(", ") ?? "-"}세` : `입력: 자녀 ${p.children_count ?? 0}명`;
     case "housing": return p.is_homeless ? `입력: 무주택 ${Math.floor((p.homeless_months ?? 0) / 12)}년` : "입력: 유주택";
-    case "residence": return `입력: ${REGIONS.find((x) => x.value === p.region_code)?.label ?? p.region_code}`;
-    case "subscription": return `입력: ${p.subscription_months ?? 0}개월 · ${p.subscription_deposits ?? 0}회`;
+    case "residence": return `입력: ${p.region_sigungu ?? REGIONS.find((x) => x.value === p.region_code)?.label ?? p.region_code}`;
+    case "subscription": {
+      const elapsed = p.subscription_active && p.subscription_as_of ? monthsBetween(p.subscription_as_of) : 0;
+      return `입력: ${(p.subscription_months ?? 0) + elapsed}개월 · ${(p.subscription_deposits ?? 0) + elapsed}회${p.subscription_active ? " (납입 중, 매달 자동 반영)" : ""}`;
+    }
     case "commute": return `입력: ${p.commute_limit_min ?? "-"}분`;
     case "status": return `입력: ${p.statuses?.length ? p.statuses.map((s) => STATUS_LABEL[s] ?? s).join(", ") : "해당 없음"}`;
   }

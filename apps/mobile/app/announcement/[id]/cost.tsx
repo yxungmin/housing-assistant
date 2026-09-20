@@ -5,7 +5,7 @@ import type { Pricing } from "@housing/schema";
 import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchAnnouncement } from "@housing/engine";
 import { Icon } from "@/components/Icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
-import { BigNumber, BottomCTA, BottomSheet, Card, Chip, Header, IconButton, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T } from "@/components/ui";
+import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, FadeIn, Header, IconButton, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T } from "@/components/ui";
 import { getAnnouncement } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
 import { manwon, pct, won } from "@/lib/format";
@@ -39,6 +39,7 @@ export default function Cost() {
   const [deposit, setDeposit] = useState<number | null>(null);
   const [loanId, setLoanId] = useState<string | undefined>(undefined);
   const [scenario, setScenario] = useState(false);
+  const [picker, setPicker] = useState(false);
   const [subSheet, setSubSheet] = useState(!canOpenCost(state, id ?? ""));
 
   const chosen = rentals[sel];
@@ -81,12 +82,19 @@ export default function Cost() {
             <T variant="heading" style={{ fontSize: 20, lineHeight: 28 }}>{a.title}</T>
             {bestTrackName ? <Sub tone="3">{bestTrackName}</Sub> : null}
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -space.screen }} contentContainerStyle={{ paddingHorizontal: space.screen, gap: 8 }}>
-            {rentals.map((r, i) => <Chip key={`${r.trackName}-${r.label}`} on={i === sel} onPress={() => setSel(i)}>{allTracks ? `${r.trackName} · ${r.label}` : r.label}</Chip>)}
-            {otherCount > 0 && !allTracks ? <Chip onPress={() => { setAllTracks(true); setSel(0); }}>다른 트랙 {otherCount}개</Chip> : null}
-          </ScrollView>
+          <Pressable onPress={() => setPicker(true)} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: pressed ? colors.cardSoft : colors.card, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 14 })}>
+            <View style={{ gap: 2 }}>
+              <Sub tone="3" variant="caption">주택형</Sub>
+              <T variant="bodyMedium">{chosen.label}</T>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+              <Sub tone="3">{rentals.length + otherCount}개 중</Sub>
+              <Icon name="right" size={18} color={colors.text4} />
+            </View>
+          </Pressable>
         </View>
 
+        <FadeIn key={`${sel}-${deposit ?? "base"}-${loanId ?? "auto"}`} style={{ gap: space.section }}>
         <View style={{ gap: 12 }}>
           <SectionTitle>지금 필요한 현금</SectionTitle>
           <Card style={{ gap: 20 }}>
@@ -122,6 +130,7 @@ export default function Cost() {
             </View>
           </Card>
         </View>
+        </FadeIn>
         <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>공고문과 {cost.loan?.as_of_date ?? LOANS[0]!.as_of_date} 기준 대출 조건으로 계산한 예상값이에요. 실제 계약 조건과 다를 수 있어요.</Sub>
         <View style={{ height: 24 }} />
       </View>
@@ -174,6 +183,33 @@ export default function Cost() {
         {deposit !== null ? (
           <Pressable onPress={() => setDeposit(null)} style={{ alignItems: "center", paddingVertical: 4 }} accessibilityRole="button"><Sub tone="3">기본 임대조건으로 되돌리기</Sub></Pressable>
         ) : null}
+      </BottomSheet>
+
+      <BottomSheet visible={picker} onClose={() => setPicker(false)}>
+        <View style={{ gap: 4 }}>
+          <T variant="heading">어떤 주택형으로 볼까요?</T>
+          <Sub tone="3">{bestTrackName ? `조건이 가장 잘 맞는 ${bestTrackName} 기준` : ""}</Sub>
+        </View>
+        <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          {rentals.map((r, i) => {
+            const on = i === sel;
+            return (
+              <Pressable key={`${r.trackName}-${r.label}-${i}`} onPress={() => { animateLayout(); setSel(i); setPicker(false); }} accessibilityRole="radio" accessibilityState={{ checked: on }}
+                style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16, borderRadius: radius.md, backgroundColor: on ? colors.primarySoft : colors.card }}>
+                <View style={{ gap: 2 }}>
+                  <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{r.label}</T>
+                  <Sub tone="3" variant="caption">{allTracks ? r.trackName + " · " : ""}보증금 {manwon(r.pricing.deposit)} · 월 {won(r.pricing.monthly_rent)}</Sub>
+                </View>
+                {on ? <Icon name="check" size={20} color={colors.primary} strokeWidth={3} /> : null}
+              </Pressable>
+            );
+          })}
+          {otherCount > 0 && !allTracks ? (
+            <Pressable onPress={() => { setAllTracks(true); }} accessibilityRole="button" style={{ padding: 14, alignItems: "center" }}>
+              <T variant="bodyMedium" color={colors.text2}>다른 트랙 주택형 {otherCount}개 더 보기</T>
+            </Pressable>
+          ) : null}
+        </ScrollView>
       </BottomSheet>
 
       <SubscriptionSheet visible={subSheet} onClose={() => { setSubSheet(false); if (!canOpenCost(state, a.id)) router.back(); }} onStarted={() => setSubSheet(false)} />
