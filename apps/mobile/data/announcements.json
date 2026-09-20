@@ -1,6 +1,7 @@
 [
  {
   "id": "001",
+  "provider": "LH",
   "lh_id": "MOCK-001",
   "title": "과천지식정보타운 S-11BL 행복주택(리츠) 입주자 모집공고",
   "housing_type": "happy",
@@ -3053,6 +3054,7 @@
  },
  {
   "id": "002",
+  "provider": "LH",
   "lh_id": "MOCK-002",
   "title": "관악봉천 행복주택 입주자 모집",
   "housing_type": "happy",
@@ -5206,6 +5208,7 @@
  },
  {
   "id": "003",
+  "provider": "LH",
   "lh_id": "MOCK-003",
   "title": "2024년 서울특별시 영구임대주택 예비입주자 모집",
   "housing_type": "long_term_rental",
@@ -5770,6 +5773,7 @@
  },
  {
   "id": "004",
+  "provider": "LH",
   "lh_id": "MOCK-004",
   "title": "2024년 LH 청년특화형 주택(아츠스테이 성산2호점) 입주자 모집공고",
   "housing_type": "purchased_rental",
@@ -6186,6 +6190,7 @@
  },
  {
   "id": "005",
+  "provider": "LH",
   "lh_id": "2015122300020801",
   "title": "군산시 (군산나운4) 영구임대주택 입주자격완화 예비입주자 모집",
   "housing_type": "long_term_rental",
@@ -6394,6 +6399,7 @@
  },
  {
   "id": "007",
+  "provider": "LH",
   "lh_id": "2015122300020804",
   "title": "제주일도·삼도 행복주택 예비입주자 모집",
   "housing_type": "happy",
@@ -7759,6 +7765,7 @@
  },
  {
   "id": "008",
+  "provider": "LH",
   "lh_id": "2015122300020753",
   "title": "강서염창 통합공공임대주택 입주자 모집공고",
   "housing_type": "other",
@@ -9641,6 +9648,7 @@
  },
  {
   "id": "010",
+  "provider": "LH",
   "lh_id": "2015122300020796",
   "title": "양산시 국민임대주택 예비입주자 완화 모집 [소득·자산·무주택요건 완화/계약금 50만원 정액]",
   "housing_type": "national_rental",
@@ -10319,6 +10327,7 @@
  },
  {
   "id": "012",
+  "provider": "LH",
   "lh_id": "2015122300020750",
   "title": "서울지역본부 신혼·신생아 매입임대주택Ⅰ 예비입주자 모집공고",
   "housing_type": "purchased_rental",
@@ -11550,6 +11559,7 @@
  },
  {
   "id": "014",
+  "provider": "LH",
   "lh_id": "2015122300020759",
   "title": "서울지역본부 청년매입임대주택 예비입주자 모집공고",
   "housing_type": "purchased_rental",
@@ -12004,7 +12014,4897 @@
   }
  },
  {
+  "id": "018",
+  "provider": "SH",
+  "lh_id": "309467",
+  "title": "제51차 장기전세주택 입주자 모집공고 <서울리츠3호 장기전세주택 포함>",
+  "housing_type": "long_term_rental",
+  "region_code": "11",
+  "region_name": "서울",
+  "status": "VERIFIED",
+  "notice_date": "2026-08-31",
+  "apply_start": "2026-09-14",
+  "apply_end": "2026-09-17",
+  "address": "서울특별시 일원(단지별 소재지 상이) / 사업주체: 서울주택도시개발공사(서울 강남구 개포로 621)",
+  "extraction": {
+   "title": "제51차 장기전세주택 입주자 모집공고 <서울리츠3호 장기전세주택 포함>",
+   "housing_type": "long_term_rental",
+   "address": "서울특별시 일원(단지별 소재지 상이) / 사업주체: 서울주택도시개발공사(서울 강남구 개포로 621)",
+   "schedule": {
+    "notice_date": "2026-08-31",
+    "apply_start": "2026-09-14",
+    "apply_end": "2026-09-17",
+    "winner_announce": "2027-03-05"
+   },
+   "tracks": [
+    {
+     "name": "일반공급(일반) - 공사 건설형·서울리츠3호 60㎡이하 1·2순위",
+     "unit_types": [],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "residence",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "11"
+       ],
+       "unit": "region_code",
+       "source": {
+        "page": 20,
+        "text": "입주자 모집 공고일(2026.8.31.) 현재 서울특별시에 거주하는 성년자인 무주택세대구성원으로서 유형별 소득・총자산, 자동차 보유 기준 및 기타 관련법에서 정한 요건을 충족하는 사람 ※ 상계장암지구는 의정부시 거주자 포함"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 21,
+        "text": "무주택세대구성원: 공고일 현재 세대원 전원이 주택(분양권등 포함)을 소유하고 있지 않은 세대의 구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 19,
+       "unit": "years",
+       "source": {
+        "page": 20,
+        "text": "민법상 미성년자(만19세 미만)·외국인은 신청할 수 없습니다."
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 662000000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "세대구성원 전원이 소유하고 있는 모든 총자산(부동산, 자동차, 금융자산, 일반자산) 가액 합산: 66,200만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "사회보장정보시스템을 통해 조사된 차량가액으로서 보건복지부장관이 정하는 금액: 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 2669354,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "60㎡ 이하(건설형 1·2순위) 기준 70% 1인가구 2,669,354원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2
+       },
+       "operator": "lte",
+       "value": 4106389,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "70% 2인가구 4,106,389원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3
+       },
+       "operator": "lte",
+       "value": 5717900,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "70% 3인가구 5,717,900원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4
+       },
+       "operator": "lte",
+       "value": 6161541,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "70% 4인가구 6,161,541원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5
+       },
+       "operator": "lte",
+       "value": 6528890,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "70% 5인가구 6,528,890원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6
+       },
+       "operator": "lte",
+       "value": 6934384,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "70% 6인가구 6,934,384원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "세곡2지구 59㎡",
+       "kind": "rental",
+       "deposit": 514020000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "세곡2지구 59 일반 22 514,020(천원)"
+       }
+      },
+      {
+       "unit_type": "수서하니움 45㎡",
+       "kind": "rental",
+       "deposit": 377520000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "수서하니움 45 일반 1 377,520"
+       }
+      },
+      {
+       "unit_type": "강동리엔파크9단지 59㎡",
+       "kind": "rental",
+       "deposit": 435240000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "강동리엔파크9단지 59 일반 3 435,240"
+       }
+      },
+      {
+       "unit_type": "강동리엔파크13단지 59㎡",
+       "kind": "rental",
+       "deposit": 435240000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "강동리엔파크13단지 59 일반 10 435,240"
+       }
+      },
+      {
+       "unit_type": "고덕강일2지구(강동리버스트) 59㎡",
+       "kind": "rental",
+       "deposit": 425100000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "고덕강일2지구 59 일반 42 425,100"
+       }
+      },
+      {
+       "unit_type": "등촌장기전세주택 49㎡",
+       "kind": "rental",
+       "deposit": 264420000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "등촌장기전세주택 49 일반 2 264,420"
+       }
+      },
+      {
+       "unit_type": "마곡지구(마곡엠밸리) 59㎡",
+       "kind": "rental",
+       "deposit": 499200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "마곡지구 59 일반 37 499,200"
+       }
+      },
+      {
+       "unit_type": "중계센트럴파크 59㎡",
+       "kind": "rental",
+       "deposit": 384540000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "중계센트럴파크 59 일반 1 384,540"
+       }
+      },
+      {
+       "unit_type": "내곡지구 49㎡",
+       "kind": "rental",
+       "deposit": 447720000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "내곡지구 49 일반 2 447,720"
+       }
+      },
+      {
+       "unit_type": "내곡지구 54㎡",
+       "kind": "rental",
+       "deposit": 481260000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "내곡지구 54 일반 1 481,260"
+       }
+      },
+      {
+       "unit_type": "내곡지구 59㎡",
+       "kind": "rental",
+       "deposit": 570960000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "내곡지구 59 일반 20 570,960"
+       }
+      },
+      {
+       "unit_type": "우면2지구(서초네이처힐) 49㎡",
+       "kind": "rental",
+       "deposit": 493740000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "우면2지구 49 일반 2 493,740"
+       }
+      },
+      {
+       "unit_type": "왕십리 모노퍼스 주상복합 47㎡",
+       "kind": "rental",
+       "deposit": 262080000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "왕십리주상복합 47 일반 1 262,080"
+       }
+      },
+      {
+       "unit_type": "위례포레샤인23단지 59㎡",
+       "kind": "rental",
+       "deposit": 531960000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "위례포레샤인23단지 59 일반 14 531,960"
+       }
+      },
+      {
+       "unit_type": "신정숲속마을 49㎡",
+       "kind": "rental",
+       "deposit": 244140000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "신정숲속마을 49 일반 1 244,140"
+       }
+      },
+      {
+       "unit_type": "신정숲속마을 59㎡",
+       "kind": "rental",
+       "deposit": 310440000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "신정숲속마을 59 일반 4 310,440"
+       }
+      },
+      {
+       "unit_type": "묵동리본타워 59㎡",
+       "kind": "rental",
+       "deposit": 333840000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "묵동리본타워 59 일반 1 333,840"
+       }
+      }
+     ]
+    },
+    {
+     "name": "일반공급(일반) - 60㎡이하(공사 건설형 3·4순위, 매입형)",
+     "unit_types": [],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "residence",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "11"
+       ],
+       "unit": "region_code",
+       "source": {
+        "page": 20,
+        "text": "입주자 모집 공고일(2026.8.31.) 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 21,
+        "text": "무주택세대구성원: 공고일 현재 세대원 전원이 주택(분양권등 포함)을 소유하고 있지 않은 세대의 구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 19,
+       "unit": "years",
+       "source": {
+        "page": 20,
+        "text": "민법상 미성년자(만19세 미만)·외국인은 신청할 수 없습니다."
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 662000000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "총자산(부동산, 자동차, 금융자산, 일반자산) 가액 합산: 66,200만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "차량가액으로서 보건복지부장관이 정하는 금액: 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 4004031,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "60㎡ 이하(건설형 3·4순위, 매입형) 기준 105% 1인가구 4,004,031원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 6159584,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 2인가구 6,159,584원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 8576850,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 3인가구 8,576,850원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 9242312,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 4인가구 9,242,312원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 9793334,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 5인가구 9,793,334원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 10401576,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 6인가구 10,401,576원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 8212778,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이인 경우 140% 2인가구 8,212,778원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 11435801,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 3인가구 11,435,801원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 12323083,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 4인가구 12,323,083원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 13057779,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 5인가구 13,057,779원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 13868768,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 6인가구 13,868,768원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "래미안레벤투스 45㎡(신규)",
+       "kind": "rental",
+       "deposit": 717600000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "래미안레벤투스(강남구 도곡동) 45 14 717,600"
+       }
+      },
+      {
+       "unit_type": "래미안레벤투스 58㎡(신규)",
+       "kind": "rental",
+       "deposit": 889200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "래미안레벤투스 58 10 889,200"
+       }
+      },
+      {
+       "unit_type": "청담르엘 59㎡(신규)",
+       "kind": "rental",
+       "deposit": 1170000000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "청담르엘(강남구 청담동) 59 57 1,170,000"
+       }
+      },
+      {
+       "unit_type": "두산위브더프레스티지 45㎡(신규)",
+       "kind": "rental",
+       "deposit": 322140000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "두산위브더프레스티지 45 7 322,140"
+       }
+      },
+      {
+       "unit_type": "두산위브더프레스티지 59㎡(신규)",
+       "kind": "rental",
+       "deposit": 442260000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "두산위브더프레스티지 59 2 442,260"
+       }
+      },
+      {
+       "unit_type": "이문3 복합공공청사 43㎡(신규)",
+       "kind": "rental",
+       "deposit": 295620000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "이문3 복합공공청사 43 2 295,620"
+       }
+      },
+      {
+       "unit_type": "디에이치방배 59㎡(신규)",
+       "kind": "rental",
+       "deposit": 850200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "디에이치방배(서초구 방배동) 59 133 850,200"
+       }
+      },
+      {
+       "unit_type": "오티에르반포 44㎡(신규)",
+       "kind": "rental",
+       "deposit": 666900000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "오티에르반포 44 18 666,900"
+       }
+      },
+      {
+       "unit_type": "오티에르반포 59㎡(신규)",
+       "kind": "rental",
+       "deposit": 998400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "오티에르반포 59 2 998,400"
+       }
+      },
+      {
+       "unit_type": "성동자이리버뷰 59㎡(신규)",
+       "kind": "rental",
+       "deposit": 686400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "성동자이리버뷰(성동구 용답동) 59 9 686,400"
+       }
+      },
+      {
+       "unit_type": "영등포자이 디그니티 59㎡(신규)",
+       "kind": "rental",
+       "deposit": 655200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "영등포자이 디그니티 59 36 655,200"
+       }
+      },
+      {
+       "unit_type": "어반하임102 45㎡(신규)",
+       "kind": "rental",
+       "deposit": 361140000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "어반하임102(중랑구 상봉동) 45 1 361,140"
+       }
+      },
+      {
+       "unit_type": "디에이치 대치 에델루이 59㎡",
+       "kind": "rental",
+       "deposit": 998400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "디에이치 대치 에델루이 59 25 998,400"
+       }
+      },
+      {
+       "unit_type": "래미안대치팰리스 59㎡",
+       "kind": "rental",
+       "deposit": 1170000000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "래미안대치팰리스 59 4 1,170,000"
+       }
+      },
+      {
+       "unit_type": "e편한세상강동프레스티지원 44㎡",
+       "kind": "rental",
+       "deposit": 450840000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "e편한세상강동프레스티지원 44 6 450,840"
+       }
+      },
+      {
+       "unit_type": "강동헤리티지자이 59㎡",
+       "kind": "rental",
+       "deposit": 546000000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "강동헤리티지자이 59 1 546,000"
+       }
+      },
+      {
+       "unit_type": "고덕숲아이파크 59㎡",
+       "kind": "rental",
+       "deposit": 498420000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "고덕숲아이파크 59 1 498,420"
+       }
+      },
+      {
+       "unit_type": "고덕아이파크 59㎡",
+       "kind": "rental",
+       "deposit": 524160000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "고덕아이파크* 59 3 524,160"
+       }
+      },
+      {
+       "unit_type": "그란츠리버파크 36㎡",
+       "kind": "rental",
+       "deposit": 357240000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "그란츠리버파크 36 12 357,240"
+       }
+      },
+      {
+       "unit_type": "그란츠리버파크 44㎡",
+       "kind": "rental",
+       "deposit": 436020000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "그란츠리버파크 44 1 436,020"
+       }
+      },
+      {
+       "unit_type": "더샵강동센트럴시티 59㎡",
+       "kind": "rental",
+       "deposit": 557700000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "더샵강동센트럴시티 59 2 557,700"
+       }
+      },
+      {
+       "unit_type": "올림픽파크한양수자인 59㎡",
+       "kind": "rental",
+       "deposit": 528840000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "올림픽파크한양수자인 59 1 528,840"
+       }
+      },
+      {
+       "unit_type": "힐스테이트 관악센트씨엘 58㎡",
+       "kind": "rental",
+       "deposit": 460200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "힐스테이트 관악센트씨엘 58 1 460,200"
+       }
+      },
+      {
+       "unit_type": "래미안프리미어팰리스 59㎡",
+       "kind": "rental",
+       "deposit": 517920000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "래미안프리미어팰리스 59 1 517,920"
+       }
+      },
+      {
+       "unit_type": "롯데캐슬 이스트폴 59㎡",
+       "kind": "rental",
+       "deposit": 731640000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "롯데캐슬 이스트폴 59 8 731,640"
+       }
+      },
+      {
+       "unit_type": "중계한화꿈에그린더퍼스트 59㎡",
+       "kind": "rental",
+       "deposit": 324480000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "중계한화꿈에그린더퍼스트 59 2 324,480"
+       }
+      },
+      {
+       "unit_type": "이문 아이파크 자이 41㎡",
+       "kind": "rental",
+       "deposit": 306540000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "이문 아이파크 자이 41 24 306,540"
+       }
+      },
+      {
+       "unit_type": "이문 아이파크 자이 59㎡",
+       "kind": "rental",
+       "deposit": 453960000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "이문 아이파크 자이 59 7 453,960"
+       }
+      },
+      {
+       "unit_type": "상도2차두산위브트레지움 59㎡",
+       "kind": "rental",
+       "deposit": 519480000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "상도2차두산위브트레지움 59 1 519,480"
+       }
+      },
+      {
+       "unit_type": "상도효성해링턴플레이스 59㎡",
+       "kind": "rental",
+       "deposit": 500760000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "상도효성해링턴플레이스 59 1 500,760"
+       }
+      },
+      {
+       "unit_type": "힐스테이트장승배기역 44㎡",
+       "kind": "rental",
+       "deposit": 359580000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "힐스테이트장승배기역 44 29 359,580"
+       }
+      },
+      {
+       "unit_type": "힐스테이트장승배기역 59㎡",
+       "kind": "rental",
+       "deposit": 530400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "힐스테이트장승배기역 59 4 530,400"
+       }
+      },
+      {
+       "unit_type": "래미안신반포팰리스 59㎡",
+       "kind": "rental",
+       "deposit": 920400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "래미안신반포팰리스 59 1 920,400"
+       }
+      },
+      {
+       "unit_type": "래미안퍼스티지 59㎡",
+       "kind": "rental",
+       "deposit": 1045200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "래미안퍼스티지* 59 7 1,045,200"
+       }
+      },
+      {
+       "unit_type": "메이플자이 43㎡",
+       "kind": "rental",
+       "deposit": 699660000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "메이플자이 43 17 699,660"
+       }
+      },
+      {
+       "unit_type": "메이플자이 49㎡",
+       "kind": "rental",
+       "deposit": 834600000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "메이플자이 49 18 834,600"
+       }
+      },
+      {
+       "unit_type": "서초푸르지오써밋 59㎡",
+       "kind": "rental",
+       "deposit": 865800000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "서초푸르지오써밋 59 5 865,800"
+       }
+      },
+      {
+       "unit_type": "래미안길음센터피스 33㎡",
+       "kind": "rental",
+       "deposit": 255060000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "래미안길음센터피스 33 3 255,060"
+       }
+      },
+      {
+       "unit_type": "롯데캐슬트윈골드 59㎡",
+       "kind": "rental",
+       "deposit": 486720000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "롯데캐슬트윈골드 59 1 486,720"
+       }
+      },
+      {
+       "unit_type": "송파래미안파인탑 53㎡",
+       "kind": "rental",
+       "deposit": 563940000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "송파래미안파인탑 53 1 563,940"
+       }
+      },
+      {
+       "unit_type": "잠실래미안아이파크 43㎡",
+       "kind": "rental",
+       "deposit": 594360000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "잠실래미안아이파크 43 35 594,360"
+       }
+      },
+      {
+       "unit_type": "잠실래미안아이파크 59㎡",
+       "kind": "rental",
+       "deposit": 826800000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "잠실래미안아이파크 59 18 826,800"
+       }
+      },
+      {
+       "unit_type": "잠실르엘 45㎡",
+       "kind": "rental",
+       "deposit": 620880000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "잠실르엘 45 20 620,880"
+       }
+      },
+      {
+       "unit_type": "잠실르엘 59㎡",
+       "kind": "rental",
+       "deposit": 842400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "잠실르엘 59 28 842,400"
+       }
+      },
+      {
+       "unit_type": "면목2코오롱하늘채 59㎡",
+       "kind": "rental",
+       "deposit": 426660000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "면목2코오롱하늘채 59 1 426,660"
+       }
+      }
+     ]
+    },
+    {
+     "name": "일반공급(일반) - 60㎡초과 85㎡이하(공사 건설형·서울리츠3호·매입형)",
+     "unit_types": [],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "residence",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "11"
+       ],
+       "unit": "region_code",
+       "source": {
+        "page": 20,
+        "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 21,
+        "text": "무주택세대구성원: 세대원 전원이 주택(분양권등 포함)을 소유하고 있지 않은 세대의 구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 19,
+       "unit": "years",
+       "source": {
+        "page": 20,
+        "text": "민법상 미성년자(만19세 미만)·외국인은 신청할 수 없습니다."
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 662000000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "총자산 가액 합산: 66,200만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "차량가액: 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 5720045,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "60㎡ 초과 기준 150% 1인가구 5,720,045원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 8799405,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 2인가구 8,799,405원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 12252644,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 3인가구 12,252,644원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 13203303,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 4인가구 13,203,303원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 13990478,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 5인가구 13,990,478원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 14859395,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 6인가구 14,859,395원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 11732540,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이인 경우 200% 2인가구 11,732,540원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 16336858,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 3인가구 16,336,858원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 17604404,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 4인가구 17,604,404원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 18653970,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 5인가구 18,653,970원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 19812526,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 6인가구 19,812,526원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "세곡지구 84㎡",
+       "kind": "rental",
+       "deposit": 616980000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "세곡지구 84 일반 11 616,980"
+       }
+      },
+      {
+       "unit_type": "세곡2지구 84㎡",
+       "kind": "rental",
+       "deposit": 655980000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "세곡2지구 84 일반 3 655,980"
+       }
+      },
+      {
+       "unit_type": "강일지구(강일리버파크) 84㎡",
+       "kind": "rental",
+       "deposit": 510900000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "강일지구 84 일반 11 510,900"
+       }
+      },
+      {
+       "unit_type": "강일2지구(고덕리엔파크) 84㎡",
+       "kind": "rental",
+       "deposit": 563160000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "강일2지구 84 일반 37 563,160"
+       }
+      },
+      {
+       "unit_type": "고덕강일2지구 74㎡",
+       "kind": "rental",
+       "deposit": 478920000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "고덕강일2지구 74 일반 5 478,920"
+       }
+      },
+      {
+       "unit_type": "고덕강일2지구 84㎡",
+       "kind": "rental",
+       "deposit": 529620000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "고덕강일2지구 84 일반 1 529,620"
+       }
+      },
+      {
+       "unit_type": "마곡지구 84㎡",
+       "kind": "rental",
+       "deposit": 599040000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "마곡지구 84 일반 16 599,040"
+       }
+      },
+      {
+       "unit_type": "천왕지구 84㎡",
+       "kind": "rental",
+       "deposit": 422760000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "천왕지구 84 일반 8 422,760"
+       }
+      },
+      {
+       "unit_type": "천왕2지구 84㎡",
+       "kind": "rental",
+       "deposit": 431340000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "천왕2지구 84 일반 1 431,340"
+       }
+      },
+      {
+       "unit_type": "상암2지구 84㎡",
+       "kind": "rental",
+       "deposit": 500760000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "상암2지구 84 일반 17 500,760"
+       }
+      },
+      {
+       "unit_type": "내곡지구 84㎡",
+       "kind": "rental",
+       "deposit": 730860000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "내곡지구 84 일반 2 730,860"
+       }
+      },
+      {
+       "unit_type": "양재리본타워2단지 84㎡",
+       "kind": "rental",
+       "deposit": 622440000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "양재리본타워2단지 84 일반 5 622,440"
+       }
+      },
+      {
+       "unit_type": "우면2지구 84㎡",
+       "kind": "rental",
+       "deposit": 669240000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "우면2지구 84 일반 20 669,240"
+       }
+      },
+      {
+       "unit_type": "마천지구(송파파크데일) 84㎡",
+       "kind": "rental",
+       "deposit": 480480000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "마천지구 84 일반 13 480,480"
+       }
+      },
+      {
+       "unit_type": "위례포레샤인18단지 74㎡",
+       "kind": "rental",
+       "deposit": 517140000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "위례포레샤인18단지 74 일반 8 517,140"
+       }
+      },
+      {
+       "unit_type": "위례포레샤인18단지 84㎡",
+       "kind": "rental",
+       "deposit": 591240000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "위례포레샤인18단지 84 일반 3 591,240"
+       }
+      },
+      {
+       "unit_type": "위례포레샤인23단지 74㎡",
+       "kind": "rental",
+       "deposit": 585780000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "위례포레샤인23단지 74 일반 6 585,780"
+       }
+      },
+      {
+       "unit_type": "신정3지구(신정이펜하우스) 84㎡",
+       "kind": "rental",
+       "deposit": 377520000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "신정3지구 84 일반 62 377,520"
+       }
+      },
+      {
+       "unit_type": "기자촌11단지 84㎡",
+       "kind": "rental",
+       "deposit": 419640000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "기자촌 11단지 84 일반 1 419,640"
+       }
+      },
+      {
+       "unit_type": "은평1지구(상림마을) 84㎡",
+       "kind": "rental",
+       "deposit": 413400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "은평1지구 84 일반 17 413,400"
+       }
+      },
+      {
+       "unit_type": "은평2지구 84㎡",
+       "kind": "rental",
+       "deposit": 433680000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "은평2지구 84 일반 77 433,680"
+       }
+      },
+      {
+       "unit_type": "은평3지구(구파발) 84㎡",
+       "kind": "rental",
+       "deposit": 469560000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "은평3지구 84 일반 105 469,560"
+       }
+      },
+      {
+       "unit_type": "은평뉴타운 폭포동 84㎡",
+       "kind": "rental",
+       "deposit": 434460000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "은평뉴타운 폭포동 84 일반 13 434,460"
+       }
+      },
+      {
+       "unit_type": "상계장암지구(수락리버시티) 84㎡",
+       "kind": "rental",
+       "deposit": 349440000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "상계장암지구 84 일반 10 349,440"
+       }
+      },
+      {
+       "unit_type": "신내3지구 84㎡",
+       "kind": "rental",
+       "deposit": 376740000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "신내3지구 84 일반 2 376,740"
+       }
+      },
+      {
+       "unit_type": "신내데시앙 84㎡",
+       "kind": "rental",
+       "deposit": 386880000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "신내데시앙 84 일반 7 386,880"
+       }
+      },
+      {
+       "unit_type": "청담자이 82㎡",
+       "kind": "rental",
+       "deposit": 1193400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "청담자이 82 1 1,193,400"
+       }
+      },
+      {
+       "unit_type": "더샵강동센트럴시티 84㎡",
+       "kind": "rental",
+       "deposit": 716040000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "더샵강동센트럴시티 84 4 716,040"
+       }
+      },
+      {
+       "unit_type": "힐스테이트 강동 리버뷰 84㎡",
+       "kind": "rental",
+       "deposit": 625560000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "힐스테이트 강동 리버뷰 84 1 625,560"
+       }
+      },
+      {
+       "unit_type": "래미안프리미어팰리스 84㎡",
+       "kind": "rental",
+       "deposit": 680940000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "래미안프리미어팰리스 84 1 680,940"
+       }
+      },
+      {
+       "unit_type": "래미안퍼스티지 84㎡",
+       "kind": "rental",
+       "deposit": 1388400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "래미안퍼스티지* 84 5 1,388,400"
+       }
+      },
+      {
+       "unit_type": "반포자이 84㎡",
+       "kind": "rental",
+       "deposit": 1263600000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "반포자이* 84 7 1,263,600"
+       }
+      },
+      {
+       "unit_type": "송파래미안파인탑 71㎡",
+       "kind": "rental",
+       "deposit": 663000000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "송파래미안파인탑 71 1 663,000"
+       }
+      },
+      {
+       "unit_type": "목동센트럴푸르지오 84㎡",
+       "kind": "rental",
+       "deposit": 904800000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "목동센트럴푸르지오 84 2 904,800"
+       }
+      }
+     ]
+    },
+    {
+     "name": "일반공급(일반) - 85㎡초과(서울리츠3호·매입형)",
+     "unit_types": [],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "residence",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "11"
+       ],
+       "unit": "region_code",
+       "source": {
+        "page": 20,
+        "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 21,
+        "text": "무주택세대구성원: 세대원 전원이 주택을 소유하고 있지 않은 세대의 구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "subscription",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 24,
+       "unit": "months",
+       "source": {
+        "page": 10,
+        "text": "85㎡ 초과: 주택청약종합저축(청약예금)에 가입하여 2년이 경과하고, 청약 예치기준금액 이상 납입한 자 - 85㎡초과 102㎡이하: 600만 원 이상, 102㎡초과 135㎡이하: 1,000만 원 이상 (1순위)"
+       },
+       "confidence": 0.8,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 662000000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "총자산 가액 합산: 66,200만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "차량가액: 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 5720045,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "60㎡ 초과 기준 150% 1인가구 5,720,045원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 8799405,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 2인가구 8,799,405원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 12252644,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 3인가구 12,252,644원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 13203303,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 4인가구 13,203,303원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 13990478,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 5인가구 13,990,478원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 14859395,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 6인가구 14,859,395원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 11732540,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 2인가구 11,732,540원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 16336858,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 3인가구 16,336,858원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 17604404,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 4인가구 17,604,404원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 18653970,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 5인가구 18,653,970원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 19812526,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 6인가구 19,812,526원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "강남데시앙파크 114㎡(서울리츠3호)",
+       "kind": "rental",
+       "deposit": 702780000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "강남데시앙파크 114 2 702,780"
+       }
+      },
+      {
+       "unit_type": "강일지구(강일리버파크) 114㎡(서울리츠3호)",
+       "kind": "rental",
+       "deposit": 582660000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "강일지구 114 3 582,660"
+       }
+      },
+      {
+       "unit_type": "강일2지구(고덕리엔파크) 114㎡(서울리츠3호)",
+       "kind": "rental",
+       "deposit": 614640000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "강일2지구 114 16 614,640"
+       }
+      },
+      {
+       "unit_type": "천왕1지구(천왕이펜하우스) 114㎡(서울리츠3호)",
+       "kind": "rental",
+       "deposit": 503100000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "천왕1지구 114 36 503,100"
+       }
+      },
+      {
+       "unit_type": "마천지구(송파파크데일) 114㎡(서울리츠3호)",
+       "kind": "rental",
+       "deposit": 572520000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 19,
+        "text": "마천지구 114 5 572,520"
+       }
+      },
+      {
+       "unit_type": "신정3지구 114㎡(서울리츠3호)",
+       "kind": "rental",
+       "deposit": 510120000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 19,
+        "text": "신정3지구 114 10 510,120"
+       }
+      },
+      {
+       "unit_type": "신내데시앙 114㎡(서울리츠3호)",
+       "kind": "rental",
+       "deposit": 458640000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 19,
+        "text": "신내데시앙 114 1 458,640"
+       }
+      },
+      {
+       "unit_type": "목동센트럴푸르지오 110㎡",
+       "kind": "rental",
+       "deposit": 1162200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 18,
+        "text": "목동센트럴푸르지오 110 1 1,162,200"
+       }
+      }
+     ]
+    },
+    {
+     "name": "일반공급(주거약자) - 공사 건설형 60㎡이하",
+     "unit_types": [],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 자격"
+      },
+      {
+       "id": "g2",
+       "mode": "any_of",
+       "label": "주거약자 자격(①~⑦ 중 하나)"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "residence",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "11"
+       ],
+       "unit": "region_code",
+       "source": {
+        "page": 20,
+        "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 21,
+        "text": "무주택세대구성원: 세대원 전원이 주택을 소유하고 있지 않은 세대의 구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 662000000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "총자산 가액 합산: 66,200만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "차량가액: 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 4004031,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "60㎡ 이하(건설형 3·4순위, 매입형) 기준 105% 1인가구 4,004,031원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 6159584,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 2인가구 6,159,584원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 8576850,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 3인가구 8,576,850원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 9242312,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 4인가구 9,242,312원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 9793334,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 5인가구 9,793,334원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 10401576,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 6인가구 10,401,576원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 8212778,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 2인가구 8,212,778원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 11435801,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 3인가구 11,435,801원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 12323083,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 4인가구 12,323,083원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 13057779,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 5인가구 13,057,779원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 13868768,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 6인가구 13,868,768원"
+       },
+       "confidence": 0.85,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 65,
+       "unit": "years",
+       "source": {
+        "page": 25,
+        "text": "ⓛ 고령자[만 65세 이상(1961.8.31.이전 출생, 당일포함)]"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "disabled"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 25,
+        "text": "②「장애인복지법」제2조제2항에 해당하는 장애인"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "national_merit"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 25,
+        "text": "③「국가유공자 등 예우 및 지원에 관한 법률」에 따른 국가유공자로서 상이등급 1급부터 7급까지의 판정을 받은 사람 ④ 보훈보상대상자 ⑤ 5·18민주화운동부상자 ⑥ 고엽제후유의증환자 ⑦ 국가유공자에 준하는 군경 등"
+       },
+       "confidence": 0.85,
+       "verified": true
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "세곡2지구 59㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 514020000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "세곡2지구 59 주거약자 7 514,020"
+       }
+      },
+      {
+       "unit_type": "내곡지구 49㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 447720000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "내곡지구 49 주거약자 6 447,720"
+       }
+      },
+      {
+       "unit_type": "내곡지구 59㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 570960000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "내곡지구 59 주거약자 8 570,960"
+       }
+      },
+      {
+       "unit_type": "마곡지구 59㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 499200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "마곡지구 59 주거약자 7 499,200"
+       }
+      },
+      {
+       "unit_type": "위례포레샤인23단지 59㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 531960000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "위례포레샤인23단지 59 주거약자 6 531,960"
+       }
+      }
+     ]
+    },
+    {
+     "name": "일반공급(주거약자) - 공사 건설형 60㎡초과 85㎡이하",
+     "unit_types": [],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 자격"
+      },
+      {
+       "id": "g2",
+       "mode": "any_of",
+       "label": "주거약자 자격(①~⑦ 중 하나)"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "residence",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "11"
+       ],
+       "unit": "region_code",
+       "source": {
+        "page": 20,
+        "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 21,
+        "text": "무주택세대구성원: 세대원 전원이 주택을 소유하고 있지 않은 세대의 구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 662000000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "총자산 가액 합산: 66,200만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "차량가액: 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 5720045,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "60㎡ 초과 기준 150% 1인가구 5,720,045원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 8799405,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 2인가구 8,799,405원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 12252644,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 3인가구 12,252,644원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 13203303,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 4인가구 13,203,303원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 13990478,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 5인가구 13,990,478원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 14859395,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "150% 6인가구 14,859,395원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 11732540,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 2인가구 11,732,540원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 16336858,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 3인가구 16,336,858원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 17604404,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 4인가구 17,604,404원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 18653970,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 5인가구 18,653,970원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 19812526,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 200% 6인가구 19,812,526원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 65,
+       "unit": "years",
+       "source": {
+        "page": 25,
+        "text": "ⓛ 고령자[만 65세 이상(1961.8.31.이전 출생, 당일포함)]"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "disabled"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 25,
+        "text": "②「장애인복지법」제2조제2항에 해당하는 장애인"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "national_merit"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 25,
+        "text": "③ 국가유공자로서 상이등급 1급~7급 ④ 보훈보상대상자 ⑤ 5·18민주화운동부상자 ⑥ 고엽제후유의증환자 ⑦ 국가유공자에 준하는 군경 등"
+       },
+       "confidence": 0.85,
+       "verified": true
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "세곡지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 616980000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "세곡지구 84 주거약자 1 616,980"
+       }
+      },
+      {
+       "unit_type": "세곡2지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 655980000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "세곡2지구 84 주거약자 2 655,980"
+       }
+      },
+      {
+       "unit_type": "강일지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 510900000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "강일지구 84 주거약자 2 510,900"
+       }
+      },
+      {
+       "unit_type": "강일2지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 563160000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "강일2지구 84 주거약자 4 563,160"
+       }
+      },
+      {
+       "unit_type": "마곡지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 599040000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "마곡지구 84 주거약자 8 599,040"
+       }
+      },
+      {
+       "unit_type": "천왕2지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 431340000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 15,
+        "text": "천왕2지구 84 주거약자 1 431,340"
+       }
+      },
+      {
+       "unit_type": "상암2지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 500760000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "상암2지구 84 주거약자 6 500,760"
+       }
+      },
+      {
+       "unit_type": "내곡지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 730860000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "내곡지구 84 주거약자 1 730,860"
+       }
+      },
+      {
+       "unit_type": "마천지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 480480000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "마천지구 84 주거약자 14 480,480"
+       }
+      },
+      {
+       "unit_type": "위례포레샤인18단지 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 591240000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "위례포레샤인18단지 84 주거약자 3 591,240"
+       }
+      },
+      {
+       "unit_type": "위례포레샤인23단지 74㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 585780000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 16,
+        "text": "위례포레샤인23단지 74 주거약자 3 585,780"
+       }
+      },
+      {
+       "unit_type": "신내3지구 84㎡(주거약자)",
+       "tier": "주거약자",
+       "kind": "rental",
+       "deposit": 376740000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 17,
+        "text": "신내3지구 84 주거약자 1 376,740"
+       }
+      }
+     ]
+    },
+    {
+     "name": "우선공급(매입형 신규공급, 60㎡이하) - 고령자·장애인·노부모부양자·2자녀이상가구·국가유공자 등",
+     "households": 38,
+     "unit_types": [
+      {
+       "name": "래미안레벤투스 45㎡",
+       "exclusive_area_m2": 45.98,
+       "households": 4
+      },
+      {
+       "name": "래미안레벤투스 58㎡",
+       "exclusive_area_m2": 58.78,
+       "households": 5
+      },
+      {
+       "name": "청담르엘 59㎡",
+       "exclusive_area_m2": 59.78,
+       "households": 6
+      },
+      {
+       "name": "디에이치방배 59㎡",
+       "exclusive_area_m2": 59.86,
+       "households": 8
+      },
+      {
+       "name": "오티에르반포 44㎡",
+       "exclusive_area_m2": 44.44,
+       "households": 5
+      },
+      {
+       "name": "성동자이리버뷰 59㎡",
+       "exclusive_area_m2": 59.9,
+       "households": 4
+      },
+      {
+       "name": "영등포자이 디그니티 59㎡",
+       "exclusive_area_m2": 59.99,
+       "households": 6
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 자격"
+      },
+      {
+       "id": "g2",
+       "mode": "any_of",
+       "label": "우선공급 계층 자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "residence",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "11"
+       ],
+       "unit": "region_code",
+       "source": {
+        "page": 20,
+        "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 28,
+        "text": "우선공급은 '가. 일반공급'과는 다른 별도의 기준에 의해 입주자를 선정하며, 단, 일반공급과 동일하게 무주택, 소득, 총자산 및 자동차 기준을 충족해야 합니다."
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 662000000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "총자산 가액 합산: 66,200만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 24,
+        "text": "차량가액: 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 4004031,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "60㎡ 이하(건설형 3·4순위, 매입형) - 우선공급 포함 기준 105% 1인가구 4,004,031원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 6159584,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 2인가구 6,159,584원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 8576850,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 3인가구 8,576,850원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 9242312,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 4인가구 9,242,312원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 9793334,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 5인가구 9,793,334원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 10401576,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "기준 105% 6인가구 10,401,576원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 8212778,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 2인가구 8,212,778원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 11435801,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 3인가구 11,435,801원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 12323083,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 4인가구 12,323,083원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 13057779,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 5인가구 13,057,779원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 13868768,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 23,
+        "text": "맞벌이 140% 6인가구 13,868,768원"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 65,
+       "unit": "years",
+       "source": {
+        "page": 29,
+        "text": "고령자: 모집 공고일 현재 만65세 이상[1961.08.31.이전 출생(당일 포함)]인 2인 이하 무주택 세대구성원 ※2인 기준: 신청자(만65세 이상), 신청자의 배우자"
+       },
+       "confidence": 0.9,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "disabled"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 29,
+        "text": "장애인: 「장애인복지법」 제32조에 따라 장애인등록증이 교부된 사람(지적장애인·정신장애인 및 장애의 정도가 심한 뇌병변장애인의 경우에는 그 배우자를 포함한다)"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "elderly_care"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 29,
+        "text": "노부모부양자: 모집 공고일 현재 만65세 이상의 직계존속(배우자의 직계존속 포함)을 1년 이상 부양하고 있는 사람"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "children",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 2,
+       "unit": "count",
+       "source": {
+        "page": 29,
+        "text": "2자녀이상 가구: 모집 공고일 현재 민법상 미성년자(2007.09.01.이후 출생)인 2명 이상의 자녀(태아 포함) 또는 미성년자인 2명 이상의 손자녀가 있는 사람"
+       },
+       "confidence": 0.95,
+       "verified": true
+      },
+      {
+       "group_id": "g2",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "national_merit"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 29,
+        "text": "국가유공자 등: 국가보훈부에서 우선공급 대상자로 선정하여 통보한 사람(국가유공자·보훈보상대상자·5.18민주유공자·특수임무유공자·참전유공자 또는 그 유족 등)"
+       },
+       "confidence": 0.95,
+       "verified": true
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "래미안레벤투스 45㎡",
+       "tier": "우선공급",
+       "kind": "rental",
+       "deposit": 717600000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "래미안레벤투스 45 계14 일반10 우선4 717,600"
+       }
+      },
+      {
+       "unit_type": "래미안레벤투스 58㎡",
+       "tier": "우선공급",
+       "kind": "rental",
+       "deposit": 889200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "래미안레벤투스 58 계10 일반5 우선5 889,200"
+       }
+      },
+      {
+       "unit_type": "청담르엘 59㎡",
+       "tier": "우선공급",
+       "kind": "rental",
+       "deposit": 1170000000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "청담르엘 59 계57 일반51 우선6 1,170,000"
+       }
+      },
+      {
+       "unit_type": "디에이치방배 59㎡",
+       "tier": "우선공급",
+       "kind": "rental",
+       "deposit": 850200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "디에이치방배 59 계133 일반125 우선8 850,200"
+       }
+      },
+      {
+       "unit_type": "오티에르반포 44㎡",
+       "tier": "우선공급",
+       "kind": "rental",
+       "deposit": 666900000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "오티에르반포 44 계18 일반13 우선5 666,900"
+       }
+      },
+      {
+       "unit_type": "성동자이리버뷰 59㎡",
+       "tier": "우선공급",
+       "kind": "rental",
+       "deposit": 686400000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "성동자이리버뷰 59 계9 일반5 우선4 686,400"
+       }
+      },
+      {
+       "unit_type": "영등포자이 디그니티 59㎡",
+       "tier": "우선공급",
+       "kind": "rental",
+       "deposit": 655200000,
+       "monthly_rent": 0,
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.1,
+         "due": "계약 시"
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.9,
+         "due": "입주 시"
+        }
+       ],
+       "source": {
+        "page": 13,
+        "text": "영등포자이 디그니티 59 계36 일반30 우선6 655,200"
+       }
+      }
+     ]
+    }
+   ],
+   "notes": [
+    "장기전세주택은 무주택 서울시민의 주거안정을 위하여 주변시세의 80퍼센트 이하 전세보증금으로 공급하는 분양전환 되지 않는 공공주택입니다. 입주 자격을 유지하는 경우 최장 20년까지 거주할 수 있습니다.",
+    "순위별 청약저축 요건(공사 건설형·서울리츠3호 60㎡이하): 1순위 월평균소득 70% 이하이면서 주택청약종합저축(청약저축) 약정 납입횟수 24회 이상, 2순위 70% 이하이면서 24회 미만(미가입자 포함, 6회 이상 우선), 3순위 105% 이하(맞벌이 140%)이면서 24회 이상, 4순위 105% 이하(맞벌이 140%)이면서 24회 미만(6회 이상 우선).",
+    "순위별 요건(60㎡초과 85㎡이하): 1순위 청약저축 약정 납입횟수 24회 이상, 2순위 6회 이상, 3순위 1·2순위 미해당자(미가입자 포함).",
+    "순위별 요건(85㎡초과): 1순위 주택청약종합저축(청약예금)에 가입하여 2년 경과하고 청약 예치기준금액 이상 납입(85㎡초과 102㎡이하 600만원 이상, 102㎡초과 135㎡이하 1,000만원 이상), 2순위 1순위 미해당자.",
+    "매입형 50㎡미만 순위: 1순위 입주자 모집 공고일 현재 신청주택이 위치한 자치구 거주, 2순위 연접자치구 거주, 3순위 그 외 서울시 자치구 거주. 거주지는 공고일 기준 주민등록표등본상 주소지로 판단하며 입주 시까지 유지해야 함. (예: 래미안레벤투스-강남구/서초·용산·성동·광진·송파, 메이플자이·오티에르반포-서초구/강남·용산·동작·관악, 잠실래미안아이파크·잠실르엘-송파구/강동·강남·광진 등)",
+    "매입형 50㎡이상 60㎡이하 및 60㎡초과 85㎡이하 순위: 1순위 청약저축 약정 납입횟수 24회 이상, 2순위 6회 이상, 3순위 1·2순위 미해당자(미가입자 포함).",
+    "출생자녀에 따른 소득·자산 가산: ① 2023.3.28. 이후 출생한 자녀(태아 포함)만 1명 있는 경우 10%p 가산(총자산 72,800만원, 자동차 4,996만원), ② 2명 이상인 경우 20%p 가산(총자산 79,400만원, 자동차 5,451만원), ③ 1명 있고 2023.3.27.이전 출생한 미성년자녀가 있는 경우 20%p 가산. 단, 맞벌이 소득기준에는 중복 적용되지 않음.",
+    "맞벌이: 본인 및 배우자가 사회보장정보시스템에서 제공하는 소득자료 중 근로소득 또는 사업소득이 있는 경우에 인정(실업급여는 공적이전소득으로 맞벌이 인정 불가). 공사 건설형 60㎡ 이하 1·2순위 신청자는 맞벌이 완화 제외.",
+    "상계장암지구(수락리버시티 1,2단지)는 의정부시 거주자 포함하여 신청 가능하며, 상계장암지구 임대주택 입주 시 서울지역 위치한 타 SH 공공주택 신청 불가.",
+    "1세대(해당 세대 전원) 1주택 신청 원칙이며 중복신청 시 전부 무효 처리. 배우자가 세대 분리하여 중복 신청하는 경우도 불가.",
+    "신청자 및 세대구성원 중 과거 공공주택 임차인으로서 불법 양도·전대 행위로 적발된 후 4년이 경과하지 않은 자가 있는 경우 모두 입주 자격이 무효처리됨.",
+    "재당첨 감점: 2009.11.30. 이후 입주자 모집공고에 의거 장기전세주택을 계약한 자로서 당첨자 발표일 기준 3년 이내 -6점, 5년 이내 -4점, 그 외 -2점.",
+    "가점 항목(일반공급·우선공급): 서울특별시 연속거주기간(만19세 이후), 무주택기간(만30세 미만 미혼신청자는 점수 없음), 신청자 만나이, 부양가족 수, 청약저축 납입횟수(85㎡초과는 청약예금 가입기간) 각 1~5점.",
+    "주거약자형 주택은 저층(1~3층)에 배정되며, 일반공급으로 신청한 경우 주거약자 신청자격을 갖추었더라도 주거약자 주택으로 공급되지 않음. 매입형·서울리츠3호 물량은 주거약자형 주택이 없음.",
+    "우선공급 신청자는 모두 1순위 접수일에 신청해야 하며, 우선공급 신청 미달로 인한 잔여세대는 일반공급 대상세대로 전환되고, 우선공급 탈락자는 별도 절차 없이 일반공급 신청자로 전환됨.",
+    "공사 건설형·매입형 재공급 단지는 모두 예비입주자로 모집하며, 예비입주자 유효기간은 당첨자 발표일로부터 12개월(2028.03.04.까지)임.",
+    "임대차 계약기간은 2년이며, 입주자격 유지 시 2년 단위로 갱신하여 최대 20년 거주 가능(서울리츠3호는 임대개시일로부터 20년 만료 시 갱신 거절될 수 있음). 갱신 시 소득기준 초과 시 보증금 할증(10% 이하 100%, 10~30% 105%, 30~50% 110%, 50% 초과 재계약 불가, 1회에 한해 120% 할증 재계약 가능).",
+    "전세금액은 계약금 10%(계약 시), 잔금 90%(입주 시)로 납부하며 월임대료는 없음.",
+    "신규공급(매입형) 입주 시작(예정)은 2027년 4월이며, 재공급 단지의 입주(예정)일은 2027년 4월 이후 예정이나 일정이 조정될 수 있음.",
+    "1순위 접수 2026.09.14.(월)~09.15.(화), 2순위 2026.09.16.(수), 3·4순위 2026.09.17.(목). 선순위 신청자가 모집세대수의 300%(3호 이하 500%, 5호 이하 400%)를 초과할 경우 후순위 접수를 진행하지 않음.",
+    "서류심사대상자 발표 2026.10.14.(수), 심사서류 제출 2026.10.19.(월)~10.21.(수) 등기우편, 당첨자 발표 2027.03.05.(금), 계약 2027.03.17.(수)~03.19.(금)."
+   ]
+  }
+ },
+ {
   "id": "pending-001",
+  "provider": "LH",
   "lh_id": "0000061175",
   "title": "시흥하중 A-4블록 신혼희망타운(공공분양) 잔여세대 추가입주자모집공고",
   "housing_type": "newlywed_hope",
