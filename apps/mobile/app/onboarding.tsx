@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
-import { KeyboardAvoidingView, Platform, Pressable, TextInput, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/Icon";
@@ -73,7 +73,8 @@ export default function Onboarding() {
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-        <FadeIn key={step.id} style={{ flex: 1, paddingHorizontal: space.screen, paddingTop: 32, gap: space.md }}>
+        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 140 }}>
+        <FadeIn key={step.id} style={{ paddingHorizontal: space.screen, paddingTop: 32, gap: space.md }}>
           <Sub tone="3">{index + 1} / {steps.length}</Sub>
           <T variant="title">{stepTitle(step, draft)}</T>
           {step.hint ? <T variant="body" color={colors.text2}>{step.hint}</T> : null}
@@ -108,6 +109,7 @@ export default function Onboarding() {
             </View>
           ) : null}
         </FadeIn>
+        </ScrollView>
       </KeyboardAvoidingView>
 
       <BottomCTA

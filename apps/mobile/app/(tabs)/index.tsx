@@ -2,13 +2,13 @@ import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/Icon";
-import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
-import { ANNOUNCEMENTS, matchAll, matching, type Matched } from "@/data/announcements";
+import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { ANNOUNCEMENTS, getAnnouncement, matchAll, matching, type Matched } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { REGIONS } from "@/lib/onboarding";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts } from "@/theme/tokens";
+import { fonts, radius } from "@/theme/tokens";
 
 /** 홈: "조건에 맞는 공고 N개" 한 문장과 큰 숫자로 시작한다. */
 export default function Home() {
@@ -37,6 +37,11 @@ export default function Home() {
   const today = new Date();
   const regionLabel = REGIONS.find((r) => r.value === state.profile?.region_code)?.label ?? "내 지역";
   const open = (id: string) => router.push(`/announcement/${id}`);
+  const free = state.subscription.status === "none" && state.freeUnlockId ? getAnnouncement(state.freeUnlockId) : undefined;
+  const toggle = (setter: (f: (v: boolean) => boolean) => void) => () => {
+    animateLayout();
+    setter((v) => !v);
+  };
 
   return (
     <Screen>
@@ -49,34 +54,47 @@ export default function Home() {
         <IconTile name="house" tone="primary" size={56} />
       </FadeIn>
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-        <Chip on={myRegionOnly} onPress={() => { animateLayout(); setMyRegionOnly((v) => !v); }}>{regionLabel}만</Chip>
-        <Chip on={rentalOnly} onPress={() => { animateLayout(); setRentalOnly((v) => !v); }}>임대만</Chip>
+        <Chip on={myRegionOnly} onPress={toggle(setMyRegionOnly)}>{regionLabel}만</Chip>
+        <Chip on={rentalOnly} onPress={toggle(setRentalOnly)}>임대만</Chip>
       </View>
-      {state.freeUnlockId && matched.some((m) => m.announcement.id === state.freeUnlockId) ? (
-        <Notice icon="check">조건이 가장 잘 맞는 공고 1건은 예상 주거비를 무료로 볼 수 있어요. 아래 "첫 계산 무료" 표시를 눌러 보세요.</Notice>
+
+      {free ? (
+        <FadeIn delay={80}>
+          <Pressable onPress={() => router.push(`/announcement/${free.id}/cost?auto=1`)} accessibilityRole="button"
+            style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: pressed ? colors.primaryPressed : colors.primary, borderRadius: radius.lg, padding: 18 })}>
+            <IconTile name="check" tone="primary" size={40} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <T variant="label" color={colors.onPrimary} style={{ opacity: 0.85 }}>첫 공고 1건 무료 계산</T>
+              <T variant="bodyMedium" color={colors.onPrimary} lines={2}>조건이 가장 잘 맞는 "{free.title}"의 예상 주거비를 보세요</T>
+            </View>
+            <Icon name="right" size={20} color={colors.onPrimary} />
+          </Pressable>
+        </FadeIn>
       ) : null}
 
-      {soon.length > 0 ? <Section title="접수 임박" items={soon} onOpen={open} /> : null}
-      {rest.length > 0 ? <Section title={soon.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} /> : null}
-      {matched.length === 0 ? (
-        <Card style={{ alignItems: "center", paddingVertical: 32, gap: 8 }}>
-          <IconTile name="bookmark" size={48} />
-          <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 조건에 맞는 공고가 없어요</T>
-          <Sub style={{ textAlign: "center" }}>새 공고가 올라오면 알려드릴게요. 내 정보에서 비어 있는 조건을 채우면 판별되는 공고가 늘어날 수 있어요.</Sub>
-        </Card>
-      ) : null}
-      {pending.length > 0 ? <Section title="조건 분석 중" items={pending} onOpen={open} /> : null}
+      <FadeIn delay={120} style={{ gap: 20 }}>
+        {soon.length > 0 ? <Section title="접수 임박" items={soon} onOpen={open} /> : null}
+        {rest.length > 0 ? <Section title={soon.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} /> : null}
+        {matched.length === 0 ? (
+          <Card style={{ alignItems: "center", paddingVertical: 32, gap: 8 }}>
+            <IconTile name="bookmark" size={48} />
+            <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 조건에 맞는 공고가 없어요</T>
+            <Sub style={{ textAlign: "center" }}>새 공고가 올라오면 알려드릴게요. 내 정보에서 비어 있는 조건을 채우면 판별되는 공고가 늘어날 수 있어요.</Sub>
+          </Card>
+        ) : null}
+        {pending.length > 0 ? <Section title="조건 분석 중" items={pending} onOpen={open} /> : null}
 
-      {others.length > 0 ? (
-        <Pressable onPress={() => { animateLayout(); setShowOthers((v) => !v); }} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
-          <T variant="bodyMedium" color={colors.text2}>조건이 맞지 않는 공고 {others.length}개</T>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
-            <T variant="small" color={colors.text3}>{showOthers ? "숨기기" : "보기"}</T>
-            <Icon name="right" size={16} color={colors.text4} />
-          </View>
-        </Pressable>
-      ) : null}
-      {showOthers && others.length > 0 ? <Section items={others} onOpen={open} /> : null}
+        {others.length > 0 ? (
+          <Pressable onPress={toggle(setShowOthers)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
+            <T variant="bodyMedium" color={colors.text2}>조건이 맞지 않는 공고 {others.length}개</T>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
+              <T variant="small" color={colors.text3}>{showOthers ? "숨기기" : "보기"}</T>
+              <Icon name="right" size={16} color={colors.text4} />
+            </View>
+          </Pressable>
+        ) : null}
+        {showOthers && others.length > 0 ? <Section items={others} onOpen={open} /> : null}
+      </FadeIn>
 
       <View style={{ flexDirection: "row", gap: 8, paddingTop: 8, paddingHorizontal: 4 }}>
         <Icon name="info" size={16} color={colors.text4} />
@@ -97,8 +115,6 @@ function Section({ title, items, onOpen }: { title?: string; items: Matched[]; o
 
 export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => void }) {
   const { colors } = useTheme();
-  const { state } = useAppState();
-  const free = state.freeUnlockId === m.announcement.id && state.subscription.status === "none";
   const a = m.announcement;
   const days = daysUntil(a.apply_end);
   const units = [...new Set(a.extraction.tracks.flatMap((t) => t.unit_types.map((u) => u.name)))];
@@ -123,9 +139,8 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
         <T variant="subheading" style={{ fontSize: 18, lineHeight: 26 }}>{a.title}</T>
         {place ? <Sub tone="3">{place}</Sub> : null}
       </View>
-      <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
+      <View style={{ flexDirection: "row" }}>
         <Tag tone={status.tone} icon={status.icon}>{status.text}</Tag>
-        {free ? <Tag tone="info">첫 계산 무료</Tag> : null}
       </View>
     </Card>
   );
