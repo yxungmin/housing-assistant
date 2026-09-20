@@ -9,16 +9,16 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.text2,
-        tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border },
-        tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 11 },
+        tabBarActiveTintColor: colors.text,
+        tabBarInactiveTintColor: colors.text3,
+        tabBarStyle: { backgroundColor: colors.tabBar, borderTopColor: colors.line, height: 84, paddingTop: 8 },
+        tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 12 },
         sceneStyle: { backgroundColor: colors.surface },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: "홈", tabBarIcon: ({ color }) => <Icon color={String(color)} name="home" size={22} strokeWidth={1.8} /> }} />
-      <Tabs.Screen name="saved" options={{ title: "관심", tabBarIcon: ({ color }) => <Icon color={String(color)} name="bookmark" size={22} strokeWidth={1.8} /> }} />
-      <Tabs.Screen name="profile" options={{ title: "내 정보", tabBarIcon: ({ color }) => <Icon color={String(color)} name="user" size={22} strokeWidth={1.8} /> }} />
+      <Tabs.Screen name="index" options={{ title: "홈", tabBarIcon: ({ color, focused }) => <Icon color={String(color)} name="home" size={26} strokeWidth={focused ? 2.4 : 1.8} /> }} />
+      <Tabs.Screen name="saved" options={{ title: "관심", tabBarIcon: ({ color, focused }) => <Icon color={String(color)} name="bookmark" size={26} strokeWidth={focused ? 2.4 : 1.8} /> }} />
+      <Tabs.Screen name="profile" options={{ title: "내 정보", tabBarIcon: ({ color, focused }) => <Icon color={String(color)} name="user" size={26} strokeWidth={focused ? 2.4 : 1.8} /> }} />
     </Tabs>
   );
 }

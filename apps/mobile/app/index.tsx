@@ -15,14 +15,14 @@ export default function Start() {
 
   return (
     <Screen scroll={false}>
-      <View style={{ flex: 1, justifyContent: "center", gap: space.lg, paddingHorizontal: 4 }}>
-        <View style={{ width: 52, height: 52, borderRadius: radius.lg, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center" }}>
-          <Icon name="house" size={28} color={colors.onPrimary} />
+      <View style={{ flex: 1, justifyContent: "center", gap: space.xl, paddingBottom: 80 }}>
+        <View style={{ width: 56, height: 56, borderRadius: radius.lg, backgroundColor: colors.primary, alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+          <Icon name="house" size={30} color={colors.onPrimary} strokeWidth={2.2} />
         </View>
         <T variant="display">내 조건에 맞는{"\n"}공공주택 공고만{"\n"}보여드릴게요</T>
-        <Sub style={{ maxWidth: 320 }}>
-          나이·소득·자산을 입력하면 LH 공고 중 조건이 맞는 것과 예상 주거비를 바로 계산합니다. 입력한 정보는 이 기기에만 저장됩니다.
-        </Sub>
+        <T variant="body" color={colors.text2} style={{ maxWidth: 320 }}>
+          나이·소득·자산을 입력하면 LH 공고 중 조건이 맞는 것과 예상 주거비를 바로 계산해요. 입력한 정보는 이 기기에만 저장됩니다.
+        </T>
       </View>
       <BottomCTA label="시작하기" onPress={() => router.push("/onboarding")} secondary secondaryLabel="로그인 없이 바로 시작합니다" onSecondary={() => router.push("/onboarding")} />
     </Screen>

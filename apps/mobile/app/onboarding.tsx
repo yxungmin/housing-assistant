@@ -4,7 +4,7 @@ import { KeyboardAvoidingView, Platform, Pressable, TextInput, View } from "reac
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/Icon";
-import { BottomCTA, Screen, Sub, T } from "@/components/ui";
+import { BottomCTA, Header, IconButton, Screen, Sub, T } from "@/components/ui";
 import { matchAll, pickBest } from "@/data/announcements";
 import { isComplete, visibleSteps, type Step } from "@/lib/onboarding";
 import { useAppState } from "@/store/appState";
@@ -65,36 +65,36 @@ export default function Onboarding() {
     const next = selected.includes(v) ? selected.filter((x) => x !== v) : [...selected, v];
     setDraft((d) => step.apply(d, next.length ? next.join(",") : null));
   };
+  const grid = (step.options?.length ?? 0) > 6;
 
   return (
     <Screen scroll={false} padded={false}>
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: space.lg, paddingVertical: 6 }}>
-        <Pressable onPress={() => (index === 0 ? router.back() : go(index - 1))} hitSlop={10} accessibilityRole="button" accessibilityLabel="뒤로">
-          <Icon name="left" color={colors.text2} />
-        </Pressable>
-        <Sub>{index + 1} / {steps.length}</Sub>
-        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button" accessibilityLabel="닫기">
-          <Icon name="x" color={colors.text2} />
-        </Pressable>
-      </View>
-      <View style={{ height: 4, marginHorizontal: space.lg, borderRadius: 2, backgroundColor: colors.border, overflow: "hidden" }}>
+      <Header onBack={() => (index === 0 ? router.back() : go(index - 1))} right={<IconButton name="x" label="닫기" onPress={() => router.back()} color={colors.text2} />} />
+      <View style={{ height: 3, marginHorizontal: space.screen, borderRadius: 2, backgroundColor: colors.cardSoft, overflow: "hidden" }}>
         <View style={{ height: "100%", width: `${((index + 1) / steps.length) * 100}%`, backgroundColor: colors.primary }} />
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-        <View style={{ flex: 1, paddingHorizontal: space.lg, paddingTop: 24, gap: space.md }}>
+        <View style={{ flex: 1, paddingHorizontal: space.screen, paddingTop: 32, gap: space.md }}>
+          <Sub tone="3">{index + 1} / {steps.length}</Sub>
           <T variant="title">{step.title}</T>
-          {step.hint ? <Sub>{step.hint}</Sub> : null}
+          {step.hint ? <T variant="body" color={colors.text2}>{step.hint}</T> : null}
 
           {(step.kind === "select" || step.kind === "multi") && (
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+            <View style={{ flexDirection: grid ? "row" : "column", flexWrap: grid ? "wrap" : "nowrap", gap: 10, marginTop: 12 }}>
               {step.options!.map((o) => {
                 const on = step.kind === "multi" ? selected.includes(o.value) : value === o.value;
                 return (
                   <Pressable key={o.value} onPress={() => (step.kind === "multi" ? toggleMulti(o.value) : setDraft((d) => step.apply(d, o.value)))} accessibilityRole="button" accessibilityLabel={o.label} accessibilityState={{ selected: on }}
-                    style={{ paddingHorizontal: 14, paddingVertical: 11, borderRadius: radius.md, borderWidth: 1, borderColor: on ? colors.primary : colors.border, backgroundColor: on ? colors.primarySoft : colors.card, minWidth: step.options!.length > 6 ? "22%" : undefined }}>
-                    <T variant="bodyMedium" color={on ? colors.primary : colors.text} style={{ textAlign: "center" }}>{o.label}</T>
-                    {o.hint ? <Sub style={{ textAlign: "center" }}>{o.hint}</Sub> : null}
+                    style={({ pressed }) => ({
+                      paddingHorizontal: 18, paddingVertical: grid ? 14 : 18, borderRadius: radius.md, backgroundColor: on ? colors.primarySoft : colors.card, opacity: pressed ? 0.85 : 1,
+                      flexDirection: "row", alignItems: "center", justifyContent: grid ? "center" : "space-between", minWidth: grid ? "22%" : undefined, flexGrow: grid ? 1 : 0,
+                    })}>
+                    <View style={{ gap: 2, alignItems: grid ? "center" : "flex-start" }}>
+                      <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{o.label}</T>
+                      {o.hint ? <Sub tone="3">{o.hint}</Sub> : null}
+                    </View>
+                    {!grid ? <Icon name="check" size={20} color={on ? colors.primary : colors.line} strokeWidth={3} /> : null}
                   </Pressable>
                 );
               })}
@@ -104,9 +104,9 @@ export default function Onboarding() {
           {numeric && <NumberField step={step} text={text} onChange={setText} />}
 
           {step.helper ? (
-            <View style={{ gap: 4 }}>
+            <View style={{ gap: 6, marginTop: 8 }}>
               <T variant="label" color={colors.primary}>건강보험료로 계산하기 (준비 중)</T>
-              <Sub>{step.helper}</Sub>
+              <Sub tone="3">{step.helper}</Sub>
             </View>
           ) : null}
         </View>
@@ -131,25 +131,38 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
   const digits = text.replace(/[^0-9]/g, "");
   const isDate = step.kind === "date";
   const display = isDate ? formatDateDigits(digits) : text ? Number(digits).toLocaleString("ko-KR") : "";
-  const ageNote = isDate && isValidBirthDate(digits) ? `만 ${ageFromBirthDate(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`)}세` : isDate ? "예: 1998.03.15" : "";
+  const valid = isDate && isValidBirthDate(digits);
+  const ageNote = valid ? `만 ${ageFromBirthDate(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`)}세` : isDate ? "예: 1998.03.15" : "";
+  const isWon = step.kind === "won";
+  const manwon = isWon && digits ? summarizeWon(Number(digits)) : "";
   return (
-    <View style={{ gap: 6, marginTop: 8 }}>
-    <View style={{ flexDirection: "row", alignItems: "baseline", borderBottomWidth: 2, borderBottomColor: colors.primary, paddingVertical: 6, gap: 8 }}>
-      <TextInput
-        value={display}
-        onChangeText={(t) => onChange(t.replace(/[^0-9]/g, "").slice(0, isDate ? 8 : 15))}
-        keyboardType="number-pad"
-        autoFocus
-        placeholder={isDate ? "1998.03.15" : "0"}
-        placeholderTextColor={colors.border}
-        style={{ flex: 1, fontFamily: fonts.num, fontSize: 30, color: colors.text, padding: 0, fontVariant: ["tabular-nums"] }}
-        accessibilityLabel={step.title}
-      />
-      {!isDate ? <T variant="bodyMedium" color={colors.text2}>{unitLabel}</T> : null}
-    </View>
-    {isDate ? <T variant="bodyMedium" color={isValidBirthDate(digits) ? colors.primary : colors.text2}>{ageNote}</T> : null}
+    <View style={{ gap: 10, marginTop: 16 }}>
+      <View style={{ flexDirection: "row", alignItems: "baseline", borderBottomWidth: 2, borderBottomColor: colors.primary, paddingBottom: 10, gap: 10 }}>
+        <TextInput
+          value={display}
+          onChangeText={(t) => onChange(t.replace(/[^0-9]/g, "").slice(0, isDate ? 8 : 15))}
+          keyboardType="number-pad"
+          autoFocus
+          placeholder={isDate ? "1998.03.15" : "0"}
+          placeholderTextColor={colors.line}
+          style={{ flex: 1, fontFamily: fonts.bold, fontSize: 36, lineHeight: 44, color: colors.text, padding: 0, letterSpacing: -1, fontVariant: ["tabular-nums"] }}
+          accessibilityLabel={step.title}
+        />
+        {!isDate ? <T variant="subheading" color={colors.text2}>{unitLabel}</T> : null}
+      </View>
+      {isDate ? <T variant="bodyMedium" color={valid ? colors.primary : colors.text3}>{ageNote}</T> : null}
+      {isWon && manwon ? <T variant="bodyMedium" color={colors.primary}>{manwon}</T> : null}
     </View>
   );
+}
+
+function summarizeWon(n: number): string {
+  if (n <= 0) return "";
+  const eok = Math.floor(n / 100_000_000);
+  const man = Math.round((n % 100_000_000) / 10_000);
+  if (eok > 0) return man > 0 ? `${eok}억 ${man.toLocaleString("ko-KR")}만 원` : `${eok}억 원`;
+  if (man > 0) return `${man.toLocaleString("ko-KR")}만 원`;
+  return `${n.toLocaleString("ko-KR")}원`;
 }
 
 function formatDateDigits(d: string): string {
