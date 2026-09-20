@@ -63,6 +63,14 @@ function stripFences(text: string): string {
   return (m?.[1] ?? text).trim();
 }
 
+/**
+ * adaptive thinking·effort를 지원하는 모델인지. Haiku 계열은 지원하지 않아 400이 난다.
+ * 새 모델을 벤치마크에 넣을 때 여기 한 줄을 고친다.
+ */
+export function supportsAdaptiveThinking(model: string): boolean {
+  return !/haiku/i.test(model);
+}
+
 export async function extractFromText(noticeText: string, opts: ExtractOptions): Promise<ExtractionResult> {
   const client = opts.client ?? new Anthropic();
   const retries = opts.retries ?? 1;
@@ -73,12 +81,16 @@ export async function extractFromText(noticeText: string, opts: ExtractOptions):
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const system = mode === "grammar" ? SYSTEM_PROMPT : SYSTEM_PROMPT + JSON_ONLY_SUFFIX + schemaText;
+      // adaptive thinking과 effort는 상위 모델에서만 받는다. 벤치마크로 비교할 때 모델마다 껐다 켠다.
+      const advanced = supportsAdaptiveThinking(opts.model);
       const stream = client.messages.stream({
         model: opts.model,
-        max_tokens: 64000,
-        thinking: { type: "adaptive" },
-        output_config:
-          mode === "grammar" ? { effort: "high", format: zodOutputFormat(LlmExtraction) } : { effort: "high" },
+        max_tokens: advanced ? 64000 : 32000,
+        ...(advanced ? { thinking: { type: "adaptive" as const } } : {}),
+        output_config: {
+          ...(advanced ? { effort: "high" as const } : {}),
+          ...(mode === "grammar" ? { format: zodOutputFormat(LlmExtraction) } : {}),
+        },
         system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
         messages: [
           {

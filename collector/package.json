@@ -15,7 +15,8 @@
     "review": "tsx src/review-server.ts",
     "app:data": "tsx src/app-data.ts",
     "benchmark:fetch": "tsx src/fetch-pdfs.ts",
-    "lh:stats": "tsx src/stats.ts"
+    "lh:stats": "tsx src/stats.ts",
+    "benchmark:compare": "tsx src/benchmark-compare.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.127.0",

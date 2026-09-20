@@ -4,6 +4,12 @@
  *   npm run benchmark -- --only 001   특정 케이스
  *   EXTRACTION_MODEL=claude-sonnet-5 npm run benchmark   모델 비교
  *
+ * 기준(reference) 두 가지:
+ *  - fixtures: 사람이 검토한 정답. 진짜 정확도를 잰다. 기본값.
+ *  - drafts(--from-drafts): benchmark/output/*.draft.json(지금은 Opus 추출본)을 기준으로 삼는다.
+ *    정답이 아직 없을 때 "모델을 바꾸면 결과가 얼마나 달라지는가"를 재는 용도다.
+ *    같은 모델을 다시 돌리면 그 모델의 재현성(잡음 바닥)이 나오고, 다른 모델 점수는 그 바닥과 비교해서 읽어야 한다.
+ *
  * 지표 (문서 "품질 기준과 검증"):
  *  - 룰 단위 정확 추출률: category·applies_to·operator·value·그룹 mode가 모두 일치한 정답 룰 비율
  *  - 공고 단위 완전 일치율: 모든 정답 룰이 정확한 공고 비율
@@ -33,8 +39,14 @@ const FIXTURES = fromRoot("benchmark", "fixtures");
 const PDFS = fromRoot("benchmark", "pdfs");
 const OUT = fromRoot("benchmark", "output");
 
-const onlyIdx = process.argv.indexOf("--only");
-const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined;
+const argOf = (name: string) => {
+  const i = process.argv.indexOf(`--${name}`);
+  return i >= 0 ? process.argv[i + 1] : undefined;
+};
+const only = argOf("only");
+/** 쉼표로 여러 건 지정 (--cases 002,008,018) */
+const cases = (argOf("cases") ?? "").split(",").map((c) => c.trim()).filter(Boolean);
+const fromDrafts = process.argv.includes("--from-drafts");
 const env = loadEnv();
 
 function ruleKey(track: SupplyTrack, r: EligibilityRule): string {
@@ -70,16 +82,37 @@ interface CaseMetrics {
   error?: string;
 }
 
-// 가격은 모델 카드 기준 대략치 (Opus 5: $5 / $25 per 1M). 모델을 바꾸면 여기 값도 바꾼다.
-const PRICE_PER_M = { input: 5, output: 25 };
+/**
+ * 모델별 100만 토큰당 단가 (USD). 실제 청구액과 다를 수 있으니 콘솔 사용량으로 한 번 확인한다.
+ * 모델을 추가하면 여기 한 줄을 더한다.
+ */
+const MODEL_PRICES: Record<string, { input: number; output: number }> = {
+  "claude-opus-5": { input: 5, output: 25 },
+  "claude-sonnet-5": { input: 3, output: 15 },
+  "claude-haiku-4-5-20251001": { input: 1, output: 5 },
+};
+const PRICE_PER_M = MODEL_PRICES[env.EXTRACTION_MODEL] ?? { input: 5, output: 25 };
+if (!MODEL_PRICES[env.EXTRACTION_MODEL]) console.warn(`단가 표에 ${env.EXTRACTION_MODEL}이 없다. Opus 단가로 계산한다.`);
 
-const files = readdirSync(FIXTURES).filter((f) => f.endsWith(".json") && !f.endsWith(".example.json"));
+// 기준 파일 모으기: fixtures 우선, --from-drafts면 없는 건 초안으로 채운다
+const referenceFiles: { path: string; reference: "fixture" | "draft" }[] = readdirSync(FIXTURES)
+  .filter((f) => f.endsWith(".json") && !f.endsWith(".example.json"))
+  .map((f) => ({ path: join(FIXTURES, f), reference: "fixture" as const }));
+if (fromDrafts) {
+  const haveIds = new Set(referenceFiles.map((r) => JSON.parse(readFileSync(r.path, "utf8")).id));
+  for (const f of readdirSync(OUT).filter((f) => f.endsWith(".draft.json"))) {
+    const id = f.replace(".draft.json", "");
+    if (!haveIds.has(id)) referenceFiles.push({ path: join(OUT, f), reference: "draft" });
+  }
+}
 const metrics: CaseMetrics[] = [];
 mkdirSync(OUT, { recursive: true });
 
-for (const file of files) {
-  const fixture = Gold.parse(JSON.parse(readFileSync(join(FIXTURES, file), "utf8")));
+for (const { path: refPath, reference } of referenceFiles) {
+  const fixture = Gold.parse(JSON.parse(readFileSync(refPath, "utf8")));
   if (only && fixture.id !== only) continue;
+  if (cases.length && !cases.includes(fixture.id)) continue;
+  void reference;
   const pdfPath = join(PDFS, fixture.pdf);
   if (!existsSync(pdfPath)) {
     console.warn(`skip ${fixture.id}: ${pdfPath} 없음`);
@@ -138,6 +171,8 @@ const goldRules = sum((m) => m.gold_rules);
 const gotRules = sum((m) => m.correct_rules + m.hallucinated_rules);
 const report = {
   model: env.EXTRACTION_MODEL,
+  /** 무엇과 비교했는가. draft면 "정확도"가 아니라 "기준 모델과의 일치도"다. */
+  reference: fromDrafts ? "draft(기준 모델 추출본)" : "fixture(사람 검토 정답)",
   cases: metrics.length,
   rule_accuracy: sum((m) => m.correct_rules) / goldRules,
   announcement_exact_rate: metrics.filter((m) => m.all_rules_correct).length / metrics.length,
@@ -151,6 +186,7 @@ const report = {
 };
 writeFileSync(join(OUT, `report.${env.EXTRACTION_MODEL}.json`), JSON.stringify(report, null, 2));
 console.log("\n=== 벤치마크 결과 ===");
+console.log(fromDrafts ? "기준: 초안(기준 모델 추출본) — 정확도가 아니라 일치도다\n" : "기준: 사람 검토 정답\n");
 console.table({
   "룰 단위 정확 추출률": `${(report.rule_accuracy * 100).toFixed(1)}% (목표 95%)`,
   "공고 단위 완전 일치율": `${(report.announcement_exact_rate * 100).toFixed(1)}% (목표 80%)`,
@@ -158,5 +194,6 @@ console.table({
   누락률: `${(report.missing_rate * 100).toFixed(1)}% (목표 ≤3%)`,
   "없는 조건 생성률": `${(report.hallucination_rate * 100).toFixed(1)}% (목표 ≤1%)`,
   "공고 1건 시간": `${report.avg_seconds.toFixed(0)}s (목표 ≤300s)`,
-  "공고 1건 비용": `$${report.avg_cost_usd.toFixed(3)}`,
+  "공고 1건 비용": `${report.avg_cost_usd.toFixed(3)}`,
 });
+console.log(`저장: ${join(OUT, `report.${env.EXTRACTION_MODEL}.json`)}`);
