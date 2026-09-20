@@ -5,7 +5,7 @@ import { matchAnnouncement } from "@housing/engine";
 import { Icon } from "@/components/Icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, Card, ConditionRow, Row, Screen, Sub, T, Tag } from "@/components/ui";
-import { getAnnouncement } from "@/data/announcements";
+import { getAnnouncement, ruleCounts } from "@/data/announcements";
 import { inputSummary, ruleTitle } from "@/lib/conditions";
 import { dday, HOUSING_LABEL, longDate, shortDate } from "@/lib/format";
 import { canOpenCost, useAppState } from "@/store/appState";
@@ -33,7 +33,7 @@ export default function AnnouncementDetail() {
       </Screen>
     );
   }
-  const total = track ? track.summary.matched + track.summary.needs_check + track.summary.mismatched : 0;
+  const counts = track ? ruleCounts(track) : { matched: 0, needsCheck: 0, total: 0 };
   const openCost = () => {
     if (canOpenCost(state, a.id)) router.push(`/announcement/${a.id}/cost`);
     else setSheet(true);
@@ -67,7 +67,7 @@ export default function AnnouncementDetail() {
         {track && (
           <Card>
             <Row>
-              <T variant="label" style={{ opacity: 0.8 }}>{track.track.name} · 조건 {track.summary.matched}/{total} 일치</T>
+              <T variant="label" style={{ opacity: 0.8 }}>{track.track.name} · 조건 {counts.total}개 중 {counts.matched}개 일치{counts.needsCheck ? ` · 확인 필요 ${counts.needsCheck}` : ""}</T>
               <Sub>근거 쪽</Sub>
             </Row>
             <View>
@@ -89,7 +89,7 @@ export default function AnnouncementDetail() {
               })}
             </View>
             {match && match.tracks.length > 1 && (
-              <Sub>다른 트랙 {match.tracks.length - 1}개: {match.tracks.filter((t) => t !== track).map((t) => `${t.track.name} ${t.summary.matched}/${t.summary.matched + t.summary.needs_check + t.summary.mismatched}`).join(", ")}</Sub>
+              <Sub>다른 트랙 {match.tracks.length - 1}개: {match.tracks.filter((t) => t !== track).map((t) => { const c = ruleCounts(t); return `${t.track.name} ${c.matched}/${c.total}`; }).join(", ")}</Sub>
             )}
           </Card>
         )}
