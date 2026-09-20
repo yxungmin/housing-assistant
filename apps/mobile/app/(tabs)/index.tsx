@@ -110,9 +110,9 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
 
   return (
     <Card onPress={onPress} style={{ gap: 12 }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-        <Sub tone="3" variant="caption">{HOUSING_LABEL[a.housing_type]}{unitLabel ? ` · ${unitLabel}` : ""}</Sub>
-        {days !== null ? <T variant="label" color={days <= 14 ? colors.danger : colors.text3} style={{ fontFamily: fonts.bold }}>{dday(a.apply_end)}</T> : null}
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+        <Sub tone="3" variant="caption" lines={1} style={{ flex: 1 }}>{HOUSING_LABEL[a.housing_type]}{unitLabel ? ` · ${unitLabel}` : ""}</Sub>
+        {days !== null ? <T variant="label" color={days <= 14 ? colors.danger : colors.text3} style={{ fontFamily: fonts.bold, flexShrink: 0 }}>{dday(a.apply_end)}</T> : null}
       </View>
       <View style={{ gap: 4 }}>
         <T variant="subheading" style={{ fontSize: 18, lineHeight: 26 }}>{a.title}</T>

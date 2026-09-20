@@ -54,18 +54,18 @@ export function IconButton({ name, onPress, label, color }: { name: IconName; on
   );
 }
 
-export function T({ children, variant = "body", color, style, numeric }: PropsWithChildren<{ variant?: keyof typeof type; color?: string; style?: StyleProp<TextStyle>; numeric?: boolean }>) {
+export function T({ children, variant = "body", color, style, numeric, lines }: PropsWithChildren<{ variant?: keyof typeof type; color?: string; style?: StyleProp<TextStyle>; numeric?: boolean; lines?: number }>) {
   const { colors } = useTheme();
   return (
-    <Text style={[type[variant], { color: color ?? colors.text }, numeric && { fontFamily: fonts.num, fontVariant: ["tabular-nums"] }, style]}>
+    <Text numberOfLines={lines} ellipsizeMode="tail" style={[type[variant], { color: color ?? colors.text }, numeric && { fontFamily: fonts.num, fontVariant: ["tabular-nums"] }, style]}>
       {children}
     </Text>
   );
 }
 
-export function Sub({ children, style, tone = "2", variant = "small" }: PropsWithChildren<{ style?: StyleProp<TextStyle>; tone?: "2" | "3"; variant?: "small" | "body" | "caption" }>) {
+export function Sub({ children, style, tone = "2", variant = "small", lines }: PropsWithChildren<{ style?: StyleProp<TextStyle>; tone?: "2" | "3"; variant?: "small" | "body" | "caption"; lines?: number }>) {
   const { colors } = useTheme();
-  return <T variant={variant} color={tone === "3" ? colors.text3 : colors.text2} style={style}>{children}</T>;
+  return <T variant={variant} color={tone === "3" ? colors.text3 : colors.text2} style={style} lines={lines}>{children}</T>;
 }
 
 /** 화면 제목 블록: 위 여백 넉넉히, 제목 크게, 부제 회색 */
