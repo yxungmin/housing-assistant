@@ -1,4 +1,4 @@
-import { mapHousingType, mapRegionCode, normalizeDate } from "./mapping.js";
+import { mapHousingType, mapRegionCode, normalizeDate } from "./mapping";
 import type { HousingType } from "@housing/schema";
 
 /**

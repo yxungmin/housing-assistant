@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { IncomeType, MarriageStatus } from "./enums.js";
+import { IncomeType, MarriageStatus, SpecialStatus } from "./enums";
 
 /**
  * 사용자 프로필. 기기 SecureStore에만 저장되며 서버로 전송되지 않는다.
@@ -23,6 +23,7 @@ export const UserProfile = z.object({
   subscription_months: z.number().int().min(0).optional().describe("청약통장 가입기간 (개월)"),
   subscription_deposits: z.number().int().min(0).optional().describe("납입 횟수"),
   cash_on_hand: z.number().int().min(0).optional().describe("보유 현금 (원)"),
+  statuses: z.array(SpecialStatus).optional().describe("해당하는 계층 자격. 빈 배열 = 해당 없음, undefined = 미입력"),
   workplace: z
     .object({
       label: z.string().optional(),

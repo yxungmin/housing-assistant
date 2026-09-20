@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, pmt } from "../src/index.js";
-import { buteomok, marriedDualProfile, newlywedTrack } from "./fixtures.js";
+import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, pmt } from "../src/index";
+import { buteomok, marriedDualProfile, newlywedTrack } from "./fixtures";
 
 describe("pmt", () => {
   it("matches the standard amortization formula", () => {

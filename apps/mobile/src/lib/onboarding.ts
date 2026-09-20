@@ -1,6 +1,6 @@
 import type { UserProfile } from "@housing/schema";
 
-export type StepKind = "select" | "won" | "count" | "age" | "months" | "skip-info";
+export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "skip-info";
 
 export interface Option {
   value: string;
@@ -92,6 +92,19 @@ export const STEPS: Step[] = [
   {
     id: "debt", kind: "won", title: "매달 갚는 대출이 있나요?", hint: "월 상환액. 없으면 0. 주거비 부담률 계산에 씁니다.", optional: true,
     apply: (p, v) => ({ ...p, monthly_debt_payment: v === null ? undefined : Number(v) }), read: (p) => p.monthly_debt_payment ?? null,
+  },
+  {
+    id: "statuses", kind: "multi", title: "해당하는 것이 있나요?", hint: "공고의 계층(대학생·수급자 등) 자격을 판별하는 데 씁니다. 없으면 '해당 없음'.",
+    options: [
+      { value: "student", label: "대학생·입복학 예정" }, { value: "job_seeker", label: "취업준비생", hint: "졸업·중퇴 2년 이내" },
+      { value: "new_worker", label: "사회초년생", hint: "소득 있는 일 5년 이내" }, { value: "artist", label: "예술인" },
+      { value: "welfare_recipient", label: "주거급여 수급자" }, { value: "basic_livelihood", label: "생계·의료급여 수급자" },
+      { value: "national_merit", label: "국가유공자" }, { value: "disabled", label: "장애인 등록" },
+      { value: "nk_defector", label: "북한이탈주민" }, { value: "single_parent_support", label: "한부모가족 지원대상" },
+      { value: "elderly_care", label: "65세 이상 부모 부양" }, { value: "creator", label: "창작자" },
+    ],
+    apply: (p, v) => ({ ...p, statuses: v === null ? [] : String(v).split(",").filter(Boolean) as UserProfile["statuses"] }),
+    read: (p) => (p.statuses === undefined ? null : p.statuses.join(",")),
   },
   {
     id: "homeless", kind: "select", title: "세대구성원 모두 집이 없나요?", hint: "본인·배우자·같이 사는 부모 등 전원이 무주택이어야 하는 공고가 많습니다.",

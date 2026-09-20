@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { EligibilityRule, RuleGroup } from "./rules.js";
+import { EligibilityRule, RuleGroup } from "./rules";
 
 /**
  * 대출 상품 룰 (수동 관리, supabase/seed). as_of_date를 화면에 노출한다.

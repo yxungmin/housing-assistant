@@ -101,6 +101,28 @@
       "minimum": 0,
       "maximum": 9007199254740991
     },
+    "statuses": {
+      "description": "해당하는 계층 자격. 빈 배열 = 해당 없음, undefined = 미입력",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "student",
+          "job_seeker",
+          "new_worker",
+          "artist",
+          "welfare_recipient",
+          "basic_livelihood",
+          "national_merit",
+          "disabled",
+          "nk_defector",
+          "single_parent_support",
+          "elderly_care",
+          "care_leaver",
+          "creator"
+        ]
+      }
+    },
     "workplace": {
       "type": "object",
       "properties": {

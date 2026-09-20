@@ -48,13 +48,19 @@ export default function Onboarding() {
 
   const numeric = step.kind === "won" || step.kind === "count" || step.kind === "age" || step.kind === "months";
   const parsed = numeric ? Number(text.replace(/[^0-9]/g, "")) : NaN;
-  const canNext = step.kind === "select" ? value !== null : step.kind === "skip-info" ? true : text !== "" && Number.isFinite(parsed);
+  const canNext = step.kind === "select" ? value !== null : step.kind === "skip-info" || step.kind === "multi" ? true : text !== "" && Number.isFinite(parsed);
+  const selected = step.kind === "multi" ? String(value ?? "").split(",").filter(Boolean) : [];
 
   const onNext = () => {
     if (step.kind === "select" || step.kind === "skip-info") return go(index + 1);
+    if (step.kind === "multi") return go(index + 1, step.apply(draft, selected.length ? selected.join(",") : null));
     go(index + 1, step.apply(draft, parsed));
   };
   const onSkip = () => go(index + 1, step.apply(draft, null));
+  const toggleMulti = (v: string) => {
+    const next = selected.includes(v) ? selected.filter((x) => x !== v) : [...selected, v];
+    setDraft((d) => step.apply(d, next.length ? next.join(",") : null));
+  };
 
   return (
     <Screen scroll={false} padded={false}>
@@ -76,12 +82,12 @@ export default function Onboarding() {
           <T variant="title">{step.title}</T>
           {step.hint ? <Sub>{step.hint}</Sub> : null}
 
-          {step.kind === "select" && (
+          {(step.kind === "select" || step.kind === "multi") && (
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
               {step.options!.map((o) => {
-                const on = value === o.value;
+                const on = step.kind === "multi" ? selected.includes(o.value) : value === o.value;
                 return (
-                  <Pressable key={o.value} onPress={() => setDraft((d) => step.apply(d, o.value))} accessibilityRole="button" accessibilityState={{ selected: on }}
+                  <Pressable key={o.value} onPress={() => (step.kind === "multi" ? toggleMulti(o.value) : setDraft((d) => step.apply(d, o.value)))} accessibilityRole="button" accessibilityLabel={o.label} accessibilityState={{ selected: on }}
                     style={{ paddingHorizontal: 14, paddingVertical: 11, borderRadius: radius.md, borderWidth: 1, borderColor: on ? colors.primary : colors.border, backgroundColor: on ? colors.primarySoft : colors.card, minWidth: step.options!.length > 6 ? "22%" : undefined }}>
                     <T variant="bodyMedium" color={on ? colors.primary : colors.text} style={{ textAlign: "center" }}>{o.label}</T>
                     {o.hint ? <Sub style={{ textAlign: "center" }}>{o.hint}</Sub> : null}
@@ -103,7 +109,7 @@ export default function Onboarding() {
       </KeyboardAvoidingView>
 
       <BottomCTA
-        label={index + 1 >= steps.length ? "내 조건으로 공고 찾기" : "다음"}
+        label={index + 1 >= steps.length ? "내 조건으로 공고 찾기" : step.kind === "multi" && selected.length === 0 ? "해당 없음" : "다음"}
         onPress={onNext}
         disabled={!canNext}
         secondary={!!step.optional}

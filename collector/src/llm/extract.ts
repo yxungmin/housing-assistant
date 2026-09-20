@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import type { ExtractionOutput } from "@housing/schema";
 import { z } from "zod";
-import { LlmExtraction, toExtractionOutput } from "./llmSchema.js";
+import { LlmExtraction, toExtractionOutput } from "./llmSchema";
 
 /**
  * 공고문 텍스트 → ExtractionOutput. AI가 개입하는 유일한 지점.
@@ -11,7 +11,7 @@ import { LlmExtraction, toExtractionOutput } from "./llmSchema.js";
  * 1차: 구조화 출력(output_config.format)으로 스키마를 강제한다.
  * 2차: API가 "문법이 너무 크다"고 거부하면 같은 스키마를 프롬프트에 넣고 JSON 텍스트로 받아 클라이언트에서 검증한다.
  */
-export const EXTRACTION_PROMPT_VERSION = "v2";
+export const EXTRACTION_PROMPT_VERSION = "v3";
 
 const SYSTEM_PROMPT = `당신은 LH 공공주택 모집공고문을 구조화하는 추출기입니다. 판단이나 요약을 하지 않고, 공고문에 적힌 조건과 금액을 주어진 스키마에 그대로 옮깁니다.
 
@@ -19,7 +19,8 @@ const SYSTEM_PROMPT = `당신은 LH 공공주택 모집공고문을 구조화하
 - 공급 트랙(우선공급·일반공급·계층별 공급 등)마다 tracks 항목 하나. 트랙마다 자격 룰과 주택형별 가격을 넣습니다.
 - 자격 조건은 룰 하나에 조건 하나입니다. 소득 상한이 가구원 수·맞벌이 여부에 따라 다르면 applies_to를 달리해 룰을 여러 개 만듭니다. 소득은 원/월 절대 금액으로 적고 unit은 KRW_monthly, 공고문이 %만 주고 금액표를 주지 않으면 그 룰은 만들지 말고 notes에 원문을 남깁니다.
 - "또는"으로 이어진 대안 조건(예: 혼인 7년 이내 또는 6세 이하 자녀)은 같은 group_id에 mode any_of 그룹으로 묶습니다. 그 외는 all_of입니다. 모든 룰의 group_id는 그 트랙의 rule_groups에 있어야 합니다.
-- category별 프로필 대응: income(원/월), asset(원), car_value(원), debt(원/월), residence(시도 코드, operator in), housing(무주택 개월, gte 0 = 무주택 요건), marriage(혼인 년수 lte / unit status면 상태 in), children(자녀 수 또는 unit child_age면 자녀 나이), age(만 나이, between), subscription(가입 개월 또는 unit count면 납입 횟수).
+- category별 프로필 대응: income(원/월), asset(원), car_value(원), debt(원/월), residence(시도 코드, operator in), housing(무주택 개월, gte 0 = 무주택 요건), marriage(혼인 년수 lte / unit status면 상태 in), children(자녀 수 또는 unit child_age면 자녀 나이), age(만 나이, between), subscription(가입 개월 또는 unit count면 납입 횟수), status(계층 자격).
+- 트랙 이름이 특정 계층(대학생, 청년, 신혼부부, 고령자, 주거급여 수급자, 창작자 등)이면 그 계층 자체를 룰로 반드시 넣습니다. 나이·혼인·자녀·소득처럼 숫자·상태로 표현되면 해당 category를 쓰고, 그렇지 않은 자격은 category status, operator in, value_json에 아래 값 배열을 씁니다: student(대학생·입복학 예정), job_seeker(취업준비생), new_worker(사회초년생·소득 업무 5년 이내), artist(예술인), welfare_recipient(주거급여 수급자), basic_livelihood(생계·의료급여 수급자), national_merit(국가유공자), disabled(장애인), nk_defector(북한이탈주민), single_parent_support(한부모가족 지원대상), elderly_care(65세 이상 직계존속 부양), care_leaver(아동복지시설 퇴소자), creator(창작자). 예: 대학생 계층 → "[\\"student\\",\\"job_seeker\\"]". "대안 중 하나"면 같은 any_of 그룹에 나이 룰 등과 함께 둡니다.
 - value_json은 값을 JSON 문자열로 적습니다: 숫자 "8640000", between "[19,39]", in "[\\"11\\",\\"41\\"]", is_true "true".
 - 모든 룰과 가격에 source.page(=== p.N === 표시의 N)와 source.text(원문 발췌 500자 이내)를 넣습니다.
 - 금액은 원 단위 정수입니다 ("6,000만원" → 60000000). 월임대료·보증금은 주택형(unit_type)별로 한 항목씩.

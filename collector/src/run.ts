@@ -6,14 +6,14 @@
  * 흐름: LH 목록 → 신규·수정 탐지 → PDF 다운로드 → Storage → 텍스트 → 섹션 → LLM 추출
  *       → 스키마·자동 검증 → announcement_versions(UNVERIFIED | CONFLICT) → 신규면 푸시 대상 조회
  */
-import { loadEnv, requireEnv } from "./config.js";
-import { Repo } from "./db/supabase.js";
-import { geocodeAddress } from "./geo/kakao.js";
-import { LhClient, parseNoticeDetail, pickNoticePdf, type LhNoticeSummary } from "./lh/api.js";
-import { extractFromText } from "./llm/extract.js";
-import { extractPdfText, ocrFallback } from "./pdf/extract.js";
-import { buildSections, sectionsToPrompt } from "./pdf/sections.js";
-import { autoChecks } from "./validate/autoChecks.js";
+import { loadEnv, requireEnv } from "./config";
+import { Repo } from "./db/supabase";
+import { geocodeAddress } from "./geo/kakao";
+import { LhClient, parseNoticeDetail, pickNoticePdf, type LhNoticeSummary } from "./lh/api";
+import { extractFromText } from "./llm/extract";
+import { extractPdfText, ocrFallback } from "./pdf/extract";
+import { buildSections, sectionsToPrompt } from "./pdf/sections";
+import { autoChecks } from "./validate/autoChecks";
 
 const dryRun = process.argv.includes("--dry-run");
 const env = loadEnv();

@@ -1,5 +1,5 @@
 import type { LoanProduct, Pricing, UserProfile } from "@housing/schema";
-import { matchTrack } from "./match.js";
+import { matchTrack } from "./match";
 
 /** 원리금균등 월 상환액. rate는 연이율, termMonths는 기간(개월). */
 export function pmt(principal: number, annualRate: number, termMonths: number): number {

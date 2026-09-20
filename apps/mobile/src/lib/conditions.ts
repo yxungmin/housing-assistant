@@ -5,6 +5,22 @@ import { manwon, won } from "./format";
 
 const MARRIAGE_LABEL: Record<string, string> = { single: "미혼", married: "기혼", pre_marriage: "예비 신혼부부", single_parent: "한부모" };
 
+export const STATUS_LABEL: Record<string, string> = {
+  student: "대학생·입복학 예정",
+  job_seeker: "취업준비생",
+  new_worker: "사회초년생",
+  artist: "예술인",
+  welfare_recipient: "주거급여 수급자",
+  basic_livelihood: "생계·의료급여 수급자",
+  national_merit: "국가유공자",
+  disabled: "장애인",
+  nk_defector: "북한이탈주민",
+  single_parent_support: "한부모가족 지원대상",
+  elderly_care: "65세 이상 부모 부양",
+  care_leaver: "아동복지시설 퇴소자",
+  creator: "창작자",
+};
+
 function appliesLabel(r: EligibilityRule): string {
   const a = r.applies_to ?? {};
   const parts: string[] = [];
@@ -54,6 +70,8 @@ export function ruleTitle(r: EligibilityRule): string {
       return `청약통장 가입 ${num(v)}개월 이상`;
     case "commute":
       return `직장까지 ${num(v)}분 이내`;
+    case "status":
+      return Array.isArray(v) ? (v as string[]).map((s) => STATUS_LABEL[s] ?? s).join(" 또는 ") : "계층 자격";
   }
 }
 
@@ -73,5 +91,6 @@ export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: 
     case "residence": return `입력: ${REGIONS.find((x) => x.value === p.region_code)?.label ?? p.region_code}`;
     case "subscription": return `입력: ${p.subscription_months ?? 0}개월 · ${p.subscription_deposits ?? 0}회`;
     case "commute": return `입력: ${p.commute_limit_min ?? "-"}분`;
+    case "status": return `입력: ${p.statuses?.length ? p.statuses.map((s) => STATUS_LABEL[s] ?? s).join(", ") : "해당 없음"}`;
   }
 }

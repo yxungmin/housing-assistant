@@ -7,7 +7,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ExtractionOutput, type HousingType } from "@housing/schema";
-import { fromRoot } from "./paths.js";
+import { fromRoot } from "./paths";
 
 const OUT = fromRoot("benchmark", "output");
 const FIXTURES = fromRoot("benchmark", "fixtures");

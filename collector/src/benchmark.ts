@@ -16,11 +16,11 @@ import { readdirSync, readFileSync, existsSync, mkdirSync, writeFileSync } from 
 import { join } from "node:path";
 import { z } from "zod";
 import { ExtractionOutput, type EligibilityRule, type SupplyTrack } from "@housing/schema";
-import { loadEnv } from "./config.js";
-import { extractFromText } from "./llm/extract.js";
-import { extractPdfText } from "./pdf/extract.js";
-import { buildSections, sectionsToPrompt } from "./pdf/sections.js";
-import { fromRoot } from "./paths.js";
+import { loadEnv } from "./config";
+import { extractFromText } from "./llm/extract";
+import { extractPdfText } from "./pdf/extract";
+import { buildSections, sectionsToPrompt } from "./pdf/sections";
+import { fromRoot } from "./paths";
 
 const Gold = z.object({
   id: z.string(),

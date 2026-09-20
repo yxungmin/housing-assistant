@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ExtractionOutput } from "@housing/schema";
-import { autoChecks } from "../src/validate/autoChecks.js";
+import { autoChecks } from "../src/validate/autoChecks";
 
 const src = { page: 1, text: "x" };
 const base: ExtractionOutput = {

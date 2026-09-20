@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
-import { LlmExtraction, toExtractionOutput } from "../src/llm/llmSchema.js";
+import { LlmExtraction, toExtractionOutput } from "../src/llm/llmSchema";
 
 const src = { page: 3, text: "원문" };
 

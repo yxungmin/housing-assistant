@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EligibilityRule, ExtractionOutput, Pricing, SupplyTrack } from "../src/index.js";
+import { EligibilityRule, ExtractionOutput, Pricing, SupplyTrack } from "../src/index";
 
 const source = { page: 17, text: "3인 이하 맞벌이의 경우 월평균소득 120% 이하" };
 

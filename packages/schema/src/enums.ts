@@ -16,8 +16,30 @@ export const RuleCategory = z.enum([
   "age", // 나이 (만)
   "subscription", // 청약통장 가입기간(개월) / 납입횟수
   "commute", // 직장까지 대중교통 시간 (분) — 사용자가 정한 상한
+  "status", // 계층 자격 (대학생·수급자·국가유공자 등). value = SpecialStatus 배열, operator in
 ]);
 export type RuleCategory = z.infer<typeof RuleCategory>;
+
+/**
+ * 나이·소득 같은 숫자로 표현되지 않는 계층 자격. 프로필의 statuses(다중 선택)와 대응한다.
+ * 프로필 statuses가 undefined면 NEEDS_CHECK, 빈 배열(해당 없음)이면 MISMATCH.
+ */
+export const SpecialStatus = z.enum([
+  "student", // 대학생 (재학·입학·복학 예정)
+  "job_seeker", // 취업준비생 (졸업·중퇴 2년 이내)
+  "new_worker", // 사회초년생 (소득 있는 업무 5년 이내)
+  "artist", // 예술인 (예술인복지법)
+  "welfare_recipient", // 주거급여 수급자
+  "basic_livelihood", // 생계·의료급여 수급자
+  "national_merit", // 국가유공자 등
+  "disabled", // 장애인 등록
+  "nk_defector", // 북한이탈주민
+  "single_parent_support", // 한부모가족 지원대상
+  "elderly_care", // 65세 이상 직계존속 부양
+  "care_leaver", // 아동복지시설 퇴소자 등
+  "creator", // 창작자 (특화형 매입임대)
+]);
+export type SpecialStatus = z.infer<typeof SpecialStatus>;
 
 /**
  * 프로필 값과 룰 값을 비교하는 연산자. value의 JSON 형태는 연산자에 따라 다르다.

@@ -6,7 +6,7 @@
 import { createServer } from "node:http";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { fromRoot } from "./paths.js";
+import { fromRoot } from "./paths";
 
 const OUT = fromRoot("benchmark", "output");
 const FIXTURES = fromRoot("benchmark", "fixtures");

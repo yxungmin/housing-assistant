@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { loadEnvFile } from "node:process";
 import { z } from "zod";
-import { fromRoot } from "./paths.js";
+import { fromRoot } from "./paths";
 
 // 루트 .env를 읽는다 (Node 20.12+ 내장). GitHub Actions에서는 파일이 없고 Secrets가 env로 들어온다.
 // 이미 설정된 환경 변수는 loadEnvFile이 덮어쓰지 않는다.

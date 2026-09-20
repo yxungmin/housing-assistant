@@ -100,10 +100,12 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
       <Row style={{ marginTop: 4 }}>
         {a.status !== "VERIFIED" ? (
           <Tag tone="warn" icon="alert">공고 조건 분석 중</Tag>
+        ) : m.match?.is_match && m.matched > 0 ? (
+          <Tag icon="check">조건 {m.matched}/{m.total} 일치{m.needsCheck ? ` · 확인 ${m.needsCheck}` : ""}</Tag>
         ) : m.match?.is_match ? (
-          <Tag icon="check">조건 {m.matched}/{m.total} 일치</Tag>
+          <Tag tone="warn" icon="alert">조건 {m.needsCheck}개 확인 필요</Tag>
         ) : (
-          <Tag tone="danger" icon="x">조건 {m.match?.best_track ? m.matched : Math.max(...m.match!.tracks.map((t) => t.summary.matched))}/{m.total || (m.match?.tracks[0] ? m.match.tracks[0].summary.matched + m.match.tracks[0].summary.mismatched + m.match.tracks[0].summary.needs_check : 0)} 일치</Tag>
+          <Tag tone="danger" icon="x">조건 {m.matched}/{m.total} 일치</Tag>
         )}
         {m.distanceKm !== null ? <Sub>직장까지 약 {m.distanceKm.toFixed(0)}km</Sub> : a.transit?.nearest_station ? <Sub>{a.transit.nearest_station} 도보 {a.transit.station_walk_min}분</Sub> : <Sub style={{ color: colors.text2 }}>{a.address ? "" : ""}</Sub>}
       </Row>

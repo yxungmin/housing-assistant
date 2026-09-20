@@ -7,11 +7,11 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
-import { loadEnv } from "./config.js";
-import { extractPdfText } from "./pdf/extract.js";
-import { buildSections, sectionsToPrompt } from "./pdf/sections.js";
-import { autoChecks } from "./validate/autoChecks.js";
-import { fromRoot, fromUser } from "./paths.js";
+import { loadEnv } from "./config";
+import { extractPdfText } from "./pdf/extract";
+import { buildSections, sectionsToPrompt } from "./pdf/sections";
+import { autoChecks } from "./validate/autoChecks";
+import { fromRoot, fromUser } from "./paths";
 
 const args = process.argv.slice(2);
 const fileArg = args.find((a) => !a.startsWith("--"));
@@ -50,7 +50,7 @@ if (args.includes("--text")) {
 }
 
 if (args.includes("--extract")) {
-  const { extractFromText } = await import("./llm/extract.js");
+  const { extractFromText } = await import("./llm/extract");
   const env = loadEnv();
   console.log(`\nLLM 추출 중 (${env.EXTRACTION_MODEL})...`);
   const t0 = Date.now();

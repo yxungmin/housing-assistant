@@ -8,7 +8,7 @@ import {
   RuleCategory,
   RuleOperator,
   VersionStatus,
-} from "./enums.js";
+} from "./enums";
 
 /** 공고문 근거. 모든 룰·가격은 원문 페이지와 발췌를 가진다. */
 export const Source = z.object({

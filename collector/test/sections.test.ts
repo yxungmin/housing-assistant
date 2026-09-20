@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildSections, classifyPage, sectionsToPrompt } from "../src/pdf/sections.js";
+import { buildSections, classifyPage, sectionsToPrompt } from "../src/pdf/sections";
 
 describe("sections", () => {
   it("classifies pages by keyword", () => {

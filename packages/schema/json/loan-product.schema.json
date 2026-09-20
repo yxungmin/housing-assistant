@@ -73,7 +73,8 @@
               "children",
               "age",
               "subscription",
-              "commute"
+              "commute",
+              "status"
             ]
           },
           "applies_to": {

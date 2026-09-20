@@ -31,6 +31,7 @@ export interface Matched {
   match: AnnouncementMatch | null; // UNVERIFIED면 null
   /** 조건 N/M (best_track 기준, 그룹 단위) */
   matched: number;
+  needsCheck: number;
   total: number;
   /** 직장까지 직선거리 (km). 통근 시간 API 연결 전 대체 표시 */
   distanceKm: number | null;
@@ -39,17 +40,18 @@ export interface Matched {
 export function matchAll(profile: UserProfile | null): Matched[] {
   return ANNOUNCEMENTS.map((a) => {
     if (a.status !== "VERIFIED" || !profile) {
-      return { announcement: a, match: null, matched: 0, total: 0, distanceKm: null };
+      return { announcement: a, match: null, matched: 0, needsCheck: 0, total: 0, distanceKm: null };
     }
     const match = matchAnnouncement(a.extraction, profile);
-    const best = match.best_track ?? match.tracks[0];
+    const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
     const matched = best?.summary.matched ?? 0;
+    const needsCheck = best?.summary.needs_check ?? 0;
     const total = best ? best.summary.matched + best.summary.needs_check + best.summary.mismatched : 0;
     const distanceKm =
       profile.workplace && a.lat !== undefined && a.lng !== undefined
         ? haversineKm(profile.workplace, { lat: a.lat, lng: a.lng })
         : null;
-    return { announcement: a, match, matched, total, distanceKm };
+    return { announcement: a, match, matched, needsCheck, total, distanceKm };
   });
 }
 

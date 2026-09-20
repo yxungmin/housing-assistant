@@ -1,4 +1,4 @@
-import type { PdfPage } from "./extract.js";
+import type { PdfPage } from "./extract";
 
 export type SectionKind = "eligibility" | "pricing" | "schedule" | "supply" | "other";
 

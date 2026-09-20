@@ -14,7 +14,7 @@ export function profileValueFor(
   category: RuleCategory,
   profile: UserProfile,
   unit?: string,
-): number | string | boolean | number[] | undefined {
+): number | string | boolean | number[] | string[] | undefined {
   switch (category) {
     case "income":
       return profile.monthly_income;
@@ -43,6 +43,9 @@ export function profileValueFor(
       return profile.subscription_months;
     case "commute":
       return profile.commute_limit_min;
+    case "status":
+      // 빈 배열(해당 없음)은 compare에서 false → MISMATCH. undefined → NEEDS_CHECK.
+      return profile.statuses === undefined ? undefined : profile.statuses.length === 0 ? "__none__" : profile.statuses;
   }
 }
 
@@ -75,13 +78,13 @@ export function applies(appliesTo: AppliesTo | undefined, profile: UserProfile):
 
 /** 값 비교. 배열 프로필 값(자녀 나이)은 하나라도 만족하면 true. */
 export function compare(
-  actual: number | string | boolean | number[],
-  operator: EligibilityRule["operator"],
+  actual: number | string | boolean | number[] | string[],
+  operator: EligibilityRule["value"] extends never ? never : EligibilityRule["operator"],
   expected: EligibilityRule["value"],
 ): boolean {
   if (Array.isArray(actual)) {
     if (actual.length === 0) return false;
-    return actual.some((a) => compare(a, operator, expected));
+    return (actual as (number | string)[]).some((a) => compare(a, operator, expected));
   }
   switch (operator) {
     case "eq":

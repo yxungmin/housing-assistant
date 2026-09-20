@@ -4,9 +4,9 @@
  * 필드명이 api.ts의 가정과 다르면 api.ts 한 곳만 고친다.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
-import { loadEnv, requireEnv } from "../config.js";
-import { LhClient, parseNoticeDetail, parseNoticeList, pickNoticePdf } from "./api.js";
-import { fromRoot } from "../paths.js";
+import { loadEnv, requireEnv } from "../config";
+import { LhClient, parseNoticeDetail, parseNoticeList, pickNoticePdf } from "./api";
+import { fromRoot } from "../paths";
 
 const env = loadEnv();
 const client = new LhClient(requireEnv(env, "LH_API_KEY"));

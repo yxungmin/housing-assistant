@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { collectDatasets, parseNoticeDetail, parseNoticeList, pickNoticePdf } from "../src/lh/api.js";
-import { mapHousingType, mapRegionCode, normalizeDate } from "../src/lh/mapping.js";
+import { collectDatasets, parseNoticeDetail, parseNoticeList, pickNoticePdf } from "../src/lh/api";
+import { mapHousingType, mapRegionCode, normalizeDate } from "../src/lh/mapping";
 
 describe("mapping", () => {
   it("maps LH type labels deterministically and reports unknowns", () => {
