@@ -22,7 +22,7 @@ export default function Onboarding() {
   const steps = useMemo(() => visibleSteps(draft), [draft]);
   const step = steps[Math.min(index, steps.length - 1)]!;
   const value = step.read(draft);
-  const [text, setText] = useState<string>(value === null ? "" : String(value));
+  const [text, setText] = useState<string>(textFor(step, value));
   const [helper, setHelper] = useState(false);
 
   const go = (next: number, patch?: Partial<UserProfile>) => {
@@ -32,8 +32,7 @@ export default function Onboarding() {
     setDraft(merged);
     setIndex(next);
     const s = nextSteps[next]!;
-    const v = s.read(merged);
-    setText(v === null ? "" : String(v));
+    setText(textFor(s, s.read(merged)));
   };
 
   const finish = (p: Partial<UserProfile>) => {
@@ -47,10 +46,12 @@ export default function Onboarding() {
   };
 
   const numeric = step.kind === "won" || step.kind === "count" || step.kind === "age" || step.kind === "months" || step.kind === "date";
+  const isDuration = step.kind === "duration";
   const digits = text.replace(/[^0-9]/g, "");
-  const parsed = numeric ? Number(digits) : NaN;
+  const duration = parseDuration(text);
+  const parsed = isDuration ? duration.total : numeric ? Number(digits) : NaN;
   const dateOk = step.kind === "date" && isValidBirthDate(digits);
-  const canNext = step.kind === "select" ? value !== null : step.kind === "skip-info" || step.kind === "multi" ? true : step.kind === "date" ? dateOk : text !== "" && Number.isFinite(parsed);
+  const canNext = step.kind === "select" ? value !== null : step.kind === "skip-info" || step.kind === "multi" ? true : step.kind === "date" ? dateOk : isDuration ? duration.years !== "" : text !== "" && Number.isFinite(parsed);
   const selected = step.kind === "multi" ? String(value ?? "").split(",").filter(Boolean) : [];
 
   const onNext = () => {
@@ -103,6 +104,7 @@ export default function Onboarding() {
           )}
 
           {numeric && <NumberField step={step} text={text} onChange={setText} />}
+          {isDuration && <DurationField text={text} onChange={setText} />}
 
           {step.helper ? (
             <Pressable onPress={() => setHelper(true)} accessibilityRole="button" style={({ pressed }) => ({ gap: 6, marginTop: 8, padding: 16, borderRadius: radius.md, backgroundColor: pressed ? colors.cardStrong : colors.cardSoft })}>
@@ -160,6 +162,52 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
       </View>
       {isDate ? <T variant="bodyMedium" color={valid ? colors.primary : colors.text3}>{ageNote}</T> : null}
       {isWon && manwon ? <T variant="bodyMedium" color={colors.primary}>{manwon}</T> : null}
+    </View>
+  );
+}
+
+/** 단계별 입력 문자열 초기값. duration은 "년:개월" 형식으로 들고 다닌다. */
+function textFor(step: Step, value: string | number | null): string {
+  if (value === null) return "";
+  if (step.kind === "duration") {
+    const m = Number(value);
+    return `${Math.floor(m / 12)}:${m % 12 ? m % 12 : ""}`;
+  }
+  return String(value);
+}
+
+function parseDuration(text: string): { years: string; months: string; total: number } {
+  const [y = "", m = ""] = text.split(":");
+  const years = y.replace(/[^0-9]/g, "");
+  const months = m.replace(/[^0-9]/g, "");
+  return { years, months, total: Number(years || 0) * 12 + Number(months || 0) };
+}
+
+/** 기간 입력: 년(필수) + 개월(선택). 개월은 0~11로 자른다. */
+function DurationField({ text, onChange }: { text: string; onChange: (t: string) => void }) {
+  const { colors } = useTheme();
+  const { years, months, total } = parseDuration(text);
+  const inputStyle = [{ minWidth: 0, fontFamily: fonts.bold, fontSize: 36, lineHeight: 44, color: colors.text, padding: 0, letterSpacing: -1, fontVariant: ["tabular-nums"] as const }, Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : null];
+  const setMonths = (t: string) => {
+    const d = t.replace(/[^0-9]/g, "").slice(0, 2);
+    onChange(`${years}:${d === "" ? "" : String(Math.min(11, Number(d)))}`);
+  };
+  return (
+    <View style={{ gap: 10, marginTop: 16 }}>
+      <View style={{ flexDirection: "row", alignItems: "flex-end", gap: 16 }}>
+        <View style={{ flex: 3, flexDirection: "row", alignItems: "baseline", gap: 8, borderBottomWidth: 2, borderBottomColor: colors.primary, paddingBottom: 10 }}>
+          <TextInput value={years} onChangeText={(t) => onChange(`${t.replace(/[^0-9]/g, "").slice(0, 3)}:${months}`)} keyboardType="number-pad" autoFocus placeholder="0" placeholderTextColor={colors.line} numberOfLines={1} selectionColor={colors.primary} accessibilityLabel="무주택 기간 (년)" style={[{ flex: 1 }, ...inputStyle]} />
+          <T variant="subheading" color={colors.text2} style={{ flexShrink: 0 }}>년</T>
+        </View>
+        <View style={{ flex: 2, flexDirection: "row", alignItems: "baseline", gap: 8, borderBottomWidth: 2, borderBottomColor: months ? colors.primary : colors.line, paddingBottom: 10 }}>
+          <TextInput value={months} onChangeText={setMonths} keyboardType="number-pad" placeholder="0" placeholderTextColor={colors.line} numberOfLines={1} selectionColor={colors.primary} accessibilityLabel="무주택 기간 (개월, 선택)" style={[{ flex: 1 }, ...inputStyle]} />
+          <T variant="subheading" color={colors.text2} style={{ flexShrink: 0 }}>개월</T>
+        </View>
+      </View>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+        <T variant="bodyMedium" color={years ? colors.primary : colors.text3}>{years ? `총 ${total}개월` : "년 수만 적어도 돼요"}</T>
+        <Sub tone="3">개월은 선택</Sub>
+      </View>
     </View>
   );
 }

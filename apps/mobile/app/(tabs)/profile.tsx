@@ -8,7 +8,7 @@ import { LOAN_AS_OF } from "@/data/loans";
 import { useAnnouncements } from "@/data/announcements";
 import { remoteConfigured } from "@/data/remote";
 import { daysLeft, PRICE_KRW } from "@/lib/billing";
-import { longDate, manwon } from "@/lib/format";
+import { longDate, manwon, yearsMonths } from "@/lib/format";
 import { getPushToken, notificationsSupported, requestNotificationPermission } from "@/lib/notifications";
 import { REGIONS } from "@/lib/onboarding";
 import { useAppState, type ThemePref } from "@/store/appState";
@@ -72,7 +72,7 @@ export default function Profile() {
           <View style={{ gap: 6 }}>
             <T variant="bodyMedium">{age} · {p.household_size}인 가구 · {MARRIAGE[p.marriage ?? ""]}{p.income_type === "dual" ? " 맞벌이" : ""} · {p.region_sigungu ?? REGIONS.find((r) => r.value === p.region_code)?.label}</T>
             <Sub>월 소득 {manwon(p.monthly_income)} · 자산 {manwon(p.total_assets)} · 현금 {manwon(p.cash_on_hand)}</Sub>
-            <Sub>{p.is_homeless ? `무주택 ${Math.floor((p.homeless_months ?? 0) / 12)}년` : "유주택"} · 청약통장 {(p.subscription_months ?? 0) + (p.subscription_active && p.subscription_as_of ? monthsBetween(p.subscription_as_of) : 0)}개월{p.subscription_active ? " (납입 중)" : ""}</Sub>
+            <Sub>{p.is_homeless ? `무주택 ${yearsMonths(p.homeless_months)}` : "유주택"} · 청약통장 {(p.subscription_months ?? 0) + (p.subscription_active && p.subscription_as_of ? monthsBetween(p.subscription_as_of) : 0)}개월{p.subscription_active ? " (납입 중)" : ""}</Sub>
             {p.workplace ? <Sub>직장 {p.workplace.label ?? "위치 저장됨"}</Sub> : null}
           </View>
         ) : (

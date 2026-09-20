@@ -3,7 +3,8 @@ import { ageFromBirthDate } from "@housing/engine";
 import { parsePlaceLabel, placeFor } from "./places";
 import { REGION_LIST, regionByCode, sigunguValue } from "./regions";
 
-export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "date" | "skip-info";
+/** duration: 년 + 개월(선택) 두 칸으로 받아 개월 수로 저장 */
+export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "duration" | "date" | "skip-info";
 
 export interface Option {
   value: string;
@@ -134,7 +135,7 @@ export const STEPS: Step[] = [
     read: (p) => (p.is_homeless === undefined ? null : p.is_homeless ? "yes" : "no"),
   },
   {
-    id: "homeless_months", kind: "months", title: "무주택 기간은 얼마나 됐나요?", hint: "개월 단위. 처음부터 집이 없었으면 나이만큼 길게 적어도 됩니다.",
+    id: "homeless_months", kind: "duration", title: "무주택 기간은 얼마나 됐나요?", hint: "년 단위로 적고 필요하면 개월을 더해 주세요. 처음부터 집이 없었으면 나이만큼 적어도 됩니다.",
     when: (p) => p.is_homeless === true,
     apply: (p, v) => ({ ...p, homeless_months: Number(v) }), read: (p) => p.homeless_months ?? null,
   },

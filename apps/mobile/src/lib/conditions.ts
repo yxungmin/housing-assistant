@@ -1,7 +1,7 @@
 import type { EligibilityRule, UserProfile } from "@housing/schema";
 import { ageFromBirthDate, monthsBetween, type RuleResult } from "@housing/engine";
 import { REGIONS } from "./onboarding";
-import { manwon, won } from "./format";
+import { manwon, won, yearsMonths } from "./format";
 
 const MARRIAGE_LABEL: Record<string, string> = { single: "미혼", married: "기혼", pre_marriage: "예비 신혼부부", single_parent: "한부모" };
 
@@ -87,7 +87,7 @@ export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: 
     case "age": return p.birth_date ? `입력: ${p.birth_date.slice(0, 4)}년생 (만 ${ageFromBirthDate(p.birth_date)}세)` : `입력: 만 ${p.age}세`;
     case "marriage": return r.unit === "status" ? `입력: ${MARRIAGE_LABEL[p.marriage ?? ""] ?? "-"}` : `입력: 혼인 ${p.marriage_years ?? 0}년`;
     case "children": return r.unit === "child_age" ? `입력: 자녀 ${p.children_ages?.join(", ") ?? "-"}세` : `입력: 자녀 ${p.children_count ?? 0}명`;
-    case "housing": return p.is_homeless ? `입력: 무주택 ${Math.floor((p.homeless_months ?? 0) / 12)}년` : "입력: 유주택";
+    case "housing": return p.is_homeless ? `입력: 무주택 ${yearsMonths(p.homeless_months)}` : "입력: 유주택";
     case "residence": return `입력: ${p.region_sigungu ?? REGIONS.find((x) => x.value === p.region_code)?.label ?? p.region_code}`;
     case "subscription": {
       const elapsed = p.subscription_active && p.subscription_as_of ? monthsBetween(p.subscription_as_of) : 0;

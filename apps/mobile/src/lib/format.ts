@@ -16,6 +16,15 @@ export function manwon(n: number | undefined | null): string {
   return `${v.toLocaleString("ko-KR")}원`;
 }
 
+/** 개월 수 → "5년" / "5년 3개월" / "8개월" */
+export function yearsMonths(months: number | undefined | null): string {
+  const m = Math.max(0, Math.round(months ?? 0));
+  const y = Math.floor(m / 12);
+  const r = m % 12;
+  if (y === 0) return `${r}개월`;
+  return r ? `${y}년 ${r}개월` : `${y}년`;
+}
+
 export function pct(ratio: number | null | undefined, digits = 1): string {
   if (ratio === null || ratio === undefined) return "-";
   return `${(ratio * 100).toFixed(digits)}%`;
