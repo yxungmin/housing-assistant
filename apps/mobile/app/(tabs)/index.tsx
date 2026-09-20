@@ -64,8 +64,9 @@ export default function Home() {
             style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: pressed ? colors.primaryPressed : colors.primary, borderRadius: radius.lg, padding: 18 })}>
             <IconTile name="check" tone="primary" size={40} />
             <View style={{ flex: 1, gap: 2 }}>
-              <T variant="label" color={colors.onPrimary} style={{ opacity: 0.85 }}>첫 공고 1건 무료 계산</T>
-              <T variant="bodyMedium" color={colors.onPrimary} lines={2}>조건이 가장 잘 맞는 "{free.title}"의 예상 주거비를 보세요</T>
+              <T variant="label" color={colors.onPrimary} style={{ opacity: 0.85 }}>조건이 가장 잘 맞는 공고 · 무료 계산</T>
+              <T variant="bodyMedium" color={colors.onPrimary} lines={1}>{free.title}</T>
+              <T variant="caption" color={colors.onPrimary} style={{ opacity: 0.85 }}>예상 주거비를 먼저 확인해 보세요</T>
             </View>
             <Icon name="right" size={20} color={colors.onPrimary} />
           </Pressable>
