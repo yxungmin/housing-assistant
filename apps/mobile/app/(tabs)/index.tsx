@@ -2,13 +2,13 @@ import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/Icon";
-import { BigNumber, Card, Chip, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { BigNumber, Card, Chip, IconTile, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ANNOUNCEMENTS, matchAll, matching, type Matched } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { REGIONS } from "@/lib/onboarding";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, space } from "@/theme/tokens";
+import { fonts } from "@/theme/tokens";
 
 /** 홈: "조건에 맞는 공고 N개" 한 문장과 큰 숫자로 시작한다. */
 export default function Home() {
@@ -40,37 +40,44 @@ export default function Home() {
 
   return (
     <Screen>
-      <View style={{ paddingTop: 28, gap: 6 }}>
-        <T variant="subheading" color={colors.text2}>내 조건에 맞는 공고</T>
-        <BigNumber value={String(matched.length)} unit="개" size={48} />
-        <Sub tone="3">{today.getFullYear()}년 {today.getMonth() + 1}월 {today.getDate()}일 기준 · 공고 {ANNOUNCEMENTS.length}개 중</Sub>
+      <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingTop: 28 }}>
+        <View style={{ gap: 6 }}>
+          <T variant="body" color={colors.text2}>내 조건에 맞는 공고</T>
+          <BigNumber value={String(matched.length)} unit="개" size={44} />
+          <Sub tone="3">{today.getMonth() + 1}월 {today.getDate()}일 기준 · 전체 공고 {ANNOUNCEMENTS.length}개</Sub>
+        </View>
+        <IconTile name="house" tone="primary" size={56} />
       </View>
-      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap", paddingTop: 4 }}>
+      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         <Chip on={myRegionOnly} onPress={() => setMyRegionOnly((v) => !v)}>{regionLabel}만</Chip>
         <Chip on={rentalOnly} onPress={() => setRentalOnly((v) => !v)}>임대만</Chip>
       </View>
 
-      {soon.length > 0 && <Section title="접수 임박" items={soon} onOpen={open} />}
-      {rest.length > 0 && <Section title={soon.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} />}
-      {matched.length === 0 && (
-        <Card>
-          <T variant="heading">아직 조건에 맞는 공고가 없어요</T>
-          <Sub>새 공고가 올라오면 알려드릴게요. 내 정보에서 비어 있는 조건을 채우면 판별되는 공고가 늘어날 수 있어요.</Sub>
+      {soon.length > 0 ? <Section title="접수 임박" items={soon} onOpen={open} /> : null}
+      {rest.length > 0 ? <Section title={soon.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} /> : null}
+      {matched.length === 0 ? (
+        <Card style={{ alignItems: "center", paddingVertical: 32, gap: 8 }}>
+          <IconTile name="bookmark" size={48} />
+          <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 조건에 맞는 공고가 없어요</T>
+          <Sub style={{ textAlign: "center" }}>새 공고가 올라오면 알려드릴게요. 내 정보에서 비어 있는 조건을 채우면 판별되는 공고가 늘어날 수 있어요.</Sub>
         </Card>
-      )}
-      {pending.length > 0 && <Section title="조건 분석 중" items={pending} onOpen={open} />}
+      ) : null}
+      {pending.length > 0 ? <Section title="조건 분석 중" items={pending} onOpen={open} /> : null}
 
-      {others.length > 0 && (
-        <Pressable onPress={() => setShowOthers((v) => !v)} accessibilityRole="button" style={{ paddingVertical: 10, flexDirection: "row", alignItems: "center", gap: 6 }}>
-          <T variant="bodyMedium" color={colors.text2}>조건이 맞지 않는 공고 {others.length}개 {showOthers ? "숨기기" : "보기"}</T>
-          <Icon name="right" size={16} color={colors.text3} />
+      {others.length > 0 ? (
+        <Pressable onPress={() => setShowOthers((v) => !v)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
+          <T variant="bodyMedium" color={colors.text2}>조건이 맞지 않는 공고 {others.length}개</T>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
+            <T variant="small" color={colors.text3}>{showOthers ? "숨기기" : "보기"}</T>
+            <Icon name="right" size={16} color={colors.text4} />
+          </View>
         </Pressable>
-      )}
-      {showOthers && others.length > 0 && <Section items={others} onOpen={open} />}
+      ) : null}
+      {showOthers && others.length > 0 ? <Section items={others} onOpen={open} /> : null}
 
-      <View style={{ flexDirection: "row", gap: 8, paddingTop: 12 }}>
-        <Icon name="info" size={16} color={colors.text3} />
-        <Sub tone="3" style={{ flex: 1 }}>"조건 일치"는 공고문 조건과 입력값을 비교한 결과이며 신청 자격을 보장하지 않아요.</Sub>
+      <View style={{ flexDirection: "row", gap: 8, paddingTop: 8, paddingHorizontal: 4 }}>
+        <Icon name="info" size={16} color={colors.text4} />
+        <Sub tone="3" variant="caption" style={{ flex: 1 }}>"조건 일치"는 공고문 조건과 입력값을 비교한 결과이며 신청 자격을 보장하지 않아요.</Sub>
       </View>
     </Screen>
   );
@@ -102,19 +109,16 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
   const place = m.distanceKm !== null ? `직장까지 약 ${m.distanceKm.toFixed(0)}km` : a.transit?.nearest_station ? `${a.transit.nearest_station} 도보 ${a.transit.station_walk_min}분` : a.region_name;
 
   return (
-    <Card onPress={onPress} style={{ gap: 10 }}>
-      <Row center>
-        <View style={{ flexDirection: "row", gap: 6, alignItems: "center" }}>
-          <T variant="label" color={colors.text3}>{HOUSING_LABEL[a.housing_type]}</T>
-          {unitLabel ? <T variant="label" color={colors.text3}>· {unitLabel}</T> : null}
-        </View>
-        {days !== null ? <T variant="label" color={days <= 14 ? colors.danger : colors.text3} numeric style={{ fontFamily: fonts.semiBold }}>{dday(a.apply_end)}</T> : null}
-      </Row>
-      <View style={{ gap: 2 }}>
-        <T variant="heading" style={{ fontSize: 18, lineHeight: 26 }}>{a.title}</T>
+    <Card onPress={onPress} style={{ gap: 12 }}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        <Sub tone="3" variant="caption">{HOUSING_LABEL[a.housing_type]}{unitLabel ? ` · ${unitLabel}` : ""}</Sub>
+        {days !== null ? <T variant="label" color={days <= 14 ? colors.danger : colors.text3} style={{ fontFamily: fonts.bold }}>{dday(a.apply_end)}</T> : null}
+      </View>
+      <View style={{ gap: 4 }}>
+        <T variant="subheading" style={{ fontSize: 18, lineHeight: 26 }}>{a.title}</T>
         {place ? <Sub tone="3">{place}</Sub> : null}
       </View>
-      <View style={{ flexDirection: "row", paddingTop: 2 }}>
+      <View style={{ flexDirection: "row" }}>
         <Tag tone={status.tone} icon={status.icon}>{status.text}</Tag>
       </View>
     </Card>

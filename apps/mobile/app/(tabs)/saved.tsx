@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useRouter } from "expo-router";
-import { Card, Notice, PageTitle, Screen, Sub, T } from "@/components/ui";
+import { Card, IconTile, Notice, PageTitle, Screen, Sub, T } from "@/components/ui";
 import { matchAll } from "@/data/announcements";
 import { daysUntil, longDate } from "@/lib/format";
 import { useAppState } from "@/store/appState";
@@ -27,9 +27,10 @@ export default function Saved() {
       <PageTitle title={`관심 공고 ${items.length}개`} sub="접수 마감 3일 전에 알려드려요" />
       {nearest ? <Notice tone="warn" icon="bell">{nearest.announcement.title} 접수가 {longDate(nearest.announcement.apply_end)}에 끝나요</Notice> : null}
       {items.length === 0 ? (
-        <Card>
-          <T variant="heading">아직 관심 공고가 없어요</T>
-          <Sub>공고 상세에서 하트를 누르면 여기에 모이고, 접수 마감 3일 전에 알려드려요.</Sub>
+        <Card style={{ alignItems: "center", paddingVertical: 36, gap: 10 }}>
+          <IconTile name="heart" size={48} tone="danger" />
+          <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 관심 공고가 없어요</T>
+          <Sub style={{ textAlign: "center" }}>공고 상세에서 하트를 누르면 여기에 모이고,{"\n"}접수 마감 3일 전에 알려드려요.</Sub>
         </Card>
       ) : (
         items.map((m) => <AnnouncementCard key={m.announcement.id} m={m} onPress={() => router.push(`/announcement/${m.announcement.id}`)} />)

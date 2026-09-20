@@ -1,60 +1,71 @@
 /**
- * 디자인 토큰 (토스 계열 톤). 두 모드는 토큰 값만 바꾼다. 색은 반드시 토큰으로만 쓴다.
- * 원칙: 면은 배경 대비로만 구분(테두리 없음), 색은 CTA·상태·강조 숫자에만, 제목과 숫자는 크게.
+ * 디자인 토큰 — 토스 디자인 시스템(TDS) 회색 단계와 같은 값을 쓴다.
+ * grey50 #F9FAFB · grey100 #F2F4F6 · grey200 #E5E8EB · grey400 #B0B8C1 · grey500 #8B95A1 · grey700 #4E5968 · grey900 #191F28
+ * 원칙: 흰 화면 + grey50 그룹 카드, 헤어라인 대신 간격, 색은 CTA·상태·강조에만.
  */
 export interface Colors {
-  primary: string; primarySoft: string; onPrimary: string;
-  surface: string; card: string; cardSoft: string; line: string;
-  text: string; text2: string; text3: string;
-  warning: string; warningSoft: string; danger: string; dangerSoft: string; ok: string; okSoft: string;
+  primary: string; primarySoft: string; onPrimary: string; primaryPressed: string;
+  surface: string; card: string; cardSoft: string; cardStrong: string; line: string;
+  text: string; text2: string; text3: string; text4: string;
+  warning: string; warningSoft: string; danger: string; dangerSoft: string; ok: string; okSoft: string; info: string; infoSoft: string;
   dim: string; tabBar: string;
 }
 
 export const light: Colors = {
-  primary: "#0AA45A",
-  primarySoft: "#E8F7EE",
+  primary: "#0FB25F",
+  primaryPressed: "#0C9A52",
+  primarySoft: "#E6F8EE",
   onPrimary: "#FFFFFF",
-  surface: "#F9FAFB",
-  card: "#FFFFFF",
+  surface: "#FFFFFF",
+  card: "#F9FAFB",
   cardSoft: "#F2F4F6",
-  line: "#F2F4F6",
+  cardStrong: "#E5E8EB",
+  line: "#E5E8EB",
   text: "#191F28",
   text2: "#4E5968",
   text3: "#8B95A1",
-  warning: "#D9822B",
-  warningSoft: "#FFF4E5",
-  danger: "#E5484D",
-  dangerSoft: "#FDECEC",
-  ok: "#0AA45A",
-  okSoft: "#E8F7EE",
-  dim: "rgba(23, 27, 31, 0.5)",
+  text4: "#B0B8C1",
+  warning: "#E67A17",
+  warningSoft: "#FFF3E6",
+  danger: "#F04452",
+  dangerSoft: "#FDECEE",
+  ok: "#0FB25F",
+  okSoft: "#E6F8EE",
+  info: "#3182F6",
+  infoSoft: "#E8F3FF",
+  dim: "rgba(0, 23, 51, 0.55)",
   tabBar: "#FFFFFF",
 };
 
 export const dark: Colors = {
   primary: "#2ED27C",
+  primaryPressed: "#26BF6F",
   primarySoft: "#123A24",
   onPrimary: "#08150D",
-  surface: "#101418",
-  card: "#17191D",
-  cardSoft: "#22262B",
-  line: "#22262B",
+  surface: "#17171C",
+  card: "#202027",
+  cardSoft: "#2A2A33",
+  cardStrong: "#353542",
+  line: "#2A2A33",
   text: "#F2F4F6",
   text2: "#B0B8C1",
-  text3: "#7C8590",
-  warning: "#F0A24A",
+  text3: "#8B95A1",
+  text4: "#6B7684",
+  warning: "#F5A044",
   warningSoft: "#3A2A14",
-  danger: "#F06A6E",
-  dangerSoft: "#3D1E20",
+  danger: "#F36C77",
+  dangerSoft: "#3D1E22",
   ok: "#2ED27C",
   okSoft: "#123A24",
-  dim: "rgba(0,0,0,0.65)",
-  tabBar: "#17191D",
+  info: "#5B9CF8",
+  infoSoft: "#1A2C45",
+  dim: "rgba(0,0,0,0.7)",
+  tabBar: "#17171C",
 };
 
-/** 간격: 화면 좌우 24, 카드 안 20, 섹션 사이 28 */
-export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, screen: 24, section: 28, xxl: 36 } as const;
-export const radius = { sm: 10, md: 14, lg: 20, xl: 24, pill: 999 } as const;
+/** 간격: 화면 좌우 24, 카드 안 20, 섹션 사이 32 */
+export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, screen: 24, section: 32, xxl: 40 } as const;
+export const radius = { sm: 8, md: 14, lg: 20, xl: 24, pill: 999 } as const;
 
 export const fonts = {
   regular: "Pretendard-Regular",
@@ -66,15 +77,15 @@ export const fonts = {
   numMedium: "Pretendard-SemiBold",
 } as const;
 
-/** 타입 스케일 */
+/** 타입 스케일 (TDS 근사): 제목은 크고 자간을 좁게, 본문 16 */
 export const type = {
-  display: { fontFamily: fonts.bold, fontSize: 34, lineHeight: 44, letterSpacing: -0.8 },
-  title: { fontFamily: fonts.bold, fontSize: 26, lineHeight: 36, letterSpacing: -0.5 },
-  heading: { fontFamily: fonts.bold, fontSize: 20, lineHeight: 28, letterSpacing: -0.3 },
-  subheading: { fontFamily: fonts.semiBold, fontSize: 17, lineHeight: 24, letterSpacing: -0.2 },
-  body: { fontFamily: fonts.regular, fontSize: 16, lineHeight: 24, letterSpacing: -0.1 },
-  bodyMedium: { fontFamily: fonts.medium, fontSize: 16, lineHeight: 24, letterSpacing: -0.1 },
-  small: { fontFamily: fonts.regular, fontSize: 14, lineHeight: 20 },
+  display: { fontFamily: fonts.bold, fontSize: 34, lineHeight: 44, letterSpacing: -1 },
+  title: { fontFamily: fonts.bold, fontSize: 28, lineHeight: 38, letterSpacing: -0.8 },
+  heading: { fontFamily: fonts.bold, fontSize: 22, lineHeight: 30, letterSpacing: -0.5 },
+  subheading: { fontFamily: fonts.bold, fontSize: 17, lineHeight: 24, letterSpacing: -0.3 },
+  body: { fontFamily: fonts.regular, fontSize: 16, lineHeight: 24, letterSpacing: -0.2 },
+  bodyMedium: { fontFamily: fonts.medium, fontSize: 16, lineHeight: 24, letterSpacing: -0.2 },
+  small: { fontFamily: fonts.regular, fontSize: 14, lineHeight: 20, letterSpacing: -0.1 },
   caption: { fontFamily: fonts.regular, fontSize: 13, lineHeight: 18 },
   label: { fontFamily: fonts.semiBold, fontSize: 13, lineHeight: 18 },
 } as const;

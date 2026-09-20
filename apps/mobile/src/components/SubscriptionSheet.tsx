@@ -33,7 +33,7 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
           </View>
         ))}
       </View>
-      <Card soft>
+      <Card>
         <Row center>
           <View style={{ gap: 2 }}>
             <T variant="heading">7일 무료 체험</T>
