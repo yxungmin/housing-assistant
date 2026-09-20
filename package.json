@@ -16,7 +16,8 @@
     "inspect": "npm run inspect -w @housing/collector --",
     "lh:dump": "npm run lh:dump -w @housing/collector",
     "benchmark": "npm run benchmark -w @housing/collector",
-    "collect:dry": "npm run collect:dry -w @housing/collector"
+    "collect:dry": "npm run collect:dry -w @housing/collector",
+    "review": "npm run review -w @housing/collector"
   },
   "engines": {
     "node": ">=20"
