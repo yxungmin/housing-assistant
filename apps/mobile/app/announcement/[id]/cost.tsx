@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
 import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchAnnouncement } from "@housing/engine";
 import { Icon } from "@/components/Icon";
@@ -80,10 +80,10 @@ export default function Cost() {
           <T variant="heading" style={{ fontSize: 18, lineHeight: 26 }}>{a.title}</T>
           {bestTrackName ? <Sub tone="3">{bestTrackName}</Sub> : null}
         </View>
-        <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -space.screen }} contentContainerStyle={{ paddingHorizontal: space.screen, gap: 8 }}>
           {rentals.map((r, i) => <Chip key={`${r.trackName}-${r.label}`} on={i === sel} onPress={() => setSel(i)}>{allTracks ? `${r.trackName} · ${r.label}` : r.label}</Chip>)}
           {otherCount > 0 && !allTracks ? <Chip onPress={() => { setAllTracks(true); setSel(0); }}>다른 트랙 {otherCount}개</Chip> : null}
-        </View>
+        </ScrollView>
 
         <Card style={{ gap: 16 }}>
           <BigNumber label="지금 필요한 현금 (예상)" value={cashLabel} unit="원" size={40} sub={cost.shortfall > 0 ? `보유 현금 ${manwon(profile.cash_on_hand)}으로는 ${manwon(cost.shortfall)} 부족해요` : `보유 현금 ${manwon(profile.cash_on_hand)}으로 감당돼요`} />
