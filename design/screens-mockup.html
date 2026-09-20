@@ -1,5 +1,5 @@
 <title>공공주택 비서 화면 시안</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700;800&family=Manrope:wght@500;600;700;800&display=swap">
 <style>
   :root {
     --pg-bg: #f3f5f2;
@@ -42,12 +42,12 @@
   * { box-sizing: border-box; }
   body {
     margin: 0; background: var(--pg-bg); color: var(--pg-text);
-    font-family: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+    font-family: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
     font-size: 15px; line-height: 1.55;
   }
   .wrap { max-width: 1480px; margin: 0 auto; padding: 40px 28px 80px; }
   header.intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 40px; align-items: end; margin-bottom: 28px; }
-  header.intro h1 { font-family: "IBM Plex Sans KR", "Noto Sans KR", sans-serif; font-weight: 600; font-size: 28px; letter-spacing: -.01em; margin: 0 0 8px; text-wrap: balance; }
+  header.intro h1 { font-weight: 800; font-size: 28px; letter-spacing: -.01em; margin: 0 0 8px; text-wrap: balance; }
   header.intro p { margin: 0; max-width: 62ch; color: var(--pg-muted); }
   .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--pg-accent); font-weight: 600; margin-bottom: 8px; }
   .toggle { display: inline-flex; border: 1px solid var(--pg-line); border-radius: 999px; padding: 3px; background: var(--pg-card); }
@@ -61,14 +61,14 @@
   figure { margin: 0; display: flex; flex-direction: column; gap: 14px; }
   figcaption { font-size: 13.5px; color: var(--pg-muted); line-height: 1.5; }
   figcaption b { display: block; color: var(--pg-text); font-weight: 600; font-size: 14px; margin-bottom: 2px; }
-  figcaption .step { font-family: "IBM Plex Sans KR", sans-serif; color: var(--pg-accent); font-weight: 600; margin-right: 6px; }
+  figcaption .step { font-family: "Manrope", sans-serif; color: var(--pg-accent); font-weight: 600; margin-right: 6px; }
 
   /* ── 폰 프레임 ─────────────────────────── */
   .phone {
     width: 360px; height: 740px; margin: 0 auto; border-radius: 40px; background: var(--surface); color: var(--text);
     border: 10px solid #111; box-shadow: 0 30px 60px -30px rgba(0,0,0,.45), 0 0 0 1px rgba(0,0,0,.15);
     position: relative; overflow: hidden; display: flex; flex-direction: column;
-    font-family: "IBM Plex Sans KR", "Noto Sans KR", sans-serif; font-size: 14px; line-height: 1.45;
+    font-family: "Gothic A1", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif; font-size: 14px; line-height: 1.45;
   }
   .phone::before { content: ""; position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 96px; height: 26px; background: #111; border-radius: 14px; z-index: 5; }
   .status { height: 44px; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 22px 6px; font-size: 12px; font-weight: 600; color: var(--text); }
@@ -76,11 +76,16 @@
   .body { flex: 1; overflow: hidden; padding: 0 18px; display: flex; flex-direction: column; gap: 12px; }
   .nav { display: flex; align-items: center; justify-content: space-between; padding: 6px 18px 4px; font-size: 15px; font-weight: 600; }
   .nav .back { color: var(--text-2); font-weight: 400; }
-  .nav .icon { color: var(--text-2); font-size: 18px; }
+  .nav .icon { color: var(--text-2); display: inline-flex; } .nav .icon svg, .nav .back svg { width: 20px; height: 20px; }
   .cta { margin: auto 18px 20px; padding: 15px; border-radius: 14px; background: var(--primary); color: var(--on-primary); text-align: center; font-weight: 700; font-size: 15px; }
   .cta.ghost { background: transparent; color: var(--text-2); font-weight: 500; margin-top: -8px; padding: 8px; }
+  .num, .input, .kv b, .price b, .status, .slider .ends, .tag.danger, .tag.gray, .total .big { font-family: "Manrope", "Gothic A1", sans-serif; font-feature-settings: "tnum"; }
+  svg.ic { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: -3px; flex: none; }
+  svg.ic.xs { width: 12px; height: 12px; stroke-width: 2.5; margin-right: 4px; vertical-align: -1.5px; }
+  .status .sys { display: inline-flex; gap: 5px; align-items: center; }
+  .status .sys svg { width: 15px; height: 15px; stroke-width: 1.8; }
   .big { font-size: 34px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; font-variant-numeric: tabular-nums; }
-  .big small { font-size: 16px; font-weight: 500; color: var(--text-2); margin-left: 4px; }
+  .big small { font-size: 16px; font-weight: 500; color: var(--text-2); margin-left: 4px; font-family: "Gothic A1", sans-serif; }
   .sub { color: var(--text-2); font-size: 13px; }
   .card { background: var(--card); border-radius: 16px; padding: 14px 16px; border: 1px solid var(--border); }
   .num { font-variant-numeric: tabular-nums; }
@@ -99,8 +104,9 @@
   .meta .dot::before { content: "·"; margin-right: 8px; }
   .cond { display: grid; grid-template-columns: 20px 1fr auto; gap: 8px 10px; align-items: start; padding: 9px 0; border-top: 1px solid var(--border); font-size: 13.5px; }
   .cond:first-of-type { border-top: 0; }
-  .cond .mark { font-weight: 700; text-align: center; }
-  .cond .mark.ok { color: var(--ok); } .cond .mark.chk { color: var(--warning); } .cond .mark.no { color: var(--danger); }
+  .cond .mark { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; margin-top: 1px; }
+  .cond .mark svg { width: 12px; height: 12px; stroke-width: 2.8; }
+  .cond .mark.ok { color: var(--ok); background: var(--primary-soft); } .cond .mark.chk { color: var(--warning); background: var(--warning-soft); } .cond .mark.no { color: var(--danger); background: var(--danger-soft); }
   .cond .why { font-size: 12px; color: var(--text-2); }
   .cond .pg { font-size: 11.5px; color: var(--primary); white-space: nowrap; }
   .group { border-radius: 12px; border: 1px dashed var(--border); padding: 8px 12px 4px; margin: 4px 0; }
@@ -138,7 +144,7 @@
   .radio i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); flex: none; }
   .radio.on i { border: 5px solid var(--primary); }
   .benefit { display: flex; gap: 10px; font-size: 14px; align-items: flex-start; }
-  .benefit .mark { color: var(--primary); font-weight: 700; }
+  .benefit .mark { color: var(--primary); display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--primary-soft); margin-top: 1px; } .benefit .mark svg { width: 12px; height: 12px; stroke-width: 2.8; }
   .price { font-size: 13px; color: var(--text-2); }
   .price b { color: var(--text); font-size: 20px; font-variant-numeric: tabular-nums; }
   .setting { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-top: 1px solid var(--border); font-size: 14px; }
@@ -147,16 +153,32 @@
   .tabbar { display: flex; justify-content: space-around; padding: 10px 6px 18px; border-top: 1px solid var(--border); background: var(--card); font-size: 11px; color: var(--text-2); }
   .tabbar div { text-align: center; }
   .tabbar .on { color: var(--primary); font-weight: 600; }
-  .tabbar .ic { display: block; width: 22px; height: 22px; border-radius: 6px; margin: 0 auto 3px; background: currentColor; opacity: .18; }
-  .tabbar .on .ic { opacity: .9; }
-  .banner { display: flex; gap: 10px; align-items: center; background: var(--warning-soft); color: var(--warning); border-radius: 12px; padding: 10px 12px; font-size: 12.5px; font-weight: 600; }
+  .tabbar svg.ic { display: block; width: 22px; height: 22px; margin: 0 auto 3px; stroke-width: 1.8; }
+  .banner { display: flex; gap: 8px; align-items: center; background: var(--warning-soft); color: var(--warning); border-radius: 12px; padding: 10px 12px; font-size: 12.5px; font-weight: 600; }
   .hero-start { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 0 22px; }
   .hero-start .big { font-size: 30px; }
-  .hero-start .mark { width: 48px; height: 48px; border-radius: 14px; background: var(--primary); position: relative; }
-  .hero-start .mark::after { content: ""; position: absolute; left: 14px; top: 16px; width: 20px; height: 16px; border: 3px solid var(--on-primary); border-top-width: 0; border-radius: 0 0 4px 4px; }
-  .hero-start .mark::before { content: ""; position: absolute; left: 12px; top: 8px; width: 24px; height: 10px; border: 3px solid var(--on-primary); border-bottom: 0; border-radius: 6px 6px 0 0; }
+  .hero-start .mark { width: 52px; height: 52px; border-radius: 16px; background: var(--primary); color: var(--on-primary); display: grid; place-items: center; }
+  .hero-start .mark svg { width: 28px; height: 28px; stroke-width: 2; }
   @media (prefers-reduced-motion: no-preference) { .toggle button { transition: background .15s, color .15s; } }
 </style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></symbol>
+  <symbol id="i-signal" viewBox="0 0 24 24"><path d="M2 20h.01M7 20v-4M12 20v-8M17 20V8M22 4v16"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></symbol>
+  <symbol id="i-battery" viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/><rect x="4.5" y="9.5" width="11" height="5" rx=".8" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-delete" viewBox="0 0 24 24"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><path d="m18 9-6 6M12 9l6 6"/></symbol>
+</svg>
 
 <div class="wrap">
   <header class="intro">
@@ -173,7 +195,7 @@
 
   <div class="principles">
     <div><b>주색 초록 하나.</b> CTA, 일치 상태, 강조 숫자에만 쓴다. 경고·불일치는 주황·빨강을 보조로.</div>
-    <div><b>상태는 아이콘+문구.</b> ✓ 일치, △ 확인 필요, ✕ 불일치. 색에만 의존하지 않는다.</div>
+    <div><b>상태는 아이콘+문구.</b> <svg class="ic xs" style="vertical-align:-1px;margin-right:2px"><use href="#i-check"/></svg>일치, <svg class="ic xs" style="vertical-align:-1px;margin-right:2px"><use href="#i-alert"/></svg>확인 필요, <svg class="ic xs" style="vertical-align:-1px;margin-right:2px"><use href="#i-x"/></svg>불일치. 색에만 의존하지 않는다.</div>
     <div><b>문구는 비확정.</b> "신청 가능"이 아니라 "조건 일치", "충족 예상". 모든 숫자에 출처.</div>
     <div><b>로그인은 늦게.</b> 매칭과 첫 계산 1건까지 로그인 없음. 구독 시트에서 처음 요구.</div>
   </div>
@@ -183,10 +205,10 @@
     <!-- 1. 시작 -->
     <figure>
       <div class="phone">
-        <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+        <div class="status"><span>9:41</span><span class="sys"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
         <div class="screen">
           <div class="hero-start">
-            <div class="mark" aria-hidden="true"></div>
+            <div class="mark" aria-hidden="true"><svg class="ic"><use href="#i-house"/></svg></div>
             <div class="big">내 조건에 맞는<br>공공주택 공고만<br>보여드릴게요</div>
             <div class="sub">나이·소득·자산을 입력하면 LH 공고 중 조건이 맞는 것과 예상 주거비를 바로 계산합니다. 입력한 정보는 이 기기에만 저장됩니다.</div>
           </div>
@@ -200,19 +222,19 @@
     <!-- 2. 조건 입력 -->
     <figure>
       <div class="phone">
-        <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+        <div class="status"><span>9:41</span><span class="sys"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
         <div class="screen">
-          <div class="nav"><span class="back">‹ 뒤로</span><span class="sub">6 / 11</span><span class="icon">✕</span></div>
+          <div class="nav"><span class="back"><svg class="ic"><use href="#i-left"/></svg> 뒤로</span><span class="sub">6 / 11</span><span class="icon"><svg class="ic"><use href="#i-x"/></svg></span></div>
           <div class="progress"><i></i></div>
           <div class="body" style="padding-top:18px">
             <div class="big" style="font-size:24px">한 달 가구 소득은<br>얼마인가요?</div>
             <div class="sub">세금 떼기 전 금액이에요. 맞벌이면 두 사람 소득을 더해 주세요.</div>
             <div class="input"><span style="color:var(--text);font-size:30px;font-weight:700">2,800,000</span><span>원 / 월</span></div>
-            <div class="helper">건강보험료로 계산하기 ›</div>
+            <div class="helper">건강보험료로 계산하기 <svg class="ic xs"><use href="#i-right"/></svg></div>
             <div class="sub" style="margin-top:2px">정확한 금액을 모르면 직장 건강보험료 납부액으로 역산해 드려요. 공고의 소득 기준이 이 값으로 판정됩니다.</div>
           </div>
           <div class="cta" style="margin-bottom:10px">다음</div>
-          <div class="keypad" aria-hidden="true"><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>00</div><div>0</div><div>⌫</div></div>
+          <div class="keypad" aria-hidden="true"><div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>00</div><div>0</div><div><svg class="ic"><use href="#i-delete"/></svg></div></div>
         </div>
       </div>
       <figcaption><b><span class="step">2</span>조건 입력 (10~12단계)</b>질문 하나, 하단 고정 CTA, 뒤로가기 자유. 소득에는 건강보험료 역산 도우미를 붙인다. 리스크 표의 "공식 소득을 모름" 대응.</figcaption>
@@ -221,12 +243,12 @@
     <!-- 3. 홈 -->
     <figure>
       <div class="phone">
-        <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+        <div class="status"><span>9:41</span><span class="sys"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
         <div class="screen">
           <div class="body" style="padding-top:14px">
             <div>
               <div class="sub">내 조건에 맞는 공고</div>
-              <div class="big">12<small>개</small></div>
+              <div class="big num">12<small>개</small></div>
               <div class="sub">2026년 9월 20일 기준 · 최근 90일 LH 공고 363개 중</div>
             </div>
             <div class="chips"><span class="chip on">서울·경기</span><span class="chip on">직장 1시간 이내</span><span class="chip">행복주택</span><span class="chip">임대만</span></div>
@@ -235,12 +257,12 @@
               <div class="card">
                 <div class="row"><span class="notice">과천지식정보타운 S-11BL 행복주택</span><span class="tag danger">D-12</span></div>
                 <div class="meta"><span>행복주택</span><span class="dot">16A·26A·36A·44A</span><span class="dot">경기 과천</span></div>
-                <div class="row" style="margin-top:8px"><span class="tag">✓ 조건 7/8 일치</span><span class="sub">직장까지 41분</span></div>
+                <div class="row" style="margin-top:8px"><span class="tag"><svg class="ic xs"><use href="#i-check"/></svg>조건 7/8 일치</span><span class="sub">직장까지 41분</span></div>
               </div>
               <div class="card">
                 <div class="row"><span class="notice">강서염창 통합공공임대 최초 입주자 모집</span><span class="tag danger">D-11</span></div>
                 <div class="meta"><span>통합공공임대</span><span class="dot">서울 강서</span></div>
-                <div class="row" style="margin-top:8px"><span class="tag">✓ 조건 8/8 일치</span><span class="sub">직장까지 52분</span></div>
+                <div class="row" style="margin-top:8px"><span class="tag"><svg class="ic xs"><use href="#i-check"/></svg>조건 8/8 일치</span><span class="sub">직장까지 52분</span></div>
               </div>
             </div>
             <div class="section-title">전체</div>
@@ -248,11 +270,11 @@
               <div class="card">
                 <div class="row"><span class="notice">군산나운4 영구임대 예비입주자 모집</span><span class="tag gray">D-9</span></div>
                 <div class="meta"><span>영구임대</span><span class="dot">전북 군산</span></div>
-                <div class="row" style="margin-top:8px"><span class="tag warn">△ 공고 조건 분석 중</span></div>
+                <div class="row" style="margin-top:8px"><span class="tag warn"><svg class="ic xs"><use href="#i-alert"/></svg>공고 조건 분석 중</span></div>
               </div>
             </div>
           </div>
-          <div class="tabbar"><div class="on"><span class="ic"></span>홈</div><div><span class="ic"></span>관심</div><div><span class="ic"></span>내 정보</div></div>
+          <div class="tabbar"><div class="on"><svg class="ic"><use href="#i-home"/></svg>홈</div><div><svg class="ic"><use href="#i-bookmark"/></svg>관심</div><div><svg class="ic"><use href="#i-user"/></svg>내 정보</div></div>
         </div>
       </div>
       <figcaption><b><span class="step">3</span>홈</b>큰 숫자 한 문장으로 시작. 카드는 단지명·유형·면적·조건 N/8·D-day. 검수 전 공고는 "분석 중"으로만 보이고 계산은 열리지 않는다.</figcaption>
@@ -261,9 +283,9 @@
     <!-- 4. 공고 상세 -->
     <figure>
       <div class="phone">
-        <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+        <div class="status"><span>9:41</span><span class="sys"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
         <div class="screen">
-          <div class="nav"><span class="back">‹</span><span></span><span class="icon">♡</span></div>
+          <div class="nav"><span class="back"><svg class="ic"><use href="#i-left"/></svg></span><span></span><span class="icon"><svg class="ic"><use href="#i-heart"/></svg></span></div>
           <div class="body">
             <div>
               <div class="chips"><span class="tag">행복주택</span><span class="tag gray">접수 12.30 ~ 1.2</span></div>
@@ -272,12 +294,12 @@
             </div>
             <div class="card">
               <div class="row"><span class="section-title" style="margin:0">청년 트랙 · 조건 7/8 일치</span><span class="sub">근거 쪽</span></div>
-              <div class="cond"><span class="mark ok">✓</span><span>무주택세대구성원<div class="why">입력: 무주택 5년</div></span><span class="pg">p.1</span></div>
-              <div class="cond"><span class="mark ok">✓</span><span>만 19~39세<div class="why">입력: 28세</div></span><span class="pg">p.1</span></div>
-              <div class="cond"><span class="mark ok">✓</span><span>1인 가구 월평균소득 100% 이하 · 3,482,964원<div class="why">입력: 2,800,000원</div></span><span class="pg">p.17</span></div>
-              <div class="cond"><span class="mark ok">✓</span><span>총자산 2억 7,300만 원 이하<div class="why">입력: 3,200만 원</div></span><span class="pg">p.2</span></div>
-              <div class="cond"><span class="mark chk">△</span><span>자동차가액 3,708만 원 이하<div class="why">차량가액을 입력하면 판별할 수 있어요</div></span><span class="pg">p.2</span></div>
-              <div class="cond"><span class="mark ok">✓</span><span>청약통장 가입 6개월·6회 이상<div class="why">입력: 31개월 · 31회</div></span><span class="pg">p.13</span></div>
+              <div class="cond"><span class="mark ok"><svg class="ic"><use href="#i-check"/></svg></span><span>무주택세대구성원<div class="why">입력: 무주택 5년</div></span><span class="pg">p.1</span></div>
+              <div class="cond"><span class="mark ok"><svg class="ic"><use href="#i-check"/></svg></span><span>만 19~39세<div class="why">입력: 28세</div></span><span class="pg">p.1</span></div>
+              <div class="cond"><span class="mark ok"><svg class="ic"><use href="#i-check"/></svg></span><span>1인 가구 월평균소득 100% 이하 · 3,482,964원<div class="why">입력: 2,800,000원</div></span><span class="pg">p.17</span></div>
+              <div class="cond"><span class="mark ok"><svg class="ic"><use href="#i-check"/></svg></span><span>총자산 2억 7,300만 원 이하<div class="why">입력: 3,200만 원</div></span><span class="pg">p.2</span></div>
+              <div class="cond"><span class="mark chk"><svg class="ic"><use href="#i-alert"/></svg></span><span>자동차가액 3,708만 원 이하<div class="why">차량가액을 입력하면 판별할 수 있어요</div></span><span class="pg">p.2</span></div>
+              <div class="cond"><span class="mark ok"><svg class="ic"><use href="#i-check"/></svg></span><span>청약통장 가입 6개월·6회 이상<div class="why">입력: 31개월 · 31회</div></span><span class="pg">p.13</span></div>
             </div>
             <div class="map"><div class="pin"></div><div class="lbl">갈현동 · 인덕원역 도보 22분 · 직장까지 41분</div></div>
           </div>
@@ -290,9 +312,9 @@
     <!-- 5. 비용 계산 -->
     <figure>
       <div class="phone">
-        <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+        <div class="status"><span>9:41</span><span class="sys"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
         <div class="screen">
-          <div class="nav"><span class="back">‹</span><span>예상 주거비</span><span class="icon">⋯</span></div>
+          <div class="nav"><span class="back"><svg class="ic"><use href="#i-left"/></svg></span><span>예상 주거비</span><span class="icon"><svg class="ic"><use href="#i-more"/></svg></span></div>
           <div class="body">
             <div class="chips"><span class="chip on">16A · 청년</span><span class="chip">26A</span><span class="chip">36A</span></div>
             <div class="card">
@@ -324,9 +346,9 @@
     <!-- 6. 시나리오 조정 시트 -->
     <figure>
       <div class="phone">
-        <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+        <div class="status"><span>9:41</span><span class="sys"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
         <div class="screen">
-          <div class="nav"><span class="back">‹</span><span>예상 주거비</span><span class="icon">⋯</span></div>
+          <div class="nav"><span class="back"><svg class="ic"><use href="#i-left"/></svg></span><span>예상 주거비</span><span class="icon"><svg class="ic"><use href="#i-more"/></svg></span></div>
           <div class="body" aria-hidden="true">
             <div class="card"><div class="sub">지금 필요한 현금 (예상)</div><div class="big num">1,142<small>만 원</small></div></div>
             <div class="card"><div class="sub">매달 나가는 돈 (예상)</div><div class="big num" style="font-size:26px">392,264<small>원</small></div></div>
@@ -349,9 +371,9 @@
     <!-- 7. 구독 시트 -->
     <figure>
       <div class="phone">
-        <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+        <div class="status"><span>9:41</span><span class="sys"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
         <div class="screen">
-          <div class="nav"><span class="back">‹</span><span></span><span class="icon">♡</span></div>
+          <div class="nav"><span class="back"><svg class="ic"><use href="#i-left"/></svg></span><span></span><span class="icon"><svg class="ic"><use href="#i-heart"/></svg></span></div>
           <div class="body" aria-hidden="true">
             <div class="notice" style="font-size:17px">강서염창 통합공공임대 최초 입주자 모집</div>
             <div class="card"><div class="section-title" style="margin:0">일반공급 · 조건 8/8 일치</div></div>
@@ -360,9 +382,9 @@
           <div class="sheet">
             <div class="notice" style="font-size:18px">다른 공고의 주거비도<br>계산해 볼까요?</div>
             <div class="sub">첫 공고 1건은 무료로 계산해 드렸어요. 이어서 보려면 구독이 필요해요.</div>
-            <div class="benefit"><span class="mark">✓</span><span>모든 공고의 필요 현금·월 주거비 계산</span></div>
-            <div class="benefit"><span class="mark">✓</span><span>보증금·월세 시나리오와 대출 상품 비교</span></div>
-            <div class="benefit"><span class="mark">✓</span><span>수정 공고가 나오면 자동 재계산</span></div>
+            <div class="benefit"><span class="mark"><svg class="ic"><use href="#i-check"/></svg></span><span>모든 공고의 필요 현금·월 주거비 계산</span></div>
+            <div class="benefit"><span class="mark"><svg class="ic"><use href="#i-check"/></svg></span><span>보증금·월세 시나리오와 대출 상품 비교</span></div>
+            <div class="benefit"><span class="mark"><svg class="ic"><use href="#i-check"/></svg></span><span>수정 공고가 나오면 자동 재계산</span></div>
             <div class="card" style="display:flex;justify-content:space-between;align-items:center">
               <div><div class="notice">7일 무료 체험</div><div class="price">체험이 끝나면 <b>월 2,900원</b></div></div>
               <span class="tag">언제든 해지</span>
@@ -378,11 +400,11 @@
     <!-- 8. 관심 공고 -->
     <figure>
       <div class="phone">
-        <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+        <div class="status"><span>9:41</span><span class="sys"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
         <div class="screen">
           <div class="body" style="padding-top:14px">
-            <div><div class="big" style="font-size:24px">관심 공고 3개</div><div class="sub">마감 3일 전에 알려드려요</div></div>
-            <div class="banner">🔔 &nbsp;강서염창 통합공공임대 접수가 10월 1일에 끝나요</div>
+            <div><div class="big" style="font-size:24px">관심 공고 <span class="num">3</span>개</div><div class="sub">마감 3일 전에 알려드려요</div></div>
+            <div class="banner"><svg class="ic"><use href="#i-bell"/></svg>강서염창 통합공공임대 접수가 10월 1일에 끝나요</div>
             <div class="list">
               <div class="card">
                 <div class="row"><span class="notice">강서염창 통합공공임대</span><span class="tag danger">D-11</span></div>
@@ -398,7 +420,7 @@
               </div>
             </div>
           </div>
-          <div class="tabbar"><div><span class="ic"></span>홈</div><div class="on"><span class="ic"></span>관심</div><div><span class="ic"></span>내 정보</div></div>
+          <div class="tabbar"><div><svg class="ic"><use href="#i-home"/></svg>홈</div><div class="on"><svg class="ic"><use href="#i-bookmark"/></svg>관심</div><div><svg class="ic"><use href="#i-user"/></svg>내 정보</div></div>
         </div>
       </div>
       <figcaption><b><span class="step">8</span>관심 공고</b>D-day 순 정렬. D-3 알림은 기기 예약 알림이라 서버가 관심 목록을 알지 못한다. 앱을 열 때 일정 변경을 반영해 다시 예약한다.</figcaption>
@@ -407,7 +429,7 @@
     <!-- 9. 내 정보 -->
     <figure>
       <div class="phone">
-        <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+        <div class="status"><span>9:41</span><span class="sys"><svg class="ic"><use href="#i-signal"/></svg><svg class="ic"><use href="#i-wifi"/></svg><svg class="ic"><use href="#i-battery"/></svg></span></div>
         <div class="screen">
           <div class="body" style="padding-top:14px">
             <div class="big" style="font-size:24px">내 정보</div>
@@ -419,17 +441,17 @@
             <div class="card">
               <div class="setting"><span>구독</span><span class="v"><span class="tag">체험 중</span> 9월 27일까지 무료</span></div>
               <div class="setting"><span>다음 결제</span><span class="v">9월 27일 · 월 2,900원</span></div>
-              <div class="setting"><span>구독 복원 · 해지</span><span class="v">›</span></div>
+              <div class="setting"><span>구독 복원 · 해지</span><span class="v"><svg class="ic"><use href="#i-right"/></svg></span></div>
             </div>
             <div class="card">
               <div class="setting"><span>대출 금리 기준일</span><span class="v">2026년 9월 1일</span></div>
-              <div class="setting"><span>화면 모드</span><span class="v">시스템 설정 따름 ›</span></div>
+              <div class="setting"><span>화면 모드</span><span class="v">시스템 설정 따름 <svg class="ic xs"><use href="#i-right"/></svg></span></div>
               <div class="setting"><span>알림</span><span class="v">신규 공고 · 마감 D-3</span></div>
-              <div class="setting"><span>이 숫자 이상해요 (신고 내역)</span><span class="v">›</span></div>
+              <div class="setting"><span>이 숫자 이상해요 (신고 내역)</span><span class="v"><svg class="ic"><use href="#i-right"/></svg></span></div>
             </div>
             <div class="sub">입력한 조건은 이 기기에만 저장되고 서버로 보내지 않아요.</div>
           </div>
-          <div class="tabbar"><div><span class="ic"></span>홈</div><div><span class="ic"></span>관심</div><div class="on"><span class="ic"></span>내 정보</div></div>
+          <div class="tabbar"><div><svg class="ic"><use href="#i-home"/></svg>홈</div><div><svg class="ic"><use href="#i-bookmark"/></svg>관심</div><div class="on"><svg class="ic"><use href="#i-user"/></svg>내 정보</div></div>
         </div>
       </div>
       <figcaption><b><span class="step">9</span>내 정보</b>조건 수정, 구독 상태와 갱신일, 대출 금리 기준일, 라이트·다크 고정. 비어 있는 입력을 채우면 어떤 조건이 판별되는지 알려 준다.</figcaption>
