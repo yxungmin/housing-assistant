@@ -25,7 +25,23 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: check secrets
+        id: secrets
+        env:
+          LH_API_KEY: ${{ secrets.LH_API_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        run: |
+          if [ -z "$LH_API_KEY" ]; then
+            echo "::notice::LH_API_KEY secret이 없어 이번 실행을 건너뜁니다 (Settings → Secrets and variables → Actions)."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          elif [ -z "$SUPABASE_URL" ] && [ "${{ inputs.dry_run }}" != "true" ]; then
+            echo "::notice::SUPABASE_URL secret이 없어 dry-run으로만 실행합니다."
+            echo "ready=dry" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: collect
+        if: steps.secrets.outputs.ready != 'false'
         env:
           LH_API_KEY: ${{ secrets.LH_API_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -35,4 +51,4 @@ jobs:
           EXTRACTION_MODEL: ${{ vars.EXTRACTION_MODEL || 'claude-opus-5' }}
           MAX_ANNOUNCEMENTS_PER_RUN: ${{ vars.MAX_ANNOUNCEMENTS_PER_RUN || '10' }}
         run: |
-          if [ "${{ inputs.dry_run }}" = "true" ]; then npm run collect:dry; else npm run collect; fi
+          if [ "${{ inputs.dry_run }}" = "true" ] || [ "${{ steps.secrets.outputs.ready }}" = "dry" ]; then npm run collect:dry; else npm run collect; fi

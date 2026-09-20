@@ -1,5 +1,7 @@
 # 공공주택 비서 (housing-assistant)
 
+저장소: https://github.com/yxungmin/housing-assistant (공개 — GitHub Actions 무료 분을 쓰기 위해)
+
 사용자가 나이·소득·자산 등 조건을 입력하면 LH 공공주택 공고 중 조건에 맞는 공고를 보여주고,
 공고별 예상 주거비를 계산해 주는 모바일 앱. 기획·설계는 [MVP 개발 문서](https://claude.ai/code/artifact/54a25418-ac2c-403c-9c5d-0169acb231fc)를 따른다.
 
