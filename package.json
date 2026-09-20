@@ -5,7 +5,8 @@
   "description": "공공주택 비서 — LH 공고 매칭·주거비 계산 앱 모노레포",
   "workspaces": [
     "packages/*",
-    "collector"
+    "collector",
+    "apps/*"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
@@ -17,7 +18,9 @@
     "lh:dump": "npm run lh:dump -w @housing/collector",
     "benchmark": "npm run benchmark -w @housing/collector",
     "collect:dry": "npm run collect:dry -w @housing/collector",
-    "review": "npm run review -w @housing/collector"
+    "review": "npm run review -w @housing/collector",
+    "app:data": "npm run app:data -w @housing/collector",
+    "app": "npm run start -w @housing/mobile"
   },
   "engines": {
     "node": ">=20"
