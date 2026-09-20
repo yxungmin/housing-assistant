@@ -24,8 +24,8 @@ export function FadeIn({ children, style, delay = 0, distance = 12 }: PropsWithC
   const translateY = useRef(new Animated.Value(distance)).current;
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(opacity, { toValue: 1, duration: 260, delay, useNativeDriver: true }),
-      Animated.timing(translateY, { toValue: 0, duration: 320, delay, useNativeDriver: true }),
+      Animated.timing(opacity, { toValue: 1, duration: 260, delay, useNativeDriver: Platform.OS !== "web" }),
+      Animated.timing(translateY, { toValue: 0, duration: 320, delay, useNativeDriver: Platform.OS !== "web" }),
     ]).start();
   }, [opacity, translateY, delay]);
   return <Animated.View style={[{ opacity, transform: [{ translateY }] }, style]}>{children}</Animated.View>;
