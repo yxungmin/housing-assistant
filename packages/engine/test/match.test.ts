@@ -132,3 +132,20 @@ describe("status category (계층 자격)", () => {
     expect(matchTrack(track, { ...base, statuses: ["welfare_recipient"] }).summary).toEqual({ matched: 1, needs_check: 0, mismatched: 0 });
   });
 });
+
+describe("marriage-years rules for non-married profiles", () => {
+  it("single user MISMATCHes '혼인 7년 이내' instead of NEEDS_CHECK (loan eligibility bug)", () => {
+    const r = matchTrack(
+      { name: "신혼", unit_types: [], rule_groups: [{ id: "g", mode: "all_of", label: "기본" }], rules: [{ group_id: "g", category: "marriage", applies_to: {}, operator: "lte", value: 7, unit: "years", source: { page: 1, text: "혼인 7년 이내" }, confidence: 1, verified: true }], pricing: [] },
+      { marriage: "single" },
+    );
+    expect(r.summary.mismatched).toBe(1);
+  });
+  it("pre-marriage counts as 0 years (MATCH)", () => {
+    const r = matchTrack(
+      { name: "신혼", unit_types: [], rule_groups: [{ id: "g", mode: "all_of", label: "기본" }], rules: [{ group_id: "g", category: "marriage", applies_to: {}, operator: "lte", value: 7, unit: "years", source: { page: 1, text: "혼인 7년 이내" }, confidence: 1, verified: true }], pricing: [] },
+      { marriage: "pre_marriage" },
+    );
+    expect(r.summary.matched).toBe(1);
+  });
+});

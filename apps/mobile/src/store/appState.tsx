@@ -3,6 +3,7 @@
  * 구독 상태는 V0.1 M8 전까지 로컬 목(mock)이다.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, type PropsWithChildren } from "react";
+import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import type { UserProfile } from "@housing/schema";
 
@@ -64,8 +65,15 @@ function reducer(s: AppState, a: Action): AppState {
 
 const KEYS = { profile: "profile.v1", meta: "meta.v1" } as const;
 
+/**
+ * 네이티브: SecureStore(암호화). 웹: 개발·시안 확인용으로만 쓰므로 localStorage.
+ * 웹은 배포 대상이 아니다 — 민감 프로필은 실제 사용자 기기(네이티브)에서만 저장된다.
+ */
+const isWeb = Platform.OS === "web";
+
 async function read(key: string): Promise<string | null> {
   try {
+    if (isWeb) return globalThis.localStorage?.getItem(key) ?? null;
     return await SecureStore.getItemAsync(key);
   } catch {
     return null;
@@ -73,10 +81,15 @@ async function read(key: string): Promise<string | null> {
 }
 async function write(key: string, value: string | null): Promise<void> {
   try {
+    if (isWeb) {
+      if (value === null) globalThis.localStorage?.removeItem(key);
+      else globalThis.localStorage?.setItem(key, value);
+      return;
+    }
     if (value === null) await SecureStore.deleteItemAsync(key);
     else await SecureStore.setItemAsync(key, value);
   } catch {
-    /* 웹 등 SecureStore가 없는 환경에서는 메모리만 */
+    /* 저장소가 없는 환경에서는 메모리만 */
   }
 }
 

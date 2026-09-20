@@ -31,8 +31,10 @@ export function profileValueFor(
       return profile.homeless_months ?? (profile.is_homeless ? 0 : undefined);
     case "marriage":
       if (unit === "status") return profile.marriage;
-      if (profile.marriage === "single" || profile.marriage === "single_parent") return undefined;
-      return profile.marriage_years;
+      // 혼인 기간 조건: 미혼·한부모는 혼인 중이 아니므로 어떤 "N년 이내(lte)" 조건도 불일치하도록 무한대. 상태를 모르면 NEEDS_CHECK.
+      if (profile.marriage === undefined) return undefined;
+      if (profile.marriage === "single" || profile.marriage === "single_parent") return Number.POSITIVE_INFINITY;
+      return profile.marriage_years ?? (profile.marriage === "pre_marriage" ? 0 : undefined);
     case "children":
       if (unit === "child_age") return profile.children_ages;
       return profile.children_count;

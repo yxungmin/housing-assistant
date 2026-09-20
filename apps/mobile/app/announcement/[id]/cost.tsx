@@ -24,12 +24,17 @@ export default function Cost() {
   const a = getAnnouncement(id ?? "");
   const profile = state.profile;
 
-  const rentals = useMemo(() => {
-    if (!a || !profile) return [] as { label: string; pricing: Pricing; trackName: string }[];
+  const [allTracks, setAllTracks] = useState(false);
+  const { rentals, bestTrackName, otherCount } = useMemo(() => {
+    if (!a || !profile) return { rentals: [] as { label: string; pricing: Pricing; trackName: string }[], bestTrackName: "", otherCount: 0 };
     const match = matchAnnouncement(a.extraction, profile);
-    const ordered = [...(match.best_track ? [match.best_track] : []), ...match.tracks.filter((t) => t !== match.best_track)];
-    return ordered.flatMap((t) => t.track.pricing.filter((p) => p.kind === "rental").map((p) => ({ label: `${p.unit_type}${p.tier ? ` · ${p.tier}` : ""}`, pricing: p, trackName: t.track.name })));
-  }, [a, profile]);
+    const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
+    const ordered = [...(best ? [best] : []), ...match.tracks.filter((t) => t !== best)];
+    const rows = ordered.flatMap((t) => t.track.pricing.filter((p) => p.kind === "rental").map((p) => ({ label: `${p.unit_type}${p.tier ? ` · ${p.tier}` : ""}`, pricing: p, trackName: t.track.name })));
+    // 기본은 조건이 가장 잘 맞는 트랙의 임대조건만. 다른 트랙은 펼쳐서 본다.
+    const bestRows = rows.filter((r) => r.trackName === best?.track.name);
+    return { rentals: allTracks || bestRows.length === 0 ? rows : bestRows, bestTrackName: best?.track.name ?? "", otherCount: rows.length - bestRows.length };
+  }, [a, profile, allTracks]);
 
   const [sel, setSel] = useState(0);
   const [deposit, setDeposit] = useState<number | null>(null);
@@ -80,9 +85,10 @@ export default function Cost() {
             <Sub style={{ flex: 1, color: colors.primary }}>조건이 가장 잘 맞는 공고의 주거비를 먼저 계산했어요. 이 공고는 계속 무료예요.</Sub>
           </View>
         ) : null}
-        <Sub>{a.title}</Sub>
+        <Sub>{a.title}{bestTrackName ? ` · ${bestTrackName}` : ""}</Sub>
         <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
-          {rentals.map((r, i) => <Chip key={`${r.trackName}-${r.label}`} on={i === sel} onPress={() => setSel(i)}>{r.label}</Chip>)}
+          {rentals.map((r, i) => <Chip key={`${r.trackName}-${r.label}`} on={i === sel} onPress={() => setSel(i)}>{allTracks ? `${r.trackName} · ${r.label}` : r.label}</Chip>)}
+          {otherCount > 0 && !allTracks ? <Chip onPress={() => { setAllTracks(true); setSel(0); }}>다른 트랙 {otherCount}개 보기</Chip> : null}
         </View>
 
         <Card>
