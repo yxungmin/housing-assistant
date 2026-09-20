@@ -1,0 +1,81 @@
+import { describe, expect, it } from "vitest";
+import { EligibilityRule, ExtractionOutput, Pricing, SupplyTrack } from "../src/index.js";
+
+const source = { page: 17, text: "3인 이하 맞벌이의 경우 월평균소득 120% 이하" };
+
+describe("EligibilityRule", () => {
+  it("accepts a lte income rule", () => {
+    const r = EligibilityRule.parse({
+      group_id: "income_cap",
+      category: "income",
+      applies_to: { household_size: 3, income_type: "dual" },
+      operator: "lte",
+      value: 8640000,
+      unit: "KRW_monthly",
+      source,
+      confidence: 0.94,
+    });
+    expect(r.verified).toBe(false);
+  });
+
+  it("rejects between with reversed bounds", () => {
+    const res = EligibilityRule.safeParse({
+      group_id: "g",
+      category: "age",
+      operator: "between",
+      value: [39, 19],
+      source,
+      confidence: 0.9,
+    });
+    expect(res.success).toBe(false);
+  });
+
+  it("rejects negative income cap", () => {
+    const res = EligibilityRule.safeParse({
+      group_id: "g",
+      category: "income",
+      operator: "lte",
+      value: -1,
+      source,
+      confidence: 0.9,
+    });
+    expect(res.success).toBe(false);
+  });
+});
+
+describe("Pricing", () => {
+  it("requires deposit and rent for rental", () => {
+    expect(Pricing.safeParse({ unit_type: "36", kind: "rental", deposit: 1000, source }).success).toBe(false);
+    expect(Pricing.safeParse({ unit_type: "36", kind: "rental", deposit: 1000, monthly_rent: 10, source }).success).toBe(true);
+  });
+});
+
+describe("SupplyTrack", () => {
+  it("rejects rules pointing at undefined groups", () => {
+    const res = SupplyTrack.safeParse({
+      name: "일반공급",
+      rule_groups: [{ id: "a", mode: "all_of", label: "기본" }],
+      rules: [{ group_id: "b", category: "age", operator: "gte", value: 19, source, confidence: 0.9 }],
+    });
+    expect(res.success).toBe(false);
+  });
+
+  it("accepts an any_of newlywed group", () => {
+    const res = SupplyTrack.safeParse({
+      name: "신혼부부 우선공급",
+      rule_groups: [{ id: "newlywed", mode: "any_of", label: "신혼부부 자격" }],
+      rules: [
+        { group_id: "newlywed", category: "marriage", operator: "lte", value: 7, unit: "years", source, confidence: 0.9 },
+        { group_id: "newlywed", category: "children", operator: "lte", value: 6, unit: "child_age", source, confidence: 0.9 },
+      ],
+    });
+    expect(res.success).toBe(true);
+  });
+});
+
+describe("ExtractionOutput", () => {
+  it("needs at least one track", () => {
+    const res = ExtractionOutput.safeParse({ title: "t", housing_type: "happy", schedule: {}, tracks: [] });
+    expect(res.success).toBe(false);
+  });
+});

@@ -1,0 +1,20 @@
+{
+  "name": "@housing/engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "매칭 엔진 + 비용 계산 엔진. 순수 함수, 네트워크 없음.",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@housing/schema": "*"
+  }
+}

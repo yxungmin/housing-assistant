@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "provider": {
+      "type": "string",
+      "minLength": 1,
+      "description": "주택도시기금, 은행명 등"
+    },
+    "kind": {
+      "type": "string",
+      "const": "rental_deposit"
+    },
+    "rule_groups": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "트랙 안에서 유일한 그룹 id (예: newlywed_status)"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "all_of",
+              "any_of"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "description": "사용자에게 보이는 그룹 이름 (예: 신혼부부 자격)"
+          }
+        },
+        "required": [
+          "id",
+          "mode",
+          "label"
+        ]
+      }
+    },
+    "eligibility": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "group_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "income",
+              "asset",
+              "car_value",
+              "debt",
+              "residence",
+              "housing",
+              "marriage",
+              "children",
+              "age",
+              "subscription",
+              "commute"
+            ]
+          },
+          "applies_to": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "household_size": {
+                "description": "가구원 수 (정확히 이 값)",
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10
+              },
+              "household_size_min": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "household_size_max": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991
+              },
+              "income_type": {
+                "type": "string",
+                "enum": [
+                  "single",
+                  "dual"
+                ]
+              },
+              "marriage": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "single",
+                    "married",
+                    "pre_marriage",
+                    "single_parent"
+                  ]
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "operator": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "lte",
+              "gte",
+              "between",
+              "in",
+              "is_true"
+            ]
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean",
+                "const": true
+              },
+              {
+                "type": "array",
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "items": false,
+                "minItems": 2,
+                "maxItems": 2
+              },
+              {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              {
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            ]
+          },
+          "unit": {
+            "description": "KRW_monthly, KRW, years, months, count, minutes, region_code ...",
+            "type": "string"
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "page": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 9007199254740991,
+                "description": "공고문 PDF 페이지 (1부터)"
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 500,
+                "description": "근거가 되는 원문 발췌"
+              }
+            },
+            "required": [
+              "page",
+              "text"
+            ]
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "verified": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "group_id",
+          "category",
+          "operator",
+          "value",
+          "source",
+          "confidence"
+        ]
+      }
+    },
+    "max_amount": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991,
+      "description": "상품 한도 (원)"
+    },
+    "ltv": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "보증금 대비 대출 비율 (0.8 = 80%)"
+    },
+    "dsr_limit": {
+      "description": "있을 때만 상환 가능액을 추가로 적용",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "term_months": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991,
+      "description": "대출 기간 (개월)"
+    },
+    "interest_only": {
+      "default": true,
+      "description": "만기일시상환(이자만) 상품인가",
+      "type": "boolean"
+    },
+    "rate_table": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "max_income": {
+            "description": "이 소득 이하에 적용 (원/월). 없으면 상한 없음",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "max_deposit": {
+            "description": "이 보증금 이하에 적용 (원)",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "annual_rate": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "annual_rate"
+        ]
+      }
+    },
+    "as_of_date": {
+      "type": "string",
+      "description": "금리·조건 기준일 YYYY-MM-DD"
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "provider",
+    "kind",
+    "max_amount",
+    "ltv",
+    "term_months",
+    "rate_table",
+    "as_of_date"
+  ]
+}

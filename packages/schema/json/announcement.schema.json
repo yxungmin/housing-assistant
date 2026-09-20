@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+    },
+    "lh_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "housing_type": {
+      "type": "string",
+      "enum": [
+        "happy",
+        "national_rental",
+        "newlywed_hope",
+        "purchased_rental",
+        "public_sale",
+        "long_term_rental",
+        "other"
+      ]
+    },
+    "region_code": {
+      "type": "string",
+      "minLength": 1,
+      "description": "시도 코드 (예: 11 서울, 41 경기)"
+    },
+    "published_version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "notice_date": {
+      "type": "string"
+    },
+    "apply_start": {
+      "type": "string"
+    },
+    "apply_end": {
+      "type": "string"
+    },
+    "pdf_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "lat": {
+      "type": "number"
+    },
+    "lng": {
+      "type": "number"
+    },
+    "transit": {
+      "type": "object",
+      "properties": {
+        "nearest_station": {
+          "type": "string"
+        },
+        "station_walk_min": {
+          "type": "number"
+        },
+        "nearest_bus_stop": {
+          "type": "string"
+        },
+        "bus_walk_min": {
+          "type": "number"
+        }
+      }
+    },
+    "updated_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "lh_id",
+    "title",
+    "housing_type",
+    "region_code",
+    "updated_at"
+  ]
+}

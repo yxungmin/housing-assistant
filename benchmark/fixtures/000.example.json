@@ -1,0 +1,41 @@
+{
+  "id": "000",
+  "pdf": "000.pdf",
+  "housing_type_label": "행복주택",
+  "gold": {
+    "title": "○○ 행복주택 입주자 모집공고",
+    "housing_type": "happy",
+    "address": "서울특별시 ○○구 ○○로 123",
+    "schedule": {
+      "notice_date": "2026-09-01",
+      "apply_start": "2026-09-15",
+      "apply_end": "2026-09-17",
+      "winner_announce": "2026-11-20",
+      "move_in": "2027-03"
+    },
+    "tracks": [
+      {
+        "name": "신혼부부·한부모가족",
+        "households": 40,
+        "unit_types": [{ "name": "36", "exclusive_area_m2": 36.9, "households": 40 }],
+        "rule_groups": [
+          { "id": "income", "mode": "all_of", "label": "소득 기준" },
+          { "id": "newlywed", "mode": "any_of", "label": "신혼부부 자격" },
+          { "id": "basic", "mode": "all_of", "label": "기본 요건" }
+        ],
+        "rules": [
+          { "group_id": "income", "category": "income", "applies_to": { "household_size": 3, "income_type": "single" }, "operator": "lte", "value": 7200000, "unit": "KRW_monthly", "source": { "page": 17, "text": "3인 가구 100% 이하" }, "confidence": 1, "verified": true },
+          { "group_id": "income", "category": "income", "applies_to": { "household_size": 3, "income_type": "dual" }, "operator": "lte", "value": 8640000, "unit": "KRW_monthly", "source": { "page": 17, "text": "3인 가구 맞벌이 120% 이하" }, "confidence": 1, "verified": true },
+          { "group_id": "newlywed", "category": "marriage", "applies_to": {}, "operator": "lte", "value": 7, "unit": "years", "source": { "page": 12, "text": "혼인기간 7년 이내" }, "confidence": 1, "verified": true },
+          { "group_id": "newlywed", "category": "children", "applies_to": {}, "operator": "lte", "value": 6, "unit": "child_age", "source": { "page": 12, "text": "6세 이하 자녀를 둔 한부모" }, "confidence": 1, "verified": true },
+          { "group_id": "basic", "category": "housing", "applies_to": {}, "operator": "gte", "value": 0, "unit": "months", "source": { "page": 11, "text": "무주택세대구성원" }, "confidence": 1, "verified": true },
+          { "group_id": "basic", "category": "asset", "applies_to": {}, "operator": "lte", "value": 345000000, "unit": "KRW", "source": { "page": 18, "text": "총자산 3억 4,500만 원 이하" }, "confidence": 1, "verified": true }
+        ],
+        "pricing": [
+          { "unit_type": "36", "kind": "rental", "deposit": 60000000, "monthly_rent": 280000, "conversion": { "rate": 0.06, "max_deposit": 110000000 }, "source": { "page": 9, "text": "36형 보증금 6,000만 원 / 월 28만 원" } }
+        ]
+      }
+    ],
+    "notes": []
+  }
+}

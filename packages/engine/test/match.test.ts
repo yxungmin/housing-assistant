@@ -1,0 +1,110 @@
+import { describe, expect, it } from "vitest";
+import type { UserProfile } from "@housing/schema";
+import { applies, compare, matchAnnouncement, matchTrack } from "../src/index.js";
+import { marriedDualProfile, newlywedTrack, youthTrack } from "./fixtures.js";
+
+describe("compare", () => {
+  it("handles every operator", () => {
+    expect(compare(5, "lte", 5)).toBe(true);
+    expect(compare(6, "lte", 5)).toBe(false);
+    expect(compare(5, "gte", 5)).toBe(true);
+    expect(compare(25, "between", [19, 39])).toBe(true);
+    expect(compare(40, "between", [19, 39])).toBe(false);
+    expect(compare("single", "in", ["single", "pre_marriage"])).toBe(true);
+    expect(compare(true, "is_true", true)).toBe(true);
+    expect(compare("11", "eq", "11")).toBe(true);
+  });
+  it("array actual matches if any element matches", () => {
+    expect(compare([9, 4], "lte", 6)).toBe(true);
+    expect(compare([9, 8], "lte", 6)).toBe(false);
+    expect(compare([], "lte", 6)).toBe(false);
+  });
+});
+
+describe("applies", () => {
+  it("returns null when the profile lacks the discriminating field", () => {
+    expect(applies({ household_size: 3 }, {})).toBeNull();
+    expect(applies({ household_size: 3 }, { household_size: 4 })).toBe(false);
+    expect(applies({ household_size: 3, income_type: "dual" }, { household_size: 3, income_type: "dual" })).toBe(true);
+  });
+});
+
+describe("matchTrack — newlywed track", () => {
+  it("married dual-income 3-person household matches", () => {
+    const r = matchTrack(newlywedTrack, marriedDualProfile);
+    expect(r.summary).toEqual({ matched: 3, needs_check: 0, mismatched: 0 });
+    const income = r.groups.find((g) => g.group.id === "income")!;
+    // 외벌이 3인 룰은 applies_to로 건너뛰고, 맞벌이 3인 룰만 집계된다
+    expect(income.rules.filter((x) => x.skipped)).toHaveLength(1);
+    expect(income.status).toBe("MATCH");
+  });
+
+  it("income above the dual cap mismatches", () => {
+    const r = matchTrack(newlywedTrack, { ...marriedDualProfile, monthly_income: 9_000_000 });
+    expect(r.groups.find((g) => g.group.id === "income")!.status).toBe("MISMATCH");
+    expect(r.summary.mismatched).toBe(1);
+  });
+
+  it("any_of group passes via children when marriage is too long", () => {
+    const r = matchTrack(newlywedTrack, { ...marriedDualProfile, marriage_years: 9, children_ages: [3] });
+    expect(r.groups.find((g) => g.group.id === "newlywed")!.status).toBe("MATCH");
+  });
+
+  it("any_of group mismatches when no alternative holds", () => {
+    const r = matchTrack(newlywedTrack, { ...marriedDualProfile, marriage_years: 9, children_ages: [10] });
+    expect(r.groups.find((g) => g.group.id === "newlywed")!.status).toBe("MISMATCH");
+  });
+
+  it("missing household_size makes income NEEDS_CHECK, not MISMATCH", () => {
+    const { household_size: _omit, ...profile } = marriedDualProfile;
+    const r = matchTrack(newlywedTrack, profile as UserProfile);
+    expect(r.groups.find((g) => g.group.id === "income")!.status).toBe("NEEDS_CHECK");
+    expect(r.summary.mismatched).toBe(0);
+  });
+
+  it("homeowner fails the housing rule", () => {
+    const r = matchTrack(newlywedTrack, { ...marriedDualProfile, is_homeless: false, homeless_months: undefined });
+    expect(r.groups.find((g) => g.group.id === "basic")!.status).toBe("MISMATCH");
+  });
+
+  it("unverified rules are NEEDS_CHECK", () => {
+    const track = {
+      ...newlywedTrack,
+      rules: newlywedTrack.rules.map((rule) => ({ ...rule, verified: false })),
+    };
+    const r = matchTrack(track, marriedDualProfile);
+    expect(r.summary).toEqual({ matched: 0, needs_check: 3, mismatched: 0 });
+  });
+
+  it("unknown category field in a rule does not crash — treated as NEEDS_CHECK", () => {
+    const track = {
+      ...youthTrack,
+      rules: [
+        ...youthTrack.rules,
+        // 스키마 진화 대비: 엔진이 모르는 category가 들어와도 죽지 않는다
+        { ...youthTrack.rules[0]!, category: "pet_allowed" as never },
+      ],
+    };
+    const r = matchTrack(track, { age: 25, marriage: "single" });
+    expect(r.groups[0]!.status).toBe("NEEDS_CHECK");
+  });
+});
+
+describe("matchAnnouncement", () => {
+  it("picks the best track with zero mismatches", () => {
+    const m = matchAnnouncement({ tracks: [youthTrack, newlywedTrack] }, marriedDualProfile);
+    expect(m.is_match).toBe(true);
+    expect(m.best_track!.track.name).toBe("신혼부부·한부모가족");
+  });
+
+  it("is_match false when every track has a mismatch", () => {
+    const m = matchAnnouncement({ tracks: [youthTrack, newlywedTrack] }, { ...marriedDualProfile, total_assets: 900_000_000 });
+    expect(m.is_match).toBe(false);
+    expect(m.best_track).toBeNull();
+  });
+
+  it("single 25-year-old matches the youth track only", () => {
+    const m = matchAnnouncement({ tracks: [youthTrack, newlywedTrack] }, { age: 25, marriage: "single", household_size: 1, income_type: "single" });
+    expect(m.best_track!.track.name).toBe("청년");
+  });
+});

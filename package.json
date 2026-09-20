@@ -1,0 +1,33 @@
+{
+  "name": "housing-assistant",
+  "private": true,
+  "version": "0.1.0",
+  "description": "공공주택 비서 — LH 공고 매칭·주거비 계산 앱 모노레포",
+  "workspaces": [
+    "packages/*",
+    "collector"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "schema:json": "npm run json-schema -w @housing/schema",
+    "collect": "npm run collect -w @housing/collector",
+    "inspect": "npm run inspect -w @housing/collector --",
+    "lh:dump": "npm run lh:dump -w @housing/collector",
+    "benchmark": "npm run benchmark -w @housing/collector",
+    "collect:dry": "npm run collect:dry -w @housing/collector"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
+  }
+}

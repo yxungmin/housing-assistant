@@ -1,0 +1,21 @@
+{
+  "name": "@housing/schema",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Rule Schema (zod) — 공고·트랙·자격 룰·가격·프로필·대출 상품의 단일 타입 소스",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "json-schema": "tsx scripts/json-schema.ts"
+  },
+  "dependencies": {
+    "zod": "^4.1.0"
+  }
+}

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+benchmark/pdfs/
+benchmark/output/
+collector/.cache/
+coverage/
+.DS_Store

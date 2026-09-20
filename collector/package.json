@@ -1,0 +1,24 @@
+{
+  "name": "@housing/collector",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "LH 공고 수집기 — API 목록 → PDF → LLM 추출 → 검증 → Supabase (GitHub Actions에서 30분 간격)",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "collect": "tsx src/run.ts",
+    "collect:dry": "tsx src/run.ts --dry-run",
+    "lh:dump": "tsx src/lh/dump.ts",
+    "inspect": "tsx src/inspect.ts",
+    "benchmark": "tsx src/benchmark.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.127.0",
+    "@housing/engine": "*",
+    "@housing/schema": "*",
+    "@supabase/supabase-js": "^2.116.0",
+    "unpdf": "^1.8.0",
+    "zod": "^4.1.0"
+  }
+}
