@@ -1,5 +1,6 @@
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
+import { parsePlaceLabel, placeFor } from "./places";
 import { REGION_LIST, regionByCode, sigunguValue } from "./regions";
 
 export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "date" | "skip-info";
@@ -154,8 +155,30 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, cash_on_hand: Number(v) }), read: (p) => p.cash_on_hand ?? null,
   },
   {
-    id: "workplace", kind: "skip-info", title: "직장 위치는 나중에", hint: "주소 검색은 지도 연결 후 열립니다. 지금은 건너뛰고, 통근 시간 조건은 내 정보에서 추가할 수 있어요.", optional: true,
-    apply: (p) => p, read: () => null,
+    id: "workplace_region", kind: "select", title: "직장은 어느 지역인가요?", hint: "직장과 가까운 공고를 먼저 보여드려요. 위치는 기기에만 저장되고, 통근 시간 계산은 지도 연결 후 열립니다.", optional: true,
+    options: REGIONS,
+    apply: (p, v) => {
+      if (v === null) return { ...p, workplace: undefined };
+      const cur = parsePlaceLabel(p.workplace?.label);
+      return { ...p, workplace: placeFor(String(v), cur?.regionCode === String(v) ? cur.sigungu : undefined) ?? undefined };
+    },
+    read: (p) => parsePlaceLabel(p.workplace?.label)?.regionCode ?? null,
+  },
+  {
+    id: "workplace_sigungu", kind: "select",
+    title: (p) => `${regionByCode(parsePlaceLabel(p.workplace?.label)?.regionCode)?.label ?? ""} 어느 시·군·구인가요?`,
+    hint: "구청·시청 부근을 기준으로 직선거리를 계산해요.",
+    when: (p) => {
+      const code = parsePlaceLabel(p.workplace?.label)?.regionCode;
+      return !!code && (regionByCode(code)?.sigungu.length ?? 0) > 1;
+    },
+    options: (p) => (regionByCode(parsePlaceLabel(p.workplace?.label)?.regionCode)?.sigungu ?? []).map((s) => ({ value: s, label: s })),
+    apply: (p, v) => {
+      const code = parsePlaceLabel(p.workplace?.label)?.regionCode;
+      if (!code || v === null) return p;
+      return { ...p, workplace: placeFor(code, String(v)) ?? p.workplace };
+    },
+    read: (p) => parsePlaceLabel(p.workplace?.label)?.sigungu ?? null,
   },
 ];
 

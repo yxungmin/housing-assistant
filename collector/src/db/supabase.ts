@@ -85,6 +85,8 @@ export class Repo {
         extraction_model: input.model ?? null,
         prompt_version: input.prompt_version ?? null,
         raw_text_chars: input.raw_text_chars ?? null,
+        // 앱 피드(app_announcements 뷰)가 그대로 내려주는 형태. 아래 정규화 테이블과 같은 내용이다.
+        extraction: input.extraction,
       })
       .select("id")
       .single();

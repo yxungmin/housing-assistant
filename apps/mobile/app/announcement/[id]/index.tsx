@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native";
-import { matchAnnouncement } from "@housing/engine";
+import { haversineKm, matchAnnouncement } from "@housing/engine";
 import { Icon } from "@/components/Icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
-import { getAnnouncement, ruleCounts } from "@/data/announcements";
+import { getAnnouncement, ruleCounts, useAnnouncements } from "@/data/announcements";
 import { inputSummary, ruleTitle } from "@/lib/conditions";
 import { daysUntil, dday, HOUSING_LABEL, longDate, shortDate } from "@/lib/format";
 import { canOpenCost, useAppState } from "@/store/appState";
@@ -18,8 +18,10 @@ export default function AnnouncementDetail() {
   const router = useRouter();
   const { colors } = useTheme();
   const { state, toggleSaved } = useAppState();
-  const a = getAnnouncement(id ?? "");
+  const { list } = useAnnouncements();
+  const a = getAnnouncement(id ?? "", list);
   const [sheet, setSheet] = useState(false);
+  const distanceKm = a && state.profile?.workplace && a.lat !== undefined && a.lng !== undefined ? haversineKm(state.profile.workplace, { lat: a.lat, lng: a.lng }) : null;
 
   const match = useMemo(() => (a && a.status === "VERIFIED" && state.profile ? matchAnnouncement(a.extraction, state.profile) : null), [a, state.profile]);
   const track = match?.best_track ?? (match ? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0] ?? null : null);
@@ -97,7 +99,7 @@ export default function AnnouncementDetail() {
             <IconTile name="map-pin" tone="info" />
             <View style={{ flex: 1, gap: 2 }}>
               <T variant="bodyMedium">{a.transit?.nearest_station ? `${a.transit.nearest_station} 도보 ${a.transit.station_walk_min}분` : "위치"}</T>
-              <Sub tone="3" variant="caption">{state.profile?.workplace ? "직장까지 시간 계산 중" : "직장 위치를 넣으면 통근 시간이 보여요"}</Sub>
+              <Sub tone="3" variant="caption">{distanceKm !== null ? `직장(${state.profile?.workplace?.label ?? ""})까지 직선 약 ${distanceKm.toFixed(0)}km · 통근 시간은 준비 중` : state.profile?.workplace ? "위치 좌표가 없어 거리를 계산할 수 없어요" : "직장 위치를 넣으면 거리가 보여요"}</Sub>
             </View>
           </Card>
         ) : null}

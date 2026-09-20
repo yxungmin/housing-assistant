@@ -4,8 +4,9 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View 
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/Icon";
+import { IncomeHelperSheet } from "@/components/IncomeHelperSheet";
 import { BottomCTA, FadeIn, Header, IconButton, Screen, Sub, T } from "@/components/ui";
-import { matchAll, pickBest } from "@/data/announcements";
+import { currentAnnouncements, matchAll, pickBest } from "@/data/announcements";
 import { isComplete, stepOptions, stepTitle, visibleSteps, type Step } from "@/lib/onboarding";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -22,6 +23,7 @@ export default function Onboarding() {
   const step = steps[Math.min(index, steps.length - 1)]!;
   const value = step.read(draft);
   const [text, setText] = useState<string>(value === null ? "" : String(value));
+  const [helper, setHelper] = useState(false);
 
   const go = (next: number, patch?: Partial<UserProfile>) => {
     const merged = patch ?? draft;
@@ -39,7 +41,7 @@ export default function Onboarding() {
     const profile: UserProfile = { ...p, subscription_deposits: p.subscription_deposits ?? p.subscription_months };
     setProfile(profile, true);
     // 첫 무료 계산 대상만 정해 두고, 결과는 홈 목록에서 먼저 보게 한다 (사용자 피드백: 바로 상세로 가면 인지가 어렵다)
-    const best = state.freeUnlockId ? null : pickBest(matchAll(profile));
+    const best = state.freeUnlockId ? null : pickBest(matchAll(profile, currentAnnouncements()));
     if (best) setFreeUnlock(best.announcement.id);
     router.replace("/(tabs)");
   };
@@ -103,15 +105,19 @@ export default function Onboarding() {
           {numeric && <NumberField step={step} text={text} onChange={setText} />}
 
           {step.helper ? (
-            <View style={{ gap: 6, marginTop: 8 }}>
-              <T variant="label" color={colors.primary}>건강보험료로 계산하기 (준비 중)</T>
+            <Pressable onPress={() => setHelper(true)} accessibilityRole="button" style={({ pressed }) => ({ gap: 6, marginTop: 8, padding: 16, borderRadius: radius.md, backgroundColor: pressed ? colors.cardStrong : colors.cardSoft })}>
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                <T variant="bodyMedium" color={colors.primary}>건강보험료로 계산하기</T>
+                <Icon name="right" size={18} color={colors.primary} />
+              </View>
               <Sub tone="3">{step.helper}</Sub>
-            </View>
+            </Pressable>
           ) : null}
         </FadeIn>
         </ScrollView>
       </KeyboardAvoidingView>
 
+      <IncomeHelperSheet visible={helper} dual={draft.income_type === "dual"} onClose={() => setHelper(false)} onApply={(v) => { setText(String(v)); setHelper(false); }} />
       <BottomCTA
         label={index + 1 >= steps.length ? "내 조건으로 공고 찾기" : step.kind === "multi" && selected.length === 0 ? "해당 없음" : "다음"}
         onPress={onNext}

@@ -6,7 +6,7 @@ import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchA
 import { Icon } from "@/components/Icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, FadeIn, Header, IconButton, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T } from "@/components/ui";
-import { getAnnouncement } from "@/data/announcements";
+import { getAnnouncement, useAnnouncements } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
 import { manwon, pct, won } from "@/lib/format";
 import { canOpenCost, useAppState } from "@/store/appState";
@@ -21,7 +21,8 @@ export default function Cost() {
   const router = useRouter();
   const { colors } = useTheme();
   const { state } = useAppState();
-  const a = getAnnouncement(id ?? "");
+  const { list } = useAnnouncements();
+  const a = getAnnouncement(id ?? "", list);
   const profile = state.profile;
 
   const [allTracks, setAllTracks] = useState(false);

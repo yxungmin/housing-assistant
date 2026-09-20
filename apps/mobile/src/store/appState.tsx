@@ -1,18 +1,15 @@
 /**
  * 앱 상태. 프로필(민감)은 SecureStore에만 저장하고 서버로 보내지 않는다.
- * 구독 상태는 V0.1 M8 전까지 로컬 목(mock)이다.
+ * 구독 상태는 billing.ts 어댑터(지금은 로컬 목)로 바뀌고, 저장된 값은 불러올 때 만료 규칙으로 정리한다.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, type PropsWithChildren } from "react";
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import type { UserProfile } from "@housing/schema";
+import { hasAccess, normalizeSubscription, type Subscription } from "@/lib/billing";
 
+export type { Subscription };
 export type ThemePref = "system" | "light" | "dark";
-
-export interface Subscription {
-  status: "none" | "trial" | "active" | "expired";
-  expiresAt?: string; // ISO
-}
 
 export interface AppState {
   loaded: boolean;
@@ -23,6 +20,9 @@ export interface AppState {
   saved: string[];
   subscription: Subscription;
   themePref: ThemePref;
+  /** 마감 알림·신규 공고 푸시 켬 (권한 허용 뒤에만 true) */
+  notifications: boolean;
+  pushToken: string | null;
 }
 
 type Action =
@@ -32,6 +32,7 @@ type Action =
   | { type: "toggleSaved"; id: string }
   | { type: "setSubscription"; subscription: Subscription }
   | { type: "setTheme"; pref: ThemePref }
+  | { type: "setNotifications"; on: boolean; pushToken?: string | null }
   | { type: "reset" };
 
 const initial: AppState = {
@@ -42,12 +43,14 @@ const initial: AppState = {
   saved: [],
   subscription: { status: "none" },
   themePref: "system",
+  notifications: false,
+  pushToken: null,
 };
 
 function reducer(s: AppState, a: Action): AppState {
   switch (a.type) {
     case "hydrate":
-      return { ...s, ...a.state, loaded: true };
+      return { ...s, ...a.state, subscription: normalizeSubscription(a.state.subscription ?? s.subscription), loaded: true };
     case "setProfile":
       return { ...s, profile: a.profile, onboarded: a.onboarded ?? s.onboarded };
     case "setFreeUnlock":
@@ -55,9 +58,11 @@ function reducer(s: AppState, a: Action): AppState {
     case "toggleSaved":
       return { ...s, saved: s.saved.includes(a.id) ? s.saved.filter((x) => x !== a.id) : [...s.saved, a.id] };
     case "setSubscription":
-      return { ...s, subscription: a.subscription };
+      return { ...s, subscription: normalizeSubscription(a.subscription) };
     case "setTheme":
       return { ...s, themePref: a.pref };
+    case "setNotifications":
+      return { ...s, notifications: a.on, pushToken: a.pushToken === undefined ? s.pushToken : a.pushToken };
     case "reset":
       return { ...initial, loaded: true };
   }
@@ -100,6 +105,7 @@ interface Ctx {
   toggleSaved: (id: string) => void;
   setSubscription: (subscription: Subscription) => void;
   setTheme: (pref: ThemePref) => void;
+  setNotifications: (on: boolean, pushToken?: string | null) => void;
   reset: () => void;
 }
 
@@ -119,8 +125,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!state.loaded) return;
     void write(KEYS.profile, state.profile ? JSON.stringify(state.profile) : null);
-    const { onboarded, freeUnlockId, saved, subscription, themePref } = state;
-    void write(KEYS.meta, JSON.stringify({ onboarded, freeUnlockId, saved, subscription, themePref }));
+    const { onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken } = state;
+    void write(KEYS.meta, JSON.stringify({ onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken }));
   }, [state]);
 
   const value = useMemo<Ctx>(
@@ -131,6 +137,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       toggleSaved: (id) => dispatch({ type: "toggleSaved", id }),
       setSubscription: (subscription) => dispatch({ type: "setSubscription", subscription }),
       setTheme: (pref) => dispatch({ type: "setTheme", pref }),
+      setNotifications: (on, pushToken) => dispatch({ type: "setNotifications", on, pushToken }),
       reset: () => dispatch({ type: "reset" }),
     }),
     [state],
@@ -144,15 +151,10 @@ export function useAppState(): Ctx {
   return ctx;
 }
 
-/** 계산 화면을 열 수 있는가: 첫 무료 1건 또는 체험·구독 중 */
+/** 계산 화면을 열 수 있는가: 첫 무료 1건 또는 체험·구독 중 (만료 후 3일 유예는 billing.ts) */
 export function canOpenCost(state: AppState, announcementId: string): boolean {
   if (state.freeUnlockId === announcementId) return true;
-  if (state.subscription.status === "trial" || state.subscription.status === "active") {
-    if (!state.subscription.expiresAt) return true;
-    // 만료일 + 3일 유예 (오프라인 캐시 규칙)
-    return Date.parse(state.subscription.expiresAt) + 3 * 86_400_000 > Date.now();
-  }
-  return false;
+  return hasAccess(state.subscription);
 }
 
 export const useCanOpenCost = (id: string) => {

@@ -20,7 +20,8 @@
     "collect:dry": "npm run collect:dry -w @housing/collector",
     "review": "npm run review -w @housing/collector",
     "app:data": "npm run app:data -w @housing/collector",
-    "app": "npm run start -w @housing/mobile"
+    "app": "npm run start -w @housing/mobile",
+    "benchmark:fetch": "npm run benchmark:fetch -w @housing/collector --"
   },
   "engines": {
     "node": ">=20"

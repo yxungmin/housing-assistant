@@ -3,12 +3,15 @@ import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/Icon";
 import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
-import { ANNOUNCEMENTS, getAnnouncement, matchAll, matching, type Matched } from "@/data/announcements";
+import { getAnnouncement, matchAll, matching, useAnnouncements, type Matched } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { REGIONS } from "@/lib/onboarding";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius } from "@/theme/tokens";
+
+/** 직장 근처 필터의 직선거리 상한 (km). 통근 시간 API 연결 전 대체 기준 */
+const NEAR_WORK_KM = 20;
 
 /** 홈: "조건에 맞는 공고 N개" 한 문장과 큰 숫자로 시작한다. */
 export default function Home() {
@@ -18,16 +21,20 @@ export default function Home() {
   const [myRegionOnly, setMyRegionOnly] = useState(false);
   const [rentalOnly, setRentalOnly] = useState(false);
   const [showOthers, setShowOthers] = useState(false);
+  const [nearWork, setNearWork] = useState(false);
+  const feed = useAnnouncements();
+  const hasWorkplace = !!state.profile?.workplace;
 
-  const all = useMemo(() => matchAll(state.profile), [state.profile]);
+  const all = useMemo(() => matchAll(state.profile, feed.list), [state.profile, feed.list]);
   const filtered = useMemo(
     () =>
       all.filter((m) => {
         if (myRegionOnly && state.profile?.region_code && m.announcement.region_code !== state.profile.region_code) return false;
         if (rentalOnly && m.announcement.housing_type === "public_sale") return false;
+        if (nearWork && hasWorkplace && (m.distanceKm === null || m.distanceKm > NEAR_WORK_KM)) return false;
         return true;
-      }),
-    [all, myRegionOnly, rentalOnly, state.profile?.region_code],
+      }).sort((x, y) => (nearWork && hasWorkplace ? (x.distanceKm ?? 1e9) - (y.distanceKm ?? 1e9) : 0)),
+    [all, myRegionOnly, rentalOnly, nearWork, hasWorkplace, state.profile?.region_code],
   );
   const matched = matching(filtered);
   const pending = filtered.filter((m) => m.announcement.status !== "VERIFIED");
@@ -37,7 +44,7 @@ export default function Home() {
   const today = new Date();
   const regionLabel = REGIONS.find((r) => r.value === state.profile?.region_code)?.label ?? "내 지역";
   const open = (id: string) => router.push(`/announcement/${id}`);
-  const free = state.subscription.status === "none" && state.freeUnlockId ? getAnnouncement(state.freeUnlockId) : undefined;
+  const free = state.subscription.status === "none" && state.freeUnlockId ? getAnnouncement(state.freeUnlockId, feed.list) : undefined;
   const toggle = (setter: (f: (v: boolean) => boolean) => void) => () => {
     animateLayout();
     setter((v) => !v);
@@ -49,13 +56,14 @@ export default function Home() {
         <View style={{ gap: 6 }}>
           <T variant="body" color={colors.text2}>내 조건에 맞는 공고</T>
           <BigNumber value={String(matched.length)} unit="개" size={44} />
-          <Sub tone="3">{today.getMonth() + 1}월 {today.getDate()}일 기준 · 전체 공고 {ANNOUNCEMENTS.length}개</Sub>
+          <Sub tone="3">{today.getMonth() + 1}월 {today.getDate()}일 기준 · 전체 공고 {feed.list.length}개</Sub>
         </View>
         <IconTile name="house" tone="primary" size={56} />
       </FadeIn>
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         <Chip on={myRegionOnly} onPress={toggle(setMyRegionOnly)}>{regionLabel}만</Chip>
         <Chip on={rentalOnly} onPress={toggle(setRentalOnly)}>임대만</Chip>
+        {hasWorkplace ? <Chip on={nearWork} onPress={toggle(setNearWork)}>직장 {NEAR_WORK_KM}km 이내</Chip> : null}
       </View>
 
       {free ? (

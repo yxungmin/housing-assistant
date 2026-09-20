@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useRouter } from "expo-router";
 import { Card, IconTile, Notice, PageTitle, Screen, Sub, T } from "@/components/ui";
-import { matchAll } from "@/data/announcements";
+import { matchAll, useAnnouncements } from "@/data/announcements";
 import { daysUntil, longDate } from "@/lib/format";
 import { useAppState } from "@/store/appState";
 import { AnnouncementCard } from "./index";
@@ -10,12 +10,13 @@ import { AnnouncementCard } from "./index";
 export default function Saved() {
   const { state } = useAppState();
   const router = useRouter();
+  const { list } = useAnnouncements();
   const items = useMemo(
     () =>
-      matchAll(state.profile)
+      matchAll(state.profile, list)
         .filter((m) => state.saved.includes(m.announcement.id))
         .sort((a, b) => (daysUntil(a.announcement.apply_end) ?? 999) - (daysUntil(b.announcement.apply_end) ?? 999)),
-    [state.profile, state.saved],
+    [state.profile, state.saved, list],
   );
   const nearest = items.find((m) => {
     const d = daysUntil(m.announcement.apply_end);

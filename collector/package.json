@@ -13,7 +13,8 @@
     "inspect": "tsx src/inspect.ts",
     "benchmark": "tsx src/benchmark.ts",
     "review": "tsx src/review-server.ts",
-    "app:data": "tsx src/app-data.ts"
+    "app:data": "tsx src/app-data.ts",
+    "benchmark:fetch": "tsx src/fetch-pdfs.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.127.0",
