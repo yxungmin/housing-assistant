@@ -110,11 +110,13 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
         </View>
         {days !== null ? <T variant="label" color={days <= 14 ? colors.danger : colors.text3} numeric style={{ fontFamily: fonts.semiBold }}>{dday(a.apply_end)}</T> : null}
       </Row>
-      <T variant="heading" style={{ fontSize: 18, lineHeight: 26 }}>{a.title}</T>
-      <Row center style={{ paddingTop: 2 }}>
+      <View style={{ gap: 2 }}>
+        <T variant="heading" style={{ fontSize: 18, lineHeight: 26 }}>{a.title}</T>
+        {place ? <Sub tone="3">{place}</Sub> : null}
+      </View>
+      <View style={{ flexDirection: "row", paddingTop: 2 }}>
         <Tag tone={status.tone} icon={status.icon}>{status.text}</Tag>
-        <Sub tone="3">{place}</Sub>
-      </Row>
+      </View>
     </Card>
   );
 }
