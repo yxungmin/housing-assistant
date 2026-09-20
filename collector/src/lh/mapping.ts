@@ -1,6 +1,9 @@
 import type { HousingType } from "@housing/schema";
 
 /**
+ * 공급기관 공고 유형명(LH UPP_AIS_TP_NM·AIS_TP_CD_NM, SH 공급유형명·공고 제목) → HousingType.
+ * LH·SH가 같은 표를 쓴다. 판정이 기관마다 달라지면 안 되기 때문이다.
+ * (아래는 LH 기준 설명)
  * LH 공고 유형명(UPP_AIS_TP_NM / AIS_TP_CD_NM) → HousingType.
  * 결정론적 매핑. 미지 값은 "other"로 두고 원본을 로그에 남긴다 (문서: 단계별 규칙 — API 메타 매핑).
  * 실제 코드 값은 M1에서 `npm run lh:dump`로 확인해 이 표에 한 줄씩 추가한다.
@@ -11,7 +14,7 @@ const HOUSING_TYPE_BY_KEYWORD: [RegExp, HousingType][] = [
   [/국민임대/, "national_rental"],
   [/매입임대|전세임대|집주인\s*임대/, "purchased_rental"], // 집주인임대(주거복지)는 V0.1에서 매입임대 계열로 취급
   [/공공분양|분양주택|신혼희망.*분양/, "public_sale"],
-  [/장기전세|통합공공임대|영구임대|공공임대/, "long_term_rental"],
+  [/장기전세|통합공공임대|영구임대|공공임대|재개발임대/, "long_term_rental"], // 재개발임대는 SH 전용 유형
 ];
 
 export interface MappingResult {

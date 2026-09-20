@@ -1,9 +1,12 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { ExtractionOutput, HousingType, VersionStatus } from "@housing/schema";
 
+export type Provider = "LH" | "SH";
+
 export interface AnnouncementRow {
   id: string;
   lh_id: string;
+  provider: Provider;
   title: string;
   housing_type: HousingType;
   region_code: string;
@@ -18,17 +21,20 @@ export class Repo {
     this.sb = createClient(url, serviceRoleKey, { auth: { persistSession: false } });
   }
 
-  async findByLhId(lhId: string): Promise<AnnouncementRow | null> {
+  /** 공급기관 + 기관 내부 식별자로 찾는다 (0004_provider.sql의 유일 인덱스와 같은 기준) */
+  async findByExternalId(provider: Provider, externalId: string): Promise<AnnouncementRow | null> {
     const { data, error } = await this.sb
       .from("announcements")
-      .select("id, lh_id, title, housing_type, region_code, published_version, source_modified_at, latest_version")
-      .eq("lh_id", lhId)
+      .select("id, lh_id, provider, title, housing_type, region_code, published_version, source_modified_at, latest_version")
+      .eq("provider", provider)
+      .eq("lh_id", externalId)
       .maybeSingle();
     if (error) throw error;
     return (data as AnnouncementRow | null) ?? null;
   }
 
   async upsertAnnouncement(input: {
+    provider: Provider;
     lh_id: string;
     title: string;
     housing_type: HousingType;
@@ -44,15 +50,15 @@ export class Repo {
   }): Promise<string> {
     const { data, error } = await this.sb
       .from("announcements")
-      .upsert({ ...input, updated_at: new Date().toISOString() }, { onConflict: "lh_id" })
+      .upsert({ ...input, updated_at: new Date().toISOString() }, { onConflict: "provider,lh_id" })
       .select("id")
       .single();
     if (error) throw error;
     return (data as { id: string }).id;
   }
 
-  async uploadPdf(lhId: string, version: number, bytes: Uint8Array): Promise<string> {
-    const path = `${lhId}/v${version}.pdf`;
+  async uploadPdf(provider: Provider, externalId: string, version: number, bytes: Uint8Array): Promise<string> {
+    const path = `${provider}/${externalId}/v${version}.pdf`;
     const { error } = await this.sb.storage.from(this.bucket).upload(path, bytes, { contentType: "application/pdf", upsert: true });
     if (error) throw error;
     return this.sb.storage.from(this.bucket).getPublicUrl(path).data.publicUrl;

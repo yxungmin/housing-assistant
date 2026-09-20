@@ -16,6 +16,7 @@ const META_PATH = fromRoot("benchmark", "pdfs", "meta.json");
 const TARGET = fromRoot("apps", "mobile", "data", "announcements.json");
 
 interface Meta {
+  provider?: "LH" | "SH";
   lh_id: string;
   region_code: string;
   region_name: string;
@@ -53,6 +54,7 @@ function metaFromApi(m: PdfMeta): Meta {
   const sido = SIDO[m.region_code] ?? m.region_name;
   const sigungu = m.address?.split(/\s+/)[1];
   return {
+    provider: m.provider,
     lh_id: m.lh_id,
     region_code: m.region_code,
     region_name: sigungu ? `${sido} ${sigungu}` : sido,
@@ -64,6 +66,7 @@ function metaFromApi(m: PdfMeta): Meta {
 
 export interface AppAnnouncement {
   id: string;
+  provider: "LH" | "SH";
   lh_id: string;
   title: string;
   housing_type: HousingType;
@@ -103,6 +106,7 @@ for (const f of files) {
   };
   items.push({
     id,
+    provider: meta?.provider ?? "LH",
     lh_id: meta?.lh_id ?? `MOCK-${id}`,
     title: parsed.data.title,
     housing_type: parsed.data.housing_type,
@@ -122,6 +126,7 @@ for (const f of files) {
 // "분석 중" 상태 예시 1건 (검수 전 공고가 앱에서 어떻게 보이는지)
 items.push({
   id: "pending-001",
+  provider: "LH",
   lh_id: "0000061175",
   title: "시흥하중 A-4블록 신혼희망타운(공공분양) 잔여세대 추가입주자모집공고",
   housing_type: "newlywed_hope",
