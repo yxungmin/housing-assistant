@@ -42,7 +42,7 @@ export default function Profile() {
         {missing.length > 0 && (
           <View style={{ flexDirection: "row", gap: 6, alignItems: "center" }}>
             <Icon name="alert" size={14} color={colors.warning} />
-            <Sub style={{ flex: 1 }}>{missing.join("·")}이 비어 있어요. 입력하면 "확인 필요"인 조건이 판별돼요.</Sub>
+            <Sub style={{ flex: 1 }}>아직 입력하지 않은 항목: {missing.join(", ")}. 입력하면 "확인 필요"였던 조건이 판별돼요.</Sub>
           </View>
         )}
       </Card>
