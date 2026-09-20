@@ -47,7 +47,8 @@ export interface LoanQuote {
 /** 한도 = min(상품 한도, 보증금 × LTV, [DSR 조건이 있을 때만] 상환 가능액 기준 원금). */
 export function loanLimit(product: LoanProduct, deposit: number, profile: UserProfile): LoanQuote {
   const rate = pickRate(product, profile.monthly_income, deposit);
-  let amount = Math.min(product.max_amount, Math.floor(deposit * product.ltv));
+  // 보증금 × 비율은 부동소수 오차(30,463,999.99…)가 나므로 천 원 단위로 반올림한다
+  let amount = Math.min(product.max_amount, Math.round((deposit * product.ltv) / 1000) * 1000);
   if (product.dsr_limit !== undefined && profile.monthly_income !== undefined) {
     const capacity = profile.monthly_income * product.dsr_limit - (profile.monthly_debt_payment ?? 0);
     if (capacity <= 0) amount = 0;
@@ -87,7 +88,7 @@ export interface CostBreakdown {
 export interface CostOptions {
   /** 관리비 기재값이 없을 때 기본값 (원/월). 문서 미결 사항 — 기본 100,000 */
   defaultMaintenance?: number;
-  /** 사용자가 고른 대출 상품 id. 없으면 월 상환액이 가장 낮은 적용 가능 상품 */
+  /** 사용자가 고른 대출 상품 id. 없으면 금리가 가장 낮은(같으면 한도가 큰) 적용 가능 상품 */
   preferredLoanId?: string;
 }
 
@@ -110,7 +111,8 @@ export function computeRentalCost(
   let loan: LoanQuote | null = null;
   if (options.preferredLoanId) loan = quotes.find((q) => q.product.id === options.preferredLoanId) ?? null;
   if (!loan && quotes.length > 0) {
-    quotes.sort((a, b) => a.monthly_payment - b.monthly_payment || b.amount - a.amount);
+    // 기본 선택: 금리가 가장 낮은 상품, 같으면 한도가 큰 상품 (필요 현금을 가장 줄여 주는 쪽)
+    quotes.sort((a, b) => a.annual_rate - b.annual_rate || b.amount - a.amount);
     loan = quotes[0]!;
   }
 
