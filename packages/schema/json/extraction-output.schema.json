@@ -211,32 +211,20 @@
                       "const": true
                     },
                     {
-                      "type": "array",
-                      "prefixItems": [
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "number"
-                        }
-                      ],
-                      "items": false,
-                      "minItems": 2,
-                      "maxItems": 2
-                    },
-                    {
                       "minItems": 1,
                       "type": "array",
                       "items": {
                         "type": "string"
-                      }
+                      },
+                      "description": "in: 허용 값 목록"
                     },
                     {
                       "minItems": 1,
                       "type": "array",
                       "items": {
                         "type": "number"
-                      }
+                      },
+                      "description": "between: [min, max] / in: 허용 숫자 목록"
                     }
                   ]
                 },

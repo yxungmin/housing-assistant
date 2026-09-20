@@ -55,11 +55,11 @@ if (args.includes("--extract")) {
   console.log(`\nLLM 추출 중 (${env.EXTRACTION_MODEL})...`);
   const t0 = Date.now();
   const result = await extractFromText(prompt, { model: env.EXTRACTION_MODEL });
-  console.log(`  ${((Date.now() - t0) / 1000).toFixed(0)}s, in=${result.usage.input_tokens} out=${result.usage.output_tokens}`);
+  console.log(`  ${((Date.now() - t0) / 1000).toFixed(0)}s, mode=${result.mode}, in=${result.usage.input_tokens} out=${result.usage.output_tokens} cache=${result.usage.cache_read_input_tokens}`);
   if (!result.output) {
     console.error(`  실패: ${result.error}`);
-    process.exit(1);
-  }
+    process.exitCode = 1;
+  } else {
   const issues = autoChecks(result.output);
   const draft = { id: name, pdf: basename(file), housing_type_label: "", gold: result.output, _auto_check_issues: issues, _model: result.model };
   const path = join(outDir, `${name}.draft.json`);
@@ -67,4 +67,5 @@ if (args.includes("--extract")) {
   console.log(`  트랙 ${result.output.tracks.length}개, 룰 ${result.output.tracks.reduce((a, t) => a + t.rules.length, 0)}개, 가격 ${result.output.tracks.reduce((a, t) => a + t.pricing.length, 0)}건`);
   console.log(`  자동 검증: ${issues.length ? issues.join(" / ") : "통과"}`);
   console.log(`  초안 저장: ${path} → 사람이 검토·수정 후 benchmark/fixtures/${name}.json으로 옮긴다`);
+  }
 }

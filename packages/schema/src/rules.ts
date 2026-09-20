@@ -32,13 +32,16 @@ export const AppliesTo = z
   .strict();
 export type AppliesTo = z.infer<typeof AppliesTo>;
 
+/**
+ * 연산자별 값. between은 숫자 2개 배열([min, max])이고 EligibilityRule.superRefine이 길이를 검사한다.
+ * (z.tuple은 JSON Schema에 items:false를 만들어 Anthropic 구조화 출력이 거부하므로 쓰지 않는다.)
+ */
 export const RuleValue = z.union([
   z.number(),
   z.string(),
   z.literal(true),
-  z.tuple([z.number(), z.number()]),
-  z.array(z.string()).min(1),
-  z.array(z.number()).min(1),
+  z.array(z.string()).min(1).describe("in: 허용 값 목록"),
+  z.array(z.number()).min(1).describe("between: [min, max] / in: 허용 숫자 목록"),
 ]);
 export type RuleValue = z.infer<typeof RuleValue>;
 
