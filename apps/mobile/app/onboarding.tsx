@@ -133,7 +133,8 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
   const display = isDate ? formatDateDigits(digits) : text ? Number(digits).toLocaleString("ko-KR") : "";
   const ageNote = isDate && isValidBirthDate(digits) ? `만 ${ageFromBirthDate(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`)}세` : isDate ? "예: 1998.03.15" : "";
   return (
-    <View style={{ flexDirection: "row", alignItems: "baseline", borderBottomWidth: 2, borderBottomColor: colors.primary, paddingVertical: 6, gap: 8, marginTop: 8 }}>
+    <View style={{ gap: 6, marginTop: 8 }}>
+    <View style={{ flexDirection: "row", alignItems: "baseline", borderBottomWidth: 2, borderBottomColor: colors.primary, paddingVertical: 6, gap: 8 }}>
       <TextInput
         value={display}
         onChangeText={(t) => onChange(t.replace(/[^0-9]/g, "").slice(0, isDate ? 8 : 15))}
@@ -144,7 +145,9 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
         style={{ flex: 1, fontFamily: fonts.num, fontSize: 30, color: colors.text, padding: 0, fontVariant: ["tabular-nums"] }}
         accessibilityLabel={step.title}
       />
-      <T variant="bodyMedium" color={colors.text2}>{isDate ? ageNote : unitLabel}</T>
+      {!isDate ? <T variant="bodyMedium" color={colors.text2}>{unitLabel}</T> : null}
+    </View>
+    {isDate ? <T variant="bodyMedium" color={isValidBirthDate(digits) ? colors.primary : colors.text2}>{ageNote}</T> : null}
     </View>
   );
 }
