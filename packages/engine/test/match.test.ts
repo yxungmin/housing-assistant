@@ -149,3 +149,14 @@ describe("marriage-years rules for non-married profiles", () => {
     expect(r.summary.matched).toBe(1);
   });
 });
+
+describe("ageFromBirthDate", () => {
+  it("counts 만 나이 by whether the birthday has passed", async () => {
+    const { ageFromBirthDate } = await import("../src/index");
+    const today = new Date(2026, 8, 20); // 2026-09-20
+    expect(ageFromBirthDate("1998-03-15", today)).toBe(28);
+    expect(ageFromBirthDate("1998-09-20", today)).toBe(28);
+    expect(ageFromBirthDate("1998-09-21", today)).toBe(27);
+    expect(ageFromBirthDate("2026-12-01", today)).toBe(0);
+  });
+});

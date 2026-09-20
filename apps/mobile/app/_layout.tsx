@@ -3,8 +3,6 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { GothicA1_400Regular, GothicA1_500Medium, GothicA1_700Bold, GothicA1_800ExtraBold } from "@expo-google-fonts/gothic-a1";
-import { Manrope_600SemiBold, Manrope_700Bold } from "@expo-google-fonts/manrope";
 import { AppStateProvider, useAppState } from "@/store/appState";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 
@@ -13,13 +11,13 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 function Root() {
   const { colors, scheme } = useTheme();
   const { state } = useAppState();
+  // Pretendard 정적 otf (npm pretendard). 키 이름은 src/theme/tokens.ts의 fonts와 같아야 한다.
   const [fontsLoaded, fontError] = useFonts({
-    GothicA1_400Regular,
-    GothicA1_500Medium,
-    GothicA1_700Bold,
-    GothicA1_800ExtraBold,
-    Manrope_600SemiBold,
-    Manrope_700Bold,
+    "Pretendard-Regular": require("pretendard/dist/public/static/Pretendard-Regular.otf"),
+    "Pretendard-Medium": require("pretendard/dist/public/static/Pretendard-Medium.otf"),
+    "Pretendard-SemiBold": require("pretendard/dist/public/static/Pretendard-SemiBold.otf"),
+    "Pretendard-Bold": require("pretendard/dist/public/static/Pretendard-Bold.otf"),
+    "Pretendard-ExtraBold": require("pretendard/dist/public/static/Pretendard-ExtraBold.otf"),
   });
   const ready = (fontsLoaded || !!fontError) && state.loaded;
 

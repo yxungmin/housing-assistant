@@ -7,6 +7,9 @@ import { IncomeType, MarriageStatus, SpecialStatus } from "./enums";
  */
 export const UserProfile = z.object({
   region_code: z.string().min(2).optional().describe("거주 시도 코드"),
+  /** 생년월일 YYYY-MM-DD. 공고는 출생일 범위로 나이를 정하므로 원본은 이것이고 age는 여기서 계산한다 */
+  birth_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  /** 만 나이. birth_date가 있으면 엔진이 그날 기준으로 다시 계산한다 */
   age: z.number().int().min(0).max(120).optional(),
   marriage: MarriageStatus.optional(),
   marriage_years: z.number().min(0).optional().describe("혼인 기간 (년). 예비신혼부부는 0"),

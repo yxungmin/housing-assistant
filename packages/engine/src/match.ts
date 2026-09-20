@@ -9,6 +9,15 @@ import type {
   UserProfile,
 } from "@housing/schema";
 
+/** 생년월일(YYYY-MM-DD) → 기준일의 만 나이 */
+export function ageFromBirthDate(birthDate: string, today = new Date()): number {
+  const [y, m, d] = birthDate.split("-").map(Number) as [number, number, number];
+  let age = today.getFullYear() - y;
+  const beforeBirthday = today.getMonth() + 1 < m || (today.getMonth() + 1 === m && today.getDate() < d);
+  if (beforeBirthday) age -= 1;
+  return Math.max(0, age);
+}
+
 /** 프로필에서 category에 대응하는 값을 꺼낸다. 없으면 undefined → NEEDS_CHECK. */
 export function profileValueFor(
   category: RuleCategory,
@@ -39,7 +48,7 @@ export function profileValueFor(
       if (unit === "child_age") return profile.children_ages;
       return profile.children_count;
     case "age":
-      return profile.age;
+      return profile.birth_date ? ageFromBirthDate(profile.birth_date) : profile.age;
     case "subscription":
       if (unit === "count") return profile.subscription_deposits;
       return profile.subscription_months;

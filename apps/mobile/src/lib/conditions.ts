@@ -1,5 +1,5 @@
 import type { EligibilityRule, UserProfile } from "@housing/schema";
-import type { RuleResult } from "@housing/engine";
+import { ageFromBirthDate, type RuleResult } from "@housing/engine";
 import { REGIONS } from "./onboarding";
 import { manwon, won } from "./format";
 
@@ -84,7 +84,7 @@ export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: 
     case "asset": return `입력: ${manwon(p.total_assets)}`;
     case "car_value": return `입력: ${manwon(p.car_value)}`;
     case "debt": return `입력: 월 ${won(p.monthly_debt_payment)}`;
-    case "age": return `입력: ${p.age}세`;
+    case "age": return p.birth_date ? `입력: ${p.birth_date.slice(0, 4)}년생 (만 ${ageFromBirthDate(p.birth_date)}세)` : `입력: 만 ${p.age}세`;
     case "marriage": return r.unit === "status" ? `입력: ${MARRIAGE_LABEL[p.marriage ?? ""] ?? "-"}` : `입력: 혼인 ${p.marriage_years ?? 0}년`;
     case "children": return r.unit === "child_age" ? `입력: 자녀 ${p.children_ages?.join(", ") ?? "-"}세` : `입력: 자녀 ${p.children_count ?? 0}명`;
     case "housing": return p.is_homeless ? `입력: 무주택 ${Math.floor((p.homeless_months ?? 0) / 12)}년` : "입력: 유주택";

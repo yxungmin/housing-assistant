@@ -1,6 +1,7 @@
 import type { UserProfile } from "@housing/schema";
+import { ageFromBirthDate } from "@housing/engine";
 
-export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "skip-info";
+export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "date" | "skip-info";
 
 export interface Option {
   value: string;
@@ -40,8 +41,15 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, region_code: String(v) }), read: (p) => p.region_code ?? null,
   },
   {
-    id: "age", kind: "age", title: "만 나이가 몇 살인가요?", hint: "청년·고령자 계층은 나이로 나뉩니다.",
-    apply: (p, v) => ({ ...p, age: Number(v) }), read: (p) => p.age ?? null,
+    id: "birth_date", kind: "date", title: "생년월일을 알려주세요", hint: "공고는 출생일 기준으로 청년·고령자 계층을 나눕니다. 만 나이는 자동으로 계산해요.",
+    // value = "YYYYMMDD"
+    apply: (p, v) => {
+      const s = String(v ?? "").replace(/[^0-9]/g, "");
+      if (s.length !== 8) return p;
+      const iso = `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+      return { ...p, birth_date: iso, age: ageFromBirthDate(iso) };
+    },
+    read: (p) => (p.birth_date ? p.birth_date.replace(/-/g, "") : null),
   },
   {
     id: "marriage", kind: "select", title: "혼인 상태를 알려주세요",
@@ -136,5 +144,5 @@ export function visibleSteps(p: Partial<UserProfile>): Step[] {
 }
 
 export function isComplete(p: Partial<UserProfile>): p is UserProfile {
-  return p.region_code !== undefined && p.age !== undefined && p.marriage !== undefined && p.household_size !== undefined && p.monthly_income !== undefined && p.total_assets !== undefined && p.is_homeless !== undefined && p.cash_on_hand !== undefined;
+  return p.region_code !== undefined && (p.birth_date !== undefined || p.age !== undefined) && p.marriage !== undefined && p.household_size !== undefined && p.monthly_income !== undefined && p.total_assets !== undefined && p.is_homeless !== undefined && p.cash_on_hand !== undefined;
 }

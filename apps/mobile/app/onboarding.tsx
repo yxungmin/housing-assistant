@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { KeyboardAvoidingView, Platform, Pressable, TextInput, View } from "react-native";
 import type { UserProfile } from "@housing/schema";
+import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/Icon";
 import { BottomCTA, Screen, Sub, T } from "@/components/ui";
 import { matchAll, pickBest } from "@/data/announcements";
@@ -46,14 +47,17 @@ export default function Onboarding() {
     }
   };
 
-  const numeric = step.kind === "won" || step.kind === "count" || step.kind === "age" || step.kind === "months";
-  const parsed = numeric ? Number(text.replace(/[^0-9]/g, "")) : NaN;
-  const canNext = step.kind === "select" ? value !== null : step.kind === "skip-info" || step.kind === "multi" ? true : text !== "" && Number.isFinite(parsed);
+  const numeric = step.kind === "won" || step.kind === "count" || step.kind === "age" || step.kind === "months" || step.kind === "date";
+  const digits = text.replace(/[^0-9]/g, "");
+  const parsed = numeric ? Number(digits) : NaN;
+  const dateOk = step.kind === "date" && isValidBirthDate(digits);
+  const canNext = step.kind === "select" ? value !== null : step.kind === "skip-info" || step.kind === "multi" ? true : step.kind === "date" ? dateOk : text !== "" && Number.isFinite(parsed);
   const selected = step.kind === "multi" ? String(value ?? "").split(",").filter(Boolean) : [];
 
   const onNext = () => {
     if (step.kind === "select" || step.kind === "skip-info") return go(index + 1);
     if (step.kind === "multi") return go(index + 1, step.apply(draft, selected.length ? selected.join(",") : null));
+    if (step.kind === "date") return go(index + 1, step.apply(draft, digits));
     go(index + 1, step.apply(draft, parsed));
   };
   const onSkip = () => go(index + 1, step.apply(draft, null));
@@ -122,22 +126,42 @@ export default function Onboarding() {
 
 function NumberField({ step, text, onChange }: { step: Step; text: string; onChange: (t: string) => void }) {
   const { colors } = useTheme();
-  const unit = { won: "원 / 월", count: "명", age: "세", months: "개월" }[step.kind as "won" | "count" | "age" | "months"];
+  const unit = { won: "원 / 월", count: "명", age: "세", months: "개월", date: "" }[step.kind as "won" | "count" | "age" | "months" | "date"];
   const unitLabel = step.id === "total_assets" || step.id === "car_value" || step.id === "cash" ? "원" : step.id === "marriage_years" ? "년" : unit;
-  const display = text ? Number(text.replace(/[^0-9]/g, "")).toLocaleString("ko-KR") : "";
+  const digits = text.replace(/[^0-9]/g, "");
+  const isDate = step.kind === "date";
+  const display = isDate ? formatDateDigits(digits) : text ? Number(digits).toLocaleString("ko-KR") : "";
+  const ageNote = isDate && isValidBirthDate(digits) ? `만 ${ageFromBirthDate(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`)}세` : isDate ? "예: 1998.03.15" : "";
   return (
     <View style={{ flexDirection: "row", alignItems: "baseline", borderBottomWidth: 2, borderBottomColor: colors.primary, paddingVertical: 6, gap: 8, marginTop: 8 }}>
       <TextInput
         value={display}
-        onChangeText={(t) => onChange(t.replace(/[^0-9]/g, ""))}
+        onChangeText={(t) => onChange(t.replace(/[^0-9]/g, "").slice(0, isDate ? 8 : 15))}
         keyboardType="number-pad"
         autoFocus
-        placeholder="0"
+        placeholder={isDate ? "1998.03.15" : "0"}
         placeholderTextColor={colors.border}
         style={{ flex: 1, fontFamily: fonts.num, fontSize: 30, color: colors.text, padding: 0, fontVariant: ["tabular-nums"] }}
         accessibilityLabel={step.title}
       />
-      <T variant="bodyMedium" color={colors.text2}>{unitLabel}</T>
+      <T variant="bodyMedium" color={colors.text2}>{isDate ? ageNote : unitLabel}</T>
     </View>
   );
+}
+
+function formatDateDigits(d: string): string {
+  if (d.length <= 4) return d;
+  if (d.length <= 6) return `${d.slice(0, 4)}.${d.slice(4)}`;
+  return `${d.slice(0, 4)}.${d.slice(4, 6)}.${d.slice(6, 8)}`;
+}
+
+function isValidBirthDate(d: string): boolean {
+  if (d.length !== 8) return false;
+  const y = Number(d.slice(0, 4)), m = Number(d.slice(4, 6)), day = Number(d.slice(6, 8));
+  const now = new Date().getFullYear();
+  if (y < now - 120 || y > now) return false;
+  if (m < 1 || m > 12) return false;
+  const dim = new Date(y, m, 0).getDate();
+  if (day < 1 || day > dim) return false;
+  return new Date(y, m - 1, day).getTime() <= Date.now();
 }

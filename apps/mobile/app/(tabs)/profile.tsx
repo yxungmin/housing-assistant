@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
+import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/Icon";
 import { Card, Chip, Divider, Row, Screen, Sub, T, Tag } from "@/components/ui";
 import { LOAN_AS_OF } from "@/data/loans";
@@ -33,7 +34,7 @@ export default function Profile() {
         </Row>
         {p ? (
           <Sub>
-            {p.age}세 · {p.household_size}인 · {MARRIAGE[p.marriage ?? ""]}{p.income_type === "dual" ? " 맞벌이" : ""} · {REGIONS.find((r) => r.value === p.region_code)?.label}
+            {p.birth_date ? `${p.birth_date.slice(0, 4)}년생 (만 ${ageFromBirthDate(p.birth_date)}세)` : `만 ${p.age}세`} · {p.household_size}인 · {MARRIAGE[p.marriage ?? ""]}{p.income_type === "dual" ? " 맞벌이" : ""} · {REGIONS.find((r) => r.value === p.region_code)?.label}
             {"\n"}월 {manwon(p.monthly_income)} · 자산 {manwon(p.total_assets)} · {p.is_homeless ? `무주택 ${Math.floor((p.homeless_months ?? 0) / 12)}년` : "유주택"} · 현금 {manwon(p.cash_on_hand)}
           </Sub>
         ) : (
