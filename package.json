@@ -21,7 +21,8 @@
     "review": "npm run review -w @housing/collector",
     "app:data": "npm run app:data -w @housing/collector",
     "app": "npm run start -w @housing/mobile",
-    "benchmark:fetch": "npm run benchmark:fetch -w @housing/collector --"
+    "benchmark:fetch": "npm run benchmark:fetch -w @housing/collector --",
+    "lh:stats": "npm run lh:stats -w @housing/collector"
   },
   "engines": {
     "node": ">=20"
