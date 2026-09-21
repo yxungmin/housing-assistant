@@ -32,7 +32,8 @@ export interface ResolvedNotice {
   apply_start?: string;
   apply_end?: string;
   correction_reason?: string;
-  pdf?: { bytes: Uint8Array; name: string };
+  /** url은 기관 사이트의 원문 첨부 주소. Supabase Storage에 올리기 전이나 로컬 데이터에서 원문을 열 때 쓴다. */
+  pdf?: { bytes: Uint8Array; name: string; url: string };
   /** PDF를 못 구한 이유 (CONFLICT 사유로 기록) */
   missing_pdf?: string;
 }
@@ -77,7 +78,7 @@ function toLhNotice(client: LhClient, n: LhNoticeSummary): CollectedNotice {
         correction_reason: detail.correction_reason,
       };
       if (!pdf) return { ...resolved, missing_pdf: "모집공고문 PDF 첨부를 찾지 못함" };
-      return { ...resolved, pdf: { bytes: await client.downloadPdf(pdf.url), name: pdf.name } };
+      return { ...resolved, pdf: { bytes: await client.downloadPdf(pdf.url), name: pdf.name, url: pdf.url } };
     },
   };
 }
@@ -112,7 +113,7 @@ export function shSource(client: ShClient): Source {
               const names = detail.attachments.map((a) => a.name).join(", ");
               return { ...resolved, missing_pdf: `모집공고문 PDF 첨부를 찾지 못함 (첨부: ${names || "없음"})` };
             }
-            return { ...resolved, pdf: { bytes: await client.downloadPdf(pdf), name: pdf.name } };
+            return { ...resolved, pdf: { bytes: await client.downloadPdf(pdf), name: pdf.name, url: pdf.url } };
           },
         };
       });

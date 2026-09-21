@@ -60,7 +60,7 @@ if (args.includes("--extract")) {
     console.error(`  실패: ${result.error}`);
     process.exitCode = 1;
   } else {
-  const issues = autoChecks(result.output);
+  const issues = autoChecks(result.output).map((i) => `${i.blocking ? "[게시 보류] " : ""}${i.message}`);
   const draft = { id: name, pdf: basename(file), housing_type_label: "", gold: result.output, _auto_check_issues: issues, _model: result.model };
   const path = join(outDir, `${name}.draft.json`);
   writeFileSync(path, JSON.stringify(draft, null, 2));

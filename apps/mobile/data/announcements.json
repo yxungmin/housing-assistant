@@ -7,7 +7,7 @@
   "housing_type": "happy",
   "region_code": "41",
   "region_name": "경기 과천시",
-  "status": "VERIFIED",
+  "status": "AUTO",
   "notice_date": "2024-12-20",
   "apply_start": "2026-09-30",
   "apply_end": "2026-10-02",
@@ -67,7 +67,7 @@
         "text": "①-㉮ (대학생) ‘대학’에 재학 중이거나 다음 학기에 입학 또는 복학 예정인 사람 / ①-㉯ (취업준비생) ‘대학 또는 고등학교’를 졸업 또는 중퇴한 지 2년 이내인 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -81,7 +81,7 @@
         "text": "입주자 모집공고일(’24. 12. 20.(금)) 현재 무주택자로서, 다음 요건을 모두 충족하여야 합니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -97,7 +97,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -113,7 +113,7 @@
         "text": "1인 4,179,557원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -129,7 +129,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -145,7 +145,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -161,7 +161,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -177,7 +177,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -193,7 +193,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -207,7 +207,7 @@
         "text": "④ 신청자 본인의 총 자산 가액 합산기준이 1억원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -221,7 +221,7 @@
         "text": "자동차가액 산출 대상이 되는 자동차를 소유하고 있지 않을 것"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -237,7 +237,7 @@
         "text": "【추가요건】 대학생 : 행복주택이 위치하는 과천시에 소재하는 대학에 재학중이거나 다음 학기에 입학 또는 복학예정인 사람 / 취업준비생 : 과천시에 거주하는 사람"
        },
        "confidence": 0.5,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -334,7 +334,7 @@
         "text": "대학생 : ①-㉮ 및 ② ∼ ④ / 취업준비생 : ①-㉯ 및 ② ∼ ④"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -348,7 +348,7 @@
         "text": "입주자 모집공고일(’24. 12. 20.(금)) 현재 무주택자로서, 다음 요건을 모두 충족하여야 합니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -364,7 +364,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -380,7 +380,7 @@
         "text": "1인 4,179,557원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -396,7 +396,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -412,7 +412,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -428,7 +428,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -444,7 +444,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -460,7 +460,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -474,7 +474,7 @@
         "text": "④ 신청자 본인의 총 자산 가액 합산기준이 1억원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -488,7 +488,7 @@
         "text": "자동차가액 산출 대상이 되는 자동차를 소유하고 있지 않을 것"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -601,7 +601,7 @@
         "text": "➀-㉮ (청년) 19세 이상 39세 이하인 사람 (출생일 : 1984. 12. 21. ∼ 2005. 12. 20.)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -618,7 +618,7 @@
         "text": "➀-㉯ (사회초년생) 아래 1), 2), 3) 중 하나에 해당하고, 소득이 있는 업무에 종사한 기간이 총 5년 이내인 사람 … 3)「예술인 복지법」 제2조제2호에 따른 예술인"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -632,7 +632,7 @@
         "text": "입주자 모집공고일(’24. 12. 20.(금)) 현재 무주택자로, 다음의 요건을 모두 충족하여야 합니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -648,7 +648,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -664,7 +664,7 @@
         "text": "세대주인 청년(세대기준) 1인 4,179,557원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -680,7 +680,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -696,7 +696,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -712,7 +712,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -728,7 +728,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -744,7 +744,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -758,7 +758,7 @@
         "text": "④ 해당세대가 보유하고 있는 총 자산가액 합산이 2억 7,300만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -772,7 +772,7 @@
         "text": "총 자산 중 자동차 가액이 3,708만원 이하일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -788,7 +788,7 @@
         "text": "【추가요건】 청년 : 행복주택이 위치하는 과천시가 거주지이거나 소득 근거지인 사람"
        },
        "confidence": 0.5,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -1062,7 +1062,7 @@
         "text": "➀-㉮ (청년) 19세 이상 39세 이하인 사람 (출생일 : 1984. 12. 21. ∼ 2005. 12. 20.)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -1079,7 +1079,7 @@
         "text": "➀-㉯ (사회초년생) … 소득이 있는 업무에 종사한 기간이 총 5년 이내인 사람"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1093,7 +1093,7 @@
         "text": "입주자 모집공고일 현재 무주택자로, 다음의 요건을 모두 충족하여야 합니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1109,7 +1109,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1125,7 +1125,7 @@
         "text": "세대주인 청년(세대기준) 1인 4,179,557원 이하 120% / 세대원(본인) 1인 4,179,557원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1141,7 +1141,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1157,7 +1157,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1173,7 +1173,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1189,7 +1189,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1205,7 +1205,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1219,7 +1219,7 @@
         "text": "④ 해당세대가 보유하고 있는 총 자산가액 합산이 2억 7,300만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1233,7 +1233,7 @@
         "text": "총 자산 중 자동차 가액이 3,708만원 이하일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -1495,7 +1495,7 @@
         "text": "1) 공고일 현재 혼인 중인 사람으로 혼인기간이 7년 이내인 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -1509,7 +1509,7 @@
         "text": "2) 공고일 현재 혼인 중인 사람으로 6세 이하 자녀(태아 포함)를 둔 사람"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -1525,7 +1525,7 @@
         "text": "➀-㉯ (예비신혼부부) 혼인을 계획 중이며 입주 전까지 혼인사실을 증명할 수 있을 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -1541,7 +1541,7 @@
         "text": "➀-㉰ (한부모가족) 6세 이하 자녀(태아 포함)를 둔 한부모인 자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1555,7 +1555,7 @@
         "text": "1) 신혼부부 : 무주택세대구성원 … 2) 예비신혼부부 : 향후 혼인으로 구성될 세대구성원 모두 무주택자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1572,7 +1572,7 @@
         "text": "일반 신혼부부·한부모가족 2인 5,957,283원 이하 110%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1589,7 +1589,7 @@
         "text": "일반 신혼부부·한부모가족 3인 7,198,649원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1606,7 +1606,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1623,7 +1623,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1640,7 +1640,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1657,7 +1657,7 @@
         "text": "맞벌이 신혼부부 2인 7,040,426 원 이하 130%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1674,7 +1674,7 @@
         "text": "맞벌이 신혼부부 3인 8,638,379 원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1691,7 +1691,7 @@
         "text": "맞벌이 신혼부부 4인 9,898,160 원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1708,7 +1708,7 @@
         "text": "맞벌이 신혼부부 5인 10,530,085 원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1725,7 +1725,7 @@
         "text": "맞벌이 신혼부부 6인 11,475,938 원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1739,7 +1739,7 @@
         "text": "③ 해당세대가 보유하고 있는 총 자산가액 합산기준 3억 4,500만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1753,7 +1753,7 @@
         "text": "총 자산 중 자동차 가액이 3,708만원 이하일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1769,7 +1769,7 @@
         "text": "【추가요건】 신혼부부‧한부모가족 계층 : 행복주택이 위치하는 과천시가 거주지인 사람"
        },
        "confidence": 0.5,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -1869,7 +1869,7 @@
         "text": "1) 공고일 현재 혼인 중인 사람으로 혼인기간이 7년 이내인 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -1883,7 +1883,7 @@
         "text": "2) 공고일 현재 혼인 중인 사람으로 6세 이하 자녀(태아 포함)를 둔 사람"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -1899,7 +1899,7 @@
         "text": "➀-㉯ (예비신혼부부) 혼인을 계획 중이며 입주 전까지 혼인사실을 증명할 수 있을 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -1915,7 +1915,7 @@
         "text": "➀-㉰ (한부모가족) 6세 이하 자녀(태아 포함)를 둔 한부모인 자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1929,7 +1929,7 @@
         "text": "1) 신혼부부 : 무주택세대구성원 … 3) 한부모가족 : 무주택세대구성원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1946,7 +1946,7 @@
         "text": "일반 신혼부부·한부모가족 2인 5,957,283원 이하 110%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1963,7 +1963,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1980,7 +1980,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -1997,7 +1997,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2014,7 +2014,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2031,7 +2031,7 @@
         "text": "맞벌이 신혼부부 2인 7,040,426 원 이하 130%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2048,7 +2048,7 @@
         "text": "맞벌이 신혼부부 3인 8,638,379 원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2065,7 +2065,7 @@
         "text": "맞벌이 신혼부부 4인 9,898,160 원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2082,7 +2082,7 @@
         "text": "맞벌이 신혼부부 5인 10,530,085 원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2099,7 +2099,7 @@
         "text": "맞벌이 신혼부부 6인 11,475,938 원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2113,7 +2113,7 @@
         "text": "③ 총 자산가액 합산기준 3억 4,500만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2127,7 +2127,7 @@
         "text": "총 자산 중 자동차 가액이 3,708만원 이하일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -2232,7 +2232,7 @@
         "text": "입주자 모집공고일 현재 무주택세대구성원인 65세 이상인 사람(’59. 12. 20. 이전 출생)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2246,7 +2246,7 @@
         "text": "무주택세대구성원인 65세 이상인 사람"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2262,7 +2262,7 @@
         "text": "1인 4,179,557원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2278,7 +2278,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2294,7 +2294,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2310,7 +2310,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2326,7 +2326,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2342,7 +2342,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2356,7 +2356,7 @@
         "text": "② 해당세대가 보유하고 있는 총 자산가액 합산기준 3억 4,500만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2370,7 +2370,7 @@
         "text": "총 자산 중 자동차 가액이 3,708만원 이하일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2386,7 +2386,7 @@
         "text": "【추가요건】 고령자 계층 : 행복주택이 위치하는 과천시가 거주지인 사람"
        },
        "confidence": 0.5,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -2545,7 +2545,7 @@
         "text": "입주자 모집공고일 현재 무주택세대구성원인 65세 이상인 사람(’59. 12. 20. 이전 출생)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2559,7 +2559,7 @@
         "text": "무주택세대구성원인 65세 이상인 사람"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2575,7 +2575,7 @@
         "text": "1인 4,179,557원 이하 120%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2591,7 +2591,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2607,7 +2607,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2623,7 +2623,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2639,7 +2639,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2655,7 +2655,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2669,7 +2669,7 @@
         "text": "② 총 자산가액 합산기준 3억 4,500만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2683,7 +2683,7 @@
         "text": "총 자산 중 자동차 가액이 3,708만원 이하일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -2834,7 +2834,7 @@
         "text": "입주자 모집공고일(’24. 12. 20.(금)) 현재 무주택세대구성원인 주거급여 수급자만 신청이 가능합니다. ➀ ’주거급여 수급자’란 「주거급여법」 제2조제2호 및 제3호에 따른 수급권자 또는 수급자를 말합니다."
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2848,7 +2848,7 @@
         "text": "무주택세대구성원인 주거급여 수급자만 신청이 가능합니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2864,7 +2864,7 @@
         "text": "【추가요건】 주거급여 수급자 : 행복주택이 위치하는 과천시가 거주지인 사람"
        },
        "confidence": 0.5,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -2961,7 +2961,7 @@
         "text": "입주자 모집공고일(’24. 12. 20.(금)) 현재 무주택세대구성원인 주거급여 수급자만 신청이 가능합니다."
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -2975,7 +2975,7 @@
         "text": "무주택세대구성원인 주거급여 수급자만 신청이 가능합니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -3060,7 +3060,7 @@
   "housing_type": "happy",
   "region_code": "11",
   "region_name": "서울 관악구",
-  "status": "VERIFIED",
+  "status": "AUTO",
   "notice_date": "2024-08-07",
   "apply_start": "2026-09-25",
   "apply_end": "2026-09-29",
@@ -3147,7 +3147,7 @@
         "text": "입주자모집공고일(2024.08.07.) 현재, 무주택자로서 아래의 요건을 모두 갖춘 자"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3164,7 +3164,7 @@
         "text": "①-㉮ (대학생) ‘대학’에 재학중이거나 다음 학기에 입학 또는 복학 예정일 것 / ①-㉯ (취업준비생) ‘대학 또는 고등학교’를 졸업 또는 중퇴한 지 2년 이내일 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3180,7 +3180,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3196,7 +3196,7 @@
         "text": "가구원수 월평균소득금액 기준 1인 4,179,557원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3212,7 +3212,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3228,7 +3228,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3244,7 +3244,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3260,7 +3260,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3276,7 +3276,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3290,7 +3290,7 @@
         "text": "④ 신청자 본인의 총 자산가액 합산기준이 10,000만원 이하이고, 자동차가액 산출대상 자동차를 소유하고 있지 않을 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3304,7 +3304,7 @@
         "text": "자동차가액 산출대상 자동차를 소유하고 있지 않을 것"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -3581,7 +3581,7 @@
         "text": "입주자모집공고일(2024.08.07.) 현재 일반공급대상자의 요건을 모두 갖추고 아래 1순위 또는 2순위의 요건을 갖춘 자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3598,7 +3598,7 @@
         "text": "①-㉮ (대학생) ‘대학’에 재학중이거나 다음 학기에 입학 또는 복학 예정일 것 / ①-㉯ (취업준비생) ‘대학 또는 고등학교’를 졸업 또는 중퇴한 지 2년 이내일 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3614,7 +3614,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3630,7 +3630,7 @@
         "text": "1순위 당해 행복주택이 위치하는 관악구에 소재하는 대학에 재학중이거나 다음 학기에 입학 또는 복학예정인 자 / (취업준비생) 거주하는 자, 2순위 당해 행복주택이 위치하는 관악구 외 서울특별시에 …"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3646,7 +3646,7 @@
         "text": "1인 4,179,557원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3662,7 +3662,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3678,7 +3678,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3694,7 +3694,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3710,7 +3710,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3726,7 +3726,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3740,7 +3740,7 @@
         "text": "④ 신청자 본인의 총 자산가액 합산기준이 10,000만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -3754,7 +3754,7 @@
         "text": "자동차가액 산출대상 자동차를 소유하고 있지 않을 것"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -3967,7 +3967,7 @@
         "text": "입주자모집공고일(2024.08.07.) 현재, 무주택자로서 아래의 요건을 모두 갖춘 자"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -3984,7 +3984,7 @@
         "text": "➀-㉮ (청년) 19세 이상 39세 이하인 자(출생일 1984.08.08∼2005.08.07)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -4001,7 +4001,7 @@
         "text": "➀-㉯ (사회초년생) 소득이 있는 업무에 종사한 기간이 총 5년 이내인 자 … 3) 「예술인 복지법」제2조제2호에 따른 예술인"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4017,7 +4017,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4033,7 +4033,7 @@
         "text": "세대주인 청년(세대기준) 1인 4,179,557원 이하 120% / 세대원(본인) 1인 4,179,557원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4049,7 +4049,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4065,7 +4065,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4081,7 +4081,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4097,7 +4097,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4113,7 +4113,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4127,7 +4127,7 @@
         "text": "④ 해당 세대가 보유하고 있는 총 자산가액이 27,300만원 이하이고 총 자산 중 자동차가액이 3,708만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4141,7 +4141,7 @@
         "text": "총 자산 중 자동차가액이 3,708만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4155,7 +4155,7 @@
         "text": "⑤ 본인 입주전까지 주택청약종합저축(청약저축 포함) 가입사실을 증명할 수 있을 것"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -4363,7 +4363,7 @@
         "text": "입주자모집공고일(2024.08.07.) 현재 일반공급대상자의 요건을 모두 갖추고 아래 1순위 또는 2순위의 요건을 갖춘 자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -4380,7 +4380,7 @@
         "text": "➀-㉮ (청년) 19세 이상 39세 이하인 자(출생일 1984.08.08∼2005.08.07)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -4397,7 +4397,7 @@
         "text": "➀-㉯ (사회초년생) … 소득이 있는 업무에 종사한 기간이 총 5년 이내인 자 … 예술인"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4413,7 +4413,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4429,7 +4429,7 @@
         "text": "1순위 당해 행복주택이 위치하는 관악구에 거주하거나 소득 근거지인 자 / 2순위 당해 행복주택이 위치하는 관악구외 서울특별시에 거주하거나 소득 근거지인 자"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4445,7 +4445,7 @@
         "text": "1인 4,179,557원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4461,7 +4461,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4477,7 +4477,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4493,7 +4493,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4509,7 +4509,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4525,7 +4525,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4539,7 +4539,7 @@
         "text": "④ 해당 세대가 보유하고 있는 총 자산가액이 27,300만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4553,7 +4553,7 @@
         "text": "총 자산 중 자동차가액이 3,708만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4567,7 +4567,7 @@
         "text": "⑤ 본인 입주전까지 주택청약종합저축(청약저축 포함) 가입사실을 증명할 수 있을 것"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -4746,7 +4746,7 @@
         "text": "입주자모집공고일(2024.08.07.) 현재 대학생계층 혹은 청년계층의 입주 자격요건을 갖춘 자로서 아래의 주거약자에 해당하는 자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4762,7 +4762,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -4776,7 +4776,7 @@
         "text": "“주거약자” 란? ① 고령자(만 65세 이상인 자)"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -4793,7 +4793,7 @@
         "text": "② 「장애인복지법」 제2조제2항에 해당하는 장애인 ③ 「국가유공자 등 예우 및 지원에 관한 법률」에 따른 국가유공자로서 상이등급 1급부터 7급까지의 판정을 받은 자"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -4810,7 +4810,7 @@
         "text": "대학생계층 혹은 청년계층의 입주 자격요건을 갖춘 자"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -4827,7 +4827,7 @@
         "text": "➀-㉮ (청년) 19세 이상 39세 이하인 자(출생일 1984.08.08∼2005.08.07)"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -4844,7 +4844,7 @@
         "text": "➀-㉯ (사회초년생) … 소득이 있는 업무에 종사한 기간이 총 5년 이내인 자"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4860,7 +4860,7 @@
         "text": "1인 4,179,557원 이하 120%"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4876,7 +4876,7 @@
         "text": "2인 5,957,283원 이하 110%"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4892,7 +4892,7 @@
         "text": "3인 7,198,649원 이하 100%"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4908,7 +4908,7 @@
         "text": "4인 8,248,467원 이하 100%"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4924,7 +4924,7 @@
         "text": "5인 8,775,071원 이하 100%"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -4940,7 +4940,7 @@
         "text": "6인 9,563,282원 이하 100%"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -5214,7 +5214,7 @@
   "housing_type": "long_term_rental",
   "region_code": "11",
   "region_name": "서울",
-  "status": "VERIFIED",
+  "status": "AUTO",
   "notice_date": "2024-12-13",
   "apply_start": "2026-09-23",
   "apply_end": "2026-09-30",
@@ -5325,7 +5325,7 @@
         "text": "입주자 모집공고일(2024.12.13.) 현재 서울특별시에 거주하는 성년자인 무주택세대구성원으로, 영구임대주택 입주자 자격에 해당되며 아래의 소득 및 자산보유 기준을 충족하는 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G1",
@@ -5339,7 +5339,7 @@
         "text": "입주자 모집공고일(2024.12.13.) 현재 서울특별시에 거주하는 성년자인 무주택세대구성원으로, 영구임대주택 입주자 자격에 해당되며 아래의 소득 및 자산보유 기준을 충족하는 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G1",
@@ -5353,7 +5353,7 @@
         "text": "「민법」상 미성년자(만 19세 미만)는 공급 신청할 수 없습니다. 단, 아래의 어느 하나에 해당하는 경우에는 미성년자도 공급신청 가능합니다.(법정대리인의 동의 또는 대리 필요)"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G2",
@@ -5369,7 +5369,7 @@
         "text": "월평균 소득 70%(1인가구 90%, 2인가구 80%) : 1인가구 3,134,668원 이하(90% 적용 금액)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G2",
@@ -5385,7 +5385,7 @@
         "text": "월평균 소득 70%(1인가구 90%, 2인가구 80%) : 2인가구 4,332,570원 이하(80% 적용 금액)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G2",
@@ -5401,7 +5401,7 @@
         "text": "월평균 소득 70% : 3인가구 5,039,054원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G2",
@@ -5417,7 +5417,7 @@
         "text": "월평균 소득 70% : 4인가구 5,773,927원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G2",
@@ -5433,7 +5433,7 @@
         "text": "월평균 소득 70% : 5인가구 6,142,550원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G2",
@@ -5449,7 +5449,7 @@
         "text": "월평균 소득 70% : 6인가구 6,694,297원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G2",
@@ -5465,7 +5465,7 @@
         "text": "월평균 소득 70% : 7인가구 7,246,045원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G2",
@@ -5481,7 +5481,7 @@
         "text": "2023년도 도시근로자 가구원수별 가구당 월평균 소득(원) 8인 70% : 7,797,793"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G3",
@@ -5495,7 +5495,7 @@
         "text": "2. 총자산 기준 세대구성원 전원이 보유하고 있는 총 자산(부동산, 자동차, 금융자산(부채반영), 일반자산) 가액 합산 기준 ( 24,100 )만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "G3",
@@ -5509,7 +5509,7 @@
         "text": "3. 자동차 기준 세대구성원 전원이 보유하고 있는 개별 자동차가액 ( 3,708 )만원 이하 * 총자산 기준과 자동차 기준 각각 충족하여야 함"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -5779,7 +5779,7 @@
   "housing_type": "purchased_rental",
   "region_code": "11",
   "region_name": "서울 마포구",
-  "status": "VERIFIED",
+  "status": "AUTO",
   "notice_date": "2024-08-22",
   "apply_start": "2026-09-22",
   "apply_end": "2026-10-06",
@@ -5845,7 +5845,7 @@
         "text": "■ (공통) 공고일 기준 무주택자이며 미혼 청년(만19~39세)으로서 본인의 월 평균 소득이 전년도 도시근로자 1인 가구 월평균 소득 100% 이하이고, 행복주택(청년) 자산기준을 충족하며, 자동차를 소유하고 있지 않은 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -5862,7 +5862,7 @@
         "text": "■ (공통) 공고일 기준 무주택자이며 미혼 청년(만19~39세)으로서 본인의 월 평균 소득이 전년도 도시근로자 1인 가구 월평균 소득 100% 이하이고, 행복주택(청년) 자산기준을 충족하며, 자동차를 소유하고 있지 않은 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -5878,7 +5878,7 @@
         "text": "■ (공통) 공고일 기준 무주택자이며 미혼 청년(만19~39세)으로서 (중략) / (기타) 기혼자, 외국인은 신청이 불가합니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -5894,7 +5894,7 @@
         "text": "〇 소득기준 구분 1인 가구 120% 4,179,557원 * 「기존주택등 매입임대주택 업무처리지침」 제14조의3에 의하여 1인가구는 20% 가산하여 적용"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -5908,7 +5908,7 @@
         "text": "〇 자산기준 구분 기준 금액 행복주택(청년) • 총자산 27,300만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -5922,7 +5922,7 @@
         "text": "※ 차량 미소유자 (「주택건설기준 등에 관한 규정」 제27조 5항 4호에 근거 임차인의 자격요건은 자동차를 소유하지 않는 것으로 한다. 「장애인복지법」 제39조 2항에 따른 장애인사용자동차등표지를 발급받은 자동차 제외)"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -6017,7 +6017,7 @@
         "text": "■ (공통) 공고일 기준 무주택자이며 미혼 청년(만19~39세)으로서 본인의 월 평균 소득이 전년도 도시근로자 1인 가구 월평균 소득 100% 이하이고, 행복주택(청년) 자산기준을 충족하며, 자동차를 소유하고 있지 않은 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6034,7 +6034,7 @@
         "text": "■ (공통) 공고일 기준 무주택자이며 미혼 청년(만19~39세)으로서 (중략) 자동차를 소유하고 있지 않은 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6050,7 +6050,7 @@
         "text": "■ (공통) 공고일 기준 무주택자이며 미혼 청년(만19~39세)으로서 (중략) / 기혼자, 외국인은 신청이 불가합니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6066,7 +6066,7 @@
         "text": "〇 소득기준 구분 1인 가구 120% 4,179,557원 * 「기존주택등 매입임대주택 업무처리지침」 제14조의3에 의하여 1인가구는 20% 가산하여 적용"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6080,7 +6080,7 @@
         "text": "〇 자산기준 구분 기준 금액 행복주택(청년) • 총자산 27,300만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6094,7 +6094,7 @@
         "text": "※ 차량 미소유자 (「주택건설기준 등에 관한 규정」 제27조 5항 4호에 근거 임차인의 자격요건은 자동차를 소유하지 않는 것으로 한다.)"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -6111,7 +6111,7 @@
         "text": "■ (특화형) 상기 자격을 충족하면서, 창작자 특화형 청년주택으로 아래 요건에 해당하는 사람 - 디자인, 공예, 문학, 사진, 공연, 영상 등 문화, 예술 분야 전공자 또는 유관분야 기업 재직자‧활동가 - 콘텐츠 제작(1인 크리에이터 포함) 분야 - 상기 분야 관련 소셜벤처·스타트업 종사자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -6196,7 +6196,7 @@
   "housing_type": "long_term_rental",
   "region_code": "45",
   "region_name": "전북 군산시",
-  "status": "VERIFIED",
+  "status": "AUTO",
   "notice_date": "2026-09-18",
   "apply_start": "2026-09-29",
   "apply_end": "2026-09-29",
@@ -6251,7 +6251,7 @@
         "text": "입주자 모집공고일(2026.09.18.) 현재 군산시에 거주하는 성년자인 무주택세대구성원으로서 아래의 소득, 자산보유 기준, 기타 법에 정한 요건을 충족하고, 입주자격제한(불법양도·전대)에 해당하지 않는 자"
        },
        "confidence": 0.5,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6265,7 +6265,7 @@
         "text": "■ 무주택세대구성원 (세대에 속하는 사람 전체가 무주택인 세대의 구성원) … 주택 또는 분양권등*을 소유하고 있지 아니할 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6279,7 +6279,7 @@
         "text": "■ 성년자 신청자는 민법상 성년자(만19세)이어야 합니다. 단, 아래의 경우 세대주인 미성년자도 신청 가능합니다."
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6293,7 +6293,7 @@
         "text": "총자산 요건 배제 (단, 자동차가액 4,542만원 이하 요건 적용)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -6405,7 +6405,7 @@
   "housing_type": "happy",
   "region_code": "50",
   "region_name": "제주 제주시",
-  "status": "VERIFIED",
+  "status": "AUTO",
   "notice_date": "2026-09-18",
   "apply_start": "2026-10-01",
   "apply_end": "2026-10-02",
@@ -6456,7 +6456,7 @@
         "text": "①-㉮ (대학생) ‘대학’에 재학중이거나 다음 학기에 입학 또는 복학 예정일 것 / ①-㉯ (취업준비생) ‘대학 또는 고등학교’를 졸업 또는 중퇴한 지 2년 이내일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6470,7 +6470,7 @@
         "text": "입주자모집공고일(2026.09.18) 현재, 무주택자로서 아래의 요건을 모두 갖춘 자 / ※ ‘무주택자’란 주택을 소유하고 있지 않은 자를 말함"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6486,7 +6486,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6502,7 +6502,7 @@
         "text": "가구원수 월평균소득금액 기준 / 1인 4,576,036원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6518,7 +6518,7 @@
         "text": "2인 6,452,897원 이하 110%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6534,7 +6534,7 @@
         "text": "3인 8,168,429원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6550,7 +6550,7 @@
         "text": "4인 8,802,202원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6566,7 +6566,7 @@
         "text": "5인 9,326,985원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6582,7 +6582,7 @@
         "text": "6인 9,906,263원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6596,7 +6596,7 @@
         "text": "④ 신청자 본인의 총 자산가액 합산기준이 10,800만원 이하이고, 자동차가액 산출대상 자동차를 소유하고 있지 않을 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6610,7 +6610,7 @@
         "text": "자동차가액 산출대상 자동차를 소유하고 있지 않을 것"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -6695,7 +6695,7 @@
         "text": "➀-㉮ (청년) 19세 이상 39세 이하인 자(출생일 1986.09.18.∼2007.09.17.)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -6712,7 +6712,7 @@
         "text": "➀-㉯ (사회초년생) 1) 소득이 있는 업무에 종사중인 자 2) 퇴직한 후 1년이 지나지 않은 사람으로서 구직급여 수급자격을 인정받은 자 3) 「예술인 복지법」제2조제2호에 따른 예술인 으로서, 소득이 있는 업무에 종사한 기간이 총 5년 이내인 자"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6726,7 +6726,7 @@
         "text": "입주자모집공고일(2026.09.18) 현재, 무주택자로서 아래의 요건을 모두 갖춘 자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6742,7 +6742,7 @@
         "text": "② 혼인 중이 아닐 것"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6758,7 +6758,7 @@
         "text": "1인 4,576,036원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6774,7 +6774,7 @@
         "text": "2인 6,452,897원 이하 110%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6790,7 +6790,7 @@
         "text": "3인 8,168,429원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6806,7 +6806,7 @@
         "text": "4인 8,802,202원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6822,7 +6822,7 @@
         "text": "5인 9,326,985원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6838,7 +6838,7 @@
         "text": "6인 9,906,263원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6852,7 +6852,7 @@
         "text": "④ 해당세대가 보유하고 있는 총 자산가액이 25,100만원 이하이고 총 자산 중 자동차가액이 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6866,7 +6866,7 @@
         "text": "총 자산 중 자동차가액이 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -6880,7 +6880,7 @@
         "text": "⑤ 본인 입주전까지 주택청약종합저축(청약저축 포함) 가입사실을 증명할 수 있을 것"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -7146,7 +7146,7 @@
         "text": "➀-㉮ (신혼부부) 혼인중인 자 ➀-㉯ (예비신혼부부) 혼인을 계획 중이며 입주 전까지 혼인사실을 증명할 수 있을 것 ➀-㉰ (한부모가족) 6세이하 자녀를 둔 한부모인 자(태아포함)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -7160,7 +7160,7 @@
         "text": "② 혼인기간이 7년 이내일 것 또는 6세 이하 자녀(태아포함)를 둔 자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -7174,7 +7174,7 @@
         "text": "② 혼인기간이 7년 이내일 것 또는 6세 이하 자녀(태아포함)를 둔 자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7188,7 +7188,7 @@
         "text": "입주자모집공고일(2026.09.18) 현재, 무주택세대구성원(예비신혼부부의 경우 혼인으로 구성될 세대의 세대구성원 모두 무주택자)으로서"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7205,7 +7205,7 @@
         "text": "가구원수 일반 신혼부부 2인 6,452,897원 이하 110%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7222,7 +7222,7 @@
         "text": "3인 8,168,429원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7239,7 +7239,7 @@
         "text": "4인 8,802,202원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7256,7 +7256,7 @@
         "text": "5인 9,326,985원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7273,7 +7273,7 @@
         "text": "6인 9,906,263원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7290,7 +7290,7 @@
         "text": "맞벌이 신혼부부 2인 7,626,151원 이하 130%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7307,7 +7307,7 @@
         "text": "맞벌이 신혼부부 3인 9,802,115원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7324,7 +7324,7 @@
         "text": "맞벌이 신혼부부 4인 10,562,642원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7341,7 +7341,7 @@
         "text": "맞벌이 신혼부부 5인 11,192,382원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7358,7 +7358,7 @@
         "text": "맞벌이 신혼부부 6인 11,887,516원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7372,7 +7372,7 @@
         "text": "④ 해당 세대가 보유하고 있는 총 자산가액 합산기준 34,500만원 이하이고, 총 자산 중 자동차가액이 4,542만원 이하 일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7386,7 +7386,7 @@
         "text": "총 자산 중 자동차가액이 4,542만원 이하 일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7400,7 +7400,7 @@
         "text": "⑤ 본인 또는 배우자(예비신혼부부의 경우는 혼인 예정인 배우자) 중 1인이 입주 전까지 주택청약종합저축(청약저축 포함) 가입사실을 증명할 수 있을 것 (단, 한부모가족은 본인만 해당)"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -7488,7 +7488,7 @@
         "text": "3-4. 고령자 ■ 일반공급대상자 입주자모집공고일(2026.09.18) 현재, 무주택세대구성원으로서 아래의 요건을 모두 갖춘 65세 이상인 자"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7502,7 +7502,7 @@
         "text": "입주자모집공고일(2026.09.18) 현재, 무주택세대구성원으로서"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7518,7 +7518,7 @@
         "text": "1인 4,576,036원 이하 120%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7534,7 +7534,7 @@
         "text": "2인 6,452,897원 이하 110%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7550,7 +7550,7 @@
         "text": "3인 8,168,429원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7566,7 +7566,7 @@
         "text": "4인 8,802,202원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7582,7 +7582,7 @@
         "text": "5인 9,326,985원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7598,7 +7598,7 @@
         "text": "6인 9,906,263원 이하 100%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7612,7 +7612,7 @@
         "text": "② 해당 세대가 보유하고 있는 총 자산가액이 34,500만원 이하이고 총 자산 중 자동차가액이 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7626,7 +7626,7 @@
         "text": "총 자산 중 자동차가액이 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -7691,7 +7691,7 @@
         "text": "3-5. 주거급여수급자 ■ 일반공급대상자 입주자모집공고일(2026.09.18) 현재 무주택세대구성원인 주거급여수급자 / ※ ‘주거급여수급자’란 「주거급여법」 제2조 제2호 및 제3호에 따른 수급권자 또는 수급자를 말함"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -7705,7 +7705,7 @@
         "text": "입주자모집공고일(2026.09.18) 현재 무주택세대구성원인 주거급여수급자 / ※ 무주택세대구성원이란 해당 세대 구성원 전원이 주택을 소유하지 않는 것을 말함"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -7771,7 +7771,7 @@
   "housing_type": "other",
   "region_code": "11",
   "region_name": "서울 강서구",
-  "status": "VERIFIED",
+  "status": "AUTO",
   "notice_date": "2026-09-17",
   "apply_start": "2026-09-29",
   "apply_end": "2026-10-01",
@@ -7820,7 +7820,7 @@
         "text": "무주택세대구성원으로서 덕수연립 가로주택정비사업 지구 내 기존거주자 중 조합이 우선공급 대상자로 선정하여 LH에 통보한 사람으로, 관련 법에 정한 자격요건을 갖추고 있는 사람 ※ 소득 및 자산요건을 적용하지 않습니다. 다만, 입주자 모집공고일부터 입주 시까지 무주택세대구성원을 유지해야 하며"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -8019,7 +8019,7 @@
         "text": "● 청년 ㉯ 18세 이상 39세 이하일 것 (출생일 : 1986.9.18.~2008.9.17.)"
        },
        "confidence": 0.97,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8035,7 +8035,7 @@
         "text": "● 청년 ㉰ 혼인 중이 아닐 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8049,7 +8049,7 @@
         "text": "● 청년 • 무주택자로서 다음의 요건을 모두 갖춘 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8065,7 +8065,7 @@
         "text": "신혼부부, 한부모가족을 제외한 모든 계층 1인 0인 170% / (기준 중위소득 170% 1인 4,359,205원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8081,7 +8081,7 @@
         "text": "신혼부부, 한부모가족을 제외한 모든 계층 2인 0인 160% / (기준 중위소득 160% 2인 6,718,867원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8097,7 +8097,7 @@
         "text": "신혼부부, 한부모가족을 제외한 모든 계층 3인 이상 0인 150% / (기준 중위소득 150% 3인 8,038,554원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8113,7 +8113,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 4인 9,742,107원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8129,7 +8129,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 5인 11,335,079원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8145,7 +8145,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 6인 12,833,928원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8161,7 +8161,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 7인 14,272,725원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8177,7 +8177,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 8인 15,711,522원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8191,7 +8191,7 @@
         "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8205,7 +8205,7 @@
         "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -8406,7 +8406,7 @@
         "text": "㉮ 혼인 중인 사람으로서 혼인기간이 7년(전 배우자였던 사람과 재혼하는 경우에는 이전 혼인기간을 포함) 이내인 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -8422,7 +8422,7 @@
         "text": "㉯ 예비신혼부부 (혼인을 계획 중이며 해당 주택의 입주 전까지 혼인사실을 증명할 수 있는 사람)"
        },
        "confidence": 0.93,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -8440,7 +8440,7 @@
         "text": "㉰ 혼인 중인 사람으로서 6세 이하 자녀(2019.9.18. 이후 출생, 태아 포함)를 둔 사람"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -8456,7 +8456,7 @@
         "text": "㉱ 6세 이하 자녀(2019.9.18. 이후 출생)를 둔 한부모가족 (자녀가 신청자와 동일한 세대별 주민등록표에 등재된 경우에 한함)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8470,7 +8470,7 @@
         "text": "(2) 무주택세대구성원(예비신혼부부의 경우 혼인으로 구성될 세대의 세대구성원 모두 무주택자인 경우)일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8487,7 +8487,7 @@
         "text": "신혼부부, 한부모가족 그 외 × 2인 0인 160% / (기준 중위소득 160% 2인 6,718,867원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8504,7 +8504,7 @@
         "text": "신혼부부, 한부모가족 그 외 × 3인 0인 150% / (기준 중위소득 150% 3인 8,038,554원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8521,7 +8521,7 @@
         "text": "신혼부부, 한부모가족 그 외 × 4인 이상 0인 150% / (기준 중위소득 150% 4인 9,742,107원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8538,7 +8538,7 @@
         "text": "4인 이상 0인 150% / (기준 중위소득 150% 5인 11,335,079원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8555,7 +8555,7 @@
         "text": "4인 이상 0인 150% / (기준 중위소득 150% 6인 12,833,928원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8572,7 +8572,7 @@
         "text": "4인 이상 0인 150% / (기준 중위소득 150% 7인 14,272,725원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8589,7 +8589,7 @@
         "text": "4인 이상 0인 150% / (기준 중위소득 150% 8인 15,711,522원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8606,7 +8606,7 @@
         "text": "신혼부부, 한부모가족 그 외 ○(신혼맞벌이) 2인 0인 190% / (기준 중위소득 190% 2인 7,978,655원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8623,7 +8623,7 @@
         "text": "○(신혼맞벌이) 3인 0인 180% / (기준 중위소득 180% 3인 9,646,265원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8640,7 +8640,7 @@
         "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 4인 11,690,528원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8657,7 +8657,7 @@
         "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 5인 13,602,094원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8674,7 +8674,7 @@
         "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 6인 15,400,714원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8691,7 +8691,7 @@
         "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 7인 17,127,270원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8708,7 +8708,7 @@
         "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 8인 18,853,826원)"
        },
        "confidence": 0.88,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8722,7 +8722,7 @@
         "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8736,7 +8736,7 @@
         "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -8932,7 +8932,7 @@
         "text": "● 고령자 ㉯ 65세 이상(1961.9.17. 이전 출생)일 것"
        },
        "confidence": 0.97,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8946,7 +8946,7 @@
         "text": "• 무주택세대구성원(혼인 중이 아닌 경우로서 단독세대주로 입주하려는 사람의 경우에는 무주택자)으로서 다음의 요건을 모두 갖춘 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8962,7 +8962,7 @@
         "text": "신혼부부, 한부모가족을 제외한 모든 계층 1인 0인 170% / (기준 중위소득 170% 1인 4,359,205원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8978,7 +8978,7 @@
         "text": "신혼부부, 한부모가족을 제외한 모든 계층 2인 0인 160% / (기준 중위소득 160% 2인 6,718,867원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -8994,7 +8994,7 @@
         "text": "신혼부부, 한부모가족을 제외한 모든 계층 3인 이상 0인 150% / (기준 중위소득 150% 3인 8,038,554원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9010,7 +9010,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 4인 9,742,107원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9026,7 +9026,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 5인 11,335,079원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9042,7 +9042,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 6인 12,833,928원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9058,7 +9058,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 7인 14,272,725원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9074,7 +9074,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 8인 15,711,522원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9088,7 +9088,7 @@
         "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9102,7 +9102,7 @@
         "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -9298,7 +9298,7 @@
         "text": "● 일반 • 무주택세대구성원으로서 해당 세대의 월평균소득이 기준 중위소득의 150퍼센트(1~2인 가구 및 출산가구의 경우에는 우대비율을 가산) 이하일 것"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9314,7 +9314,7 @@
         "text": "신혼부부, 한부모가족을 제외한 모든 계층 1인 0인 170% / (기준 중위소득 170% 1인 4,359,205원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9330,7 +9330,7 @@
         "text": "신혼부부, 한부모가족을 제외한 모든 계층 2인 0인 160% / (기준 중위소득 160% 2인 6,718,867원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9346,7 +9346,7 @@
         "text": "신혼부부, 한부모가족을 제외한 모든 계층 3인 이상 0인 150% / (기준 중위소득 150% 3인 8,038,554원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9362,7 +9362,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 4인 9,742,107원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9378,7 +9378,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 5인 11,335,079원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9394,7 +9394,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 6인 12,833,928원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9410,7 +9410,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 7인 14,272,725원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9426,7 +9426,7 @@
         "text": "3인 이상 0인 150% / (기준 중위소득 150% 8인 15,711,522원)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9440,7 +9440,7 @@
         "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9454,7 +9454,7 @@
         "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -9654,7 +9654,7 @@
   "housing_type": "national_rental",
   "region_code": "48",
   "region_name": "경남 양산시",
-  "status": "VERIFIED",
+  "status": "AUTO",
   "notice_date": "2026-09-15",
   "apply_start": "2026-09-28",
   "apply_end": "2026-09-29",
@@ -9777,7 +9777,7 @@
         "text": "입주자모집공고일(2026.09.15) 현재 무주택세대구성원으로서 아래의 ‘소득 및 자산보유 기준’을 충족하는 사람 (단, 입주자모집공고일로부터 입주 시까지 무주택세대구성원을 유지해야 하며, 무주택세대구성원을 유지하지 않을 경우 당첨 취소 및 계약거절 등의 불이익을 받을 수 있습니다.)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9791,7 +9791,7 @@
         "text": "금번 공고에서는 별도의 소득 및 자산 기준을 적용하지 아니함 (단, 자동차 가액 기준은 충족하여야 함) / 자동차 : 세대구성원 전원이 보유하고 있는 개별 자동차가액 ( 4,542 )만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -9805,7 +9805,7 @@
         "text": "■ 성년자 「민법」상 미성년자(19세 미만)는 공급 신청할 수 없습니다. 단, 아래의 어느 하나에 해당하는 경우 미성년자도 공급 신청 가능합니다."
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -10103,7 +10103,7 @@
         "text": "입주자모집공고일(2026.09.15) 현재 무주택세대구성원으로서 아래의 ‘소득 및 자산보유 기준’을 충족하는 사람"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10117,7 +10117,7 @@
         "text": "금번 공고에서는 별도의 소득 및 자산 기준을 적용하지 아니함 (단, 자동차 가액 기준은 충족하여야 함) / 자동차 : 세대구성원 전원이 보유하고 있는 개별 자동차가액 ( 4,542 )만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10131,7 +10131,7 @@
         "text": "■ 성년자 「민법」상 미성년자(19세 미만)는 공급 신청할 수 없습니다."
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10145,7 +10145,7 @@
         "text": "■ 선정방법 (전용면적 50㎡이상주택) ① 1순위 : 주택청약종합저축에 가입하여 24회 이상 납입한 사람 ② 2순위 : 주택청약종합저축에 가입하여 6회 이상 납입한 사람 ③ 3순위 : 제1순위 및 제2순위에 해당되지 아니하는 자"
        },
        "confidence": 0.5,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -10207,7 +10207,7 @@
         "text": "입주자모집공고일(2026.09.15) 현재 무주택세대구성원으로서 아래의 ‘소득 및 자산보유 기준’을 충족하는 사람"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10221,7 +10221,7 @@
         "text": "자동차 : 세대구성원 전원이 보유하고 있는 개별 자동차가액 ( 4,542 )만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10235,7 +10235,7 @@
         "text": "■ 성년자 「민법」상 미성년자(19세 미만)는 공급 신청할 수 없습니다."
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -10249,7 +10249,7 @@
         "text": "“주거약자” 란? 국민임대주택 일반공급대상의 자격을 갖춘 아래의 자를 말합니다. ① 고령자(65세 이상인 자) ② 「장애인복지법」 제2조제2항에 해당하는 장애인"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -10266,7 +10266,7 @@
         "text": "② 「장애인복지법」 제2조제2항에 해당하는 장애인 ③ 「국가유공자 등 예우 및 지원에 관한 법률」에 따른 국가유공자로서 상이등급 1급부터 7급까지의 판정을 받은 자 ④ 「보훈보상대상자 지원에 관한 법률」에 따른 보훈보상대상자로서 상이등급 1급부터 7급까지의 판정을 받은 자 ⑤ 5ㆍ18민주화운동부상자 ⑥ 고엽제후유의증환자 ⑦ 국가유공자에 준하는 군경 등"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -10333,7 +10333,10 @@
   "housing_type": "purchased_rental",
   "region_code": "11",
   "region_name": "서울",
-  "status": "VERIFIED",
+  "status": "AUTO",
+  "checks": [
+   "가격 정보 없음"
+  ],
   "notice_date": "2026-09-17",
   "apply_start": "2026-09-28",
   "apply_end": "2026-09-30",
@@ -10377,7 +10380,7 @@
         "text": "공고일(‘26.09.17) 현재 무주택세대구성원으로서 신혼·신생아 매입임대주택Ⅰ 소득 및 자산기준을 충족하는"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10394,7 +10397,7 @@
         "text": "전년도 도시근로자 가구원수별 월평균소득의 70% 이하 / 70% 1인 가구 3,432,027원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10411,7 +10414,7 @@
         "text": "70% 2인 가구 4,693,016원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10428,7 +10431,7 @@
         "text": "70% 3인 가구 5,717,900원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10445,7 +10448,7 @@
         "text": "70% 4인 가구 6,161,541원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10462,7 +10465,7 @@
         "text": "70% 5인 가구 6,528,890원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10479,7 +10482,7 @@
         "text": "70% 6인 가구 6,934,384원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10496,7 +10499,7 @@
         "text": "(본인 및 배우자 모두 소득이 있는 경우 90% 이하) / 90% 1인 가구 4,194,699원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10513,7 +10516,7 @@
         "text": "90% 2인 가구 5,866,270원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10530,7 +10533,7 @@
         "text": "90% 3인 가구 7,351,586원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10547,7 +10550,7 @@
         "text": "90% 4인 가구 7,921,982원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10564,7 +10567,7 @@
         "text": "90% 5인 가구 8,394,287원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10581,7 +10584,7 @@
         "text": "90% 6인 가구 8,915,637원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10595,7 +10598,7 @@
         "text": "국민임대 자산기준 충족 - 총자산 34,500만원 이하, 자동차 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10609,7 +10612,7 @@
         "text": "자동차가액 45,420,000원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -10623,7 +10626,7 @@
         "text": "⑤ 신생아 가구 : 2년 이내 출산한 자녀가 있는 가구(‘24.9.17이후 출생한 자녀·입양자녀 및 태아)"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -10639,7 +10642,7 @@
         "text": "1순위 Ÿ 신생아 가구 Ÿ 지원대상 한부모가족(「한부모가족 지원법 시행규칙」 제3조에 따라 여성가족부장관이 정하여 고시하는 모자가족 또는 부자가족)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": []
@@ -10672,7 +10675,7 @@
         "text": "공고일(‘26.09.17) 현재 무주택세대구성원으로서 신혼·신생아 매입임대주택Ⅰ 소득 및 자산기준을 충족하는"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10689,7 +10692,7 @@
         "text": "70% 1인 가구 3,432,027원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10706,7 +10709,7 @@
         "text": "70% 2인 가구 4,693,016원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10723,7 +10726,7 @@
         "text": "70% 3인 가구 5,717,900원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10740,7 +10743,7 @@
         "text": "70% 4인 가구 6,161,541원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10757,7 +10760,7 @@
         "text": "70% 5인 가구 6,528,890원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10774,7 +10777,7 @@
         "text": "70% 6인 가구 6,934,384원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10791,7 +10794,7 @@
         "text": "90% 1인 가구 4,194,699원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10808,7 +10811,7 @@
         "text": "90% 2인 가구 5,866,270원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10825,7 +10828,7 @@
         "text": "90% 3인 가구 7,351,586원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10842,7 +10845,7 @@
         "text": "90% 4인 가구 7,921,982원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10859,7 +10862,7 @@
         "text": "90% 5인 가구 8,394,287원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10876,7 +10879,7 @@
         "text": "90% 6인 가구 8,915,637원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10890,7 +10893,7 @@
         "text": "총자산 34,500만원 이하, 자동차 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10904,7 +10907,7 @@
         "text": "자동차가액 45,420,000원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -10923,7 +10926,7 @@
         "text": "① 신혼부부 : 공고일 현재 혼인 7년 이내(혼인신고일이 2019.9.17 ~ 2026.9.17)인 사람 / ② 예비신혼부부 : 공고일 현재 혼인 예정인 사람으로서 입주일 전일까지 혼인신고를 하는 사람"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -10941,7 +10944,7 @@
         "text": "2순위 1순위가 아닌, Ÿ 미성년 자녀가 있는 신혼부부 및 예비신혼부부 Ÿ 6세 이하 자녀가 있는 한부모 가족"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": []
@@ -10974,7 +10977,7 @@
         "text": "공고일(‘26.09.17) 현재 무주택세대구성원으로서 신혼·신생아 매입임대주택Ⅰ 소득 및 자산기준을 충족하는"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -10991,7 +10994,7 @@
         "text": "70% 1인 가구 3,432,027원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11008,7 +11011,7 @@
         "text": "70% 2인 가구 4,693,016원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11025,7 +11028,7 @@
         "text": "70% 3인 가구 5,717,900원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11042,7 +11045,7 @@
         "text": "70% 4인 가구 6,161,541원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11059,7 +11062,7 @@
         "text": "70% 5인 가구 6,528,890원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11076,7 +11079,7 @@
         "text": "70% 6인 가구 6,934,384원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11093,7 +11096,7 @@
         "text": "90% 1인 가구 4,194,699원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11110,7 +11113,7 @@
         "text": "90% 2인 가구 5,866,270원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11127,7 +11130,7 @@
         "text": "90% 3인 가구 7,351,586원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11144,7 +11147,7 @@
         "text": "90% 4인 가구 7,921,982원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11161,7 +11164,7 @@
         "text": "90% 5인 가구 8,394,287원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11178,7 +11181,7 @@
         "text": "90% 6인 가구 8,915,637원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11192,7 +11195,7 @@
         "text": "총자산 34,500만원 이하, 자동차 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11206,7 +11209,7 @@
         "text": "자동차가액 45,420,000원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11225,7 +11228,7 @@
         "text": "① 신혼부부 : 공고일 현재 혼인 7년 이내(혼인신고일이 2019.9.17 ~ 2026.9.17)인 사람"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11239,7 +11242,7 @@
         "text": "3순위 Ÿ 미성년 자녀가 없는 신혼부부 및 예비신혼부부"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": []
@@ -11272,7 +11275,7 @@
         "text": "공고일(‘26.09.17) 현재 무주택세대구성원으로서 신혼·신생아 매입임대주택Ⅰ 소득 및 자산기준을 충족하는"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11289,7 +11292,7 @@
         "text": "70% 1인 가구 3,432,027원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11306,7 +11309,7 @@
         "text": "70% 2인 가구 4,693,016원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11323,7 +11326,7 @@
         "text": "70% 3인 가구 5,717,900원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11340,7 +11343,7 @@
         "text": "70% 4인 가구 6,161,541원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11357,7 +11360,7 @@
         "text": "70% 5인 가구 6,528,890원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11374,7 +11377,7 @@
         "text": "70% 6인 가구 6,934,384원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11391,7 +11394,7 @@
         "text": "90% 1인 가구 4,194,699원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11408,7 +11411,7 @@
         "text": "90% 2인 가구 5,866,270원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11425,7 +11428,7 @@
         "text": "90% 3인 가구 7,351,586원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11442,7 +11445,7 @@
         "text": "90% 4인 가구 7,921,982원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11459,7 +11462,7 @@
         "text": "90% 5인 가구 8,394,287원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11476,7 +11479,7 @@
         "text": "90% 6인 가구 8,915,637원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11490,7 +11493,7 @@
         "text": "총자산 34,500만원 이하, 자동차 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11504,7 +11507,7 @@
         "text": "자동차가액 45,420,000원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11520,7 +11523,7 @@
         "text": "4순위 1,2순위가 아닌, Ÿ 6세 이하 자녀가 있는 혼인가구"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11534,7 +11537,7 @@
         "text": "④ 유자녀 혼인가구 : 6세 이하 자녀가 있는 혼인가구(‘19.9.18이후 출생한 자녀 및 태아)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": []
@@ -11565,7 +11568,10 @@
   "housing_type": "purchased_rental",
   "region_code": "11",
   "region_name": "서울",
-  "status": "VERIFIED",
+  "status": "AUTO",
+  "checks": [
+   "가격 정보 없음"
+  ],
   "notice_date": "2026-09-17",
   "apply_start": "2026-09-28",
   "apply_end": "2026-09-30",
@@ -11612,7 +11618,7 @@
         "text": "공고일 현재(2026.09.17.) 무주택자인 미혼 청년으로서 소득 및 자산 기준을 충족하는,"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11628,7 +11634,7 @@
         "text": "공고일 현재(2026.09.17.) 무주택자인 미혼 청년으로서 소득 및 자산 기준을 충족하는,"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11645,7 +11651,7 @@
         "text": "① 19세 이상 39세 이하인 사람 (1986.09.18. ~ 2007.09.17. 출생자) ② 대학생 (입학·복학 예정자 포함) ③ 취업준비생 (고등학교·대학교 등을 졸업·중퇴 후 2년 이내인 사람으로서 미취업자) * ①에 해당되지 않는 사람만 ② 또는 ③으로 신청"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11662,7 +11668,7 @@
         "text": "② 대학생 (입학·복학 예정자 포함) ③ 취업준비생 (고등학교·대학교 등을 졸업·중퇴 후 2년 이내인 사람으로서 미취업자)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11679,7 +11685,7 @@
         "text": "1순위 수급자 가구 「국민기초생활보장법」 제7조에 따른 생계·의료·주거급여 중 어느 하나에 해당하는 급여를 받는 수급자 가구"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11695,7 +11701,7 @@
         "text": "지원대상 한부모가족 「한부모가족 지원법 시행규칙」 제3조에 따라 여성가족부장관이 정하는 기준에 해당하는 한부모가족"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": []
@@ -11733,7 +11739,7 @@
         "text": "공고일 현재(2026.09.17.) 무주택자인 미혼 청년으로서 소득 및 자산 기준을 충족하는,"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11749,7 +11755,7 @@
         "text": "공고일 현재(2026.09.17.) 무주택자인 미혼 청년으로서 소득 및 자산 기준을 충족하는,"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11766,7 +11772,7 @@
         "text": "① 19세 이상 39세 이하인 사람 (1986.09.18. ~ 2007.09.17. 출생자)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11783,7 +11789,7 @@
         "text": "② 대학생 (입학·복학 예정자 포함) ③ 취업준비생 (고등학교·대학교 등을 졸업·중퇴 후 2년 이내인 사람으로서 미취업자)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11799,7 +11805,7 @@
         "text": "본인과 부모의 월평균소득이 전년도 도시근로자 가구원수별 가구당 월평균소득의 100% 이하 - (1인) 4,576,036원, (2인) 6,452,897원, (3인) 8,168,429원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11815,7 +11821,7 @@
         "text": "본인과 부모의 월평균소득이 전년도 도시근로자 가구원수별 가구당 월평균소득의 100% 이하 - (1인) 4,576,036원, (2인) 6,452,897원, (3인) 8,168,429원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11831,7 +11837,7 @@
         "text": "본인과 부모의 월평균소득이 전년도 도시근로자 가구원수별 가구당 월평균소득의 100% 이하 - (1인) 4,576,036원, (2인) 6,452,897원, (3인) 8,168,429원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11845,7 +11851,7 @@
         "text": "국민임대주택 자산기준 충족 - 총자산 34,500만원 이하, 자동차 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11859,7 +11865,7 @@
         "text": "국민임대주택 자산기준 충족 - 총자산 34,500만원 이하, 자동차 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": []
@@ -11897,7 +11903,7 @@
         "text": "공고일 현재(2026.09.17.) 무주택자인 미혼 청년으로서 소득 및 자산 기준을 충족하는,"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -11913,7 +11919,7 @@
         "text": "공고일 현재(2026.09.17.) 무주택자인 미혼 청년으로서 소득 및 자산 기준을 충족하는,"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11930,7 +11936,7 @@
         "text": "① 19세 이상 39세 이하인 사람 (1986.09.18. ~ 2007.09.17. 출생자)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -11947,7 +11953,7 @@
         "text": "② 대학생 (입학·복학 예정자 포함) ③ 취업준비생 (고등학교·대학교 등을 졸업·중퇴 후 2년 이내인 사람으로서 미취업자)"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11963,7 +11969,7 @@
         "text": "본인의 월평균소득이 전년도 도시근로자 1인 가구 월평균소득의 100% 이하 - (1인) 4,576,036원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11977,7 +11983,7 @@
         "text": "행복주택(청년) 자산기준 충족 - 총자산 25,100만원 이하, 자동차 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g3",
@@ -11991,7 +11997,7 @@
         "text": "행복주택(청년) 자산기준 충족 - 총자산 25,100만원 이하, 자동차 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": []
@@ -12021,11 +12027,12 @@
   "housing_type": "long_term_rental",
   "region_code": "11",
   "region_name": "서울",
-  "status": "VERIFIED",
+  "status": "AUTO",
   "notice_date": "2026-08-31",
   "apply_start": "2026-09-14",
   "apply_end": "2026-09-17",
   "address": "서울특별시 일원(단지별 소재지 상이) / 사업주체: 서울주택도시개발공사(서울 강남구 개포로 621)",
+  "pdf_url": "https://www.i-sh.co.kr/main/com/file/innoFD.do?brdId=GS0401&seq=309467&fileTp=A&fileSeq=1",
   "extraction": {
    "title": "제51차 장기전세주택 입주자 모집공고 <서울리츠3호 장기전세주택 포함>",
    "housing_type": "long_term_rental",
@@ -12062,7 +12069,7 @@
         "text": "입주자 모집 공고일(2026.8.31.) 현재 서울특별시에 거주하는 성년자인 무주택세대구성원으로서 유형별 소득・총자산, 자동차 보유 기준 및 기타 관련법에서 정한 요건을 충족하는 사람 ※ 상계장암지구는 의정부시 거주자 포함"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12076,7 +12083,7 @@
         "text": "무주택세대구성원: 공고일 현재 세대원 전원이 주택(분양권등 포함)을 소유하고 있지 않은 세대의 구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12090,7 +12097,7 @@
         "text": "민법상 미성년자(만19세 미만)·외국인은 신청할 수 없습니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12104,7 +12111,7 @@
         "text": "세대구성원 전원이 소유하고 있는 모든 총자산(부동산, 자동차, 금융자산, 일반자산) 가액 합산: 66,200만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12118,7 +12125,7 @@
         "text": "사회보장정보시스템을 통해 조사된 차량가액으로서 보건복지부장관이 정하는 금액: 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12134,7 +12141,7 @@
         "text": "60㎡ 이하(건설형 1·2순위) 기준 70% 1인가구 2,669,354원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12150,7 +12157,7 @@
         "text": "70% 2인가구 4,106,389원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12166,7 +12173,7 @@
         "text": "70% 3인가구 5,717,900원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12182,7 +12189,7 @@
         "text": "70% 4인가구 6,161,541원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12198,7 +12205,7 @@
         "text": "70% 5인가구 6,528,890원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12214,7 +12221,7 @@
         "text": "70% 6인가구 6,934,384원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -12619,7 +12626,7 @@
         "text": "입주자 모집 공고일(2026.8.31.) 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12633,7 +12640,7 @@
         "text": "무주택세대구성원: 공고일 현재 세대원 전원이 주택(분양권등 포함)을 소유하고 있지 않은 세대의 구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12647,7 +12654,7 @@
         "text": "민법상 미성년자(만19세 미만)·외국인은 신청할 수 없습니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12661,7 +12668,7 @@
         "text": "총자산(부동산, 자동차, 금융자산, 일반자산) 가액 합산: 66,200만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12675,7 +12682,7 @@
         "text": "차량가액으로서 보건복지부장관이 정하는 금액: 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12691,7 +12698,7 @@
         "text": "60㎡ 이하(건설형 3·4순위, 매입형) 기준 105% 1인가구 4,004,031원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12708,7 +12715,7 @@
         "text": "기준 105% 2인가구 6,159,584원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12725,7 +12732,7 @@
         "text": "기준 105% 3인가구 8,576,850원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12742,7 +12749,7 @@
         "text": "기준 105% 4인가구 9,242,312원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12759,7 +12766,7 @@
         "text": "기준 105% 5인가구 9,793,334원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12776,7 +12783,7 @@
         "text": "기준 105% 6인가구 10,401,576원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12793,7 +12800,7 @@
         "text": "맞벌이인 경우 140% 2인가구 8,212,778원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12810,7 +12817,7 @@
         "text": "맞벌이 140% 3인가구 11,435,801원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12827,7 +12834,7 @@
         "text": "맞벌이 140% 4인가구 12,323,083원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12844,7 +12851,7 @@
         "text": "맞벌이 140% 5인가구 13,057,779원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -12861,7 +12868,7 @@
         "text": "맞벌이 140% 6인가구 13,868,768원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -13882,7 +13889,7 @@
         "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -13896,7 +13903,7 @@
         "text": "무주택세대구성원: 세대원 전원이 주택(분양권등 포함)을 소유하고 있지 않은 세대의 구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -13910,7 +13917,7 @@
         "text": "민법상 미성년자(만19세 미만)·외국인은 신청할 수 없습니다."
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -13924,7 +13931,7 @@
         "text": "총자산 가액 합산: 66,200만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -13938,7 +13945,7 @@
         "text": "차량가액: 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -13954,7 +13961,7 @@
         "text": "60㎡ 초과 기준 150% 1인가구 5,720,045원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -13971,7 +13978,7 @@
         "text": "150% 2인가구 8,799,405원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -13988,7 +13995,7 @@
         "text": "150% 3인가구 12,252,644원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14005,7 +14012,7 @@
         "text": "150% 4인가구 13,203,303원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14022,7 +14029,7 @@
         "text": "150% 5인가구 13,990,478원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14039,7 +14046,7 @@
         "text": "150% 6인가구 14,859,395원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14056,7 +14063,7 @@
         "text": "맞벌이인 경우 200% 2인가구 11,732,540원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14073,7 +14080,7 @@
         "text": "맞벌이 200% 3인가구 16,336,858원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14090,7 +14097,7 @@
         "text": "맞벌이 200% 4인가구 17,604,404원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14107,7 +14114,7 @@
         "text": "맞벌이 200% 5인가구 18,653,970원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14124,7 +14131,7 @@
         "text": "맞벌이 200% 6인가구 19,812,526원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -14903,7 +14910,7 @@
         "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14917,7 +14924,7 @@
         "text": "무주택세대구성원: 세대원 전원이 주택을 소유하고 있지 않은 세대의 구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14931,7 +14938,7 @@
         "text": "85㎡ 초과: 주택청약종합저축(청약예금)에 가입하여 2년이 경과하고, 청약 예치기준금액 이상 납입한 자 - 85㎡초과 102㎡이하: 600만 원 이상, 102㎡초과 135㎡이하: 1,000만 원 이상 (1순위)"
        },
        "confidence": 0.8,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14945,7 +14952,7 @@
         "text": "총자산 가액 합산: 66,200만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14959,7 +14966,7 @@
         "text": "차량가액: 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14975,7 +14982,7 @@
         "text": "60㎡ 초과 기준 150% 1인가구 5,720,045원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -14992,7 +14999,7 @@
         "text": "150% 2인가구 8,799,405원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15009,7 +15016,7 @@
         "text": "150% 3인가구 12,252,644원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15026,7 +15033,7 @@
         "text": "150% 4인가구 13,203,303원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15043,7 +15050,7 @@
         "text": "150% 5인가구 13,990,478원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15060,7 +15067,7 @@
         "text": "150% 6인가구 14,859,395원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15077,7 +15084,7 @@
         "text": "맞벌이 200% 2인가구 11,732,540원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15094,7 +15101,7 @@
         "text": "맞벌이 200% 3인가구 16,336,858원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15111,7 +15118,7 @@
         "text": "맞벌이 200% 4인가구 17,604,404원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15128,7 +15135,7 @@
         "text": "맞벌이 200% 5인가구 18,653,970원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15145,7 +15152,7 @@
         "text": "맞벌이 200% 6인가구 19,812,526원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -15357,7 +15364,7 @@
         "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15371,7 +15378,7 @@
         "text": "무주택세대구성원: 세대원 전원이 주택을 소유하고 있지 않은 세대의 구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15385,7 +15392,7 @@
         "text": "총자산 가액 합산: 66,200만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15399,7 +15406,7 @@
         "text": "차량가액: 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15415,7 +15422,7 @@
         "text": "60㎡ 이하(건설형 3·4순위, 매입형) 기준 105% 1인가구 4,004,031원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15432,7 +15439,7 @@
         "text": "기준 105% 2인가구 6,159,584원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15449,7 +15456,7 @@
         "text": "기준 105% 3인가구 8,576,850원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15466,7 +15473,7 @@
         "text": "기준 105% 4인가구 9,242,312원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15483,7 +15490,7 @@
         "text": "기준 105% 5인가구 9,793,334원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15500,7 +15507,7 @@
         "text": "기준 105% 6인가구 10,401,576원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15517,7 +15524,7 @@
         "text": "맞벌이 140% 2인가구 8,212,778원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15534,7 +15541,7 @@
         "text": "맞벌이 140% 3인가구 11,435,801원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15551,7 +15558,7 @@
         "text": "맞벌이 140% 4인가구 12,323,083원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15568,7 +15575,7 @@
         "text": "맞벌이 140% 5인가구 13,057,779원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15585,7 +15592,7 @@
         "text": "맞벌이 140% 6인가구 13,868,768원"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -15599,7 +15606,7 @@
         "text": "ⓛ 고령자[만 65세 이상(1961.8.31.이전 출생, 당일포함)]"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -15615,7 +15622,7 @@
         "text": "②「장애인복지법」제2조제2항에 해당하는 장애인"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -15631,7 +15638,7 @@
         "text": "③「국가유공자 등 예우 및 지원에 관한 법률」에 따른 국가유공자로서 상이등급 1급부터 7급까지의 판정을 받은 사람 ④ 보훈보상대상자 ⑤ 5·18민주화운동부상자 ⑥ 고엽제후유의증환자 ⑦ 국가유공자에 준하는 군경 등"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -15782,7 +15789,7 @@
         "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15796,7 +15803,7 @@
         "text": "무주택세대구성원: 세대원 전원이 주택을 소유하고 있지 않은 세대의 구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15810,7 +15817,7 @@
         "text": "총자산 가액 합산: 66,200만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15824,7 +15831,7 @@
         "text": "차량가액: 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15840,7 +15847,7 @@
         "text": "60㎡ 초과 기준 150% 1인가구 5,720,045원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15857,7 +15864,7 @@
         "text": "150% 2인가구 8,799,405원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15874,7 +15881,7 @@
         "text": "150% 3인가구 12,252,644원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15891,7 +15898,7 @@
         "text": "150% 4인가구 13,203,303원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15908,7 +15915,7 @@
         "text": "150% 5인가구 13,990,478원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15925,7 +15932,7 @@
         "text": "150% 6인가구 14,859,395원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15942,7 +15949,7 @@
         "text": "맞벌이 200% 2인가구 11,732,540원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15959,7 +15966,7 @@
         "text": "맞벌이 200% 3인가구 16,336,858원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15976,7 +15983,7 @@
         "text": "맞벌이 200% 4인가구 17,604,404원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -15993,7 +16000,7 @@
         "text": "맞벌이 200% 5인가구 18,653,970원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16010,7 +16017,7 @@
         "text": "맞벌이 200% 6인가구 19,812,526원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -16024,7 +16031,7 @@
         "text": "ⓛ 고령자[만 65세 이상(1961.8.31.이전 출생, 당일포함)]"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -16040,7 +16047,7 @@
         "text": "②「장애인복지법」제2조제2항에 해당하는 장애인"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -16056,7 +16063,7 @@
         "text": "③ 국가유공자로서 상이등급 1급~7급 ④ 보훈보상대상자 ⑤ 5·18민주화운동부상자 ⑥ 고엽제후유의증환자 ⑦ 국가유공자에 준하는 군경 등"
        },
        "confidence": 0.85,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [
@@ -16405,7 +16412,7 @@
         "text": "입주자 모집 공고일 현재 서울특별시에 거주하는 성년자인 무주택세대구성원"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16419,7 +16426,7 @@
         "text": "우선공급은 '가. 일반공급'과는 다른 별도의 기준에 의해 입주자를 선정하며, 단, 일반공급과 동일하게 무주택, 소득, 총자산 및 자동차 기준을 충족해야 합니다."
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16433,7 +16440,7 @@
         "text": "총자산 가액 합산: 66,200만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16447,7 +16454,7 @@
         "text": "차량가액: 4,542만원 이하"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16463,7 +16470,7 @@
         "text": "60㎡ 이하(건설형 3·4순위, 매입형) - 우선공급 포함 기준 105% 1인가구 4,004,031원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16480,7 +16487,7 @@
         "text": "기준 105% 2인가구 6,159,584원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16497,7 +16504,7 @@
         "text": "기준 105% 3인가구 8,576,850원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16514,7 +16521,7 @@
         "text": "기준 105% 4인가구 9,242,312원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16531,7 +16538,7 @@
         "text": "기준 105% 5인가구 9,793,334원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16548,7 +16555,7 @@
         "text": "기준 105% 6인가구 10,401,576원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16565,7 +16572,7 @@
         "text": "맞벌이 140% 2인가구 8,212,778원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16582,7 +16589,7 @@
         "text": "맞벌이 140% 3인가구 11,435,801원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16599,7 +16606,7 @@
         "text": "맞벌이 140% 4인가구 12,323,083원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16616,7 +16623,7 @@
         "text": "맞벌이 140% 5인가구 13,057,779원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g1",
@@ -16633,7 +16640,7 @@
         "text": "맞벌이 140% 6인가구 13,868,768원"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -16647,7 +16654,7 @@
         "text": "고령자: 모집 공고일 현재 만65세 이상[1961.08.31.이전 출생(당일 포함)]인 2인 이하 무주택 세대구성원 ※2인 기준: 신청자(만65세 이상), 신청자의 배우자"
        },
        "confidence": 0.9,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -16663,7 +16670,7 @@
         "text": "장애인: 「장애인복지법」 제32조에 따라 장애인등록증이 교부된 사람(지적장애인·정신장애인 및 장애의 정도가 심한 뇌병변장애인의 경우에는 그 배우자를 포함한다)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -16679,7 +16686,7 @@
         "text": "노부모부양자: 모집 공고일 현재 만65세 이상의 직계존속(배우자의 직계존속 포함)을 1년 이상 부양하고 있는 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -16693,7 +16700,7 @@
         "text": "2자녀이상 가구: 모집 공고일 현재 민법상 미성년자(2007.09.01.이후 출생)인 2명 이상의 자녀(태아 포함) 또는 미성년자인 2명 이상의 손자녀가 있는 사람"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       },
       {
        "group_id": "g2",
@@ -16709,7 +16716,7 @@
         "text": "국가유공자 등: 국가보훈부에서 우선공급 대상자로 선정하여 통보한 사람(국가유공자·보훈보상대상자·5.18민주유공자·특수임무유공자·참전유공자 또는 그 유족 등)"
        },
        "confidence": 0.95,
-       "verified": true
+       "verified": false
       }
      ],
      "pricing": [

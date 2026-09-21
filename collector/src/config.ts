@@ -16,6 +16,15 @@ const Env = z.object({
   KAKAO_REST_API_KEY: z.string().optional(),
   /** 추출 모델. 벤치마크로 바꿔가며 비교한다. */
   EXTRACTION_MODEL: z.string().default("claude-opus-5"),
+  /**
+   * LLM 추출 스위치. **기본값은 꺼짐**이다.
+   * 돈이 나가는 곳은 추출 한 군데뿐이라(공고 1건 약 1,300원) 켜는 것을 명시적인 행동으로 만든다.
+   * 켜려면 .env나 Actions 변수에 EXTRACTION_ENABLED=true. 수집·게시·검수는 꺼진 상태에서도 그대로 돈다.
+   */
+  EXTRACTION_ENABLED: z
+    .string()
+    .default("false")
+    .transform((v) => v.toLowerCase() === "true" || v === "1"),
   /** 수집할 공급기관. 쉼표 구분 (LH, SH) */
   COLLECT_PROVIDERS: z.string().default("LH,SH"),
   /** 수집할 시도 코드. 쉼표 구분, 빈 값이면 전국. 기본은 서울·경기 (비용 통제) */

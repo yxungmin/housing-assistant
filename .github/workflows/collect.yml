@@ -1,8 +1,10 @@
 name: collect
 
 on:
-  schedule:
-    - cron: "*/30 * * * *" # 30분 간격 (스케줄 지연은 흔하다 — "30분 내"는 목표치)
+  # 테스트 기간 동안 정기 실행을 멈춰 둔다. 추출 비용이 나가는 유일한 경로다.
+  # 다시 켤 때 아래 두 줄의 주석을 풀고 Actions 변수 EXTRACTION_ENABLED=true 로 둔다.
+  # schedule:
+  #   - cron: "*/30 * * * *" # 30분 간격 (스케줄 지연은 흔하다 — "30분 내"는 목표치)
   workflow_dispatch:
     inputs:
       dry_run:
@@ -49,6 +51,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
           EXTRACTION_MODEL: ${{ vars.EXTRACTION_MODEL || 'claude-opus-5' }}
+          # 없으면 꺼짐. 켜지 않으면 목록·신규 판정까지만 하고 LLM 호출이 없다.
+          EXTRACTION_ENABLED: ${{ vars.EXTRACTION_ENABLED || 'false' }}
           MAX_ANNOUNCEMENTS_PER_RUN: ${{ vars.MAX_ANNOUNCEMENTS_PER_RUN || '10' }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ] || [ "${{ steps.secrets.outputs.ready }}" = "dry" ]; then npm run collect:dry; else npm run collect; fi

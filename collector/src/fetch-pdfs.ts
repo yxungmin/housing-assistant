@@ -30,6 +30,8 @@ export interface PdfMeta {
   apply_end?: string;
   address?: string;
   pdf_name?: string;
+  /** 기관 사이트의 원문 공고문 주소. 앱이 "공고문 12쪽"을 실제로 열 수 있게 한다. */
+  pdf_url?: string;
   fetched_at: string;
 }
 
@@ -92,6 +94,7 @@ for (const n of candidates) {
       apply_end: detail.apply_end ?? n.apply_end,
       address: detail.address,
       pdf_name: detail.pdf.name,
+      pdf_url: detail.pdf.url,
       fetched_at: new Date().toISOString(),
     });
     writeFileSync(META_PATH, JSON.stringify(meta, null, 2));

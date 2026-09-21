@@ -7,6 +7,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { ExtractionOutput, type HousingType } from "@housing/schema";
+import { advisoryChecks, autoChecks, blockingChecks } from "./validate/autoChecks";
 import type { PdfMeta } from "./fetch-pdfs";
 import { fromRoot } from "./paths";
 
@@ -17,6 +18,7 @@ const TARGET = fromRoot("apps", "mobile", "data", "announcements.json");
 
 interface Meta {
   provider?: "LH" | "SH";
+  pdf_url?: string;
   lh_id: string;
   region_code: string;
   region_name: string;
@@ -52,9 +54,13 @@ const SIDO: Record<string, string> = {
 
 function metaFromApi(m: PdfMeta): Meta {
   const sido = SIDO[m.region_code] ?? m.region_name;
-  const sigungu = m.address?.split(/\s+/)[1];
+  // 주소의 두 번째 어절이 언제나 시군구는 아니다. SH 공고는 "서울특별시 일원(단지별 소재지 상이)"처럼 와서
+  // 그대로 쓰면 지역 이름이 "서울 일원(단지별"이 된다. 시·군·구로 끝나는 어절만 쓴다.
+  const token = m.address?.split(/\s+/)[1];
+  const sigungu = token && /[시군구]$/.test(token) ? token : undefined;
   return {
     provider: m.provider,
+    pdf_url: m.pdf_url,
     lh_id: m.lh_id,
     region_code: m.region_code,
     region_name: sigungu ? `${sido} ${sigungu}` : sido,
@@ -64,6 +70,8 @@ function metaFromApi(m: PdfMeta): Meta {
   };
 }
 
+export type DataStatus = "VERIFIED" | "AUTO" | "UNVERIFIED";
+
 export interface AppAnnouncement {
   id: string;
   provider: "LH" | "SH";
@@ -72,7 +80,10 @@ export interface AppAnnouncement {
   housing_type: HousingType;
   region_code: string;
   region_name: string;
-  status: "VERIFIED" | "UNVERIFIED";
+  /** VERIFIED 사람이 공고문과 대조함 / AUTO 자동 추출·검증만 / UNVERIFIED 아직 조건을 못 읽음 */
+  status: DataStatus;
+  /** 자동 검증에서 걸린 것 (있으면 화면에 그대로 알린다) */
+  checks?: string[];
   notice_date?: string;
   apply_start?: string;
   apply_end?: string;
@@ -80,6 +91,8 @@ export interface AppAnnouncement {
   lat?: number;
   lng?: number;
   transit?: { nearest_station?: string; station_walk_min?: number };
+  /** 기관 사이트의 원문 공고문. 앱이 근거 쪽수를 실제로 열 수 있게 한다 */
+  pdf_url?: string;
   pdf_pages?: number;
   extraction: ExtractionOutput;
 }
@@ -99,11 +112,17 @@ for (const f of files) {
     continue;
   }
   const meta = MANUAL_META[id] ?? apiMeta[id];
-  // 앱 로컬 데이터는 사람이 검토한 것으로 간주해 verified=true (실제 서비스는 publish_version()이 한다)
-  const extraction = {
-    ...parsed.data,
-    tracks: parsed.data.tracks.map((t) => ({ ...t, rules: t.rules.map((r) => ({ ...r, verified: true })) })),
-  };
+  // 사람이 본 것만 VERIFIED다. 초안은 사람이 본 적이 없으므로 AUTO로 두고 룰의 verified도 건드리지 않는다.
+  // (전에는 여기서 전부 verified=true를 붙여, 검수하지 않은 LLM 추출이 앱에서 "검수 완료"로 보였다.)
+  const extraction = parsed.data;
+  const fromFixture = existsSync(fixture);
+  // autoChecks는 "tracks[0] 1순위 (…): 가격 정보 없음"처럼 트랙별로 나온다.
+  // 화면에는 트랙 이름을 빼고 같은 지적을 한 번만 보여 준다 (네 트랙이 같은 말을 하면 한 줄).
+  const checked = autoChecks(extraction);
+  const blocking = blockingChecks(checked);
+  // 화면에는 트랙 이름을 빼고 같은 지적을 한 번만 보여 준다 (네 트랙이 같은 말을 하면 한 줄).
+  const short = (m: string) => m.slice(m.lastIndexOf(": ") + 2);
+  const issues = [...new Set(advisoryChecks(checked).map(short))];
   items.push({
     id,
     provider: meta?.provider ?? "LH",
@@ -112,7 +131,9 @@ for (const f of files) {
     housing_type: parsed.data.housing_type,
     region_code: meta?.region_code ?? "00",
     region_name: meta?.region_name ?? "",
-    status: "VERIFIED",
+    // 게시를 막을 지적이 있으면 조건을 믿을 수 없다 → 앱에서 "조건 분석 중"으로 둔다 (수집기의 CONFLICT와 같은 기준)
+    status: blocking.length ? "UNVERIFIED" : fromFixture ? "VERIFIED" : "AUTO",
+    checks: issues.length ? issues : undefined,
     notice_date: parsed.data.schedule.notice_date,
     apply_start: meta?.apply_start ?? parsed.data.schedule.apply_start,
     apply_end: meta?.apply_end ?? parsed.data.schedule.apply_end,
@@ -120,6 +141,7 @@ for (const f of files) {
     lat: meta?.lat,
     lng: meta?.lng,
     transit: meta?.transit,
+    pdf_url: meta?.pdf_url,
     extraction,
   });
 }

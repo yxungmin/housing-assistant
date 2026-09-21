@@ -4,7 +4,8 @@
  *   npm run collect:dry        목록만 읽고 신규 판정까지만 (쓰기·LLM 없음)
  *
  * 흐름: 기관별 목록(LH API, SH 게시판) → 신규·수정 탐지 → 공고문 PDF → Storage → 텍스트 → 섹션
- *       → LLM 추출 → 스키마·자동 검증 → announcement_versions(UNVERIFIED | CONFLICT) → 신규면 푸시 대상 조회
+ *       → LLM 추출 → 스키마·자동 검증 → announcement_versions(UNVERIFIED | CONFLICT)
+ *       → 게시를 막을 지적이 없으면 자동 게시(auto_publish_version) → 신규면 푸시 대상 조회
  *
  * 비용은 추출한 공고 수에 비례한다. COLLECT_REGIONS로 지역을 좁히면 그만큼 줄어든다 (기본 서울·경기).
  */
@@ -17,16 +18,23 @@ import { extractPdfText, ocrFallback } from "./pdf/extract";
 import { buildSections, sectionsToPrompt } from "./pdf/sections";
 import { inRegions, lhSource, shSource, type CollectedNotice } from "./sources";
 import { ShClient } from "./sh/api";
-import { autoChecks } from "./validate/autoChecks";
+import { advisoryChecks, autoChecks, blockingChecks } from "./validate/autoChecks";
 
-const dryRun = process.argv.includes("--dry-run");
 const env = loadEnv();
+// 추출이 꺼져 있으면 목록·신규 판정까지만 한다. 돈도, 쓰기도 없다.
+const extractionOff = !env.EXTRACTION_ENABLED;
+const dryRun = process.argv.includes("--dry-run") || extractionOff;
 const repo = dryRun ? null : new Repo(requireEnv(env, "SUPABASE_URL"), requireEnv(env, "SUPABASE_SERVICE_ROLE_KEY"), env.PDF_BUCKET);
 
 const regions = env.COLLECT_REGIONS.split(",").map((r) => r.trim()).filter(Boolean);
 const providers = env.COLLECT_PROVIDERS.split(",").map((p) => p.trim().toUpperCase()).filter(Boolean);
 
 const log = (msg: string) => console.log(`[${new Date().toISOString()}] ${msg}`);
+
+if (extractionOff) {
+  log("추출이 꺼져 있다 (EXTRACTION_ENABLED=false) — 목록과 신규 판정까지만 하고 LLM·쓰기는 건너뛴다.");
+  log("  켜려면 .env 또는 Actions 변수에 EXTRACTION_ENABLED=true. 공고 1건 추출에 약 1,300원이 나간다.");
+}
 
 async function processNotice(notice: CollectedNotice): Promise<"new" | "modified" | "skipped" | "conflict"> {
   const existing = repo ? await repo.findByExternalId(notice.provider, notice.external_id) : null;
@@ -76,19 +84,29 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
   log(`  LLM ${result.model} in=${result.usage.input_tokens} out=${result.usage.output_tokens} cache=${result.usage.cache_read_input_tokens}`);
   if (!result.output) return conflict([`추출 실패: ${result.error ?? "unknown"}`]);
 
-  const issues = autoChecks(result.output);
-  const status = issues.length ? "CONFLICT" : "UNVERIFIED";
-  await repo.insertVersion({
+  // 게시를 막을 지적(숫자를 믿을 수 없음)과 알리기만 할 지적(가격 정보 없음 등)을 나눈다.
+  const checked = autoChecks(result.output);
+  const blocking = blockingChecks(checked);
+  const advisory = advisoryChecks(checked);
+  const status = blocking.length ? "CONFLICT" : "UNVERIFIED";
+  const versionId = await repo.insertVersion({
     announcement_id: announcementId,
     version,
     status,
     source_modified_at: detail.modified_key,
-    conflict_reasons: issues,
+    conflict_reasons: blocking,
+    checks: advisory,
     extraction: result.output,
     model: result.model,
     prompt_version: result.prompt_version,
     raw_text_chars: prompt.length,
   });
+
+  // 자동 게시: 사람 승인을 기다리지 않는다. 사람 확인은 나중에 배지(VERIFIED)로만 붙는다.
+  if (!blocking.length) {
+    await repo.autoPublish(versionId);
+    log(`  게시 v${version} (자동 확인)${advisory.length ? ` · 알림 ${advisory.length}건: ${advisory.join(" / ")}` : ""}`);
+  }
 
   // 좌표는 신규 공고에서 1회
   const address = result.output.address ?? detail.address;
@@ -110,7 +128,7 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       transit: geo?.transit,
     });
   }
-  log(`  v${version} ${status}${issues.length ? `: ${issues.join(" / ")}` : ""}`);
+  log(`  v${version} ${status}${blocking.length ? `: ${blocking.join(" / ")}` : ""}`);
   if (isNew) {
     const tokens = await repo.pushTargets(notice.region_code, notice.housing_type);
     log(`  푸시 대상 ${tokens.length}명 (발송은 검수 VERIFIED 후 — TODO M7)`);

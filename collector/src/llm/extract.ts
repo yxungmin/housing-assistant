@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import type { ExtractionOutput } from "@housing/schema";
 import { z } from "zod";
+import { loadEnv } from "../config";
 import { LlmExtraction, toExtractionOutput } from "./llmSchema";
 
 /**
@@ -71,7 +72,21 @@ export function supportsAdaptiveThinking(model: string): boolean {
   return !/haiku/i.test(model);
 }
 
+/**
+ * 비용이 나가는 유일한 문. 여기서 막으면 수집기·벤치마크·inspect 어느 경로로도 과금되지 않는다.
+ * 테스트 기간에는 EXTRACTION_ENABLED가 기본 false다 (config.ts).
+ */
+function assertExtractionEnabled(opts: ExtractOptions): void {
+  if (opts.client) return; // 테스트가 넣어 준 가짜 클라이언트는 과금되지 않는다
+  if (loadEnv().EXTRACTION_ENABLED) return;
+  throw new Error(
+    "LLM 추출이 꺼져 있다 (EXTRACTION_ENABLED=false). 돈이 나가는 곳은 여기뿐이라 기본값을 꺼짐으로 둔다. " +
+      "쓰려면 .env에 EXTRACTION_ENABLED=true (공고 1건 약 1,300원).",
+  );
+}
+
 export async function extractFromText(noticeText: string, opts: ExtractOptions): Promise<ExtractionResult> {
+  assertExtractionEnabled(opts);
   const client = opts.client ?? new Anthropic();
   const retries = opts.retries ?? 1;
   let mode: "grammar" | "json" = opts.forceJsonMode ? "json" : "grammar";
