@@ -123,7 +123,7 @@ export default function Onboarding() {
       <BottomCTA
         label={index + 1 >= steps.length ? "내 조건으로 공고 찾기" : step.kind === "multi" && selected.length === 0 ? "해당 없음" : "다음"}
         onPress={onNext}
-        disabled={!canNext}
+        appear={canNext}
         secondary={!!step.optional}
         secondaryLabel="나중에 입력할게요"
         onSecondary={onSkip}
@@ -159,10 +159,22 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
           accessibilityLabel={typeof step.title === "string" ? step.title : step.id}
         />
         {!isDate ? <T variant="subheading" color={colors.text2} style={{ flexShrink: 0 }}>{unitLabel}</T> : null}
+        {digits ? <ClearButton onPress={() => onChange("")} /> : null}
       </View>
       {isDate ? <T variant="bodyMedium" color={valid ? colors.primary : colors.text3}>{ageNote}</T> : null}
       {isWon && manwon ? <T variant="bodyMedium" color={colors.primary}>{manwon}</T> : null}
     </View>
+  );
+}
+
+/** 입력한 값을 한 번에 지운다. 긴 숫자를 백스페이스로 지우게 두지 않는다. */
+function ClearButton({ onPress }: { onPress: () => void }) {
+  const { colors } = useTheme();
+  return (
+    <Pressable onPress={onPress} hitSlop={12} accessibilityRole="button" accessibilityLabel="입력 지우기"
+      style={({ pressed }) => ({ width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: pressed ? colors.text3 : colors.text4, flexShrink: 0 })}>
+      <Icon name="x" size={14} color={colors.surface} strokeWidth={3} />
+    </Pressable>
   );
 }
 
@@ -198,6 +210,7 @@ function DurationField({ text, onChange }: { text: string; onChange: (t: string)
         <View style={{ flex: 3, flexDirection: "row", alignItems: "baseline", gap: 8, borderBottomWidth: 2, borderBottomColor: colors.primary, paddingBottom: 10 }}>
           <TextInput value={years} onChangeText={(t) => onChange(`${t.replace(/[^0-9]/g, "").slice(0, 3)}:${months}`)} keyboardType="number-pad" autoFocus placeholder="0" placeholderTextColor={colors.line} numberOfLines={1} selectionColor={colors.primary} accessibilityLabel="무주택 기간 (년)" style={[{ flex: 1 }, ...inputStyle]} />
           <T variant="subheading" color={colors.text2} style={{ flexShrink: 0 }}>년</T>
+          {years ? <ClearButton onPress={() => onChange(`:${months}`)} /> : null}
         </View>
         <View style={{ flex: 2, flexDirection: "row", alignItems: "baseline", gap: 8, borderBottomWidth: 2, borderBottomColor: months ? colors.primary : colors.line, paddingBottom: 10 }}>
           <TextInput value={months} onChangeText={setMonths} keyboardType="number-pad" placeholder="0" placeholderTextColor={colors.line} numberOfLines={1} selectionColor={colors.primary} accessibilityLabel="무주택 기간 (개월, 선택)" style={[{ flex: 1 }, ...inputStyle]} />

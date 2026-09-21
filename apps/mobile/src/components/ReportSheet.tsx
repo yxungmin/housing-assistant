@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Platform, TextInput, View } from "react-native";
-import { BottomSheet, Notice, PrimaryButton, Sub, T } from "./ui";
+import { BottomSheet, Notice, PrimaryButton, SlideUp, Sub, T } from "./ui";
 import { REPORT_STATUS_LABEL, type LocalReport } from "@/lib/reports";
 import { hasSource, openSource } from "@/lib/source";
 import { longDate } from "@/lib/format";
@@ -101,7 +101,10 @@ export function ReportSheet({
             multiline
           />
           <Field label="공고문에 적힌 값 (선택)" value={suggested} onChange={setSuggested} placeholder="예: 4억 3,524만 원" />
-          <PrimaryButton label={ok ? "보내기" : "무엇이 이상한지 적어 주세요"} disabled={!ok} onPress={() => onSubmit(message, suggested)} />
+          {/* 흐린 버튼을 두지 않는다. 적을 내용이 생기면 그때 버튼이 올라온다 */}
+          <SlideUp visible={ok}>
+            <PrimaryButton label="보내기" onPress={() => onSubmit(message, suggested)} />
+          </SlideUp>
           <Sub tone="3" variant="caption">
             신고한 항목과 적어 주신 내용만 보내요. 이름·연락처 같은 개인정보는 적지 말아 주세요.
           </Sub>

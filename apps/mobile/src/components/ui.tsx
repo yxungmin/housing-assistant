@@ -13,6 +13,34 @@ import { Icon, type IconName } from "./Icon";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) UIManager.setLayoutAnimationEnabledExperimental(true);
 
+/**
+ * 조건이 갖춰지면 아래에서 올라오며 나타나고, 아니면 자리까지 비운다.
+ * 자리를 비우는 게 핵심이다 — 흐린 버튼이 남아 있으면 "왜 안 눌리지"를 묻게 된다.
+ */
+export function SlideUp({ visible, children }: PropsWithChildren<{ visible: boolean }>) {
+  const anim = useRef(new Animated.Value(visible ? 1 : 0)).current;
+  const [mounted, setMounted] = useState(visible);
+  useEffect(() => {
+    if (visible) setMounted(true);
+    const animation = Animated.timing(anim, {
+      toValue: visible ? 1 : 0,
+      duration: visible ? 220 : 140,
+      easing: visible ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
+      useNativeDriver: Platform.OS !== "web",
+    });
+    animation.start(({ finished }) => {
+      if (finished && !visible) setMounted(false);
+    });
+    return () => animation.stop();
+  }, [visible, anim]);
+  if (!mounted) return null;
+  return (
+    <Animated.View style={{ opacity: anim, transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
+      {children}
+    </Animated.View>
+  );
+}
+
 /** 목록·카드 크기 변화를 부드럽게. 상태를 바꾸기 직전에 호출한다. */
 export function animateLayout(duration = 220) {
   LayoutAnimation.configureNext({ duration, create: { type: "easeInEaseOut", property: "opacity" }, update: { type: "easeInEaseOut" }, delete: { type: "easeInEaseOut", property: "opacity" } });
@@ -281,11 +309,22 @@ export function KeyValue({ label, value, src, strong }: { label: string; value: 
 }
 
 /** 하단 고정 CTA: 높이 56, 라운드 16. Screen의 footer 슬롯에 넣으면 스크롤과 무관하게 고정된다. */
-export function BottomCTA({ label, onPress, disabled, secondary, secondaryLabel, onSecondary }: { label: string; onPress: () => void; disabled?: boolean; secondary?: boolean; secondaryLabel?: string; onSecondary?: () => void }) {
+/**
+ * 하단 CTA.
+ * disabled 대신 `appear`를 주면 할 수 있을 때 버튼이 올라온다 — 흐린 버튼을 계속 보여 주는 대신
+ * 버튼이 나타나는 것 자체를 "다 됐다"는 신호로 쓴다. 건너뛰기(secondary)는 그동안에도 남는다.
+ */
+export function BottomCTA({ label, onPress, disabled, appear, secondary, secondaryLabel, onSecondary }: { label: string; onPress: () => void; disabled?: boolean; appear?: boolean; secondary?: boolean; secondaryLabel?: string; onSecondary?: () => void }) {
   const { colors } = useTheme();
   return (
     <View style={{ paddingHorizontal: space.xl, paddingTop: 12, paddingBottom: 28, gap: 4, backgroundColor: colors.surface }}>
-      <PrimaryButton label={label} onPress={onPress} disabled={disabled} />
+      {appear !== undefined ? (
+        <SlideUp visible={appear}>
+          <PrimaryButton label={label} onPress={onPress} />
+        </SlideUp>
+      ) : (
+        <PrimaryButton label={label} onPress={onPress} disabled={disabled} />
+      )}
       {secondary && secondaryLabel ? (
         <Pressable onPress={onSecondary} style={{ paddingVertical: 12, alignItems: "center" }} accessibilityRole="button">
           <Text {...wordWrap} style={[{ fontFamily: fonts.medium, fontSize: 15, color: colors.text3 }]}>{secondaryLabel}</Text>
