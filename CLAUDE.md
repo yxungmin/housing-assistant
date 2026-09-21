@@ -71,6 +71,10 @@ npm run output:size                  # 추출 출력이 어디서 커지는지 (
 - 제품 한 줄: 공고를 찾는 앱이 아니라 "이 공고가 나한테 맞는지 판단하는 앱". 지도·커뮤니티·복지정보는 V0.1에서 만들지 않는다 (`TODO.md`의 제품 포지션).
 - 비용 계산은 임대와 분양 둘 다 V0.1이다. 임대는 `engine/cost.ts`, 분양 납부 계획은 `engine/sale.ts`.
   분양 비율은 공고문에서 읽은 payment_schedule만 쓰고 표준 비율을 짐작해 채우지 않는다.
+- 아이콘은 `src/components/icon` 배럴 하나로만 들어온다. 두 가족이 있고 섞지 않는다:
+  MONO는 한 가지 색(`currentColor`)이라 쓰는 쪽이 색을 정하고, ASSET은 브랜드 색이 박혀 있어 `color`를 무시한다.
+  굵기·색 보정 props는 없다 — 도형에 박혀 있다. 고칠 때는 `icons.ts`를 통째로 갈아 끼우고
+  `npm run app:icons`로 라이트·다크 양쪽을 본다. 원본에서 손댄 곳은 그 파일 머리말에 적는다.
 - 앱 상대 import에 `.js` 확장자를 붙이지 않는다 (Metro가 .ts로 못 푼다).
 - 수집기 `insertVersion`은 정규화 테이블과 함께 `announcement_versions.extraction`(jsonb)도 채운다. 앱은 그 jsonb만 읽는다.
 - 건강보험료율 등 연도별 상수는 엔진 한 곳(`income.ts`)에 기준일과 함께 둔다.

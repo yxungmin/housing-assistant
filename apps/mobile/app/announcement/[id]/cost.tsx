@@ -265,7 +265,7 @@ export default function Cost() {
                   <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{q.product.name}</T>
                   <Sub tone="3" variant="caption">연 {(q.annual_rate * 100).toFixed(1)}% · 한도 {Math.round(q.product.ltv * 100)}% · 최대 {manwon(q.amount)}</Sub>
                 </View>
-                {on ? <Icon name="check" size={20} color={colors.primary} strokeWidth={3} /> : null}
+                {on ? <Icon name="check" size={20} color={colors.primary} /> : null}
               </Pressable>
             );
           })}
@@ -291,7 +291,7 @@ export default function Cost() {
                   <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{r.label}</T>
                   <Sub tone="3" variant="caption">{allTracks ? r.trackName + " · " : ""}보증금 {manwon(r.pricing.deposit)} · 월 {won(r.pricing.monthly_rent)}</Sub>
                 </View>
-                {on ? <Icon name="check" size={20} color={colors.primary} strokeWidth={3} /> : null}
+                {on ? <Icon name="check" size={20} color={colors.primary} /> : null}
               </Pressable>
             );
           })}

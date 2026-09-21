@@ -144,7 +144,7 @@ export default function AnnouncementDetail() {
                     <View key={g.group.id} style={{ backgroundColor: colors.surface, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 6, marginVertical: 6 }}>
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 4, paddingTop: 8, paddingBottom: 2 }}>
                         <Sub tone="3" variant="caption">{g.group.label} · 하나만 맞으면 됩니다</Sub>
-                        {g.status === "MATCH" ? <Icon name="check" size={13} color={colors.ok} strokeWidth={3} /> : null}
+                        {g.status === "MATCH" ? <Icon name="check" size={13} color={colors.ok} /> : null}
                       </View>
                       {rules.map((r, i) => (
                         <ConditionRow key={i} status={r.status} title={ruleTitle(r.rule)} why={inputSummary(r.rule, state.profile, r)} page={r.rule.source.page} {...rowReport(r)} />

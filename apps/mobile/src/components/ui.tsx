@@ -97,7 +97,7 @@ export function Header({ onBack, title, right }: { onBack?: () => void; title?: 
       <View style={{ width: 48, alignItems: "flex-start" }}>
         {onBack ? (
           <Pressable onPress={onBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="뒤로" style={({ pressed }) => ({ padding: 8, borderRadius: radius.pill, backgroundColor: pressed ? colors.cardSoft : "transparent" })}>
-            <Icon name="left" size={26} color={colors.text} strokeWidth={2.2} />
+            <Icon name="left" size={26} color={colors.text} />
           </Pressable>
         ) : null}
       </View>
@@ -126,7 +126,7 @@ export function IconButton({ name, onPress, label, color, pop }: { name: IconNam
   return (
     <Pressable onPress={onPress} hitSlop={12} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => ({ padding: 8, borderRadius: radius.pill, backgroundColor: pressed ? colors.cardSoft : "transparent" })}>
       <Animated.View style={{ transform: [{ scale }] }}>
-        <Icon name={name} size={24} color={color ?? colors.text} strokeWidth={2} />
+        <Icon name={name} size={24} color={color ?? colors.text} />
       </Animated.View>
     </Pressable>
   );
@@ -211,9 +211,9 @@ export function IconTile({ name, tone = "gray", size = 40 }: { name: IconName; t
   const fg = { gray: colors.text2, primary: colors.primary, warn: colors.warning, danger: colors.danger, info: colors.info }[tone];
   return (
     <View style={{ width: size, height: size, borderRadius: size * 0.3, backgroundColor: bg, alignItems: "center", justifyContent: "center" }}>
-      {/* 의미색을 쓰는 타일(일치·확인 필요·불일치)은 한 색으로 둔다 — 거기서는 색이 곧 판정이다.
-          중립 타일(회색·정보)에서만 두 톤을 쓴다. */}
-      <Icon name={name} size={Math.round(size * 0.5)} color={fg} mono={tone === "primary" || tone === "warn" || tone === "danger"} strokeWidth={2.2} />
+      {/* 선 아이콘은 타일의 의미색을 그대로 입는다 — 여기서는 색이 곧 판정이다.
+          그림 아이콘(집·지하철 등)은 색이 박혀 있어 이 색을 무시한다 (icon/icons.ts). */}
+      <Icon name={name} size={Math.round(size * 0.5)} color={fg} />
     </View>
   );
 }
@@ -241,7 +241,7 @@ export function Tag({ children, tone = "primary", icon }: PropsWithChildren<{ to
   const fg = { primary: colors.primary, warn: colors.warning, danger: colors.danger, gray: colors.text2, info: colors.info }[tone];
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: bg, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 }}>
-      {icon ? <Icon name={icon} size={12} color={fg} strokeWidth={3} /> : null}
+      {icon ? <Icon name={icon} size={12} color={fg} /> : null}
       <Text {...wordWrap} style={[{ fontFamily: fonts.bold, fontSize: 12, color: fg, lineHeight: 16, letterSpacing: -0.1 }]}>{children}</Text>
     </View>
   );
@@ -490,7 +490,7 @@ export function Notice({ tone = "primary", icon, children }: PropsWithChildren<{
   const fg = tone === "warn" ? colors.warning : tone === "info" ? colors.info : colors.primary;
   return (
     <View style={{ flexDirection: "row", gap: 10, alignItems: "center", backgroundColor: bg, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 14 }}>
-      {icon ? <Icon name={icon} size={18} color={fg} strokeWidth={2.6} /> : null}
+      {icon ? <Icon name={icon} size={18} color={fg} /> : null}
       <T variant="small" color={fg} style={{ flex: 1, fontFamily: fonts.semiBold }}>{children}</T>
     </View>
   );

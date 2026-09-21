@@ -1,123 +1,89 @@
 /**
- * 아이콘 도형 데이터. 그리는 것은 `Icon.tsx`, 미리보기 페이지는 `scripts/icon-preview.ts`가
- * **같은 데이터**로 만든다 — 눈으로 확인한 모양과 앱에 나가는 모양이 갈리지 않게 한다.
+ * 아이콘 원본. SVG 문자열 그대로 두고, 앱(`Icon.tsx`)과 미리보기(`scripts/icon-preview.ts`)가
+ * **같은 문자열**을 그린다 — 눈으로 확인한 모양과 앱에 나가는 모양이 갈릴 자리를 없앤다.
  *
- * 컨셉: 24×24, 굵기 2, 둥근 끝. 두 가지 색을 쓴다.
- *  - `line` 골격·테두리 (기본 글자색)
- *  - `accent` 안에 든 내용 (기본 브랜드 초록)
+ * 두 가족으로 나뉜다. 섞지 않는 것이 이 파일의 요점이다.
  *
- * accent는 아껴 쓴다. 기준은 "색을 빼면 뜻이 흐려지는가"다.
- *  - 쓴다: 판정(check-circle)·상태(house-check, clock)·내용(calendar 일정, notice 글줄)·
- *         위치(map-pin 점)·주변 시설처럼, 초록이 가리키는 대상이 따로 있는 것.
- *  - 안 쓴다: 방향(←·→)·조작(search·filter·trash·settings·bell·chat·more·delete)처럼
- *         뼈대가 전부인 것. 거기에 색을 넣으면 없는 의미가 생기고, 화면 전체에서
- *         초록이 흔해져 정작 판정에 쓴 초록이 눈에 띄지 않는다.
- *  - 특히 경고(alert)·오류(x-circle)는 색 자체가 의미인 자리라 초록을 섞지 않는다.
- *    "빨간 ×인데 속은 초록"이 되면 읽는 사람이 한 번 멈춘다.
+ *  MONO  — 한 가지 색으로 그리는 선 아이콘. 색을 `currentColor`로 두어 쓰는 쪽이 정한다.
+ *          조작·방향·판정처럼 **뜻이 모양에만 있는** 것들이다. 그래서 경고는 주황, 오류는 빨강으로
+ *          그 자리의 색을 그대로 입힐 수 있다. 예전 세트의 `mono` 옵션이 하던 일을 기본값으로 삼았다.
+ *
+ *  ASSET — 브랜드 색으로 칠한 작은 그림. 집·지하철·어린이집처럼 **대상이 따로 있는** 것들이다.
+ *          색이 팔레트에 박혀 있어 쓰는 쪽이 바꾸지 못한다. 바꿀 수 있게 두면 같은 집 그림이
+ *          화면마다 다른 색으로 나오고, 그 순간 아이콘이 아니라 장식이 된다.
+ *
+ * 어느 가족인지는 이름으로 안다 (`isAssetIcon`). 쓰는 쪽은 `<Icon name="..." />` 하나만 쓴다.
+ *
+ * 고칠 일이 있으면 이 파일을 통째로 갈아 끼운다. 좌표를 손으로 만지는 파일이 아니다.
+ * 바꾼 뒤에는 `npm run app:icons`로 미리보기를 다시 만들어 라이트·다크 양쪽에서 본다.
+ *
+ * 받은 원본에서 손댄 곳 (갈아 끼울 때 다시 봐야 한다):
+ *  - alert: 느낌표 막대가 삼각형 빗변 안쪽과 겹쳐서 아래로 내리고 얇게 했다 (9.15→10.4, 굵기 2.35→2.15).
+ *           점도 같은 비율로 줄였다 (r 1.15→1.1, cy 16.45→16.2).
+ *  - walk: 두 발이 같은 path의 평행이동이라 왼발이 둘이었다. 뒷발을 x축으로 뒤집어 오른발로 만들었다.
+ *  - user-edit: 어깨 꼭대기가 머리보다 오른쪽이라 목이 꺾여 보였다. 꼭대기를 머리 바로 아래로 옮기고
+ *               어깨 높이를 기본 user와 같은 비율로 낮췄다.
  */
 
 /** 기본 크기 (px). 목록 한 줄에 들어가는 크기를 기준으로 잡았다 */
 export const ICON_SIZE = 20;
-/** 기본 선 굵기. 24×24 그리드에서 2가 16px까지 뭉개지지 않는 하한이다 */
-export const ICON_STROKE_WIDTH = 2;
 
-export type IconName =
-  // 상태·판정
-  | "check" | "check-circle" | "alert" | "x" | "x-circle" | "info"
-  // 이동·조작
-  | "left" | "right" | "more" | "delete" | "search" | "filter"
-  // 탭·기능
-  | "home" | "bookmark" | "user" | "user-edit" | "heart" | "heart-filled" | "bell" | "settings" | "trash" | "chat"
-  // 공고·일정
-  | "house" | "house-check" | "notice" | "calendar" | "clock"
-  // 위치·교통
-  | "map-pin" | "subway" | "bus" | "walk"
-  // 주변 인프라
-  | "baby" | "school" | "cart" | "store" | "hospital" | "tree";
+/** 한 가지 색으로 그리는 선 아이콘. 색은 쓰는 쪽이 정한다 (currentColor). */
+export const MONO_ICONS = {
+  "alert": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M12 4.75 19.5 17.8c.42.73-.1 1.64-.95 1.64H5.45c-.85 0-1.37-.91-.95-1.64L12 4.75Z" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 10.4v3.3" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="16.2" r="1.1" fill="currentColor"/></svg>`,
+  "bell": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M6.75 16.55h10.5l-1.05-1.85v-4.15a4.2 4.2 0 1 0-8.4 0v4.15l-1.05 1.85Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.1 18.7c.55.7 1.16 1.05 1.9 1.05s1.35-.35 1.9-1.05" fill="none" stroke="currentColor" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "bookmark": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M7.15 4.8h9.7c.6 0 1.08.48 1.08 1.08V19l-5.93-3.05L6.07 19V5.88c0-.6.48-1.08 1.08-1.08Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "chat": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M6.25 5.9h11.5c1.05 0 1.9.85 1.9 1.9v6.15c0 1.05-.85 1.9-1.9 1.9h-6.45L6.7 19.1v-3.25h-.45c-1.05 0-1.9-.85-1.9-1.9V7.8c0-1.05.85-1.9 1.9-1.9Z" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "check-circle": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><circle cx="12" cy="12" r="8.7" fill="none" stroke="currentColor" stroke-width="2.25"/><path d="M8.15 12.25 10.8 14.9 15.95 9.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "check": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M6.7 12.4 10.35 16 17.45 8.8" fill="none" stroke="currentColor" stroke-width="2.65" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "clock": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><circle cx="12" cy="12" r="8.7" fill="none" stroke="currentColor" stroke-width="2.25"/><path d="M12 7.95v4.25l2.95 1.8" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "delete": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M5.25 12 9.1 8.15c.48-.48 1.14-.75 1.82-.75h7.73c.75 0 1.35.6 1.35 1.35v6.5c0 .75-.6 1.35-1.35 1.35h-7.73c-.68 0-1.34-.27-1.82-.75L5.25 12Z" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.1 10.15 16.15 13.2M16.15 10.15 13.1 13.2" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "filter": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M5.1 6.4h13.8l-5.1 6v4.85l-3.6 1.55v-6.4L5.1 6.4Z" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "heart-filled": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M12 19s-6.9-4.15-8.05-8.05A4.38 4.38 0 0 1 12 7.9a4.38 4.38 0 0 1 8.05 3.05C18.9 14.85 12 19 12 19Z" fill="currentColor"/></svg>`,
+  "heart": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M12 19s-6.9-4.15-8.05-8.05A4.38 4.38 0 0 1 12 7.9a4.38 4.38 0 0 1 8.05 3.05C18.9 14.85 12 19 12 19Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "home": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M4.8 10.7 12 4.9l7.2 5.8v7.9c0 .72-.58 1.3-1.3 1.3H6.1c-.72 0-1.3-.58-1.3-1.3v-7.9Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "info": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><circle cx="12" cy="12" r="8.7" fill="none" stroke="currentColor" stroke-width="2.25"/><circle cx="12" cy="8.15" r="1.15" fill="currentColor"/><path d="M12 11.1v4.85" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "left": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M14.7 6.65 9.35 12l5.35 5.35" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "more": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><circle cx="6.5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="17.5" cy="12" r="1.5" fill="currentColor"/></svg>`,
+  "right": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M9.3 6.65 14.65 12 9.3 17.35" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "search": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><circle cx="10.2" cy="10.2" r="5.2" fill="none" stroke="currentColor" stroke-width="2.45"/><path d="M14.25 14.25 18.9 18.9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "settings": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M5 8h14M5 16h14" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="8" r="2.1" fill="white" stroke="currentColor" stroke-width="2.15"/><circle cx="15" cy="16" r="2.1" fill="white" stroke="currentColor" stroke-width="2.15"/></svg>`,
+  "trash": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M7.6 7.35h8.8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.35 7.35 9 17.5c.04.6.54 1.07 1.14 1.07h3.72c.6 0 1.1-.47 1.14-1.07l.65-10.15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "user-edit": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><circle cx="9.1" cy="7.8" r="2.95" fill="none" stroke="currentColor" stroke-width="2.15"/><path d="M4.35 18.1c.32-2.75 2.3-4.5 4.75-4.5 1 0 1.95.3 2.75.85" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.4 16.9 18.45 12.85l1.7 1.7-4.05 4.05-2.35.65.65-2.35Z" fill="none" stroke="currentColor" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "user": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><circle cx="12" cy="8.0" r="3.15" fill="none" stroke="currentColor" stroke-width="2.25"/><path d="M5.55 19.15c.36-3.22 3.05-5.2 6.45-5.2s6.09 1.98 6.45 5.2" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "walk": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M8.4 4.7c1.15.15 1.85 1.25 1.62 2.7-.16.98-.62 1.88-1.1 2.7-.45.77-.6 1.53-.48 2.45.12.95-.52 1.72-1.4 1.72-.7 0-1.25-.4-1.55-1.02-.52-1.06-.72-2.3-.65-3.6.12-2.2.82-5.1 3.56-4.95Z" fill="currentColor"/><path d="M8.4 4.7c1.15.15 1.85 1.25 1.62 2.7-.16.98-.62 1.88-1.1 2.7-.45.77-.6 1.53-.48 2.45.12.95-.52 1.72-1.4 1.72-.7 0-1.25-.4-1.55-1.02-.52-1.06-.72-2.3-.65-3.6.12-2.2.82-5.1 3.56-4.95Z" fill="currentColor" transform="translate(22.05, 5.05) scale(-1, 1)"/></svg>`,
+  "x-circle": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><circle cx="12" cy="12" r="8.7" fill="none" stroke="currentColor" stroke-width="2.25"/><path d="M9.05 9.05 14.95 14.95M14.95 9.05 9.05 14.95" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "x": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" color="currentColor"><path d="M7.35 7.35 16.65 16.65M16.65 7.35 7.35 16.65" fill="none" stroke="currentColor" stroke-width="2.55" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+} as const;
 
-type Tone = "line" | "accent";
+/** 브랜드 색이 박힌 작은 그림. 쓰는 쪽이 색을 바꾸지 못한다. */
+export const ASSET_ICONS = {
+  "baby": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="11.5" r="7" fill="#DDF8EA"/><path d="M10.2 6.3c.7-1 1.65-1.65 2.8-1.85" stroke="#2ED27C" stroke-width="1.9" stroke-linecap="round"/><circle cx="9.7" cy="10.8" r=".92" fill="#191F28"/><circle cx="14.3" cy="10.8" r=".92" fill="#191F28"/><path d="M9.8 14.2c1.4 1.2 3 1.2 4.4 0" stroke="#17B66B" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  "bus": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="4.9" y="3.9" width="14.2" height="14.9" rx="4.3" fill="#DDF8EA"/><rect x="7.2" y="6.1" width="9.6" height="5.3" rx="1.9" fill="#2ED27C"/><rect x="8.2" y="7.1" width="7.6" height="3.3" rx="1.1" fill="#FFFFFF" opacity=".92"/><rect x="8.1" y="12.6" width="7.8" height="1.8" rx=".9" fill="#83E7B4"/><circle cx="8.8" cy="15.2" r="1.3" fill="#17B66B"/><circle cx="15.2" cy="15.2" r="1.3" fill="#17B66B"/><rect x="7.9" y="18" width="1.7" height="2.5" rx=".85" fill="#191F28"/><rect x="14.4" y="18" width="1.7" height="2.5" rx=".85" fill="#191F28"/></svg>`,
+  "calendar": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3.8" y="5.1" width="16.4" height="15.1" rx="3.5" fill="#DDF8EA"/><path d="M3.8 8.8c0-2 1.62-3.7 3.62-3.7h9.16c2 0 3.62 1.7 3.62 3.7v2.35H3.8V8.8Z" fill="#2ED27C"/><rect x="7.15" y="3.3" width="2" height="4" rx="1" fill="#17B66B"/><rect x="14.85" y="3.3" width="2" height="4" rx="1" fill="#17B66B"/><rect x="8.2" y="13.2" width="3.8" height="3.8" rx="1.1" fill="#FFFFFF"/><text x="10.1" y="16" font-size="3.8" text-anchor="middle" fill="#17B66B" font-family="Arial, sans-serif" font-weight="700">8</text></svg>`,
+  "cart": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 5.4h2l1.2 7.1c.16.96.98 1.66 1.95 1.66h5.58c.9 0 1.68-.59 1.92-1.45l1.2-4.31H7.6" fill="#F1FCF6" stroke="#4E5968" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 8.1h9.8l-.96 3.6H9.1l-.6-3.6Z" fill="#2ED27C"/><circle cx="10" cy="18.2" r="1.45" fill="#17B66B"/><circle cx="16" cy="18.2" r="1.45" fill="#17B66B"/></svg>`,
+  "hospital": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="4.4" y="4.4" width="15.2" height="15.2" rx="4" fill="#DDF8EA"/><rect x="10.65" y="7.05" width="2.7" height="9.9" rx="1.15" fill="#17B66B"/><rect x="7.05" y="10.65" width="9.9" height="2.7" rx="1.15" fill="#2ED27C"/></svg>`,
+  "house-check": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4.3 10.3 10.9 4.9c.64-.52 1.56-.52 2.2 0l6.6 5.4v8.1c0 .88-.72 1.6-1.6 1.6H5.9c-.88 0-1.6-.72-1.6-1.6v-8.1Z" fill="#DDF8EA"/><path d="M5.4 10.1 12 4.8l6.6 5.3-1.8 2.25L12 8.6l-4.8 3.76-1.8-2.26Z" fill="#2ED27C"/><rect x="7.8" y="11.8" width="8.4" height="8.2" rx="2" fill="#FFFFFF"/><rect x="10.2" y="14.1" width="3.6" height="5.9" rx="1.2" fill="#17B66B"/><circle cx="17.4" cy="7.2" r="4.1" fill="#17B66B"/><path d="M15.55 7.15 16.8 8.4 19.2 6" fill="none" stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  "house": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4.3 10.3 10.9 4.9c.64-.52 1.56-.52 2.2 0l6.6 5.4v8.1c0 .88-.72 1.6-1.6 1.6H5.9c-.88 0-1.6-.72-1.6-1.6v-8.1Z" fill="#DDF8EA"/><path d="M5.4 10.1 12 4.8l6.6 5.3-1.8 2.25L12 8.6l-4.8 3.76-1.8-2.26Z" fill="#2ED27C"/><rect x="7.8" y="11.8" width="8.4" height="8.2" rx="2" fill="#FFFFFF"/><rect x="10.2" y="14.1" width="3.6" height="5.9" rx="1.2" fill="#17B66B"/></svg>`,
+  "map-pin": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 21s6.5-5.6 6.5-11A6.5 6.5 0 1 0 5.5 10c0 5.4 6.5 11 6.5 11Z" fill="#2ED27C"/><circle cx="12" cy="9.9" r="3" fill="#FFFFFF"/><circle cx="12" cy="9.9" r="1.35" fill="#17B66B"/></svg>`,
+  "notice": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5.2" y="3.8" width="13.6" height="16.4" rx="3.2" fill="#DDF8EA"/><path d="M14.3 3.8 18.8 8.3h-3.05c-.8 0-1.45-.65-1.45-1.45V3.8Z" fill="#2ED27C"/><rect x="8.1" y="10.4" width="7.8" height="2.2" rx="1.1" fill="#17B66B"/><rect x="8.1" y="14.4" width="5.5" height="2.2" rx="1.1" fill="#2ED27C"/></svg>`,
+  "school": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5.2" y="9.4" width="13.6" height="10.6" rx="2.7" fill="#DDF8EA"/><path d="M4.1 9.8 12 4.8l7.9 5-1.45 2.2L12 7.9 5.55 12l-1.45-2.2Z" fill="#2ED27C"/><rect x="8.2" y="12.1" width="2" height="2" rx=".7" fill="#FFFFFF"/><rect x="13.8" y="12.1" width="2" height="2" rx=".7" fill="#FFFFFF"/><rect x="10.4" y="14.2" width="3.2" height="5.8" rx="1" fill="#17B66B"/></svg>`,
+  "store": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5.3" y="9.2" width="13.4" height="10.8" rx="2.7" fill="#DDF8EA"/><path d="M4.5 9.4 6 4.8h12l1.5 4.6c.28.88-.36 1.82-1.28 1.82-.78 0-1.4-.62-1.4-1.38 0 .76-.62 1.38-1.4 1.38-.78 0-1.4-.62-1.4-1.38 0 .76-.62 1.38-1.4 1.38-.78 0-1.4-.62-1.4-1.38 0 .76-.62 1.38-1.4 1.38-.78 0-1.4-.62-1.4-1.38 0 .76-.62 1.38-1.4 1.38-.92 0-1.56-.94-1.28-1.82Z" fill="#2ED27C"/><rect x="8.9" y="14.1" width="6.2" height="5.9" rx="1.4" fill="#FFFFFF"/><rect x="10.7" y="15.5" width="2.6" height="4.5" rx=".95" fill="#17B66B"/></svg>`,
+  "subway": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5.3" y="3.4" width="13.4" height="15.4" rx="4.4" fill="#DDF8EA"/><rect x="7.4" y="5.9" width="9.2" height="5.5" rx="1.9" fill="#2ED27C"/><rect x="8.4" y="6.9" width="7.2" height="3.5" rx="1.15" fill="#FFFFFF" opacity=".92"/><circle cx="9.5" cy="14.1" r="1.3" fill="#17B66B"/><circle cx="14.5" cy="14.1" r="1.3" fill="#17B66B"/><path d="M8.9 18.8 7.4 20.6M15.1 18.8l1.5 1.8M8.8 20.5h6.4" stroke="#4E5968" stroke-width="1.75" stroke-linecap="round"/></svg>`,
+  "tree": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="10.9" y="14.2" width="2.2" height="5.8" rx="1.1" fill="#17B66B"/><circle cx="9.4" cy="10.9" r="3.4" fill="#83E7B4"/><circle cx="14.8" cy="10.6" r="4" fill="#2ED27C"/><circle cx="12.2" cy="7.8" r="4.4" fill="#17B66B" opacity=".94"/></svg>`,
+} as const;
 
-export type Shape =
-  | { k: "path"; d: string; tone?: Tone; fill?: boolean }
-  | { k: "circle"; cx: number; cy: number; r: number; tone?: Tone; fill?: boolean }
-  | { k: "rect"; x: number; y: number; w: number; h: number; rx?: number; tone?: Tone; fill?: boolean };
+export type MonoIconName = keyof typeof MONO_ICONS;
+export type AssetIconName = keyof typeof ASSET_ICONS;
+export type IconName = MonoIconName | AssetIconName;
 
-const p = (d: string, tone: Tone = "line"): Shape => ({ k: "path", d, tone });
-/** 채워 넣는 도형 (테두리 없음). 기본은 강조색 */
-const fp = (d: string, tone: Tone = "accent"): Shape => ({ k: "path", d, tone, fill: true });
-const c = (cx: number, cy: number, r: number, tone: Tone = "line"): Shape => ({ k: "circle", cx, cy, r, tone });
-const fc = (cx: number, cy: number, r: number, tone: Tone = "accent"): Shape => ({ k: "circle", cx, cy, r, tone, fill: true });
-const r = (x: number, y: number, w: number, h: number, rx = 0, tone: Tone = "line"): Shape => ({ k: "rect", x, y, w, h, rx, tone });
-const fr = (x: number, y: number, w: number, h: number, rx = 0): Shape => ({ k: "rect", x, y, w, h, rx, tone: "accent", fill: true });
+/** 색을 입힐 수 없는 쪽인가. 쓰는 쪽이 `color`를 줘도 무시된다는 뜻이다. */
+export const isAssetIcon = (name: IconName): name is AssetIconName => name in ASSET_ICONS;
 
-/**
- * 톱니 8개짜리 기어 윤곽. 처음에는 중심에서 뻗는 짧은 선 6개로 그렸는데
- * 16px에서 햇살처럼 보여서 닫힌 윤곽으로 바꿨다 — 톱니가 실루엣에 있어야 기어로 읽힌다.
- * 한 톱니(45°) 안에서 0~20°는 바깥 반지름, 25~45°는 안쪽 반지름을 쓴다.
- */
-const gearOutline = (): Shape => {
-  const at = (rr: number, deg: number) => {
-    const rad = ((deg - 90) * Math.PI) / 180;
-    return `${(12 + rr * Math.cos(rad)).toFixed(2)} ${(12 + rr * Math.sin(rad)).toFixed(2)}`;
-  };
-  const pts: string[] = [];
-  for (let i = 0; i < 8; i++) {
-    const b = i * 45;
-    pts.push(at(10, b), at(10, b + 20), at(7.2, b + 25), at(7.2, b + 45));
-  }
-  return p(`M${pts[0]}${pts.slice(1).map((q) => `L${q}`).join("")}Z`);
-};
+export const svgFor = (name: IconName): string =>
+  isAssetIcon(name) ? ASSET_ICONS[name] : MONO_ICONS[name as MonoIconName];
 
-export const ICONS: Record<IconName, Shape[]> = {
-  // ── 상태·판정 ────────────────────────────────────────────────
-  check: [p("M20 6 9 17l-5-5")],
-  "check-circle": [c(12, 12, 9), p("m8 12.3 2.7 2.7L16.2 9.3", "accent")],
-  alert: [p("M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"), p("M12 9.5v4"), p("M12 17.2h.01")],
-  x: [p("M18 6 6 18M6 6l12 12")],
-  "x-circle": [c(12, 12, 9), p("m9.3 9.3 5.4 5.4M14.7 9.3l-5.4 5.4")],
-  info: [c(12, 12, 9), p("M12 11.2v5", "accent"), fc(12, 8.1, 1.15)],
-
-  // ── 이동·조작 ────────────────────────────────────────────────
-  left: [p("m15 18-6-6 6-6")],
-  right: [p("m9 18 6-6-6-6")],
-  more: [fc(5, 12, 1.7, "line"), fc(12, 12, 1.7, "line"), fc(19, 12, 1.7, "line")],
-  // 백스페이스: 왼쪽이 뾰족한 키 + 초록 ×
-  delete: [p("M9.2 4h10.3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H9.2a2 2 0 0 1-1.5-.7l-5-6a2 2 0 0 1 0-2.6l5-6A2 2 0 0 1 9.2 4Z"), p("m12.3 9.5 5 5M17.3 9.5l-5 5")],
-  search: [c(10.5, 10.5, 6.5), p("m15.4 15.4 5.1 5.1")],
-  filter: [p("M3.5 5h17l-6.4 7.6v6.1l-4.2 2.3v-8.4z")],
-
-  // ── 탭·기능 ─────────────────────────────────────────────────
-  home: [p("m3 10 9-7 9 7v9.5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"), fp("M9.8 21.5v-5.2a2.2 2.2 0 0 1 4.4 0v5.2z")],
-  bookmark: [p("M6 3h12a1.5 1.5 0 0 1 1.5 1.5v16.2a.6.6 0 0 1-1 .5L12 17l-6.5 4.2a.6.6 0 0 1-1-.5V4.5A1.5 1.5 0 0 1 6 3Z"), fp("M9.7 3h4.6v13.1L12 14.6l-2.3 1.5z")],
-  user: [c(12, 7.2, 3.6), p("M4.5 20.5a7.5 7.5 0 0 1 15 0")],
-  "user-edit": [c(10, 7.2, 3.6), p("M2.8 20.5a7.2 7.2 0 0 1 12.4-5"), p("m16.6 20.6-3.1.7.7-3.1 4.6-4.6a1.4 1.4 0 0 1 2 0l.4.4a1.4 1.4 0 0 1 0 2z", "accent")],
-  heart: [p("M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5C2 10.8 3.5 12.5 5 14l7 7z")],
-  "heart-filled": [fp("M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5C2 10.8 3.5 12.5 5 14l7 7z"), p("M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5C2 10.8 3.5 12.5 5 14l7 7z")],
-  bell: [p("M6 9.5a6 6 0 0 1 12 0c0 6 2.5 8 2.5 8h-17s2.5-2 2.5-8"), fp("M9.6 17.5h4.8a2.4 2.4 0 0 1-4.8 0Z", "line"), p("M12 3.5v-1.2")],
-  settings: [gearOutline(), c(12, 12, 3.4)],
-  trash: [p("M3.5 6.5h17"), p("M9 6.5V4.8a1.3 1.3 0 0 1 1.3-1.3h3.4A1.3 1.3 0 0 1 15 4.8v1.7"), p("M5.8 6.5h12.4l-.9 13a2 2 0 0 1-2 1.9H8.7a2 2 0 0 1-2-1.9z"), p("M10 10.5v6.5M14 10.5v6.5")],
-  chat: [p("M4 4.5h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9.5l-4.3 3.6a.6.6 0 0 1-1-.5v-3.1H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2Z"), fc(8.5, 10.5, 1.5, "line"), fc(12.5, 10.5, 1.5, "line"), fc(16.5, 10.5, 1.5, "line")],
-
-  // ── 공고·일정 ────────────────────────────────────────────────
-  house: [p("M3.5 9.8 12 2.8l8.5 7v9.4a1.8 1.8 0 0 1-1.8 1.8H5.3a1.8 1.8 0 0 1-1.8-1.8z"), fp("M9.8 21v-4.8a2.2 2.2 0 0 1 4.4 0V21z")],
-  "house-check": [p("M3.5 9.8 12 2.8l8.5 7v9.4a1.8 1.8 0 0 1-1.8 1.8H5.3a1.8 1.8 0 0 1-1.8-1.8z"), p("m8.4 14.4 2.6 2.6 4.6-4.9", "accent")],
-  notice: [p("M5.5 2.8h8l5 5v13.4a1.8 1.8 0 0 1-1.8 1.8H5.5a1.8 1.8 0 0 1-1.8-1.8V4.6a1.8 1.8 0 0 1 1.8-1.8Z"), p("M13.5 2.8v5h5"), p("M7.4 12.5h8M7.4 16h8", "accent")],
-  calendar: [r(3, 5, 18, 16.5, 2.5), p("M8 2.5V6M16 2.5V6"), p("M3 10h18"), fr(6.8, 12.6, 3, 2.6, 0.8), fr(11.8, 12.6, 3, 2.6, 0.8), fr(16.8, 12.6, 3, 2.6, 0.8), fr(6.8, 16.8, 3, 2.6, 0.8), fr(11.8, 16.8, 3, 2.6, 0.8)],
-  clock: [c(12, 12, 9), p("M12 6.8V12h4.4", "accent")],
-
-  // ── 위치·교통 ────────────────────────────────────────────────
-  "map-pin": [p("M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"), fc(12, 10, 3.1)],
-  subway: [r(5, 2.8, 14, 13.4, 3.2), fr(7.5, 5.4, 9, 4.6, 1.6), fc(9.2, 13.2, 1.15), fc(14.8, 13.2, 1.15), p("m8.2 16.2-2.4 3.6M15.8 16.2l2.4 3.6"), p("M4.2 21h15.6")],
-  bus: [r(3, 3.4, 18, 12, 2.6), fr(5.3, 5.8, 13.4, 4.2, 1.4), fc(7.2, 13, 1.05), fc(16.8, 13, 1.05), c(7.6, 18.4, 2), c(16.4, 18.4, 2), p("M5.6 15.4h12.8")],
-  walk: [fc(12.8, 4, 2.1), p("M12.8 7v4.6"), p("m12.8 11.6-3.4 4.2-.6 5"), p("m12.8 11.6 2.7 2.6.9 4.9"), p("M9.2 9.2 12.8 8.2l3.4 1.8")],
-
-  // ── 주변 인프라 ──────────────────────────────────────────────
-  baby: [c(12, 13.8, 7.1), fc(9.8, 13, 1.05, "line"), fc(14.2, 13, 1.05, "line"), p("M9.9 16.4a3 3 0 0 0 4.2 0", "accent"), p("M11.7 6.9c.9-2.2 3.7-1.6 3 .9", "accent")],
-  school: [p("M2.8 20.6h18.4"), p("M6.2 20.6V10.2L12 6.4l5.8 3.8v10.4"), p("M12 6.4V2.8"), fp("M12 2.8h3.6v2.6H12z"), fp("M10.2 20.6v-4a1.8 1.8 0 0 1 3.6 0v4z")],
-  cart: [p("M2.4 3.6h2.6l2.9 11.6h10.4"), fp("M6.5 7.2h14.9l-1.7 6H8z"), fc(9.2, 19.4, 1.5, "line"), fc(17.6, 19.4, 1.5, "line")],
-  store: [fp("M3.8 4.2h16.4l2.4 4.8H1.4z"), p("M3.8 4.2h16.4l2.4 4.8H1.4z"), p("M4.6 9V20.6h14.8V9"), p("M2.6 20.6h18.8"), fr(9.7, 14.8, 4.6, 5.8, 0.9)],
-  hospital: [p("M2.8 20.6h18.4"), r(2.8, 11.4, 4.2, 9.2, 1), r(17, 11.4, 4.2, 9.2, 1), p("M7 20.6V7.4L12 3.6l5 3.8v13.2"), p("M12 7.8v4.4M9.8 10h4.4", "accent"), fp("M10.2 20.6v-3.8a1.8 1.8 0 0 1 3.6 0v3.8z")],
-  tree: [p("M12 2.6a5.2 5.2 0 0 1 5 3.8 4.1 4.1 0 0 1-1 8.1H8a4.1 4.1 0 0 1-1-8.1 5.2 5.2 0 0 1 5-3.8Z"), p("M12 21.4V9.6", "accent"), p("m12 13.4-2.6-2.6M12 13.4l2.6-2.6", "accent"), p("M8.4 21.4h7.2")],
-};
-
-export const ICON_NAMES = Object.keys(ICONS) as IconName[];
+/** 미리보기·테스트가 도는 순서. 가족을 갈라 둔다 */
+export const MONO_ICON_NAMES = Object.keys(MONO_ICONS) as MonoIconName[];
+export const ASSET_ICON_NAMES = Object.keys(ASSET_ICONS) as AssetIconName[];
+export const ICON_NAMES: IconName[] = [...MONO_ICON_NAMES, ...ASSET_ICON_NAMES];

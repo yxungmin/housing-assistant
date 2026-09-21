@@ -95,7 +95,7 @@ export default function Onboarding() {
                       <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{o.label}</T>
                       {o.hint ? <Sub tone="3">{o.hint}</Sub> : null}
                     </View>
-                    {!grid ? <Icon name="check" size={20} color={on ? colors.primary : colors.line} strokeWidth={3} /> : null}
+                    {!grid ? <Icon name="check" size={20} color={on ? colors.primary : colors.line} /> : null}
                   </Pressable>
                 );
               })}
@@ -176,7 +176,7 @@ function ClearButton({ onPress }: { onPress: () => void }) {
   return (
     <Pressable onPress={onPress} hitSlop={12} accessibilityRole="button" accessibilityLabel="입력 지우기"
       style={({ pressed }) => ({ width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: pressed ? colors.text3 : colors.text4, flexShrink: 0 })}>
-      <Icon name="x" size={14} color={colors.surface} strokeWidth={3} />
+      <Icon name="x" size={14} color={colors.surface} />
     </Pressable>
   );
 }
