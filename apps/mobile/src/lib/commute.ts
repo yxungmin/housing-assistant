@@ -55,8 +55,14 @@ export function commuteLines(
 }
 
 /**
- * 목록 한 줄에 쓰는 짧은 꼴. 시간을 알면 시간으로 말한다 ("직장 42분") —
- * 거리보다 시간이 사람이 실제로 쓰는 기준이다. 모르면 거리로 돌아간다 ("직장 12km").
+ * 목록 한 줄에 쓰는 짧은 꼴. 시간을 알면 시간으로 말한다 —
+ * 거리보다 시간이 사람이 실제로 쓰는 기준이다. 모르면 거리로 돌아간다.
+ *
+ * 무엇을 재서 나온 숫자인지 같이 적는다. "직장 21분"은 걸어서인지 차로인지 알 수 없고,
+ * "직장 12km"는 그 거리가 직선인지 도로인지 알 수 없다. 둘 다 사람이 그 숫자를 믿고
+ * 판단하는 자리라, 무엇을 잰 값인지 빠지면 잘못 읽힌다.
+ *
+ * 부부는 두 사람을 나란히 적어야 해서 한 줄이 길어진다. 그때는 재는 방법을 앞에 한 번만 쓴다.
  */
 export function commuteShort(
   distanceKm: number | null,
@@ -64,17 +70,15 @@ export function commuteShort(
   mine?: { minutes: number },
   partner?: { minutes: number },
 ): string | null {
-  if (mine || partner) {
-    const parts: string[] = [];
-    if (mine) parts.push(`직장 ${mine.minutes}분`);
-    if (partner) parts.push(`${mine ? "배우자" : "배우자 직장"} ${partner.minutes}분`);
-    if (parts.length) return parts.join(" · ");
-  }
+  if (mine && partner) return `대중교통 직장 ${mine.minutes}분 · 배우자 ${partner.minutes}분`;
+  if (mine) return `직장까지 대중교통 ${mine.minutes}분`;
+  if (partner) return `배우자 직장까지 대중교통 ${partner.minutes}분`;
+
   const km = (v: number) => `${v < 10 ? v.toFixed(1) : v.toFixed(0)}km`;
   if (distanceKm === null && distancePartnerKm === null) return null;
-  if (distancePartnerKm === null) return `직장 ${km(distanceKm!)}`;
-  if (distanceKm === null) return `배우자 직장 ${km(distancePartnerKm)}`;
-  return `직장 ${km(distanceKm)} · 배우자 ${km(distancePartnerKm)}`;
+  if (distanceKm !== null && distancePartnerKm !== null) return `직선거리 직장 ${km(distanceKm)} · 배우자 ${km(distancePartnerKm)}`;
+  if (distancePartnerKm === null) return `직장까지 직선거리 ${km(distanceKm!)}`;
+  return `배우자 직장까지 직선거리 ${km(distancePartnerKm)}`;
 }
 
 /**

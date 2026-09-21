@@ -70,20 +70,33 @@ describe("commuteLines", () => {
 
 describe("commuteShort", () => {
   it("10km 미만은 소수 한 자리까지 — 3km와 3.8km는 다른 이야기다", () => {
-    expect(commuteShort(3.8, null)).toBe("직장 3.8km");
-    expect(commuteShort(12.4, null)).toBe("직장 12km");
+    expect(commuteShort(3.8, null)).toBe("직장까지 직선거리 3.8km");
+    expect(commuteShort(12.4, null)).toBe("직장까지 직선거리 12km");
   });
 
   it("둘 다 있으면 나란히 보여 준다", () => {
-    expect(commuteShort(12, 4.2)).toBe("직장 12km · 배우자 4.2km");
+    expect(commuteShort(12, 4.2)).toBe("직선거리 직장 12km · 배우자 4.2km");
   });
 
   it("내 직장만 없으면 배우자 쪽을 말한다", () => {
-    expect(commuteShort(null, 4.2)).toBe("배우자 직장 4.2km");
+    expect(commuteShort(null, 4.2)).toBe("배우자 직장까지 직선거리 4.2km");
   });
 
   it("둘 다 없으면 아무 말도 하지 않는다 (호출한 쪽이 다른 걸 보여 준다)", () => {
     expect(commuteShort(null, null)).toBeNull();
+  });
+
+  it("무엇을 잰 값인지 같이 적는다 — '직장 21분'은 걸어서인지 차로인지 알 수 없다", () => {
+    expect(commuteShort(12, null, { minutes: 21 })).toBe("직장까지 대중교통 21분");
+    expect(commuteShort(null, 8, undefined, { minutes: 34 })).toBe("배우자 직장까지 대중교통 34분");
+  });
+
+  it("부부는 재는 방법을 앞에 한 번만 쓴다 — 두 번 쓰면 한 줄이 넘친다", () => {
+    expect(commuteShort(12, 8, { minutes: 21 }, { minutes: 34 })).toBe("대중교통 직장 21분 · 배우자 34분");
+  });
+
+  it("시간을 알면 거리를 쓰지 않는다", () => {
+    expect(commuteShort(12, 8, { minutes: 21 })).toBe("직장까지 대중교통 21분");
   });
 });
 

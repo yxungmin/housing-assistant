@@ -166,11 +166,11 @@ export default function Cost() {
               }
             />
             <View style={{ gap: 14 }}>
-              <KeyValue label="임대보증금" value={won(cost.deposit)} src={`공고문 ${base.source.page}쪽${deposit !== null ? " · 전환 적용" : ""}`} />
+              <KeyValue label="임대보증금" value={won(cost.deposit)} amount={cost.deposit} src={`공고문 ${base.source.page}쪽${deposit !== null ? " · 전환 적용" : ""}`} />
               {cost.loan ? (
-                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${hide(won(cost.loan.amount))}`} src={locked ? `${cost.loan.product.provider} · ${needsSignIn ? "로그인하면" : "구독하면"} 한도와 금리를 봐요` : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
+                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${hide(won(cost.loan.amount))}`} amount={locked ? undefined : -cost.loan.amount} note={locked ? `${cost.loan.product.provider} · ${needsSignIn ? "로그인하면" : "구독하면"} 한도와 금리를 봐요` : undefined} src={locked ? undefined : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
               ) : (
-                <KeyValue label="적용 가능한 대출" value="없음" src="입력 조건에 맞는 전세자금대출 상품이 없어요" />
+                <KeyValue label="적용 가능한 대출" value="없음" note="입력 조건에 맞는 전세자금대출 상품이 없어요" />
               )}
             </View>
           </Card>
@@ -182,10 +182,11 @@ export default function Cost() {
           <View style={{ gap: 12 }}>
             <SectionTitle>주변 시세와 비교</SectionTitle>
             <Card style={{ gap: 14 }}>
-              <KeyValue label="이 공고 보증금" value={won(cost.deposit)} strong />
+              <KeyValue label="이 공고 보증금" value={won(cost.deposit)} amount={cost.deposit} strong />
               <KeyValue
                 label="주변 전세 중앙값"
                 value={won(a.market.jeonse_median)}
+                amount={a.market.jeonse_median}
                 src={`전용 ${a.market.area_from}~${a.market.area_to}㎡ · ${a.market.deals}건`}
               />
               {a.market.monthly_rent_median ? (
@@ -211,10 +212,16 @@ export default function Cost() {
               ) : null}
             </Row>
             <View style={{ gap: 14 }}>
-              <KeyValue label="월임대료" value={won(cost.monthly_rent)} />
+              <KeyValue label="월임대료" value={won(cost.monthly_rent)} amount={cost.monthly_rent} />
               {cost.loan ? <KeyValue label={cost.loan.interest_only ? "대출 이자" : "대출 원리금"} value={hide(won(cost.loan.monthly_payment))} /> : null}
-              <KeyValue label="관리비" value={won(cost.maintenance_estimate)} src={base.maintenance_estimate === undefined ? "공고문에 없어 추정값을 썼어요" : `공고문 ${base.source.page}쪽`} />
-              {cost.monthly_debt_payment > 0 ? <KeyValue label="기존 부채 상환" value={hide(won(cost.monthly_debt_payment))} src="부담률 계산에만 포함" /> : null}
+              <KeyValue
+                label="관리비"
+                value={won(cost.maintenance_estimate)}
+                amount={cost.maintenance_estimate}
+                note={base.maintenance_estimate === undefined ? "공고문에 없어 추정값을 썼어요" : undefined}
+                src={base.maintenance_estimate === undefined ? undefined : `공고문 ${base.source.page}쪽`}
+              />
+              {cost.monthly_debt_payment > 0 ? <KeyValue label="기존 부채 상환" value={hide(won(cost.monthly_debt_payment))} note="부담률 계산에만 포함" /> : null}
             </View>
           </Card>
         </View>

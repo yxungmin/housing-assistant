@@ -9,7 +9,8 @@ import { SourceCard } from "@/components/SourceCard";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
-import { inputSummary, ruleTitle } from "@/lib/conditions";
+import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
+import { userFacingNotes } from "@/lib/notes";
 import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
@@ -75,7 +76,19 @@ export default function AnnouncementDetail() {
     );
   }
   const counts = track ? ruleCounts(track) : { matched: 0, needsCheck: 0, total: 0 };
+  const notes = userFacingNotes(a.extraction.notes);
   const trackIndex = track ? a.extraction.tracks.indexOf(track.track) : -1;
+  /**
+   * 값이 없어 판별을 못 한 줄에 "지금 입력하기"를 단다.
+   * 그 줄이 할 수 있는 말은 "입력하면 판별 가능"뿐인데, 그러려면 내 정보로 나가서 항목을 찾아야 했다.
+   * 여기서 바로 넣고 돌아오면 그 자리에서 판정이 끝난다.
+   */
+  const fillProps = (r: RuleResult) => {
+    if (r.status !== "NEEDS_CHECK" || r.skipped) return {};
+    const step = missingStepFor(r.rule, state.profile);
+    return step ? { onFill: () => router.push(`/onboarding?step=${step}`) } : {};
+  };
+
   /** 조건 한 줄을 눌렀을 때 쓸 신고 대상 + 이미 신고했으면 그 상태 */
   const rowReport = (r: RuleResult) => {
     const target: ReportTarget = {
@@ -147,13 +160,13 @@ export default function AnnouncementDetail() {
                         {g.status === "MATCH" ? <Icon name="check" size={13} color={colors.ok} /> : null}
                       </View>
                       {rules.map((r, i) => (
-                        <ConditionRow key={i} status={r.status} title={ruleTitle(r.rule)} why={inputSummary(r.rule, state.profile, r)} page={r.rule.source.page} {...rowReport(r)} />
+                        <ConditionRow key={i} status={r.status} title={ruleTitle(r.rule)} why={inputSummary(r.rule, state.profile, r)} page={r.rule.source.page} {...rowReport(r)} {...fillProps(r)} />
                       ))}
                     </View>
                   );
                 }
                 return rules.map((r, i) => (
-                  <ConditionRow key={`${g.group.id}-${i}`} status={r.status} title={ruleTitle(r.rule)} why={inputSummary(r.rule, state.profile, r)} page={r.rule.source.page} {...rowReport(r)} />
+                  <ConditionRow key={`${g.group.id}-${i}`} status={r.status} title={ruleTitle(r.rule)} why={inputSummary(r.rule, state.profile, r)} page={r.rule.source.page} {...rowReport(r)} {...fillProps(r)} />
                 ));
               })}
             </Card>
@@ -250,11 +263,12 @@ export default function AnnouncementDetail() {
           </Card>
         </View>
 
-        {a.extraction.notes.length > 0 ? (
+        {/* 추출이 남긴 작업 메모는 거르고 공고문 내용만 낸다 (lib/notes.ts) */}
+        {notes.length > 0 ? (
           <View style={{ gap: 12 }}>
             <SectionTitle>그 밖의 조건</SectionTitle>
             <Card style={{ gap: 12 }}>
-              {a.extraction.notes.slice(0, 4).map((n, i) => <Sub key={i}>{n}</Sub>)}
+              {notes.slice(0, 4).map((n, i) => <Sub key={i}>{n}</Sub>)}
             </Card>
           </View>
         ) : null}

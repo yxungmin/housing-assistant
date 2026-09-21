@@ -39,10 +39,19 @@ export function pct(ratio: number | null | undefined, digits = 1): string {
   return `${(ratio * 100).toFixed(digits)}%`;
 }
 
+/**
+ * 마감까지 며칠 남았나. 날짜 단위로 센다 — 오늘 마감이면 0, 내일이면 1이다.
+ *
+ * 시각 차이를 86,400,000으로 나누던 때는 오늘 마감이 0.6일로 나와 올림하면 1이 됐다.
+ * 그래서 오늘 끝나는 공고에 "D-1"이 붙고 "오늘 마감"은 화면에 뜬 적이 없었다.
+ * 사람이 세는 방식은 시각이 아니라 날짜다. 달력에서 며칠 뒤인지를 센다.
+ */
 export function daysUntil(dateIso: string | undefined, now = new Date()): number | null {
   if (!dateIso) return null;
-  const d = new Date(`${dateIso}T23:59:59+09:00`);
-  return Math.ceil((d.getTime() - now.getTime()) / 86_400_000);
+  const [y, m, d] = dateIso.split("-").map(Number) as [number, number, number];
+  const end = Date.UTC(y, m - 1, d);
+  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((end - today) / 86_400_000);
 }
 
 export function dday(dateIso: string | undefined): string {
@@ -129,3 +138,35 @@ export const CATEGORY_LABEL: Record<string, string> = {
   subscription: "청약통장",
   commute: "통근",
 };
+
+/**
+ * 큰 금액을 한글로 읽어 준다: 43,520,000 → "4천3백52만 원".
+ *
+ * 숫자만 있으면 자릿수를 세어야 한다. "43,520,000원"과 "4,352,000원"은 쉼표 위치 하나 차이인데
+ * 열 배가 다르고, 사람은 그 자리에서 잘못 읽는다. 보증금이나 대출금처럼 한 번 잘못 읽으면
+ * 판단이 통째로 어긋나는 자리라, 원래 숫자 아래에 읽는 법을 작게 같이 적는다.
+ *
+ * 천 원 아래는 버린다. 34,816,000원의 "6천 원"은 이 화면에서 아무 판단도 바꾸지 않고
+ * 한글 줄만 길게 만든다. 버림이라 실제 금액이 이 값보다 적어 보이는 일은 없다.
+ */
+export function koreanWon(n: number | undefined | null): string {
+  if (n === undefined || n === null) return "";
+  const man = Math.floor(Math.abs(n) / 10_000);
+  if (man === 0) return "";
+  // 본문 금액이 쓰는 빼기 기호와 같은 글자를 쓴다. 하이픈과 섞이면 한 줄 안에서 두 모양이 보인다.
+  const sign = n < 0 ? "−" : "";
+
+  const eok = Math.floor(man / 10_000);
+  const rest = man % 10_000;
+  const parts: string[] = [];
+  if (eok > 0) parts.push(`${eok.toLocaleString("ko-KR")}억`);
+  if (rest > 0) {
+    const thousand = Math.floor(rest / 1000);
+    const hundred = Math.floor((rest % 1000) / 100);
+    const tail = rest % 100;
+    // 4352 → "4천3백52", 6200 → "6천2백", 81 → "81". 끝 두 자리는 그냥 숫자로 읽는 게 자연스럽다.
+    const text = `${thousand > 0 ? `${thousand}천` : ""}${hundred > 0 ? `${hundred}백` : ""}${tail > 0 ? String(tail) : ""}`;
+    parts.push(`${text}만`);
+  }
+  return `${sign}${parts.join(" ")} 원`;
+}

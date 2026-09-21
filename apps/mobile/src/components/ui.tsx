@@ -5,9 +5,11 @@
  * 원칙: 흰 화면 + grey50 카드, 헤어라인 대신 간격, 아이콘은 연한 타일 안에, 색은 CTA·상태에만.
  */
 import { useEffect, useRef, useState, type PropsWithChildren, type ReactNode } from "react";
-import { Animated, Easing, Image, Keyboard, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { Animated, Dimensions, Easing, Image, Keyboard, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useScrollToTop } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
+import { koreanWon } from "@/lib/format";
 import { fonts, radius, space, type } from "@/theme/tokens";
 import { Icon, type IconName } from "./icon";
 
@@ -74,11 +76,20 @@ export function FadeIn({ children, style, delay = 0, distance = 12 }: PropsWithC
 export function Screen({ children, scroll = true, padded = true, style, bottomInset = space.section, header, footer }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number; header?: ReactNode; footer?: ReactNode }>) {
   const { colors } = useTheme();
   const inner = padded ? { paddingHorizontal: space.screen } : undefined;
+  /**
+   * 지금 있는 탭을 다시 누르면 맨 위로 올라간다.
+   *
+   * 목록을 한참 내려 보다가 처음으로 돌아가려면 그만큼 다시 쓸어 올려야 했다.
+   * 탭을 한 번 더 누르는 건 사람들이 이미 다른 앱에서 하는 동작이라 따로 배울 것이 없다.
+   * useScrollToTop이 지금 화면이 포커스일 때만 듣기 때문에, 다른 탭을 누르는 것과 섞이지 않는다.
+   */
+  const scroller = useRef<ScrollView>(null);
+  useScrollToTop(scroller);
   return (
     <SafeAreaView style={[{ flex: 1, backgroundColor: colors.surface }, style]} edges={["top", "left", "right"]}>
       {header}
       {scroll ? (
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={[inner, { paddingBottom: bottomInset, gap: space.xl }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={[inner, { paddingBottom: bottomInset, gap: space.xl }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           {children}
         </ScrollView>
       ) : (
@@ -280,7 +291,27 @@ export function Chip({ children, on, count, onPress }: PropsWithChildren<{ on?: 
 
 /** 조건 행: 상태 타일 + 조건 + 내 입력 + 근거 쪽. 구분선 없음. */
 /** 조건 한 줄. onPress를 주면 눌러서 근거를 펴 보고 신고할 수 있다 (ReportSheet). */
-export function ConditionRow({ status, title, why, page, onPress, flag }: { status: "MATCH" | "NEEDS_CHECK" | "MISMATCH"; title: string; why?: string; page?: number; first?: boolean; onPress?: () => void; flag?: string }) {
+export function ConditionRow({
+  status,
+  title,
+  why,
+  page,
+  onPress,
+  flag,
+  onFill,
+  fillLabel = "지금 입력하기",
+}: {
+  status: "MATCH" | "NEEDS_CHECK" | "MISMATCH";
+  title: string;
+  why?: string;
+  page?: number;
+  first?: boolean;
+  onPress?: () => void;
+  flag?: string;
+  /** 값이 없어 판별을 못 한 줄에만. 누르면 그 항목 하나를 받는 화면으로 간다 */
+  onFill?: () => void;
+  fillLabel?: string;
+}) {
   const { colors } = useTheme();
   const map = {
     MATCH: { icon: "check" as const, tone: "primary" as const },
@@ -293,15 +324,39 @@ export function ConditionRow({ status, title, why, page, onPress, flag }: { stat
       <View style={{ flex: 1, gap: 2, paddingTop: 1 }}>
         <T variant="bodyMedium" style={{ fontSize: 15.5 }}>{title}</T>
         {why ? <Sub tone="3" variant="caption">{why}</Sub> : null}
+        {/* 누를 수 있는 줄 안에 또 버튼을 두면 버튼 속의 버튼이 된다. 그래서 바깥에서 받는다 (아래 참고) */}
         {flag ? <View style={{ flexDirection: "row", paddingTop: 4 }}><Tag tone="info" icon="info">{flag}</Tag></View> : null}
       </View>
       {page ? <T variant="caption" color={colors.text4} style={{ paddingTop: 8 }}>p.{page}</T> : null}
     </View>
   );
-  return onPress ? (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${title} 근거 보기`}>{({ pressed }) => inner(pressed)}</Pressable>
-  ) : (
-    inner(false)
+  // 입력 버튼은 행 바깥에 나란히 둔다. 행 전체가 "근거 보기"라서, 그 안에 넣으면
+  // 버튼 속의 버튼이 되고 값을 넣으려다 근거가 열린다.
+  const withFill = (row: ReactNode) =>
+    onFill ? (
+      <View style={{ gap: 2 }}>
+        {row}
+        <Pressable
+          onPress={onFill}
+          accessibilityRole="button"
+          accessibilityLabel={`${title} 입력하기`}
+          style={({ pressed }) => ({ alignSelf: "flex-start", marginLeft: 54, marginBottom: 6, paddingVertical: 6, paddingHorizontal: 12, borderRadius: radius.pill, backgroundColor: pressed ? colors.primary : colors.primarySoft })}
+        >
+          {({ pressed }) => (
+            <Text style={{ fontFamily: fonts.semiBold, fontSize: 13, color: pressed ? colors.onPrimary : colors.primary, letterSpacing: -0.2 }}>{fillLabel}</Text>
+          )}
+        </Pressable>
+      </View>
+    ) : (
+      row
+    );
+
+  return withFill(
+    onPress ? (
+      <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${title} 근거 보기`}>{({ pressed }) => inner(pressed)}</Pressable>
+    ) : (
+      inner(false)
+    ),
   );
 }
 
@@ -325,15 +380,116 @@ export function ListRow({ label, sub, value, icon, iconTone, onPress, danger }: 
 }
 
 /** 금액 행: 라벨 회색, 값 검정 굵게, 아래 출처 */
-export function KeyValue({ label, value, src, strong }: { label: string; value: string; src?: string; strong?: boolean }) {
+/**
+ * 물음표 대신 쓰는 작은 (i). 누르면 그 자리에 말풍선이 뜬다.
+ *
+ * 출처("공고문 6쪽", "주택도시기금 2026.09.01 기준")는 없으면 안 되는 정보지만,
+ * 줄마다 작은 회색 글씨로 깔리면 숫자를 읽는 데 방해가 된다. 실제로 화면 절반이 각주였다.
+ * 그래서 평소에는 점 하나로 접어 두고, 궁금한 줄에서만 펴 보게 한다.
+ *
+ * 남발하지 않는다. 근거·출처처럼 "알고 싶으면 본다"에 해당하는 것만 넣는다.
+ * 숫자를 어떻게 읽어야 하는지 바꾸는 말(추정값을 썼다 같은 것)은 접지 않고 그대로 둔다 —
+ * 그건 눌러야 보이면 안 되는 종류의 사실이다.
+ */
+export function InfoTip({ text, label = "자세히" }: { text: string; label?: string }) {
   const { colors } = useTheme();
+  const [at, setAt] = useState<{ x: number; y: number; w: number } | null>(null);
+  const anchor = useRef<View>(null);
+
+  const open = () => {
+    anchor.current?.measureInWindow((x, y, w) => setAt({ x, y, w }));
+  };
+
+  const WIDTH = 260;
+  const screen = Dimensions.get("window");
+  // 오른쪽으로 넘치면 화면 안으로 당긴다. 아래 공간이 모자라면 위로 띄운다.
+  const left = at ? Math.max(12, Math.min(at.x + at.w / 2 - WIDTH / 2, screen.width - WIDTH - 12)) : 0;
+  const below = at ? at.y + 26 : 0;
+  const flip = at ? below + 120 > screen.height : false;
+
+  return (
+    <>
+      <Pressable
+        ref={anchor}
+        onPress={open}
+        hitSlop={10}
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        style={({ pressed }) => ({ padding: 2, opacity: pressed ? 0.5 : 1 })}
+      >
+        <Icon name="info" size={15} color={colors.text4} />
+      </Pressable>
+      <Modal visible={at !== null} transparent animationType="fade" onRequestClose={() => setAt(null)}>
+        <Pressable style={{ flex: 1 }} onPress={() => setAt(null)} accessibilityLabel="닫기">
+          {at ? (
+            <View
+              style={{
+                position: "absolute",
+                left,
+                ...(flip ? { bottom: screen.height - at.y + 8 } : { top: below }),
+                width: WIDTH,
+                backgroundColor: colors.cardStrong,
+                // 말풍선은 본문 위에 떠 있다. 테두리가 없으면 어디까지가 말풍선인지 안 보인다.
+                borderWidth: 1,
+                borderColor: colors.line,
+                borderRadius: radius.md,
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+                shadowColor: "#000",
+                shadowOpacity: 0.18,
+                shadowRadius: 16,
+                shadowOffset: { width: 0, height: 4 },
+                elevation: 6,
+              }}
+            >
+              <Text {...wordWrap} style={[type.small, { color: colors.text2 }]}>{text}</Text>
+            </View>
+          ) : null}
+        </Pressable>
+      </Modal>
+    </>
+  );
+}
+
+export function KeyValue({
+  label,
+  value,
+  src,
+  note,
+  strong,
+  amount,
+}: {
+  label: string;
+  value: string;
+  /** 근거·출처. 라벨 옆 (i)에 접어 둔다 */
+  src?: string;
+  /**
+   * 숫자를 어떻게 읽어야 하는지 바꾸는 말 (추정값을 썼다 등). 접지 않고 그대로 보여 준다 —
+   * 눌러야 보이면 안 되는 종류의 사실이다.
+   */
+  note?: string;
+  strong?: boolean;
+  /**
+   * 원 금액. 주면 숫자 아래에 한글로 읽는 법을 작게 붙인다 ("4천3백52만 원").
+   * 43,520,000과 4,352,000은 쉼표 하나 차이인데 열 배가 다르고, 사람은 그 자리에서 잘못 읽는다.
+   */
+  amount?: number | null;
+}) {
+  const { colors } = useTheme();
+  const reading = koreanWon(amount);
   return (
     <View style={{ gap: 2 }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-        <T variant="body" color={colors.text2} style={{ flex: 1 }}>{label}</T>
-        <T variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold }}>{value}</T>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+        <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 4 }}>
+          <T variant="body" color={colors.text2} style={{ flexShrink: 1 }}>{label}</T>
+          {src ? <InfoTip text={src} label={`${label} 근거`} /> : null}
+        </View>
+        <View style={{ alignItems: "flex-end", gap: 1 }}>
+          <T variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold }}>{value}</T>
+          {reading ? <Sub tone="3" variant="caption">{reading}</Sub> : null}
+        </View>
       </View>
-      {src ? <Sub tone="3" variant="caption">{src}</Sub> : null}
+      {note ? <Sub tone="3" variant="caption">{note}</Sub> : null}
     </View>
   );
 }

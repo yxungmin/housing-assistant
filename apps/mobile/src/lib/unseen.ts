@@ -53,3 +53,6 @@ export const isUnseen = (seen: SeenState, id: string): boolean => seen.newIds.in
 
 /** 목록 전체에서 안 본 것의 수 (목록 머리말에 쓴다) */
 export const unseenCount = (seen: SeenState, ids: string[]): number => ids.filter((id) => isUnseen(seen, id)).length;
+
+/** 아직 안 연 새 공고 id만. 알림 이력이 "새 공고" 줄을 만들 때 쓴다 (lib/inbox.ts) */
+export const unseenIds = (seen: SeenState, ids: string[]): string[] => ids.filter((id) => isUnseen(seen, id));

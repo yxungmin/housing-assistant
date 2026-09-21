@@ -9,6 +9,15 @@ import { withDerived } from "@/lib/onboarding";
 import type { UserProfile } from "@housing/schema";
 import { billing, canUseFirstMonthFree, normalizeSubscription, type Subscription } from "@/lib/billing";
 import type { ChangeRecord } from "@/lib/changes";
+import {
+  addNotifications,
+  fromChange,
+  markAllRead,
+  markRead,
+  pruneNotifications,
+  removeNotification,
+  type AppNotification,
+} from "@/lib/inbox";
 import { emptySeen, markOpened, noteSeen, type SeenState } from "@/lib/unseen";
 import { canOpenCost as canOpenCostRule, type Account } from "@/lib/access";
 import { canSend, type LocalReport } from "@/lib/reports";
@@ -36,6 +45,11 @@ export interface AppState {
   reports: LocalReport[];
   /** 관심 공고에서 값이 바뀐 기록. 공고를 열면 seen 처리한다 */
   changes: ChangeRecord[];
+  /**
+   * 알림 이력 (lib/inbox.ts). 푸시는 한 번 뜨고 사라지므로 앱 안에 남긴다.
+   * 90일이 지난 것은 불러올 때 버린다.
+   */
+  inbox: AppNotification[];
   /** 목록에 떴던 공고와 아직 안 연 새 공고 (lib/unseen.ts) */
   seen: SeenState;
 }
@@ -52,6 +66,10 @@ type Action =
   | { type: "addReport"; report: LocalReport }
   | { type: "mergeReports"; reports: LocalReport[] }
   | { type: "addChanges"; records: ChangeRecord[] }
+  | { type: "addNotifications"; items: AppNotification[] }
+  | { type: "readNotification"; id: string }
+  | { type: "readAllNotifications" }
+  | { type: "removeNotification"; id: string }
   | { type: "seeChange"; announcementId: string }
   | { type: "noteSeen"; ids: string[] }
   | { type: "openAnnouncement"; id: string }
@@ -69,13 +87,21 @@ const initial: AppState = {
   pushToken: null,
   reports: [],
   changes: [],
+  inbox: [],
   seen: emptySeen,
 };
 
 function reducer(s: AppState, a: Action): AppState {
   switch (a.type) {
     case "hydrate":
-      return { ...s, ...a.state, subscription: normalizeSubscription(a.state.subscription ?? s.subscription), loaded: true };
+      return {
+        ...s,
+        ...a.state,
+        subscription: normalizeSubscription(a.state.subscription ?? s.subscription),
+        // 90일이 지난 알림은 불러올 때 버린다. 지우는 시점을 한 곳으로 모아 둔다.
+        inbox: pruneNotifications(a.state.inbox ?? s.inbox),
+        loaded: true,
+      };
     case "setProfile":
       return { ...s, profile: withDerived(a.profile), onboarded: a.onboarded ?? s.onboarded };
     case "signIn":
@@ -101,8 +127,21 @@ function reducer(s: AppState, a: Action): AppState {
     case "addChanges": {
       // 같은 공고의 이전 기록은 새 것으로 덮는다. 쌓아 두면 "무엇이 최신인지"를 사용자가 판단해야 한다.
       const ids = new Set(a.records.map((r) => r.announcementId));
-      return { ...s, changes: [...a.records, ...s.changes.filter((c) => !ids.has(c.announcementId))].slice(0, 30) };
+      return {
+        ...s,
+        changes: [...a.records, ...s.changes.filter((c) => !ids.has(c.announcementId))].slice(0, 30),
+        // 변경 기록은 덮어쓰지만 알림 이력은 남긴다. "언제 무엇이 바뀌었나"를 되짚을 수 있어야 한다.
+        inbox: addNotifications(s.inbox, a.records.map(fromChange)),
+      };
     }
+    case "addNotifications":
+      return { ...s, inbox: addNotifications(s.inbox, a.items) };
+    case "readNotification":
+      return { ...s, inbox: markRead(s.inbox, a.id) };
+    case "readAllNotifications":
+      return { ...s, inbox: markAllRead(s.inbox) };
+    case "removeNotification":
+      return { ...s, inbox: removeNotification(s.inbox, a.id) };
     case "seeChange":
       return { ...s, changes: s.changes.map((c) => (c.announcementId === a.announcementId ? { ...c, seen: true } : c)) };
     case "noteSeen": {
@@ -174,6 +213,11 @@ interface Ctx {
   setNotifications: (on: boolean, pushToken?: string | null) => void;
   addReport: (report: LocalReport) => void;
   addChanges: (records: ChangeRecord[]) => void;
+  /** 마감·새 공고 알림을 이력에 넣는다. 이미 있는 것은 무시된다 (lib/inbox.ts) */
+  addNotifications: (items: AppNotification[]) => void;
+  readNotification: (id: string) => void;
+  readAllNotifications: () => void;
+  removeNotification: (id: string) => void;
   seeChange: (announcementId: string) => void;
   /** 목록이 바뀔 때 부른다. 처음 켠 기기에서는 그 목록이 기준선이 되고 아무것도 새 것이 아니다 */
   noteSeen: (ids: string[]) => void;
@@ -205,8 +249,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!state.loaded) return;
     void write(KEYS.profile, state.profile ? JSON.stringify(state.profile) : null);
-    const { onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen } = state;
-    void write(KEYS.meta, JSON.stringify({ onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen }));
+    const { onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox } = state;
+    void write(KEYS.meta, JSON.stringify({ onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox }));
     // 한 번 쓰면 지우지 않는다 — 여기서 null을 쓰면 위 주석의 보호가 통째로 없어진다
     if (subscription.firstMonthUsedAt) void write(KEYS.firstMonth, subscription.firstMonthUsedAt);
   }, [state]);
@@ -270,6 +314,10 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       setNotifications: (on, pushToken) => dispatch({ type: "setNotifications", on, pushToken }),
       addReport: (report) => dispatch({ type: "addReport", report }),
       addChanges: (records) => dispatch({ type: "addChanges", records }),
+      addNotifications: (items) => dispatch({ type: "addNotifications", items }),
+      readNotification: (id) => dispatch({ type: "readNotification", id }),
+      readAllNotifications: () => dispatch({ type: "readAllNotifications" }),
+      removeNotification: (id) => dispatch({ type: "removeNotification", id }),
       seeChange: (announcementId) => dispatch({ type: "seeChange", announcementId }),
       noteSeen: (ids) => dispatch({ type: "noteSeen", ids }),
       openAnnouncement: (id) => dispatch({ type: "openAnnouncement", id }),

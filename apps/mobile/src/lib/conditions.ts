@@ -1,4 +1,4 @@
-import type { EligibilityRule, UserProfile } from "@housing/schema";
+import type { EligibilityRule, RuleCategory, UserProfile } from "@housing/schema";
 import { ageFromBirthDate, monthsBetween, type RuleResult } from "@housing/engine";
 import { REGIONS } from "./onboarding";
 import { manwon, won, yearsMonths } from "./format";
@@ -81,6 +81,54 @@ export function ruleTitle(r: EligibilityRule): string {
  * "입력: 혼인 0년"처럼 값을 그대로 옮기지 않는다. 0년은 혼인을 안 했다는 뜻이고,
  * 자녀 0명은 "자녀 없음"이다. 숫자를 그대로 보여 주면 읽는 사람이 해석을 해야 한다.
  */
+
+/**
+ * "입력하면 판별 가능"에서 어느 질문으로 보낼지.
+ *
+ * 그 줄을 읽은 사람이 할 수 있는 일은 하나뿐인데(값을 넣는 것), 그러려면 내 정보로 나가서
+ * 항목을 찾아야 했다. 조건 옆에서 바로 넣고 돌아오면 그 자리에서 판정이 끝난다.
+ *
+ * 비어 있는 값이 있을 때만 보낸다. 값이 있는데 판별을 못 한 것이라면(공고문을 못 읽은 경우)
+ * 사용자가 넣을 것이 없으므로 보내지 않는다 — 눌러도 아무것도 안 바뀌는 버튼은 거짓말이다.
+ */
+const STEP_FOR_CATEGORY: Partial<Record<RuleCategory, string>> = {
+  income: "annual_income",
+  asset: "total_assets",
+  car_value: "car_value",
+  debt: "debt",
+  residence: "region",
+  housing: "homeless",
+  marriage: "marriage",
+  children: "children_count",
+  age: "birth_date",
+  subscription: "subscription_months",
+  status: "statuses",
+};
+
+/** 그 규칙의 판별에 빠진 값이 있으면, 그것을 받는 단계 id */
+export function missingStepFor(rule: EligibilityRule, p: UserProfile | null): string | undefined {
+  if (!p) return undefined;
+
+  // applies_to가 판별이 안 되는 경우다. 가구원 수나 맞벌이 여부가 없어서 어느 줄을 볼지 모른다.
+  if (rule.applies_to?.household_size !== undefined && p.household_size === undefined) return "household_size";
+  if (rule.applies_to?.income_type !== undefined && p.income_type === undefined) return "income_type";
+
+  const missing: Partial<Record<RuleCategory, boolean>> = {
+    income: p.monthly_income === undefined,
+    asset: p.total_assets === undefined,
+    car_value: p.car_value === undefined,
+    debt: p.monthly_debt_payment === undefined,
+    residence: p.region_code === undefined,
+    housing: p.is_homeless === undefined,
+    marriage: p.marriage === undefined,
+    children: p.children_count === undefined,
+    age: p.birth_date === undefined && p.age === undefined,
+    subscription: p.subscription_months === undefined,
+    status: p.statuses === undefined,
+  };
+  return missing[rule.category] ? STEP_FOR_CATEGORY[rule.category] : undefined;
+}
+
 export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: RuleResult): string {
   if (!p) return "";
   if (result.status === "NEEDS_CHECK") return result.reason;
