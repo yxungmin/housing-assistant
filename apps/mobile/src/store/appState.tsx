@@ -36,6 +36,8 @@ export interface AppState {
    */
   account: Account | null;
   saved: string[];
+  /** "이 공고에 신청했어요"로 표시한 공고. 당첨자 발표 알림 대상 (무료) */
+  applied: string[];
   subscription: Subscription;
   themePref: ThemePref;
   /** 마감 알림·신규 공고 푸시 켬 (권한 허용 뒤에만 true) */
@@ -60,6 +62,7 @@ type Action =
   | { type: "signIn"; account: Account }
   | { type: "signOut" }
   | { type: "toggleSaved"; id: string }
+  | { type: "toggleApplied"; id: string }
   | { type: "setSubscription"; subscription: Subscription }
   | { type: "setTheme"; pref: ThemePref }
   | { type: "setNotifications"; on: boolean; pushToken?: string | null }
@@ -81,6 +84,7 @@ const initial: AppState = {
   onboarded: false,
   account: null,
   saved: [],
+  applied: [],
   subscription: { status: "none" },
   themePref: "system",
   notifications: false,
@@ -111,6 +115,8 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, account: null };
     case "toggleSaved":
       return { ...s, saved: s.saved.includes(a.id) ? s.saved.filter((x) => x !== a.id) : [...s.saved, a.id] };
+    case "toggleApplied":
+      return { ...s, applied: s.applied.includes(a.id) ? s.applied.filter((x) => x !== a.id) : [...s.applied, a.id] };
     case "setSubscription": {
       // 첫 달 무료는 한 번뿐이다. 어느 경로로 구독을 바꾸든 여기서 기록을 지킨다 —
       // 호출부마다 챙기게 두면 한 군데만 빠져도 무료 달이 다시 생긴다.
@@ -208,6 +214,7 @@ interface Ctx {
   signIn: (provider: Account["provider"]) => Promise<void>;
   signOut: () => void;
   toggleSaved: (id: string) => void;
+  toggleApplied: (id: string) => void;
   setSubscription: (subscription: Subscription) => void;
   setTheme: (pref: ThemePref) => void;
   setNotifications: (on: boolean, pushToken?: string | null) => void;
@@ -236,6 +243,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       const [profile, meta, firstMonth] = await Promise.all([read(KEYS.profile), read(KEYS.meta), read(KEYS.firstMonth)]);
       const parsedMeta = meta ? (JSON.parse(meta) as Partial<AppState>) : {};
       // 이 필드가 생기기 전에 깔린 기기에는 seen이 없다. 그 경우 다음 목록이 기준선이 된다.
+      // 이 필드가 생기기 전에 깔린 기기에는 applied가 없다
+      if (!parsedMeta.applied) parsedMeta.applied = [];
       if (!parsedMeta.seen) parsedMeta.seen = emptySeen;
       // meta가 지워졌어도 첫 달 기록이 남아 있으면 되살린다
       if (firstMonth) {
@@ -249,8 +258,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!state.loaded) return;
     void write(KEYS.profile, state.profile ? JSON.stringify(state.profile) : null);
-    const { onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox } = state;
-    void write(KEYS.meta, JSON.stringify({ onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox }));
+    const { onboarded, account, saved, applied, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox } = state;
+    void write(KEYS.meta, JSON.stringify({ onboarded, account, saved, applied, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox }));
     // 한 번 쓰면 지우지 않는다 — 여기서 null을 쓰면 위 주석의 보호가 통째로 없어진다
     if (subscription.firstMonthUsedAt) void write(KEYS.firstMonth, subscription.firstMonthUsedAt);
   }, [state]);
@@ -309,6 +318,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       },
       signOut: () => dispatch({ type: "signOut" }),
       toggleSaved: (id) => dispatch({ type: "toggleSaved", id }),
+      toggleApplied: (id) => dispatch({ type: "toggleApplied", id }),
       setSubscription: (subscription) => dispatch({ type: "setSubscription", subscription }),
       setTheme: (pref) => dispatch({ type: "setTheme", pref }),
       setNotifications: (on, pushToken) => dispatch({ type: "setNotifications", on, pushToken }),

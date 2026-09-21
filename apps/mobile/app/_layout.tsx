@@ -7,7 +7,7 @@ import { useAnnouncements } from "@/data/announcements";
 import { registerPushSubscription } from "@/data/remote";
 import { useAnnouncementSync } from "@/data/sync";
 import { changeSummary } from "@/lib/changes";
-import { notifyChange, setupNotificationHandler, syncDeadlineReminders } from "@/lib/notifications";
+import { notifyChange, setupNotificationHandler, syncReminders } from "@/lib/notifications";
 import { AppStateProvider, useAppState } from "@/store/appState";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 
@@ -58,13 +58,23 @@ function Root() {
 function useReminderSync() {
   const { state } = useAppState();
   const { list } = useAnnouncements();
-  const { saved, notifications, pushToken, loaded } = state;
+  const { saved, applied, notifications, pushToken, loaded } = state;
   const region = state.profile?.region_code;
   useEffect(() => {
     if (!loaded) return;
-    const items = list.filter((a) => saved.includes(a.id)).map((a) => ({ id: a.id, title: a.title, apply_end: a.apply_end }));
-    void syncDeadlineReminders(items, notifications);
-  }, [loaded, list, saved, notifications]);
+    // 관심(마감)과 신청함(발표)을 한 번에 넘긴다 — 예약은 지우고 다시 거는 방식이라 나눠 부르면 서로를 지운다
+    const items = list
+      .filter((a) => saved.includes(a.id) || applied.includes(a.id))
+      .map((a) => ({
+        id: a.id,
+        title: a.title,
+        apply_end: a.apply_end,
+        winner_announce: a.extraction.schedule.winner_announce,
+        saved: saved.includes(a.id),
+        applied: applied.includes(a.id),
+      }));
+    void syncReminders(items, notifications);
+  }, [loaded, list, saved, applied, notifications]);
   useEffect(() => {
     if (!loaded || !notifications || !pushToken || !region) return;
     void registerPushSubscription(pushToken, [region], ["happy", "national_rental", "purchased_rental", "long_term_rental", "newlywed_hope", "public_sale", "other"]).catch(() => false);

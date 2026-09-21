@@ -25,7 +25,7 @@ export default function AnnouncementDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { colors } = useTheme();
-  const { state, toggleSaved, addReport, seeChange, openAnnouncement } = useAppState();
+  const { state, toggleSaved, toggleApplied, addReport, seeChange, openAnnouncement } = useAppState();
   const { list } = useAnnouncements();
   const a = getAnnouncement(id ?? "", list);
   const [sheet, setSheet] = useState(false);
@@ -53,6 +53,9 @@ export default function AnnouncementDetail() {
   // 가격이 아예 없는 공고를 "분양"이라고 하면 사실이 아니다. 두 경우를 나눠 말한다.
   const hasAnyPricing = !!a?.extraction.tracks.some((t) => t.pricing.length > 0);
   const saved = !!a && state.saved.includes(a.id);
+  const applied = !!a && state.applied.includes(a.id);
+  // 발표일이 날짜로 적힌 공고만 알림을 걸 수 있다 ("2027년 2월"처럼 월까지만 있는 경우가 있다)
+  const announceDate = /^\d{4}-\d{2}-\d{2}$/.test(a?.extraction.schedule.winner_announce?.trim() ?? "");
 
   // seeChange는 상태가 바뀔 때마다 새로 만들어진다. 막지 않으면
   // 표시 → 상태 변경 → 새 함수 → 다시 표시로 무한히 돈다. 한 번만 부른다.
@@ -308,6 +311,24 @@ export default function AnnouncementDetail() {
             <KeyValue label="접수" value={dateRange(a.apply_start, a.apply_end)} />
             {a.extraction.schedule.winner_announce ? <KeyValue label="당첨자 발표" value={looseDate(a.extraction.schedule.winner_announce)} /> : null}
             {a.extraction.schedule.move_in ? <KeyValue label="입주 예정" value={looseDate(a.extraction.schedule.move_in)} /> : null}
+          </Card>
+
+          {/* 발표일을 놓치지 않게 한다. 구독과 무관하게 무료다 — 알림을 잠그면 마감을 놓치게 된다. */}
+          <Card onPress={() => toggleApplied(a.id)}>
+            {/* 이 파일에는 위치·교통용 지역 Row가 따로 있어 ui의 Row를 쓰지 않는다 */}
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+              <View style={{ flex: 1, gap: 2 }}>
+                <T variant="bodyMedium">{applied ? "신청한 공고예요" : "이 공고에 신청했어요"}</T>
+                <Sub tone="3" variant="caption">
+                  {applied
+                    ? announceDate
+                      ? `당첨자 발표 3일 전·1일 전·당일에 알려드릴게요`
+                      : "발표일이 공고문에 날짜로 적혀 있지 않아 알림을 걸지 못했어요"
+                    : "표시해 두면 당첨자 발표일에 알려드려요"}
+                </Sub>
+              </View>
+              <Icon name={applied ? "check-circle" : "bell"} size={22} color={applied ? colors.primary : colors.text4} />
+            </View>
           </Card>
         </View>
 
