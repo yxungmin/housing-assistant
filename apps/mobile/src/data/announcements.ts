@@ -1,8 +1,10 @@
 import { useSyncExternalStore } from "react";
 import type { ExtractionOutput, HousingType, UserProfile } from "@housing/schema";
-import { haversineKm, matchAnnouncement, type AnnouncementMatch, type TrackResult } from "@housing/engine";
+import { haversineKm, matchAnnouncement, ruleCounts, type AnnouncementMatch, type TrackResult } from "@housing/engine";
 import { parsePlaceLabel, placeFor } from "@housing/schema";
 import raw from "../../data/announcements.json";
+
+export { ruleCounts };
 
 export type DataStatus = "VERIFIED" | "AUTO" | "UNVERIFIED";
 
@@ -191,27 +193,6 @@ export const commuteKm = (m: Pick<Matched, "distanceKm" | "distancePartnerKm">):
 export function listDistanceKm(m: Matched, regionCode: string | undefined): number {
   if (regionCode && m.announcement.region_code === regionCode) return -1;
   return commuteKm(m) ?? m.residenceKm ?? Number.MAX_SAFE_INTEGER;
-}
-
-/** 트랙의 규칙 단위 집계 (applies_to로 건너뛴 규칙 제외). any_of 그룹은 통과했으면 그 안의 불일치 규칙을 세지 않는다. */
-export function ruleCounts(track: TrackResult): { matched: number; needsCheck: number; total: number } {
-  let matched = 0;
-  let needsCheck = 0;
-  let total = 0;
-  for (const g of track.groups) {
-    const rules = g.rules.filter((r) => !r.skipped);
-    if (g.group.mode === "any_of" && g.status === "MATCH") {
-      matched += 1;
-      total += 1;
-      continue;
-    }
-    for (const r of rules) {
-      total += 1;
-      if (r.status === "MATCH") matched += 1;
-      else if (r.status === "NEEDS_CHECK") needsCheck += 1;
-    }
-  }
-  return { matched, needsCheck, total };
 }
 
 /** 홈 목록: 조건에 맞는 공고 (best_track.mismatched == 0) */

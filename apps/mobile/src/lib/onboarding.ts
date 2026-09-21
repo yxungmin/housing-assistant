@@ -186,16 +186,31 @@ export const STEPS: Step[] = [
     // "무주택 몇 년인가요?"는 답하기 어려운 질문이다. 태어나서부터도 아니고 자취 시작일도 아니다.
     // 청약 가점제 규칙이 따로 있어서(만 30세부터, 그 전 혼인이면 혼인신고일부터) 그대로 계산해 채워 둔다.
     // 확정하지는 않는다 — 혼인일을 연 단위로만 알고, 집을 팔았던 사람은 그날부터 다시 세야 한다.
-    id: "homeless_months", kind: "duration", title: "무주택 기간이 이렇게 되나요?",
-    hint: (p) => {
-      // 기산일을 셀 수 있으면 규칙을 다시 읊지 않는다. 계산 결과가 곧 규칙의 설명이다.
-      const sold = "집을 가졌다 판 적이 있으면 판 날부터 다시 세 주세요.";
-      const basis = homelessBasis(p);
-      return basis ? `${homelessBasisReason(basis)}. ${sold}` : `만 30세부터 세고, 그 전에 혼인했으면 혼인신고일부터예요. ${sold}`;
+    // 생년월일과 혼인 여부가 있으면 규칙이 값을 정한다. 묻지 않고 알려만 준다 —
+    // 물어 놓고 규칙으로 덮어쓰면 적은 사람이 자기 답이 어디 갔는지 알 수 없다.
+    id: "homeless_months", kind: "skip-info",
+    title: (p) => {
+      const months = homelessBasis(p)?.months ?? 0;
+      const y = Math.floor(months / 12);
+      const m = months % 12;
+      const text = months === 0 ? "아직 0이에요" : y === 0 ? `${m}개월이에요` : m === 0 ? `${y}년이에요` : `${y}년 ${m}개월이에요`;
+      return `무주택 기간은 ${text}`;
     },
-    when: (p) => p.is_homeless === true,
+    hint: (p) => {
+      const basis = homelessBasis(p);
+      return `${basis ? homelessBasisReason(basis) : ""}. 청약 가점제 규칙이라 생년월일과 혼인 정보에서 정해져요. 집을 가졌다 판 적이 있으면 실제 기간은 더 짧을 수 있어요.`.replace(/^\. /, "");
+    },
+    when: (p) => p.is_homeless === true && homelessBasis(p) !== null,
+    apply: (p) => ({ ...p, homeless_months: homelessBasis(p)?.months ?? p.homeless_months }),
+    read: (p) => homelessBasis(p)?.months ?? null,
+  },
+  {
+    // 생년월일이 없으면 규칙으로 셀 수 없다. 그때만 직접 받는다.
+    id: "homeless_months_manual", kind: "duration", title: "무주택 기간은 얼마나 됐나요?",
+    hint: "만 30세부터 세고, 그 전에 혼인했으면 혼인신고일부터예요. 집을 가졌다 판 적이 있으면 판 날부터 다시 세 주세요.",
+    when: (p) => p.is_homeless === true && homelessBasis(p) === null,
     apply: (p, v) => ({ ...p, homeless_months: Number(v) }),
-    read: (p) => p.homeless_months ?? homelessBasis(p)?.months ?? null,
+    read: (p) => p.homeless_months ?? null,
   },
   {
     id: "subscription_months", kind: "months", title: "청약통장은 얼마나 넣었나요?", hint: "가입 기간(개월). 없으면 0.",
@@ -250,6 +265,7 @@ const STEP_LABEL: Record<string, string> = {
   statuses: "해당 계층",
   homeless: "무주택 여부",
   homeless_months: "무주택 기간",
+  homeless_months_manual: "무주택 기간",
   subscription_months: "청약통장 기간",
   subscription_active: "청약통장 납입 중",
   cash: "보유 현금",
@@ -260,6 +276,22 @@ const STEP_LABEL: Record<string, string> = {
 };
 
 export const stepLabel = (s: Step): string => STEP_LABEL[s.id] ?? s.id;
+
+/**
+ * 규칙으로 정해지는 값을 다시 매긴다. 프로필을 저장할 때마다 한 번 지난다.
+ *
+ * 무주택 기간이 그렇다. 생년월일과 혼인 여부가 정해지면 청약 가점제 규칙이 값을 정한다 —
+ * 사람이 적은 숫자와 규칙이 어긋나면 규칙이 이긴다. 공고를 판정하는 것이 규칙이지 기억이 아니다.
+ * 생년월일을 고치면 무주택 기간도 따라 바뀌어야 하는데, 단계마다 챙기게 두면 한 군데만 빠져도 낡은 값이 남는다.
+ * 그래서 저장 길목 한 곳에서 계산한다.
+ *
+ * 생년월일이 없어 셀 수 없으면 사람이 적은 값을 그대로 둔다.
+ */
+export function withDerived(p: UserProfile): UserProfile {
+  if (!p.is_homeless) return p;
+  const basis = homelessBasis(p);
+  return basis ? { ...p, homeless_months: basis.months } : p;
+}
 
 const wonText = (n: number): string => {
   if (n <= 0) return "0원";

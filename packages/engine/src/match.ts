@@ -149,6 +149,12 @@ export interface TrackResult {
   track: SupplyTrack;
   groups: GroupResult[];
   summary: { matched: number; needs_check: number; mismatched: number };
+  /**
+   * 거주 요건 안전망이 붙은 트랙인가 (regionGuard 참고).
+   * 공고문에서 거주 요건을 못 읽었고 공고 지역이 내가 사는 곳과 다르다는 뜻이다.
+   * 불일치라고 단정하지는 않지만 "조건에 맞는 공고"로 세지도 않는다.
+   */
+  region_guarded?: boolean;
 }
 
 export interface AnnouncementMatch {
@@ -157,6 +163,12 @@ export interface AnnouncementMatch {
   best_track: TrackResult | null;
   /** 홈 목록에서 "조건에 맞는 공고"로 셀지 */
   is_match: boolean;
+  /**
+   * 어긋난 조건은 없지만 거주 요건을 확인하지 못했다.
+   * 화면은 이걸 "맞는 공고"가 아니라 "다른 지역 공고"로 따로 세운다 —
+   * 맞다고도 아니라고도 말하지 않는 자리다.
+   */
+  region_uncertain: boolean;
 }
 
 /**
@@ -226,6 +238,33 @@ export function matchTrack(track: SupplyTrack, profile: UserProfile): TrackResul
   return { track, groups, summary };
 }
 
+
+/**
+ * 트랙의 규칙 단위 집계 ("조건 8개 중 7개 일치"). applies_to로 건너뛴 규칙은 세지 않는다.
+ * any_of 그룹은 통과했으면 그 안의 불일치 규칙을 세지 않는다 — 하나만 맞으면 되는 자리다.
+ *
+ * 일치 판정 자체(is_match)는 그룹 단위로 하고, 이건 화면에 적는 숫자다. 둘은 다른 질문에 답한다.
+ */
+export function ruleCounts(track: TrackResult): { matched: number; needsCheck: number; total: number } {
+  let matched = 0;
+  let needsCheck = 0;
+  let total = 0;
+  for (const g of track.groups) {
+    const rules = g.rules.filter((r) => !r.skipped);
+    if (g.group.mode === "any_of" && g.status === "MATCH") {
+      matched += 1;
+      total += 1;
+      continue;
+    }
+    for (const r of rules) {
+      total += 1;
+      if (r.status === "MATCH") matched += 1;
+      else if (r.status === "NEEDS_CHECK") needsCheck += 1;
+    }
+  }
+  return { matched, needsCheck, total };
+}
+
 export interface MatchOptions {
   /**
    * 공고가 속한 시도 코드. API 메타에서 오는 값이라 추출 결과와 달리 확실하다.
@@ -249,13 +288,27 @@ export interface MatchOptions {
  * 자격이 되는 사람에게 공고를 감추면 그 오류는 아무도 신고하지 못한다.
  * 대신 "맞는다"고 단정하지도 않는다.
  */
+/**
+ * 한 생활권으로 묶어 보는 지역들.
+ *
+ * 수도권 공공임대의 거주 요건은 대개 "해당 시·도 또는 수도권 거주"다. 서울 사는 사람에게
+ * 과천(8km) 공고를 "다른 지역"으로 빼면 실제로 신청할 수 있는 집을 감추게 된다.
+ * 시뮬레이션에서 이게 드러났다(2026-09-21) — 서울 프로필 전부에서 과천 공고가 빠졌다.
+ *
+ * 묶지 않은 시도는 시도 단위로 본다. 제주·경남처럼 멀리 떨어진 곳은 그래야 한다.
+ */
+const REGION_CLUSTERS: string[][] = [["11", "28", "41"]];
+
+const sameCluster = (a: string, b: string): boolean =>
+  a === b || REGION_CLUSTERS.some((c) => c.includes(a) && c.includes(b));
+
 export function regionGuard(
   track: TrackResult,
   profile: UserProfile,
   announcementRegion: string | undefined,
 ): TrackResult {
   if (!announcementRegion || !profile.region_code) return track;
-  if (announcementRegion === profile.region_code) return track;
+  if (sameCluster(announcementRegion, profile.region_code)) return track;
   const hasResidenceRule = track.groups.some((g) => g.rules.some((r) => !r.skipped && r.rule.category === "residence"));
   if (hasResidenceRule) return track;
 
@@ -282,6 +335,52 @@ export function regionGuard(
     ...track,
     groups,
     summary: { ...track.summary, needs_check: track.summary.needs_check + 1 },
+    region_guarded: true,
+  };
+}
+
+/**
+ * 소득·자산 요건 안전망.
+ *
+ * 공공임대는 소득과 자산 상한이 거의 언제나 있다. 그런데 추출이 그 표를 못 읽으면
+ * 규칙이 한두 개만 남고, 그 한두 개를 맞춘 사람에게 "조건 1개 중 1개 일치"라는
+ * 완벽한 초록 태그가 붙는다.
+ *
+ * 시뮬레이션에서 실제로 나왔다(2026-09-21): 강서염창 우선공급 트랙의 규칙이 「무주택세대구성원」
+ * 하나뿐이라, 자산 9억 원 맞벌이 가구에게도 "조건 1개 중 1개 일치"로 떴다.
+ *
+ * 그래서 소득 규칙이 하나도 없는 임대 트랙에는 "확인 필요"를 한 줄 얹는다.
+ * 지역 안전망과 달리 후보에서 빼지는 않는다 — 소득 상한은 사람마다 걸리고 안 걸리고가 갈려서,
+ * 우리가 모른다는 이유로 모두에게서 감출 일이 아니다. 대신 완벽해 보이지 않게 만든다.
+ */
+export function incomeGuard(track: TrackResult): TrackResult {
+  const isRental = track.track.pricing.some((p) => p.kind === "rental");
+  if (!isRental) return track;
+  const hasIncomeRule = track.groups.some((g) => g.rules.some((r) => !r.skipped && r.rule.category === "income"));
+  if (hasIncomeRule) return track;
+
+  const guard: RuleResult = {
+    rule: {
+      group_id: "__income_guard__",
+      category: "income",
+      applies_to: {},
+      operator: "lte",
+      value: 0,
+      source: { page: 0, text: "공고문에서 소득 기준을 읽지 못했어요." },
+      confidence: 0,
+      verified: false,
+    },
+    status: "NEEDS_CHECK",
+    reason: "공고문에서 소득 기준을 읽지 못했어요. 공공임대는 소득 상한이 거의 항상 있으니 공고문을 확인해 주세요.",
+    skipped: false,
+  };
+  return {
+    ...track,
+    groups: [
+      ...track.groups,
+      { group: { id: "__income_guard__", mode: "all_of" as const, label: "소득 기준" }, status: "NEEDS_CHECK" as const, rules: [guard] },
+    ],
+    summary: { ...track.summary, needs_check: track.summary.needs_check + 1 },
   };
 }
 
@@ -292,11 +391,26 @@ export function matchAnnouncement(
 ): AnnouncementMatch {
   const tracks = extraction.tracks
     .map((t) => matchTrack(t, profile))
-    .map((t) => regionGuard(t, profile, options.announcement_region));
-  const candidates = tracks.filter((t) => t.summary.mismatched === 0);
-  candidates.sort((a, b) => b.summary.matched - a.summary.matched || a.summary.needs_check - b.summary.needs_check);
-  const best = candidates[0] ?? null;
-  return { tracks, best_track: best, is_match: best !== null };
+    .map((t) => regionGuard(t, profile, options.announcement_region))
+    .map(incomeGuard);
+  const byFit = (a: TrackResult, b: TrackResult) => b.summary.matched - a.summary.matched || a.summary.needs_check - b.summary.needs_check;
+  const clean = tracks.filter((t) => t.summary.mismatched === 0).sort(byFit);
+  // 거주 요건을 확인 못 한 트랙은 후보에서 뺀다.
+  //
+  // 시뮬레이션으로 확인한 것(2026-09-21): 안전망을 "확인 필요" 한 줄로만 두면
+  // 서울 사는 사람 프로필 열 개 중 여덟 개에서 제주 공고(443km)가 "조건 일치"로 떴다.
+  // 어긋난 조건이 없다는 것과 조건에 맞는다는 것은 다른 말인데, 화면은 뒤를 말하고 있었다.
+  //
+  // 그래도 MISMATCH로 자르지는 않는다. 전국 모집도 있고, 자격이 되는 사람에게서 공고를 감추면
+  // 그 오류는 아무도 신고하지 못한다. best_track은 그대로 둬서 상세 화면이 조건을 다 보여 준다.
+  const candidates = clean.filter((t) => !t.region_guarded);
+  const best = candidates[0] ?? clean[0] ?? null;
+  return {
+    tracks,
+    best_track: best,
+    is_match: candidates.length > 0,
+    region_uncertain: candidates.length === 0 && clean.length > 0,
+  };
 }
 
 /** 위경도 두 점의 직선거리 (km). API 실패 시 통근 조건 대체 표시용. */

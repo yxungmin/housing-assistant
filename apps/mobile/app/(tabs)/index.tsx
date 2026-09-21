@@ -23,6 +23,7 @@ export default function Home() {
   const [myRegionOnly, setMyRegionOnly] = useState(false);
   const [rentalOnly, setRentalOnly] = useState(false);
   const [showOthers, setShowOthers] = useState(false);
+  const [showFar, setShowFar] = useState(false);
   const [nearWork, setNearWork] = useState(false);
   const feed = useAnnouncements();
   const hasWorkplace = !!state.profile?.workplace;
@@ -76,7 +77,10 @@ export default function Home() {
     [all, myRegionOnly, rentalOnly, nearWork, hasWorkplace, state.profile?.region_code],
   );
   const pending = filtered.filter((m) => !isReadable(m.announcement));
-  const others = filtered.filter((m) => isReadable(m.announcement) && !m.match?.is_match);
+  // 거주 요건을 못 읽었고 공고 지역도 다른 것들. "맞지 않는다"와는 다른 말이라 따로 세운다 —
+  // 우리는 맞는지 아닌지를 모르는 것이고, 모르는 것을 아는 척하면 그 자리에서 신뢰가 깎인다.
+  const farAway = filtered.filter((m) => isReadable(m.announcement) && m.match?.region_uncertain);
+  const others = filtered.filter((m) => isReadable(m.announcement) && !m.match?.is_match && !m.match?.region_uncertain);
   // 접수가 끝난 공고는 임박이 아니다. d가 음수인 것까지 넣으면 "마감"이 접수 임박 맨 위에 온다.
   const soon = matched.filter((m) => {
     const d = daysUntil(m.announcement.apply_end);
@@ -123,6 +127,26 @@ export default function Home() {
         ) : null}
         {pending.length > 0 ? <Section title="조건 분석 중" items={pending} onOpen={open} /> : null}
 
+        {farAway.length > 0 ? (
+          <View style={{ gap: 12 }}>
+            <Pressable onPress={toggle(setShowFar)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
+              <T variant="bodyMedium" color={colors.text2}>다른 지역 공고 {farAway.length}개</T>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
+                <T variant="small" color={colors.text3}>{showFar ? "숨기기" : "보기"}</T>
+                <Icon name="right" size={16} color={colors.text4} />
+              </View>
+            </Pressable>
+            {showFar ? (
+              <>
+                <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
+                  다른 조건은 어긋나지 않지만, 공고문에서 거주 요건을 읽지 못했어요. 사는 지역이 달라 신청 가능한지는 공고문을 확인해 주세요.
+                </Sub>
+                <Section items={farAway} onOpen={open} />
+              </>
+            ) : null}
+          </View>
+        ) : null}
+
         {others.length > 0 ? (
           <Pressable onPress={toggle(setShowOthers)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
             <T variant="bodyMedium" color={colors.text2}>조건이 맞지 않는 공고 {others.length}개</T>
@@ -167,7 +191,9 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
         ? { tone: "primary" as const, icon: "check" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치${m.needsCheck ? ` · 확인 ${m.needsCheck}` : ""}` }
         : m.match?.is_match
           ? { tone: "warn" as const, icon: "alert" as const, text: `조건 ${m.needsCheck}개 확인 필요` }
-          : { tone: "danger" as const, icon: "x" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` };
+          : m.match?.region_uncertain
+            ? { tone: "warn" as const, icon: "alert" as const, text: "다른 지역 · 거주 요건 확인 필요" }
+            : { tone: "danger" as const, icon: "x" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` };
   // 직장을 넣었으면 통근이 먼저, 아니면 가장 가까운 역, 그것도 없으면 지역명
   const place =
     commuteShort(

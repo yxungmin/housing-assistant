@@ -16,6 +16,10 @@
 ## 구조
 - `packages/schema` zod Rule Schema. 타입의 단일 소스. `npm run schema:json`으로 JSON Schema 생성.
 - `packages/engine` 매칭(`match.ts`)·비용(`cost.ts`). 룰은 `rule_groups`로 묶이고 `any_of`는 하나만 맞아도 통과. 프로필 값이 없으면 `NEEDS_CHECK`.
+  추출이 놓친 요건을 막는 안전망이 둘 있다. `regionGuard`는 거주 요건을 못 읽고 공고 지역이 다르면 "확인 필요"를 얹고 `is_match`를 끈다
+  (수도권 11·28·41은 한 생활권으로 묶는다). `incomeGuard`는 소득 규칙이 없는 임대 트랙에 "확인 필요"를 얹되 후보에서 빼지는 않는다.
+  둘 다 MISMATCH로 자르지 않는다 — 자격이 되는 사람에게서 공고를 감추면 그 오류는 아무도 신고하지 못한다.
+  무주택 기간은 `homeless.ts`가 청약 가점제 규칙으로 계산한다(만 30세부터, 그 전 혼인이면 혼인신고일부터). 사람이 적은 값보다 규칙이 이긴다.
   룰의 `verified`(사람 검수 여부)는 판정에 쓰지 않는다 — 검수 전이라고 숨기면 자격이 되는 사람에게 공고를 감추게 된다. 화면이 사실대로 알린다.
 - `collector` 기관 목록 → PDF → 텍스트/섹션 → Claude 구조화 추출(`llm/extract.ts`) → `autoChecks` → Supabase(`db/supabase.ts`, 버저닝). 기관 어댑터는 `sources.ts` 한 곳(LH는 공공데이터포털 API, SH는 게시판 HTML 파싱 `sh/api.ts`). 수집 범위는 `COLLECT_PROVIDERS`·`COLLECT_REGIONS`(기본 LH,SH / 서울·경기)로 줄여 비용을 통제한다.
 - `supabase/migrations` 테이블·RLS. 게시는 자동이다(0006): 자동 검증을 통과하면 `auto_publish_version()`이 바로 내보내고,
@@ -54,6 +58,7 @@ npm run benchmark                    # 추출 벤치마크 (ANTHROPIC_API_KEY �
 npm run benchmark:fetch -- --count 10   # LH API에서 공고문 PDF 추가 수집 (LH_API_KEY 필요)
 npm run app:data                     # 초안/정답 → 앱 번들 데이터
 npm run app:enrich [-- --links]      # 번들에 원문 링크·그림·좌표·시세·대기·통근 (LLM 없음, --links는 링크·그림만)
+npm run simulate [-- --full]         # 프로필 10종 × 지금 공고로 매칭 점검 (LLM 없음)
 npm run db:check                     # 빈 Postgres에 마이그레이션 전체 적용 + 동작 확인 (Docker 필요)
 npm run fixture:check -- 018         # 초안 ↔ 공고문 PDF 1차 대조 (사람 검수 전)
 npm run review                       # 검수 뷰어 4310 — 추출 검수 + 신고 큐

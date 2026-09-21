@@ -5,6 +5,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, type PropsWithChildren } from "react";
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { withDerived } from "@/lib/onboarding";
 import type { UserProfile } from "@housing/schema";
 import { billing, canUseFirstMonthFree, normalizeSubscription, type Subscription } from "@/lib/billing";
 import type { ChangeRecord } from "@/lib/changes";
@@ -76,7 +77,7 @@ function reducer(s: AppState, a: Action): AppState {
     case "hydrate":
       return { ...s, ...a.state, subscription: normalizeSubscription(a.state.subscription ?? s.subscription), loaded: true };
     case "setProfile":
-      return { ...s, profile: a.profile, onboarded: a.onboarded ?? s.onboarded };
+      return { ...s, profile: withDerived(a.profile), onboarded: a.onboarded ?? s.onboarded };
     case "signIn":
       return { ...s, account: a.account };
     case "signOut":
