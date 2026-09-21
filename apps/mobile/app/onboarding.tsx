@@ -76,7 +76,7 @@ export default function Onboarding() {
       </View>
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
-        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 140 }}>
+        <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <FadeIn key={step.id} style={{ paddingHorizontal: space.screen, paddingTop: 32, gap: space.md }}>
           <Sub tone="3">{index + 1} / {steps.length}</Sub>
           <T variant="title">{stepTitle(step, draft)}</T>
@@ -117,17 +117,18 @@ export default function Onboarding() {
           ) : null}
         </FadeIn>
         </ScrollView>
+        {/* CTA는 KeyboardAvoidingView 안에 둔다. 밖에 두면 키패드가 버튼을 덮는다. */}
+        <BottomCTA
+          label={index + 1 >= steps.length ? "내 조건으로 공고 찾기" : step.kind === "multi" && selected.length === 0 ? "해당 없음" : "다음"}
+          onPress={onNext}
+          appear={canNext}
+          secondary={!!step.optional}
+          secondaryLabel="나중에 입력할게요"
+          onSecondary={onSkip}
+        />
       </KeyboardAvoidingView>
 
       <IncomeHelperSheet visible={helper} dual={draft.income_type === "dual"} onClose={() => setHelper(false)} onApply={(v) => { setText(String(v)); setHelper(false); }} />
-      <BottomCTA
-        label={index + 1 >= steps.length ? "내 조건으로 공고 찾기" : step.kind === "multi" && selected.length === 0 ? "해당 없음" : "다음"}
-        onPress={onNext}
-        appear={canNext}
-        secondary={!!step.optional}
-        secondaryLabel="나중에 입력할게요"
-        onSecondary={onSkip}
-      />
     </Screen>
   );
 }
