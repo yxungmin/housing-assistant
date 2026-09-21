@@ -254,7 +254,30 @@ export const SupplyUnit = z.object({
   /** 지하는 음수 */
   floor: z.number().int().optional(),
   elevator: z.boolean().optional(),
-  /** 기본 임대조건 (가장 낮은 소득 구간). 구간별 차이는 공고문에서 본다 */
+  /** 집을 미리 볼 수 있는지 ("열람불가(계약 전 주택 개방)") */
+  viewing: z.string().optional(),
+  /**
+   * 소득 구간별 임대조건.
+   *
+   * 매입임대는 같은 집이라도 소득에 따라 월세가 다르다 — 수급자·한부모·차상위는 시세 30%,
+   * 그 외(소득 70% 이하)는 40%다. 실제로 같은 집에서 476,370원과 651,800원으로 갈렸다.
+   * 한 쪽만 저장하면 대부분의 사람에게 틀린 금액을 보여 주게 된다.
+   *
+   * 구간마다 "기본"과 "임대료→보증금 최대전환시" 둘이 온다. 전환은 보증금을 올려 월세를 낮춘 값이다.
+   */
+  rent_options: z
+    .array(
+      z.object({
+        /** 공고문이 쓴 구간 이름 ("수급자, 지원대상 한부모가족, 차상위계층") */
+        tier: z.string(),
+        /** 보증금을 올려 월세를 낮춘 조건인가 */
+        max_conversion: z.boolean(),
+        deposit: z.number().int(),
+        monthly_rent: z.number().int(),
+      }),
+    )
+    .optional(),
+  /** 첫 구간의 기본 조건. rent_options가 있으면 거기서 고르고, 이건 호환용이다 */
   deposit: z.number().int().optional(),
   monthly_rent: z.number().int().optional(),
   lat: z.number().optional(),

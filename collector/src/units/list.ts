@@ -36,6 +36,30 @@ function headerRow(rows: string[][]): number {
   return -1;
 }
 
+/**
+ * 임대조건 열 짝 찾기.
+ *
+ * 임대보증금·월임대료가 소득 구간 × (기본/최대전환) = 네 번 반복된다. 구간 이름은 두 행 위,
+ * 기본/전환 구분은 한 행 위에 병합 셀로 있어서 그 열에는 값이 없다 — 왼쪽으로 훑어 가장 가까운 값을 쓴다.
+ *
+ * 실측 (2026-09-22): Q 수급자·기본 / S 수급자·최대전환 / U 그 외·기본 / W 그 외·최대전환.
+ */
+function rentColumns(rows: string[][], headerAt: number): { at: number; tier: string; maxConversion: boolean }[] {
+  const header = rows[headerAt] ?? [];
+  const leftward = (row: string[] | undefined, from: number): string => {
+    for (let i = from; i >= 0; i--) if (row?.[i]) return row[i]!;
+    return "";
+  };
+  const out: { at: number; tier: string; maxConversion: boolean }[] = [];
+  header.forEach((h, i) => {
+    if (key(h) !== "임대보증금") return;
+    const tier = leftward(rows[headerAt - 2], i) || leftward(rows[headerAt - 1], i);
+    const kind = leftward(rows[headerAt - 1], i);
+    out.push({ at: i, tier: tier.replace(/\s+/g, " ").trim(), maxConversion: /전환/.test(kind) });
+  });
+  return out;
+}
+
 function columnMap(header: string[]): Map<string, number> {
   const out = new Map<string, number>();
   header.forEach((h, i) => {
@@ -65,6 +89,7 @@ export function parseUnitList(file: Buffer): SupplyUnit[] {
   const at = headerRow(rows);
   if (at < 0) return [];
   const col = columnMap(rows[at]!);
+  const rentCols = rentColumns(rows, at);
 
   const get = (row: string[], name: string): string | undefined => {
     const i = col.get(name);
@@ -79,6 +104,9 @@ export function parseUnitList(file: Buffer): SupplyUnit[] {
 
     const dong = get(row, "동");
     const ho = get(row, "호");
+    const options = rentCols
+      .map((c) => ({ tier: c.tier, max_conversion: c.maxConversion, deposit: num(row[c.at]), monthly_rent: num(row[c.at + 1]) }))
+      .filter((o): o is { tier: string; max_conversion: boolean; deposit: number; monthly_rent: number } => o.deposit !== undefined && o.monthly_rent !== undefined);
     out.push({
       // 주소 하나에 여러 세대가 있다. 동·호까지 합쳐야 한 집이 된다.
       id: [address, dong, ho].filter(Boolean).join(" "),
@@ -92,8 +120,11 @@ export function parseUnitList(file: Buffer): SupplyUnit[] {
       rooms: num(get(row, "방수")),
       floor: floor(get(row, "층수")),
       elevator: get(row, "승강기유무") === "Y" ? true : get(row, "승강기유무") === "N" ? false : undefined,
-      deposit: num(get(row, "임대보증금")),
-      monthly_rent: num(get(row, "월임대료")),
+      viewing: get(row, "주택열람일정"),
+      rent_options: options.length > 0 ? options : undefined,
+      // 호환용. 화면은 rent_options에서 사람에 맞는 구간을 고른다.
+      deposit: options[0]?.deposit ?? num(get(row, "임대보증금")),
+      monthly_rent: options[0]?.monthly_rent ?? num(get(row, "월임대료")),
     });
   }
   return out;

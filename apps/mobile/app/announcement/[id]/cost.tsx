@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
@@ -6,16 +6,17 @@ import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchA
 import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SourceCard } from "@/components/SourceCard";
-import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, FadeIn, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { getAnnouncement, useAnnouncements } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
 import { manwon, maskDigits, pct, won, dateText } from "@/lib/format";
-import { unitLabel, unitSpec, unitsWithDistance } from "@/lib/units";
+import { compareUnits, UNIT_SORT_LABEL, unitLabel, unitRent, unitsWithDistance, type UnitSort } from "@/lib/units";
 import { nearbyLines, transitLines } from "@/lib/commute";
 import type { IconName } from "@/components/icon";
 import type { SupplyUnit } from "@housing/schema";
+import type { UnitRent } from "@/lib/units";
 
 /**
  * 고를 수 있는 임대조건 한 줄.
@@ -26,6 +27,10 @@ interface RentalChoice {
   pricing: Pricing;
   trackName: string;
   unit?: SupplyUnit;
+  /** 직장까지 직선거리 (km). 흩어진 공고에만 */
+  km?: number | null;
+  /** 이 사람에게 적용되는 임대조건 */
+  rent?: UnitRent;
 }
 import { canOpenCost, useAppState } from "@/store/appState";
 import { accessLevel } from "@/lib/access";
@@ -45,6 +50,8 @@ export default function Cost() {
   const profile = state.profile;
 
   const [allTracks, setAllTracks] = useState(false);
+  // 흩어진 집을 세우는 기준. 기본은 가까운 순 — 거리가 제일 먼저 걸러지는 조건이다.
+  const [houseSort, setHouseSort] = useState<UnitSort>("near");
   const { rentals, bestTrackName, otherCount } = useMemo((): { rentals: RentalChoice[]; bestTrackName: string; otherCount: number } => {
     if (!a || !profile) return { rentals: [], bestTrackName: "", otherCount: 0 };
 
@@ -59,19 +66,34 @@ export default function Cost() {
      */
     if (a.units?.length) {
       const rows = unitsWithDistance(a.units, profile)
-        .filter((u) => u.unit.deposit !== undefined)
-        .map(({ unit, km }) => ({
-          unit,
-          label: `${unitLabel(unit)}${unit.ho ? ` ${unit.ho}호` : ""}`,
-          trackName: km !== null ? `직장 ${km < 10 ? km.toFixed(1) : km.toFixed(0)}km · ${unitSpec(unit)}` : unitSpec(unit),
-          pricing: {
-            unit_type: unitLabel(unit),
-            kind: "rental" as const,
-            deposit: unit.deposit!,
-            monthly_rent: unit.monthly_rent ?? 0,
-            source: { page: 0, text: "공급주택목록 첨부" },
-          } as Pricing,
-        }));
+        .sort((x, y) => compareUnits(houseSort, x, y))
+        .flatMap(({ unit, km }) => {
+          // 소득 구간마다 월세가 다르다. 이 사람에게 맞는 줄로 계산한다 (lib/units.ts).
+          const rent = unitRent(unit, profile);
+          if (!rent) return [];
+          return [
+            {
+              unit,
+              km,
+              rent,
+              label: `${unitLabel(unit)}${unit.ho ? ` ${unit.ho}호` : ""}`,
+              // 목록 한 줄에 들어갈 만큼만: 거리·크기·보증금. 나머지는 눌러서 본다.
+              trackName: [
+                km !== null ? `직장 직선 ${km < 10 ? km.toFixed(1) : km.toFixed(0)}km` : null,
+                unit.exclusive_area_m2 !== undefined ? `전용 ${unit.exclusive_area_m2.toFixed(1)}㎡` : null,
+              ]
+                .filter(Boolean)
+                .join(" · "),
+              pricing: {
+                unit_type: unitLabel(unit),
+                kind: "rental" as const,
+                deposit: rent.deposit,
+                monthly_rent: rent.monthly_rent,
+                source: { page: 0, text: "공급주택목록 첨부" },
+              } as Pricing,
+            },
+          ];
+        });
       return { rentals: rows, bestTrackName: "", otherCount: 0 };
     }
 
@@ -81,7 +103,7 @@ export default function Cost() {
     const rows = ordered.flatMap((t) => t.track.pricing.filter((p) => p.kind === "rental").map((p) => ({ label: `${p.unit_type}${p.tier ? ` · ${p.tier}` : ""}`, pricing: p, trackName: t.track.name })));
     const bestRows = rows.filter((r) => r.trackName === best?.track.name);
     return { rentals: allTracks || bestRows.length === 0 ? rows : bestRows, bestTrackName: best?.track.name ?? "", otherCount: rows.length - bestRows.length };
-  }, [a, profile, allTracks]);
+  }, [a, profile, allTracks, houseSort]);
 
   const [sel, setSel] = useState(0);
   const [deposit, setDeposit] = useState<number | null>(null);
@@ -113,12 +135,30 @@ export default function Cost() {
   const picksHouse = !!a?.units?.length;
   const chosen = rentals[sel];
   /**
+   * 정렬을 바꾸면 같은 번째가 다른 집이 된다. 고른 집의 id를 들고 있다가 새 목록에서 자리를 다시 찾는다.
+   *
+   * id는 사람이 고를 때만 적는다(pickHouse). 렌더 결과에서 적으면 정렬이 바뀐 직후
+   * 그 값이 "새 첫 번째 집"으로 덮여 되찾을 대상이 사라진다 — 효과 순서에 기대는 코드가 된다.
+   */
+  const chosenId = useRef<string | undefined>(undefined);
+  const pickHouse = (at: number) => {
+    chosenId.current = rentals[at]?.unit?.id;
+    setSel(at);
+  };
+  useEffect(() => {
+    if (!picksHouse || !chosenId.current) return;
+    const at = rentals.findIndex((r) => r.unit?.id === chosenId.current);
+    if (at >= 0 && at !== sel) setSel(at);
+  }, [rentals]);
+  /**
    * 고른 집의 역·정류장·주변 시설.
    *
    * 따로 부르지 않는다 — 좌표를 찍는 호출이 이미 같이 받아 온 값이고, 수집할 때 집에 붙여 뒀다.
    * 공고 하나의 좌표로 그리던 위치 섹션은 이 유형에서 꺼 두었다(시청 좌표였다). 여기가 그 자리를 대신한다.
    */
   const spot = picksHouse ? chosen?.unit : undefined;
+  /** 목록에서 (i)를 눌러 펼친 집. 고르는 것과는 별개다 — 보기만 하고 닫을 수 있어야 한다 */
+  const [detail, setDetail] = useState<RentalChoice | null>(null);
   const scenarioPricing = useMemo(() => {
     if (!chosen) return null;
     if (deposit === null) return chosen.pricing;
@@ -180,11 +220,12 @@ export default function Cost() {
             {bestTrackName ? <Sub tone="3">{bestTrackName}</Sub> : null}
           </View>
           <Pressable onPress={() => setPicker(true)} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: pressed ? colors.cardSoft : colors.card, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 14 })}>
-            <View style={{ gap: 2 }}>
+            <View style={{ flex: 1, gap: 2 }}>
               <Sub tone="3" variant="caption">{picksHouse ? "집" : "주택형"}</Sub>
+              {/* 주소는 잘리면 어느 집인지 알 수 없다. 줄바꿈해서 다 보여 준다. */}
               <T variant="bodyMedium">{chosen.label}</T>
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4, flexShrink: 0 }}>
               <Sub tone="3">{rentals.length + otherCount}개 중</Sub>
               <Icon name="right" size={18} color={colors.text4} />
             </View>
@@ -357,28 +398,56 @@ export default function Cost() {
           <T variant="heading">{picksHouse ? "어떤 집으로 볼까요?" : "어떤 주택형으로 볼까요?"}</T>
           <Sub tone="3">
             {picksHouse
-              ? state.profile?.workplace
-                ? "직장에서 가까운 순이에요"
-                : "내 정보에 직장을 넣으면 가까운 순으로 보여드려요"
+              ? houseSort !== "near"
+                ? `${UNIT_SORT_LABEL[houseSort]}으로 보고 있어요`
+                : state.profile?.workplace
+                  ? "직장에서 가까운 순이에요"
+                  : "내 정보에 직장을 넣으면 가까운 순으로 보여드려요"
               : bestTrackName
                 ? `조건이 가장 잘 맞는 ${bestTrackName} 기준`
                 : ""}
           </Sub>
         </View>
+        {picksHouse ? (
+          <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+            {(Object.keys(UNIT_SORT_LABEL) as UnitSort[]).map((k) => (
+              <Chip key={k} on={houseSort === k} onPress={() => { animateLayout(); setHouseSort(k); }}>
+                {UNIT_SORT_LABEL[k]}
+              </Chip>
+            ))}
+          </View>
+        ) : null}
         <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           {rentals.map((r, i) => {
             const on = i === sel;
             return (
-              <Pressable key={`${r.trackName}-${r.label}-${i}`} onPress={() => { animateLayout(); setSel(i); setPicker(false); }} accessibilityRole="radio" accessibilityState={{ checked: on }}
-                style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16, borderRadius: radius.md, backgroundColor: on ? colors.primarySoft : colors.card }}>
-                <View style={{ gap: 2 }}>
+              <View key={`${r.trackName}-${r.label}-${i}`} style={{ flexDirection: "row", alignItems: "center", borderRadius: radius.md, backgroundColor: on ? colors.primarySoft : colors.card }}>
+              <Pressable onPress={() => { animateLayout(); pickHouse(i); setPicker(false); }} accessibilityRole="radio" accessibilityState={{ checked: on }}
+                style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16 }}>
+                <View style={{ flex: 1, gap: 2, minWidth: 0 }}>
+                  {/* 주소는 이 줄의 정체다. 말줄임하면 같은 길 다른 번지를 구분할 수 없다. */}
                   <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{r.label}</T>
                   <Sub tone="3" variant="caption">
-                    {picksHouse || allTracks ? `${r.trackName} · ` : ""}보증금 {manwon(r.pricing.deposit)} · 월 {won(r.pricing.monthly_rent)}
+                    {picksHouse
+                      ? `${r.trackName ? `${r.trackName} · ` : ""}보증금 ${manwon(r.pricing.deposit)}`
+                      : `${allTracks ? `${r.trackName} · ` : ""}보증금 ${manwon(r.pricing.deposit)} · 월 ${won(r.pricing.monthly_rent)}`}
                   </Sub>
                 </View>
                 {on ? <Icon name="check" size={20} color={colors.primary} /> : null}
               </Pressable>
+              {/* 집은 한 줄에 다 못 적는다. 층·방·승강기·주변·전체 주소는 여기서 펼쳐 본다. */}
+              {picksHouse ? (
+                <Pressable
+                  onPress={() => setDetail(r)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${r.label} 자세히`}
+                  hitSlop={8}
+                  style={({ pressed }) => ({ paddingHorizontal: 14, paddingVertical: 16, opacity: pressed ? 0.5 : 1 })}
+                >
+                  <Icon name="info" size={18} color={colors.text4} />
+                </Pressable>
+              ) : null}
+              </View>
             );
           })}
           {otherCount > 0 && !allTracks ? (
@@ -390,6 +459,24 @@ export default function Cost() {
       </BottomSheet>
 
       {/* 닫아도 내보내지 않는다 — 잠긴 화면 그대로 두는 편이 무엇을 사는지 더 잘 보여 준다 */}
+      {/*
+        집 하나를 자세히. 목록은 거리·크기·보증금까지만 적고 나머지를 여기 모은다 —
+        한 줄에 다 넣으면 줄바꿈으로 목록이 두 배가 되고, 그러면 훑어보기가 안 된다.
+      */}
+      <BottomSheet visible={detail !== null} onClose={() => setDetail(null)}>
+        {detail?.unit ? (
+          <UnitDetail
+            choice={detail}
+            onPick={() => {
+              const i = rentals.indexOf(detail);
+              if (i >= 0) pickHouse(i);
+              setDetail(null);
+              setPicker(false);
+            }}
+          />
+        ) : null}
+      </BottomSheet>
+
       <SubscriptionSheet visible={subSheet} onClose={() => setSubSheet(false)} onStarted={() => setSubSheet(false)} />
       <ReportSheet
         visible={report}
@@ -424,5 +511,97 @@ function NearRow({ icon, title, detail }: { icon: IconName; title: string; detai
         <Sub tone="3" variant="caption">{detail}</Sub>
       </View>
     </View>
+  );
+}
+
+/**
+ * 집 한 채를 자세히.
+ *
+ * 목록은 훑어보는 곳이라 거리·크기·보증금까지만 적는다. 그 이상을 넣으면 줄바꿈으로 목록이
+ * 두 배가 되고, 그러면 수백 채에서 고른다는 이 화면의 목적이 사라진다.
+ * 대신 실제로 집을 고를 때 묻는 것들을 여기 모은다 — 몇 층인지, 승강기가 있는지,
+ * 전체 주소가 어디인지, 미리 볼 수 있는지, 그리고 역과 생활 시설이 얼마나 가까운지.
+ *
+ * 소득 구간을 밝혀 적는다. 같은 집이라도 수급자·한부모·차상위는 시세 30%, 그 외는 40%라
+ * 월세가 37% 차이 난다. 어느 기준으로 계산한 금액인지 모르면 그 숫자를 믿을 수 없다.
+ */
+function UnitDetail({ choice, onPick }: { choice: RentalChoice; onPick: () => void }) {
+  const { colors } = useTheme();
+  const unit = choice.unit!;
+  const rent = choice.rent;
+  const facts: { label: string; value: string }[] = [
+    ...(unit.dong || unit.ho ? [{ label: "동·호", value: [unit.dong ? `${unit.dong}동` : null, unit.ho ? `${unit.ho}호` : null].filter(Boolean).join(" ") }] : []),
+    ...(unit.complex ? [{ label: "주택군", value: unit.complex }] : []),
+    ...(unit.housing_form ? [{ label: "주택유형", value: unit.housing_form }] : []),
+    ...(unit.exclusive_area_m2 !== undefined
+      ? [{ label: "전용면적", value: `${unit.exclusive_area_m2.toFixed(2)}㎡${unit.total_area_m2 !== undefined ? ` (공용 포함 ${unit.total_area_m2.toFixed(2)}㎡)` : ""}` }]
+      : []),
+    ...(unit.rooms !== undefined ? [{ label: "방", value: `${unit.rooms}개` }] : []),
+    ...(unit.floor !== undefined ? [{ label: "층", value: `${unit.floor < 0 ? `지하 ${Math.abs(unit.floor)}` : unit.floor}층${unit.elevator === false ? " · 승강기 없음" : unit.elevator ? " · 승강기 있음" : ""}` }] : []),
+    ...(choice.km !== null && choice.km !== undefined ? [{ label: "직장까지", value: `직선거리 ${choice.km < 10 ? choice.km.toFixed(1) : choice.km.toFixed(0)}km` }] : []),
+    ...(unit.viewing ? [{ label: "주택 열람", value: unit.viewing }] : []),
+  ];
+
+  return (
+    <>
+      <View style={{ gap: 4 }}>
+        <T variant="heading">{choice.label}</T>
+        {rent?.tier ? <Sub tone="3">{rent.tier} 기준</Sub> : null}
+      </View>
+
+      <ScrollView style={{ maxHeight: 420 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 18, paddingBottom: 8 }}>
+        <Card style={{ gap: 14 }}>
+          {/* 주소는 길다. 오른쪽 정렬 칸에 넣으면 폭이 모자라 잘리므로 한 줄 아래로 내려 다 보여 준다. */}
+          <View style={{ gap: 3 }}>
+            <Sub tone="3" variant="caption">주소</Sub>
+            <T variant="bodyMedium" style={{ fontSize: 15 }}>{unit.address}</T>
+          </View>
+          {facts.map((f) => (
+            <KeyValue key={f.label} label={f.label} value={f.value} />
+          ))}
+        </Card>
+
+        {rent ? (
+          <View style={{ gap: 10 }}>
+            <SectionTitle>임대조건</SectionTitle>
+            <Card style={{ gap: 14 }}>
+              <KeyValue label="보증금" value={won(rent.deposit)} amount={rent.deposit} strong />
+              <KeyValue label="월임대료" value={won(rent.monthly_rent)} amount={rent.monthly_rent} />
+              {rent.maxConversion ? (
+                <>
+                  <KeyValue
+                    label="보증금을 최대로 올리면"
+                    value={won(rent.maxConversion.deposit)}
+                    amount={rent.maxConversion.deposit}
+                    note={`월임대료가 ${won(rent.maxConversion.monthly_rent)}으로 내려가요`}
+                  />
+                </>
+              ) : null}
+            </Card>
+          </View>
+        ) : null}
+
+        {unit.transit || unit.nearby?.length ? (
+          <View style={{ gap: 10 }}>
+            <SectionTitle>이 집 주변</SectionTitle>
+            <Card style={{ gap: 16 }}>
+              {transitLines(unit.transit).map((t) => (
+                <NearRow key={t.title} icon={t.icon} title={t.title} detail={t.detail} />
+              ))}
+              {nearbyLines(unit.nearby).map((n) => (
+                <NearRow key={n.kind} icon={n.icon as IconName} title={n.title} detail={n.detail} />
+              ))}
+              <Sub tone="3" variant="caption">종류마다 가장 가까운 한 곳만 보여드리고, 모두 직선거리예요.</Sub>
+            </Card>
+          </View>
+        ) : null}
+
+        <Sub tone="3" variant="caption">
+          공고문에 함께 붙은 공급주택목록에서 옮긴 값이에요. 평면도와 사진은 공고문 첨부에서 확인해 주세요.
+        </Sub>
+      </ScrollView>
+
+      <PrimaryButton label="이 집으로 계산하기" onPress={onPick} />
+    </>
   );
 }

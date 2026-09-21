@@ -68,3 +68,78 @@ export function unitSpec(unit: SupplyUnit): string {
   if (unit.elevator) parts.push("승강기");
   return parts.join(" · ");
 }
+
+/**
+ * 집을 세우는 기준.
+ *
+ * 기본은 가까운 순이다 — 흩어진 집에서 고를 때 제일 먼저 걸러지는 것이 거리다.
+ * 넓은 순과 보증금 낮은 순은 그다음에 오는 질문이고, 사람마다 순서가 다르다.
+ *
+ * "저렴한 순"이라 쓰지 않고 "보증금 낮은 순"이라 쓴다. 싸다는 말에는 월세도 들어가는데
+ * 보증금과 월세는 서로 바꿀 수 있어서(전환) 한 숫자로 줄이면 우리가 기준을 지어내는 셈이 된다.
+ * 목록에 보이는 숫자로 세워야 사람이 결과를 검산할 수 있다.
+ */
+export type UnitSort = "near" | "large" | "cheap";
+
+export const UNIT_SORT_LABEL: Record<UnitSort, string> = {
+  near: "가까운 순",
+  large: "넓은 순",
+  cheap: "보증금 낮은 순",
+};
+
+/** 값이 없는 집은 그 기준에서 맨 뒤로. 없는 값을 0으로 두면 맨 앞에 서 버린다. */
+const last = (v: number | undefined | null): number => (v === undefined || v === null ? Number.MAX_SAFE_INTEGER : v);
+
+export function compareUnits(by: UnitSort, a: { unit: SupplyUnit; km: number | null }, b: { unit: SupplyUnit; km: number | null }): number {
+  if (by === "large") return last(b.unit.exclusive_area_m2) === last(a.unit.exclusive_area_m2)
+    ? last(a.km) - last(b.km)
+    : (b.unit.exclusive_area_m2 ?? -1) - (a.unit.exclusive_area_m2 ?? -1);
+  if (by === "cheap") {
+    const d = last(a.unit.deposit) - last(b.unit.deposit);
+    return d !== 0 ? d : last(a.unit.monthly_rent) - last(b.unit.monthly_rent);
+  }
+  return last(a.km) - last(b.km);
+}
+
+/**
+ * 이 사람에게 적용되는 임대조건.
+ *
+ * 매입임대는 같은 집이라도 소득에 따라 월세가 다르다. 수급자·지원대상 한부모가족·차상위계층은
+ * 시세 30%, 그 외(소득 70% 이하)는 40%다. 실제로 같은 집에서 476,370원과 651,800원으로 갈렸다 —
+ * 첫 줄만 쓰면 대부분의 사람에게 37% 싼 금액을 보여 주게 된다.
+ *
+ * 어느 구간인지는 프로필의 계층 자격으로 정한다. 모르면 높은 쪽(그 외)을 쓴다 —
+ * 주거비를 낮게 보여 주는 실수가 높게 보여 주는 실수보다 나쁘다.
+ */
+const LOW_TIER_STATUSES = ["basic_livelihood", "welfare_recipient", "single_parent_support"] as const;
+
+const isLowTier = (profile: UserProfile | null | undefined): boolean =>
+  (profile?.statuses ?? []).some((s) => (LOW_TIER_STATUSES as readonly string[]).includes(s));
+
+export interface UnitRent {
+  deposit: number;
+  monthly_rent: number;
+  /** 공고문이 쓴 구간 이름. 화면에 그대로 적어 어느 기준인지 알린다 */
+  tier: string;
+  /** 보증금을 올려 월세를 낮춘 같은 구간의 조건. 없을 수도 있다 */
+  maxConversion?: { deposit: number; monthly_rent: number };
+}
+
+export function unitRent(unit: SupplyUnit, profile: UserProfile | null | undefined): UnitRent | null {
+  const options = unit.rent_options ?? [];
+  if (options.length === 0) {
+    return unit.deposit === undefined ? null : { deposit: unit.deposit, monthly_rent: unit.monthly_rent ?? 0, tier: "" };
+  }
+  const low = isLowTier(profile);
+  const bases = options.filter((o) => !o.max_conversion);
+  // 구간 순서는 공고문이 낮은 소득부터 적는다. 해당 없으면 마지막(가장 높은 요율)을 쓴다.
+  const base = (low ? bases[0] : bases[bases.length - 1]) ?? bases[0];
+  if (!base) return null;
+  const conversion = options.find((o) => o.max_conversion && o.tier === base.tier);
+  return {
+    deposit: base.deposit,
+    monthly_rent: base.monthly_rent,
+    tier: base.tier,
+    maxConversion: conversion ? { deposit: conversion.deposit, monthly_rent: conversion.monthly_rent } : undefined,
+  };
+}

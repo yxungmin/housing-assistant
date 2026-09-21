@@ -73,10 +73,13 @@ export function readSheet(file: Buffer): string[][] {
   for (const m of xml.matchAll(/<row[^>]*?r="(\d+)"[^>]*>([\s\S]*?)<\/row>/g)) {
     const at = Number(m[1]) - 1;
     const cells: string[] = [];
-    for (const c of m[2]!.matchAll(/<c r="([A-Z]+\d+)"([^>]*)>([\s\S]*?)<\/c>/g)) {
+    // 값이 없고 서식만 있는 칸은 <c r="B7" s="5"/>처럼 자기닫힘으로 온다.
+    // 닫는 태그를 요구하면 그 칸부터 다음 </c>까지를 한 칸으로 삼아 값이 엉뚱한 열에 들어간다
+    // (머리글이 병합 셀인 행에서 실제로 그랬다). 두 모양을 다 받는다.
+    for (const c of m[2]!.matchAll(/<c\s+r="([A-Z]+\d+)"([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)) {
       const col = columnIndex(c[1]!);
       const type = /t="([^"]*)"/.exec(c[2]!)?.[1];
-      const body = c[3]!;
+      const body = c[3] ?? "";
       let value = "";
       if (type === "s") {
         const idx = Number(/<v>([^<]*)<\/v>/.exec(body)?.[1]);

@@ -484,8 +484,9 @@ export function KeyValue({
           <T variant="body" color={colors.text2} style={{ flexShrink: 1 }}>{label}</T>
           {src ? <InfoTip text={src} label={`${label} 근거`} /> : null}
         </View>
-        <View style={{ alignItems: "flex-end", gap: 1 }}>
-          <T variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold }}>{value}</T>
+        {/* 긴 값은 잘리는 대신 줄바꿈한다. 금액은 짧아 이 설정에 영향받지 않는다. */}
+        <View style={{ flexShrink: 1, alignItems: "flex-end", gap: 1 }}>
+          <T variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold, textAlign: "right" }}>{value}</T>
           {reading ? <Sub tone="3" variant="caption">{reading}</Sub> : null}
         </View>
       </View>
