@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { parseUnitList, pickUnitList } from "../src/units/list";
 import { columnIndex } from "../src/xlsx";
 import { fromRoot } from "../src/paths";
@@ -39,7 +39,12 @@ describe("pickUnitList", () => {
  */
 const REAL = fromRoot("collector", ".cache", "unit-list.xlsx");
 describe.skipIf(!existsSync(REAL))("parseUnitList (실제 파일 2026-09-22)", () => {
-  const units = parseUnitList(readFileSync(REAL));
+  // describe 콜백은 skip 여부와 무관하게 수집 단계에서 실행된다. 파일 읽기를 여기 바로 두면
+  // 파일이 없는 곳에서 skip이 걸리기도 전에 수집이 터진다 — 실제로 이 파일은 아무 데서도 안 돌고 있었다.
+  let units: ReturnType<typeof parseUnitList>;
+  beforeAll(() => {
+    units = parseUnitList(readFileSync(REAL));
+  });
 
   it("공고문이 말한 총 호수만큼 읽는다", () => {
     expect(units).toHaveLength(81);
