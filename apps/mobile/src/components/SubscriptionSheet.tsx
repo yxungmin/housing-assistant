@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
+import { CoffeeMark } from "./CoffeeMark";
 import { Icon } from "./icon";
 import { BottomSheet, Card, PrimaryButton, Row, Sub, T, Tag } from "./ui";
 import { billing, canUseFirstMonthFree, daysLeft, PRICE_KRW, TRIAL_DAYS } from "@/lib/billing";
@@ -39,6 +40,14 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
 
   return (
     <BottomSheet visible={visible} onClose={onClose}>
+      {/* 값을 말로 설명하기 전에 한 번 보여 준다. 1,900원은 실제로 카페 아메리카노보다 싸다. */}
+      <View style={{ alignItems: "center", gap: 6 }}>
+        <CoffeeMark />
+        <T variant="heading" style={{ textAlign: "center" }}>커피 한 잔이면 한 달이에요</T>
+        <Sub variant="caption" tone="3" style={{ textAlign: "center" }}>
+          {freeMonth ? `첫 달 0원 · 그 뒤로 ${price}` : `${price} · 언제든 해지`}
+        </Sub>
+      </View>
       <View style={{ gap: 8 }}>
         <T variant="title">{expired ? (freeMonth ? "구독이 끝났어요" : "첫 달 무료는 다 쓰셨어요") : "다른 공고의 주거비도\n계산해 볼까요?"}</T>
         <T variant="body" color={colors.text2}>

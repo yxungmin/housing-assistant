@@ -9,6 +9,8 @@ import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
 import { REGIONS } from "@/lib/onboarding";
 import { commuteFor, commuteShort, splitStation } from "@/lib/commute";
 import { isUnseen, unseenCount } from "@/lib/unseen";
+import { fundsFor, fundsNote } from "@/lib/funds";
+import { LOANS } from "@/data/loans";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius } from "@/theme/tokens";
@@ -211,6 +213,10 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
             ? { tone: "warn" as const, icon: "alert" as const, text: "다른 지역 · 거주 요건 확인 필요" }
             : { tone: "danger" as const, icon: "x" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` };
   // 직장을 넣었으면 통근이 먼저, 아니면 가장 가까운 역, 그것도 없으면 지역명
+  // 조건이 맞아도 보증금을 못 대면 못 간다. 그 사실만 무료로 알리고 금액은 비용 화면(유료)에서 본다.
+  const funds = useMemo(() => fundsFor(a, state.profile, LOANS), [a, state.profile]);
+  const note = m.match?.is_match ? fundsNote(funds) : null;
+
   const place =
     commuteShort(
       m.distanceKm,
@@ -234,8 +240,10 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
         </View>
         {place ? <Sub tone="3">{place}</Sub> : null}
       </View>
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
         <Tag tone={status.tone} icon={status.icon}>{status.text}</Tag>
+        {/* 조건이 맞는 공고에만 붙인다 — 애초에 자격이 안 되는 공고에서 돈 이야기를 하면 소음이다 */}
+        {note ? <Tag tone="warn" icon="alert">{note}</Tag> : null}
       </View>
     </Card>
   );
