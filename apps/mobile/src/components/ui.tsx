@@ -242,13 +242,28 @@ export function Logo({ size = 56 }: { size?: number }) {
   return <Image source={require("../../assets/logo.png")} style={{ width: size, height: size }} resizeMode="contain" accessibilityLabel="공공주택 비서" />;
 }
 
-/** 필터 칩: grey100 면, 선택은 검정 면 */
-export function Chip({ children, on, onPress }: PropsWithChildren<{ on?: boolean; onPress?: () => void }>) {
+/**
+ * 필터 칩: grey100 면, 선택은 검정 면.
+ * `count`를 주면 "이걸 켜면 몇 개 남나"를 옆에 흐리게 붙인다 — 누르기 전에 결과 크기를 알게 한다.
+ * 0이면 눌러도 빈 화면이 되므로 흐리게 깔고 눌리지 않게 한다.
+ */
+export function Chip({ children, on, count, onPress }: PropsWithChildren<{ on?: boolean; count?: number; onPress?: () => void }>) {
   const { colors } = useTheme();
+  const dead = count === 0 && !on;
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}
-      style={({ pressed }) => ({ paddingHorizontal: 14, paddingVertical: 9, borderRadius: radius.pill, backgroundColor: on ? colors.text : pressed ? colors.cardStrong : colors.cardSoft })}>
+    <Pressable onPress={dead ? undefined : onPress} accessibilityRole="button"
+      accessibilityState={{ selected: !!on, disabled: dead }}
+      accessibilityLabel={count === undefined ? undefined : `${children} ${count}개`}
+      style={({ pressed }) => ({
+        flexDirection: "row", alignItems: "center", gap: 5,
+        paddingHorizontal: 14, paddingVertical: 9, borderRadius: radius.pill,
+        opacity: dead ? 0.4 : 1,
+        backgroundColor: on ? colors.text : pressed ? colors.cardStrong : colors.cardSoft,
+      })}>
       <Text {...wordWrap} style={[{ fontFamily: fonts.semiBold, fontSize: 14, color: on ? colors.surface : colors.text2, letterSpacing: -0.2 }]}>{children}</Text>
+      {count === undefined ? null : (
+        <Text style={{ fontFamily: fonts.semiBold, fontSize: 13, color: on ? colors.surface : colors.text3, opacity: on ? 0.7 : 1, fontVariant: ["tabular-nums"] }}>{count}</Text>
+      )}
     </Pressable>
   );
 }

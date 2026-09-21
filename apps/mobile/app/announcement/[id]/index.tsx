@@ -22,7 +22,7 @@ export default function AnnouncementDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { colors } = useTheme();
-  const { state, toggleSaved, addReport, seeChange } = useAppState();
+  const { state, toggleSaved, addReport, seeChange, openAnnouncement } = useAppState();
   const { list } = useAnnouncements();
   const a = getAnnouncement(id ?? "", list);
   const [sheet, setSheet] = useState(false);
@@ -55,6 +55,14 @@ export default function AnnouncementDetail() {
     setChange(incoming);
     seeChange(incoming.announcementId);
   }, [incoming, seeChange]);
+
+  // 열었으면 "새 공고" 점을 지운다. 위와 같은 이유로 한 번만 부른다.
+  const opened = useRef(false);
+  useEffect(() => {
+    if (!id || opened.current) return;
+    opened.current = true;
+    openAnnouncement(id);
+  }, [id, openAnnouncement]);
 
   if (!a) {
     return (

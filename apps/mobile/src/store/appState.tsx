@@ -8,6 +8,7 @@ import * as SecureStore from "expo-secure-store";
 import type { UserProfile } from "@housing/schema";
 import { hasAccess, normalizeSubscription, type Subscription } from "@/lib/billing";
 import type { ChangeRecord } from "@/lib/changes";
+import { emptySeen, markOpened, noteSeen, type SeenState } from "@/lib/unseen";
 import { canSend, type LocalReport } from "@/lib/reports";
 import { fetchReportStatuses, remoteConfigured, sendIssueReport } from "@/data/remote";
 
@@ -30,6 +31,8 @@ export interface AppState {
   reports: LocalReport[];
   /** 관심 공고에서 값이 바뀐 기록. 공고를 열면 seen 처리한다 */
   changes: ChangeRecord[];
+  /** 목록에 떴던 공고와 아직 안 연 새 공고 (lib/unseen.ts) */
+  seen: SeenState;
 }
 
 type Action =
@@ -44,6 +47,8 @@ type Action =
   | { type: "mergeReports"; reports: LocalReport[] }
   | { type: "addChanges"; records: ChangeRecord[] }
   | { type: "seeChange"; announcementId: string }
+  | { type: "noteSeen"; ids: string[] }
+  | { type: "openAnnouncement"; id: string }
   | { type: "reset" };
 
 const initial: AppState = {
@@ -58,6 +63,7 @@ const initial: AppState = {
   pushToken: null,
   reports: [],
   changes: [],
+  seen: emptySeen,
 };
 
 function reducer(s: AppState, a: Action): AppState {
@@ -85,6 +91,14 @@ function reducer(s: AppState, a: Action): AppState {
     }
     case "seeChange":
       return { ...s, changes: s.changes.map((c) => (c.announcementId === a.announcementId ? { ...c, seen: true } : c)) };
+    case "noteSeen": {
+      const { next } = noteSeen(s.seen, a.ids);
+      return next === s.seen ? s : { ...s, seen: next };
+    }
+    case "openAnnouncement": {
+      const next = markOpened(s.seen, a.id);
+      return next === s.seen ? s : { ...s, seen: next };
+    }
     case "mergeReports": {
       const byId = new Map(a.reports.map((r) => [r.id, r]));
       return { ...s, reports: s.reports.map((r) => byId.get(r.id) ?? r) };
@@ -135,6 +149,10 @@ interface Ctx {
   addReport: (report: LocalReport) => void;
   addChanges: (records: ChangeRecord[]) => void;
   seeChange: (announcementId: string) => void;
+  /** 목록이 바뀔 때 부른다. 처음 켠 기기에서는 그 목록이 기준선이 되고 아무것도 새 것이 아니다 */
+  noteSeen: (ids: string[]) => void;
+  /** 상세를 열면 "새 공고" 표시를 지운다 */
+  openAnnouncement: (id: string) => void;
   reset: () => void;
 }
 
@@ -147,6 +165,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     (async () => {
       const [profile, meta] = await Promise.all([read(KEYS.profile), read(KEYS.meta)]);
       const parsedMeta = meta ? (JSON.parse(meta) as Partial<AppState>) : {};
+      // 이 필드가 생기기 전에 깔린 기기에는 seen이 없다. 그 경우 다음 목록이 기준선이 된다.
+      if (!parsedMeta.seen) parsedMeta.seen = emptySeen;
       dispatch({ type: "hydrate", state: { ...parsedMeta, profile: profile ? (JSON.parse(profile) as UserProfile) : null } });
     })();
   }, []);
@@ -154,8 +174,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!state.loaded) return;
     void write(KEYS.profile, state.profile ? JSON.stringify(state.profile) : null);
-    const { onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports, changes } = state;
-    void write(KEYS.meta, JSON.stringify({ onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports, changes }));
+    const { onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports, changes, seen } = state;
+    void write(KEYS.meta, JSON.stringify({ onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports, changes, seen }));
   }, [state]);
 
   // 신고 동기화: 못 보낸 건 보내고, 보낸 건의 처리 결과를 받아 "확인 중"을 끝맺는다.
@@ -209,6 +229,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       addReport: (report) => dispatch({ type: "addReport", report }),
       addChanges: (records) => dispatch({ type: "addChanges", records }),
       seeChange: (announcementId) => dispatch({ type: "seeChange", announcementId }),
+      noteSeen: (ids) => dispatch({ type: "noteSeen", ids }),
+      openAnnouncement: (id) => dispatch({ type: "openAnnouncement", id }),
       reset: () => dispatch({ type: "reset" }),
     }),
     [state],
