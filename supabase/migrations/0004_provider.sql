@@ -10,7 +10,10 @@ comment on column announcements.provider is '공급기관 코드 (LH, SH)';
 comment on column announcements.lh_id is '공급기관 내부 공고 식별자 (LH PAN_ID, SH 게시판 seq)';
 
 -- 앱 피드에도 기관을 내려 준다 (화면에 "LH"/"SH" 배지)
-create or replace view app_announcements
+-- create or replace는 컬럼을 중간에 끼우지 못한다 ("cannot change name of view column").
+-- provider를 가운데 넣으므로 지우고 다시 만든다. grant도 함께 사라지므로 아래에서 다시 준다.
+drop view if exists app_announcements;
+create view app_announcements
 with (security_invoker = true) as
 select
   a.id, a.lh_id, a.provider, a.title, a.housing_type, a.region_code,

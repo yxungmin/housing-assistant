@@ -17,7 +17,8 @@
     "benchmark:fetch": "tsx src/fetch-pdfs.ts",
     "lh:stats": "tsx src/stats.ts",
     "benchmark:compare": "tsx src/benchmark-compare.ts",
-    "benchmark:rescore": "tsx src/benchmark-rescore.ts"
+    "benchmark:rescore": "tsx src/benchmark-rescore.ts",
+    "fixture:check": "tsx src/fixture-check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.127.0",
