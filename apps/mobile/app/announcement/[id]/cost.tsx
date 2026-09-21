@@ -13,6 +13,7 @@ import { getAnnouncement, useAnnouncements } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
 import { manwon, maskDigits, pct, won, dateText } from "@/lib/format";
 import { canOpenCost, useAppState } from "@/store/appState";
+import { accessLevel } from "@/lib/access";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space } from "@/theme/tokens";
 
@@ -23,7 +24,7 @@ export default function Cost() {
   const { id, auto } = useLocalSearchParams<{ id: string; auto?: string }>();
   const router = useRouter();
   const { colors } = useTheme();
-  const { state, addReport } = useAppState();
+  const { state, addReport, signIn } = useAppState();
   const { list } = useAnnouncements();
   const a = getAnnouncement(id ?? "", list);
   const profile = state.profile;
@@ -46,12 +47,24 @@ export default function Cost() {
   const [picker, setPicker] = useState(false);
   const [subSheet, setSubSheet] = useState(false);
   const [report, setReport] = useState(false);
+  const [signingIn, setSigningIn] = useState(false);
 
   // 확정된 선: 조건 매칭은 무료, 자금 계산은 유료.
   // 잠겼어도 화면은 그대로 보여 준다 — 보증금·월임대료는 공고문에 적힌 공개 사실이라 가리지 않고,
   // 우리가 계산한 값(필요 현금·부족액·대출·월 합계)만 가린다.
+  //
+  // 잠긴 이유가 둘이라 안내가 달라야 한다. 구독을 했는데도 로그인이 없어 막히면
+  // 사용자는 왜 막혔는지 알 수 없다 (결제 복원 뒤에 생길 수 있는 상태다).
+  const level = accessLevel({ account: state.account, subscription: state.subscription });
   const locked = !canOpenCost(state);
+  const needsSignIn = level === "gate";
   const hide = (text: string) => (locked ? maskDigits(text) : text);
+
+  const unlock = () => {
+    if (!needsSignIn) return setSubSheet(true);
+    setSigningIn(true);
+    void signIn("kakao").finally(() => setSigningIn(false));
+  };
 
   const chosen = rentals[sel];
   const scenarioPricing = useMemo(() => {
@@ -99,8 +112,11 @@ export default function Cost() {
       header={<Header onBack={() => (auto ? router.replace("/(tabs)") : router.back())} title="예상 주거비" right={<IconButton name="more" label="더보기" color={colors.text2} />} />}
       footer={
         <BottomCTA
-          label={locked ? "구독하고 계산 보기" : conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"}
-          onPress={() => (locked ? setSubSheet(true) : setScenario(true))}
+          label={
+            signingIn ? "로그인 중" : needsSignIn ? "로그인하고 계산 보기" : locked ? "구독하고 계산 보기" : conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"
+          }
+          disabled={signingIn}
+          onPress={() => (locked ? unlock() : setScenario(true))}
         />
       }
     >
@@ -124,7 +140,11 @@ export default function Cost() {
         </View>
 
         {locked ? (
-          <Notice icon="info">보증금과 월임대료는 공고문에 적힌 그대로예요. 가려진 것은 이 조건으로 우리가 계산한 값이에요.</Notice>
+          <Notice icon="info">
+            {needsSignIn
+              ? "보증금과 월임대료는 공고문에 적힌 그대로예요. 가려진 계산 결과는 로그인하면 볼 수 있어요."
+              : "보증금과 월임대료는 공고문에 적힌 그대로예요. 가려진 것은 이 조건으로 우리가 계산한 값이에요."}
+          </Notice>
         ) : null}
 
         <FadeIn key={`${sel}-${deposit ?? "base"}-${loanId ?? "auto"}`} style={{ gap: space.section }}>
@@ -137,7 +157,9 @@ export default function Cost() {
               size={40}
               sub={
                 locked
-                  ? "보증금에서 받을 수 있는 대출을 빼고 계산해요"
+                  ? needsSignIn
+                    ? "로그인하면 보증금에서 받을 수 있는 대출을 빼고 계산해 드려요"
+                    : "보증금에서 받을 수 있는 대출을 빼고 계산해요"
                   : cost.shortfall > 0
                     ? `보유 현금 ${manwon(profile.cash_on_hand)}으로는 ${manwon(cost.shortfall)} 부족해요`
                     : `보유 현금 ${manwon(profile.cash_on_hand)}으로 감당돼요`
@@ -146,7 +168,7 @@ export default function Cost() {
             <View style={{ gap: 14 }}>
               <KeyValue label="임대보증금" value={won(cost.deposit)} src={`공고문 ${base.source.page}쪽${deposit !== null ? " · 전환 적용" : ""}`} />
               {cost.loan ? (
-                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${hide(won(cost.loan.amount))}`} src={locked ? `${cost.loan.product.provider} · 구독하면 한도와 금리를 봐요` : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
+                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${hide(won(cost.loan.amount))}`} src={locked ? `${cost.loan.product.provider} · ${needsSignIn ? "로그인하면" : "구독하면"} 한도와 금리를 봐요` : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
               ) : (
                 <KeyValue label="적용 가능한 대출" value="없음" src="입력 조건에 맞는 전세자금대출 상품이 없어요" />
               )}
