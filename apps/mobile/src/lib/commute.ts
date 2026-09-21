@@ -9,7 +9,7 @@
  * 걷는 시간은 거리에서 환산한 값이라(4km/h) "약"을 뗄 수 없다. 화면도 "약 7분"으로 쓴다.
  */
 import { Linking, Platform } from "react-native";
-import type { Announcement, Transit } from "@/data/announcements";
+import type { Announcement, Nearby, Transit } from "@/data/announcements";
 import type { UserProfile } from "@housing/schema";
 
 /** 한 사람 몫의 통근 표시. 부부는 두 줄이 된다. */
@@ -115,6 +115,39 @@ export function transitLines(transit: Transit | undefined): TransitLine[] {
     out.push({ icon: "bus", title: `${transit.nearest_bus_stop} 정류장`, detail: walk(transit.bus_walk_min, transit.bus_distance_m) });
   }
   return out;
+}
+
+const NEARBY_LABEL: Record<Nearby["kind"], string> = {
+  daycare: "어린이집",
+  school: "학교",
+  mart: "마트",
+  convenience: "편의점",
+  hospital: "병원",
+  park: "공원",
+};
+
+const NEARBY_ICON: Record<Nearby["kind"], TransitLine["icon"] | "baby" | "school" | "cart" | "store" | "hospital" | "tree"> = {
+  daycare: "baby",
+  school: "school",
+  mart: "cart",
+  convenience: "store",
+  hospital: "hospital",
+  park: "tree",
+};
+
+/**
+ * 주변 시설 한 줄씩. 종류마다 가장 가까운 한 곳만 담겨 있다.
+ *
+ * 상세 화면(단지)과 예상 주거비(흩어진 집에서 고른 한 채)가 같은 목록을 그린다.
+ * 문구를 두 벌로 두면 한쪽만 고치는 날이 온다.
+ */
+export function nearbyLines(nearby: Nearby[] | undefined): { kind: string; icon: string; title: string; detail: string }[] {
+  return (nearby ?? []).map((n) => ({
+    kind: n.kind,
+    icon: NEARBY_ICON[n.kind],
+    title: `${NEARBY_LABEL[n.kind]} · ${n.name}`,
+    detail: `약 ${n.distance_m}m`,
+  }));
 }
 
 /**

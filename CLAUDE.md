@@ -70,7 +70,8 @@ npm run output:size                  # 추출 출력이 어디서 커지는지 (
 - 추출 프롬프트(`collector/src/llm/extract.ts`)를 바꾸면 `EXTRACTION_PROMPT_VERSION`을 올리고 벤치마크를 다시 돌린다.
 - 매입임대·전세임대는 집이 흩어져 있다. 주택별 소재지·면적·임대조건은 공고문이 아니라 별도 엑셀 첨부에 있고,
   `collector/src/units/list.ts`가 읽어 `Announcement.units`에 담는다(`xlsx.ts`는 zlib만 쓰는 최소 리더).
-  좌표는 주소마다 한 번만 찍는다(한 건물에 여러 세대). 앱은 `lib/units.ts`로 다루고,
+  좌표는 주소마다 한 번만 찍는다(한 건물에 여러 세대). 그 호출이 역·정류장·주변 시설까지 같이 주므로 집에 그대로 붙인다.
+  앱은 `lib/units.ts`로 다루고,
   이런 공고에서는 위치·통근 섹션을 끄고(좌표가 하나일 수 없다) 예상 주거비의 선택 대상이 주택형이 아니라 집이 된다.
 - 단지 그림은 LH 상세의 `dsSbdAhfl`에서 온다(첨부 `dsAhflInfo`와 별개 데이터셋).
   `AHFL_URL`은 그림이 아니라 그림 한 장을 담은 HTML 페이지다. 같은 fileid를 `lhFile.do`에 넣어야 그림 파일이 나온다(`resolveImages`).

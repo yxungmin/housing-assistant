@@ -207,6 +207,31 @@ export const AnnouncementVersion = z.object({
 export type AnnouncementVersion = z.infer<typeof AnnouncementVersion>;
 
 /**
+ * 좌표 주변에서 찾은 것. 직선거리이지 경로가 아니다 — 실제 통근 시간은 교통 API를 붙여야 나온다.
+ * 걷는 시간(walk_min)은 거리를 4km/h로 나눈 환산값이라 화면에서도 "약"을 붙여 쓴다.
+ *
+ * 단지형 공고(Announcement)와 흩어진 집 한 채(SupplyUnit)가 같은 모양을 쓴다.
+ * 두 벌로 두면 화면 문구도 두 벌이 되고, 한쪽만 고치는 날이 온다.
+ */
+export const Transit = z.object({
+  nearest_station: z.string().optional().describe('가장 가까운 지하철역. Kakao는 "망원역 6호선"처럼 호선을 붙여 준다'),
+  station_walk_min: z.number().optional(),
+  station_distance_m: z.number().optional(),
+  nearest_bus_stop: z.string().optional(),
+  bus_walk_min: z.number().optional(),
+  bus_distance_m: z.number().optional(),
+});
+export type Transit = z.infer<typeof Transit>;
+
+/** 주변 생활 인프라 한 곳. 종류마다 가장 가까운 하나만 담는다 */
+export const NearbyPlace = z.object({
+  kind: NearbyKind,
+  name: z.string(),
+  distance_m: z.number(),
+});
+export type NearbyPlace = z.infer<typeof NearbyPlace>;
+
+/**
  * 매입임대·전세임대가 공급하는 집 한 채.
  *
  * 단지형 공고는 주소가 하나라 Announcement의 lat/lng로 끝나지만, 이 유형은 수십 채가 흩어져 있다.
@@ -234,6 +259,14 @@ export const SupplyUnit = z.object({
   monthly_rent: z.number().int().optional(),
   lat: z.number().optional(),
   lng: z.number().optional(),
+  /**
+   * 이 집의 최근접 역·정류장과 주변 시설.
+   *
+   * 좌표를 찍는 호출(Kakao Local)이 이미 같이 받아 오는 값이다 — 따로 부르지 않는다.
+   * 주소마다 한 번이므로 집 수가 아니라 주소 수만큼이고, 같은 건물의 세대는 같은 값을 쓴다.
+   */
+  transit: Transit.optional(),
+  nearby: z.array(NearbyPlace).optional(),
 });
 export type SupplyUnit = z.infer<typeof SupplyUnit>;
 
@@ -275,30 +308,8 @@ export const Announcement = z.object({
     .optional(),
   lat: z.number().optional(),
   lng: z.number().optional(),
-  /**
-   * 수집 시 좌표 주변에서 찾은 것. 직선거리이지 경로가 아니다 — 실제 통근 시간은 교통 API를 붙여야 나온다.
-   * 걷는 시간(walk_min)은 거리를 4km/h로 나눈 환산값이라 화면에서도 "약"을 붙여 쓴다.
-   */
-  transit: z
-    .object({
-      nearest_station: z.string().optional().describe('가장 가까운 지하철역. Kakao는 "망원역 6호선"처럼 호선을 붙여 준다'),
-      station_walk_min: z.number().optional(),
-      station_distance_m: z.number().optional(),
-      nearest_bus_stop: z.string().optional(),
-      bus_walk_min: z.number().optional(),
-      bus_distance_m: z.number().optional(),
-    })
-    .optional(),
-  nearby: z
-    .array(
-      z.object({
-        kind: NearbyKind,
-        name: z.string(),
-        distance_m: z.number(),
-      }),
-    )
-    .optional()
-    .describe("주변 생활 인프라. 종류마다 가장 가까운 한 곳만"),
+  transit: Transit.optional(),
+  nearby: z.array(NearbyPlace).optional().describe("주변 생활 인프라. 종류마다 가장 가까운 한 곳만"),
   /**
    * 같은 법정동의 최근 전월세 실거래 요약. 수집할 때 한 번 채운다 (사용자 수와 무관).
    * 보증금이 싼지 비싼지 판단할 맥락을 주려는 것이고, 없으면 화면에서 통째로 감춘다.

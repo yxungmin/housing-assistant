@@ -15,7 +15,7 @@ import { isScattered, unitLabel, unitSpec, unitsWithDistance } from "@/lib/units
 import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
-import { commuteDetail, commuteFor, commuteLines, mapUrl, openMap, transitLines } from "@/lib/commute";
+import { commuteDetail, commuteFor, commuteLines, mapUrl, nearbyLines, openMap, transitLines } from "@/lib/commute";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { space } from "@/theme/tokens";
@@ -262,8 +262,8 @@ export default function AnnouncementDetail() {
 
             {a.nearby?.length ? (
               <Card style={{ gap: 16 }}>
-                {a.nearby.map((n) => (
-                  <Row key={n.kind} icon={NEARBY_ICON[n.kind]} tone="gray" title={`${NEARBY_LABEL[n.kind]} · ${n.name}`} detail={`약 ${n.distance_m}m`} />
+                {nearbyLines(a.nearby).map((n) => (
+                  <Row key={n.kind} icon={n.icon as IconName} tone="gray" title={n.title} detail={n.detail} />
                 ))}
                 <Sub tone="3" variant="caption">종류마다 가장 가까운 한 곳만 보여드려요.</Sub>
               </Card>
@@ -342,24 +342,6 @@ export default function AnnouncementDetail() {
     </Screen>
   );
 }
-
-const NEARBY_LABEL: Record<Nearby["kind"], string> = {
-  daycare: "어린이집",
-  school: "학교",
-  mart: "마트",
-  convenience: "편의점",
-  hospital: "병원",
-  park: "공원",
-};
-
-const NEARBY_ICON: Record<Nearby["kind"], IconName> = {
-  daycare: "baby",
-  school: "school",
-  mart: "cart",
-  convenience: "store",
-  hospital: "hospital",
-  park: "tree",
-};
 
 /** 위치·교통·인프라 한 줄. 아이콘 타일 + 제목 + 보조 설명, 누를 수 있으면 화살표. */
 function Row({

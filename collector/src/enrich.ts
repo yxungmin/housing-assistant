@@ -124,7 +124,8 @@ const save = () => writeFileSync(TARGET, JSON.stringify(rows, null, 1));
  * 좌표·시세가 이미 있는 공고에도 주택 목록은 새로 붙기 때문이다.
  */
 async function fillUnitCoords(): Promise<number> {
-  const targets = rows.filter((r) => r.units?.length && (force || r.units.some((u) => u.lat === undefined)));
+  // 좌표는 있는데 주변이 없는 경우도 채운다 — 예전에는 좌표만 쓰고 나머지를 버렸다.
+  const targets = rows.filter((r) => r.units?.length && (force || r.units.some((u) => u.lat === undefined || u.nearby === undefined)));
   if (targets.length === 0) return 0;
   if (!env.KAKAO_REST_API_KEY) {
     console.log(`주택 좌표: KAKAO_REST_API_KEY 없음 — ${targets.length}건 건너뜀`);
@@ -132,22 +133,26 @@ async function fillUnitCoords(): Promise<number> {
   }
   let filled = 0;
   for (const row of targets) {
-    const seen = new Map<string, { lat: number; lng: number } | null>();
+    // 주소 하나에 한 번만 부른다. 같은 건물의 세대는 역·정류장·주변 시설이 같다.
+    const seen = new Map<string, Awaited<ReturnType<typeof geocodeAddress>>>();
     for (const unit of row.units!) {
-      if (!force && unit.lat !== undefined) continue;
-      let at = seen.get(unit.address);
-      if (at === undefined) {
-        const geo = await geocodeAddress(unit.address, env.KAKAO_REST_API_KEY).catch(() => null);
-        at = geo ? { lat: geo.lat, lng: geo.lng } : null;
-        seen.set(unit.address, at);
+      if (!force && unit.lat !== undefined && unit.nearby !== undefined) continue;
+      let geo = seen.get(unit.address);
+      if (geo === undefined) {
+        geo = await geocodeAddress(unit.address, env.KAKAO_REST_API_KEY).catch(() => null);
+        seen.set(unit.address, geo);
       }
-      if (at) {
-        unit.lat = at.lat;
-        unit.lng = at.lng;
+      if (geo) {
+        unit.lat = geo.lat;
+        unit.lng = geo.lng;
+        // 이 값들은 좌표와 같은 호출로 이미 와 있다. 버리면 화면에서 다시 부를 일이 생긴다.
+        unit.transit = Object.keys(geo.transit).length > 0 ? geo.transit : undefined;
+        unit.nearby = geo.nearby.length > 0 ? geo.nearby : [];
       }
     }
     const found = row.units!.filter((u) => u.lat !== undefined).length;
-    console.log(`${row.id}: 주택 좌표 ${found}/${row.units!.length}호 (주소 ${seen.size}곳)`);
+    const withNearby = row.units!.filter((u) => u.nearby?.length).length;
+    console.log(`${row.id}: 주택 좌표 ${found}/${row.units!.length}호 · 주변 ${withNearby}호 (주소 ${seen.size}곳)`);
     filled++;
     save();
   }

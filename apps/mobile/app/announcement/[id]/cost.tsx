@@ -6,13 +6,27 @@ import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchA
 import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SourceCard } from "@/components/SourceCard";
-import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, FadeIn, Header, IconButton, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, FadeIn, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { getAnnouncement, useAnnouncements } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
 import { manwon, maskDigits, pct, won, dateText } from "@/lib/format";
 import { unitLabel, unitSpec, unitsWithDistance } from "@/lib/units";
+import { nearbyLines, transitLines } from "@/lib/commute";
+import type { IconName } from "@/components/icon";
+import type { SupplyUnit } from "@housing/schema";
+
+/**
+ * 고를 수 있는 임대조건 한 줄.
+ * 단지형은 주택형 하나, 흩어진 공고는 집 한 채다 — 뒤쪽만 unit이 붙는다 (lib/units.ts).
+ */
+interface RentalChoice {
+  label: string;
+  pricing: Pricing;
+  trackName: string;
+  unit?: SupplyUnit;
+}
 import { canOpenCost, useAppState } from "@/store/appState";
 import { accessLevel } from "@/lib/access";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -31,8 +45,8 @@ export default function Cost() {
   const profile = state.profile;
 
   const [allTracks, setAllTracks] = useState(false);
-  const { rentals, bestTrackName, otherCount } = useMemo(() => {
-    if (!a || !profile) return { rentals: [] as { label: string; pricing: Pricing; trackName: string }[], bestTrackName: "", otherCount: 0 };
+  const { rentals, bestTrackName, otherCount } = useMemo((): { rentals: RentalChoice[]; bestTrackName: string; otherCount: number } => {
+    if (!a || !profile) return { rentals: [], bestTrackName: "", otherCount: 0 };
 
     /**
      * 흩어진 공고(매입임대·전세임대)는 임대조건이 주택형이 아니라 집마다 다르다.
@@ -47,6 +61,7 @@ export default function Cost() {
       const rows = unitsWithDistance(a.units, profile)
         .filter((u) => u.unit.deposit !== undefined)
         .map(({ unit, km }) => ({
+          unit,
           label: `${unitLabel(unit)}${unit.ho ? ` ${unit.ho}호` : ""}`,
           trackName: km !== null ? `직장 ${km < 10 ? km.toFixed(1) : km.toFixed(0)}km · ${unitSpec(unit)}` : unitSpec(unit),
           pricing: {
@@ -97,6 +112,13 @@ export default function Cost() {
   // 흩어진 공고에서 고르는 것은 주택형이 아니라 집 한 채다. 말이 다르면 화면의 말도 달라야 한다.
   const picksHouse = !!a?.units?.length;
   const chosen = rentals[sel];
+  /**
+   * 고른 집의 역·정류장·주변 시설.
+   *
+   * 따로 부르지 않는다 — 좌표를 찍는 호출이 이미 같이 받아 온 값이고, 수집할 때 집에 붙여 뒀다.
+   * 공고 하나의 좌표로 그리던 위치 섹션은 이 유형에서 꺼 두었다(시청 좌표였다). 여기가 그 자리를 대신한다.
+   */
+  const spot = picksHouse ? chosen?.unit : undefined;
   const scenarioPricing = useMemo(() => {
     if (!chosen) return null;
     if (deposit === null) return chosen.pricing;
@@ -205,6 +227,23 @@ export default function Cost() {
             </View>
           </Card>
         </View>
+
+        {spot && (spot.transit || spot.nearby?.length) ? (
+          <View style={{ gap: 12 }}>
+            <SectionTitle>이 집 주변</SectionTitle>
+            <Card style={{ gap: 16 }}>
+              {transitLines(spot.transit).map((t) => (
+                <NearRow key={t.title} icon={t.icon} title={t.title} detail={t.detail} />
+              ))}
+              {nearbyLines(spot.nearby).map((n) => (
+                <NearRow key={n.kind} icon={n.icon as IconName} title={n.title} detail={n.detail} />
+              ))}
+              <Sub tone="3" variant="caption">
+                {chosen?.label} 기준이에요. 종류마다 가장 가까운 한 곳만 보여드리고, 모두 직선거리예요.
+              </Sub>
+            </Card>
+          </View>
+        ) : null}
 
         {/* 보증금이 싼지 비싼지는 비교 대상이 있어야 안다. 잠그지 않는다 — 보증금 자체가 무료인데
             싼지 비싼지만 가리면 판단의 절반을 뺏는 셈이다. */}
@@ -372,5 +411,18 @@ function Stepper({ label, onPress, disabled }: { label: string; onPress: () => v
     <Pressable onPress={onPress} disabled={disabled} accessibilityRole="button" style={({ pressed }) => ({ paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.pill, backgroundColor: pressed ? colors.cardStrong : colors.cardSoft, opacity: disabled ? 0.4 : 1 })}>
       <T variant="small" numeric style={{ fontFamily: fonts.semiBold }}>{label}</T>
     </Pressable>
+  );
+}
+
+/** 역·정류장·주변 시설 한 줄. 상세 화면의 Row와 같은 모양이지만 누를 일이 없어 단순하다. */
+function NearRow({ icon, title, detail }: { icon: IconName; title: string; detail: string }) {
+  return (
+    <View style={{ flexDirection: "row", gap: 14, alignItems: "center" }}>
+      <IconTile name={icon} tone="gray" size={36} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <T variant="bodyMedium" style={{ fontSize: 15 }}>{title}</T>
+        <Sub tone="3" variant="caption">{detail}</Sub>
+      </View>
+    </View>
   );
 }
