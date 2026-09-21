@@ -69,6 +69,7 @@ export class Repo {
     lat?: number;
     lng?: number;
     transit?: Record<string, unknown>;
+    market?: object;
     nearby?: Record<string, unknown>[];
   }): Promise<string> {
     const { data, error } = await this.sb

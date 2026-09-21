@@ -28,6 +28,7 @@ interface Meta {
   lng?: number;
   transit?: { nearest_station?: string; station_walk_min?: number; station_distance_m?: number; nearest_bus_stop?: string; bus_walk_min?: number; bus_distance_m?: number };
   nearby?: { kind: string; name: string; distance_m: number }[];
+  market?: Record<string, unknown>;
 }
 
 /** 초기 벤치마크 PDF(001~004)는 API 메타 없이 받았으므로 손으로 채운 값. 접수일은 시안 기준일(2026-09-20) 근처. */

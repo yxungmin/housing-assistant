@@ -8,6 +8,19 @@ export type DataStatus = "VERIFIED" | "AUTO" | "UNVERIFIED";
 /** 조건을 읽어 낸 공고인가 (매칭·계산을 할 수 있는가). 사람 검수 여부와는 다른 질문이다. */
 export const isReadable = (a: Announcement): boolean => a.status !== "UNVERIFIED";
 
+export interface MarketRent {
+  lawd_cd: string;
+  area_from: number;
+  area_to: number;
+  from: string;
+  to: string;
+  deals: number;
+  jeonse_median?: number;
+  monthly_deposit_median?: number;
+  monthly_rent_median?: number;
+  source: string;
+}
+
 export interface Announcement {
   id: string;
   lh_id: string;
@@ -32,6 +45,8 @@ export interface Announcement {
   transit?: Transit;
   /** 주변 생활 인프라. 종류별로 가장 가까운 한 곳 */
   nearby?: Nearby[];
+  /** 같은 법정동 최근 전월세 실거래 요약. 표본이 적으면 없다 */
+  market?: MarketRent;
   /** 기관 사이트의 원문 공고문. 근거로 적은 쪽수를 실제로 열 수 있게 한다 */
   pdf_url?: string;
   extraction: ExtractionOutput;

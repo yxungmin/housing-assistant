@@ -243,6 +243,24 @@ export const Announcement = z.object({
     )
     .optional()
     .describe("주변 생활 인프라. 종류마다 가장 가까운 한 곳만"),
+  /**
+   * 같은 법정동의 최근 전월세 실거래 요약. 수집할 때 한 번 채운다 (사용자 수와 무관).
+   * 보증금이 싼지 비싼지 판단할 맥락을 주려는 것이고, 없으면 화면에서 통째로 감춘다.
+   */
+  market: z
+    .object({
+      lawd_cd: z.string(),
+      area_from: z.number(),
+      area_to: z.number(),
+      from: z.string(),
+      to: z.string(),
+      deals: z.number(),
+      jeonse_median: z.number().optional(),
+      monthly_deposit_median: z.number().optional(),
+      monthly_rent_median: z.number().optional(),
+      source: z.string(),
+    })
+    .optional(),
   updated_at: z.string(),
 });
 export type Announcement = z.infer<typeof Announcement>;

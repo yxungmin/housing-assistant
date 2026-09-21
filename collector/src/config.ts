@@ -14,6 +14,8 @@ const Env = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   ANTHROPIC_API_KEY: z.string().optional(),
   KAKAO_REST_API_KEY: z.string().optional(),
+  /** 국토교통부 실거래가 (공공데이터포털). LH 키와 같은 계정 키지만 서비스마다 활용신청이 필요하다 */
+  MOLIT_API_KEY: z.string().optional(),
   /** 추출 모델. 벤치마크로 바꿔가며 비교한다. */
   EXTRACTION_MODEL: z.string().default("claude-opus-5"),
   /**

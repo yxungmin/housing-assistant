@@ -176,6 +176,28 @@ export default function Cost() {
           </Card>
         </View>
 
+        {/* 보증금이 싼지 비싼지는 비교 대상이 있어야 안다. 잠그지 않는다 — 보증금 자체가 무료인데
+            싼지 비싼지만 가리면 판단의 절반을 뺏는 셈이다. */}
+        {a.market && a.market.jeonse_median ? (
+          <View style={{ gap: 12 }}>
+            <SectionTitle>주변 시세와 비교</SectionTitle>
+            <Card style={{ gap: 14 }}>
+              <KeyValue label="이 공고 보증금" value={won(cost.deposit)} strong />
+              <KeyValue
+                label="주변 전세 중앙값"
+                value={won(a.market.jeonse_median)}
+                src={`전용 ${a.market.area_from}~${a.market.area_to}㎡ · ${a.market.deals}건`}
+              />
+              {a.market.monthly_rent_median ? (
+                <KeyValue label="주변 월세 중앙값" value={`보증금 ${manwon(a.market.monthly_deposit_median)} / 월 ${won(a.market.monthly_rent_median)}`} />
+              ) : null}
+              <Sub tone="3" variant="caption">
+                {a.market.from}~{a.market.to} {a.market.source}. 공공임대와 민간 전월세는 조건이 달라 그대로 견주기 어려워요.
+              </Sub>
+            </Card>
+          </View>
+        ) : null}
+
         <View style={{ gap: 12 }}>
           <SectionTitle>매달 나가는 돈</SectionTitle>
           <Card style={{ gap: 20 }}>

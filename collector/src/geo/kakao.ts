@@ -9,6 +9,8 @@
 import type { NearbyKind } from "@housing/schema";
 
 export interface GeoResult {
+  /** 법정동 코드 10자리. 실거래가 조회에는 앞 5자리를 쓴다 */
+  b_code?: string;
   lat: number;
   lng: number;
   transit: {
@@ -38,7 +40,7 @@ export async function geocodeAddress(address: string, restKey: string, fetchImpl
   const headers = { Authorization: `KakaoAK ${restKey}` };
   const addr = await fetchImpl(`https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`, { headers });
   if (!addr.ok) return null;
-  const addrJson = (await addr.json()) as { documents: { x: string; y: string }[] };
+  const addrJson = (await addr.json()) as { documents: { x: string; y: string; address?: { b_code?: string } }[] };
   const doc = addrJson.documents[0];
   if (!doc) return null;
   const lng = Number(doc.x);
@@ -77,5 +79,5 @@ export async function geocodeAddress(address: string, restKey: string, fetchImpl
     if (found) nearby.push({ kind: c.kind, name: found.name, distance_m: found.distance_m });
   }
 
-  return { lat, lng, transit, nearby };
+  return { b_code: doc.address?.b_code, lat, lng, transit, nearby };
 }

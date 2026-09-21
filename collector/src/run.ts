@@ -9,9 +9,11 @@
  *
  * 비용은 추출한 공고 수에 비례한다. COLLECT_REGIONS로 지역을 좁히면 그만큼 줄어든다 (기본 서울·경기).
  */
+import type { ExtractionOutput } from "@housing/schema";
 import { loadEnv, requireEnv } from "./config";
 import { Repo } from "./db/supabase";
 import { geocodeAddress } from "./geo/kakao";
+import { isUsable, RentClient } from "./market/rent";
 import { LhClient } from "./lh/api";
 import { extractFromText } from "./llm/extract";
 import { extractPdfText, ocrFallback } from "./pdf/extract";
@@ -112,6 +114,17 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
   const address = result.output.address ?? detail.address;
   if (isNew && address && env.KAKAO_REST_API_KEY) {
     const geo = await geocodeAddress(address, env.KAKAO_REST_API_KEY).catch(() => null);
+    // 주변 시세: 법정동 앞 5자리 + 대표 전용면적으로 한 번 조회한다.
+    // 실패하거나 표본이 적으면 넣지 않는다 — 몇 건으로 "시세"라고 말하면 거짓말이 된다.
+    const area = representativeArea(result.output);
+    const market =
+      geo?.b_code && area && env.MOLIT_API_KEY
+        ? await new RentClient(env.MOLIT_API_KEY)
+            .summary(geo.b_code.slice(0, 5), area)
+            .then((m) => (isUsable(m) ? m : null))
+            .catch(() => null)
+        : null;
+    if (market) log(`  주변 시세: ${market.deals}건 (전용 ${market.area_from}~${market.area_to}㎡, ${market.from}~${market.to})`);
     await repo.upsertAnnouncement({
       provider: notice.provider,
       lh_id: notice.external_id,
@@ -127,6 +140,7 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       lng: geo?.lng,
       transit: geo?.transit,
       nearby: geo?.nearby,
+      market: market ?? undefined,
     });
   }
   log(`  v${version} ${status}${blocking.length ? `: ${blocking.join(" / ")}` : ""}`);
@@ -135,6 +149,15 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
     log(`  푸시 대상 ${tokens.length}명 (발송은 검수 VERIFIED 후 — TODO M7)`);
   }
   return isNew ? "new" : "modified";
+}
+
+/** 시세를 비교할 기준 면적. 공고의 주택형 중 가장 많이 나오는 전용면적을 쓴다 */
+function representativeArea(extraction: ExtractionOutput): number | undefined {
+  const areas = extraction.tracks.flatMap((t) => t.unit_types.map((u) => u.exclusive_area_m2)).filter((a): a is number => typeof a === "number" && a > 0);
+  if (areas.length === 0) return undefined;
+  const counts = new Map<number, number>();
+  for (const a of areas) counts.set(a, (counts.get(a) ?? 0) + 1);
+  return [...counts.entries()].sort((x, y) => y[1] - x[1] || x[0] - y[0])[0]![0];
 }
 
 const sources = [];
