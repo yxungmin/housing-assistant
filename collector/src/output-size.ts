@@ -19,13 +19,19 @@ import type { ExtractionOutput } from "@housing/schema";
 const CHARS_PER_TOKEN = 1.18;
 /** LlmAppliesTo·LlmPricing이 요구하는 키 순서 (llmSchema.ts와 같아야 한다) */
 const APPLIES = ["household_size", "household_size_min", "household_size_max", "income_type", "marriage"] as const;
-const PRICE = ["unit_type", "tier", "kind", "deposit", "monthly_rent", "sale_price", "conversion", "payment_schedule", "maintenance_estimate", "source"] as const;
+/** v4에서 payment_schedule을 뺐다. v3 대비 얼마나 줄었는지 보려고 둘 다 둔다. */
+const PRICE = ["unit_type", "tier", "kind", "deposit", "monthly_rent", "sale_price", "conversion", "maintenance_estimate", "source"] as const;
+const PRICE_V3 = [...PRICE.slice(0, 7), "payment_schedule", ...PRICE.slice(7)] as const;
 
 const j = (o: unknown) => JSON.stringify(o);
 const len = (o: unknown) => j(o).length;
 
-/** 저장된 추출 결과를 LLM이 뱉었을 모양으로 되돌린다 (없는 값 → null). */
-function asLlmOutput(e: ExtractionOutput): unknown {
+/**
+ * 저장된 추출 결과를 LLM이 뱉었을 모양으로 되돌린다 (없는 값 → null).
+ * v3는 applies_to 키 5개를 늘 쓰고 payment_schedule을 받았다. v4는 둘 다 뺐다.
+ */
+function asLlmOutput(e: ExtractionOutput, v3 = false): unknown {
+  const priceKeys: readonly string[] = v3 ? PRICE_V3 : PRICE;
   return {
     title: e.title,
     housing_type: e.housing_type,
@@ -40,14 +46,17 @@ function asLlmOutput(e: ExtractionOutput): unknown {
       rules: t.rules.map((r) => ({
         group_id: r.group_id,
         category: r.category,
-        applies_to: Object.fromEntries(APPLIES.map((k) => [k, (r.applies_to as Record<string, unknown>)?.[k] ?? null])),
+        applies_to:
+          v3 || (r.applies_to && Object.keys(r.applies_to).length > 0)
+            ? Object.fromEntries(APPLIES.map((k) => [k, (r.applies_to as Record<string, unknown>)?.[k] ?? null]))
+            : null,
         operator: r.operator,
         value_json: j(r.value),
         unit: r.unit ?? null,
         source: r.source,
         confidence: r.confidence,
       })),
-      pricing: t.pricing.map((p) => Object.fromEntries(PRICE.map((k) => [k, (p as Record<string, unknown>)[k] ?? null]))),
+      pricing: t.pricing.map((p) => Object.fromEntries(priceKeys.map((k) => [k, (p as Record<string, unknown>)[k] ?? null]))),
     })),
   };
 }
@@ -57,6 +66,7 @@ const list = items.map((i) => i.extraction).filter((e) => e.tracks.some((t) => t
 if (list.length === 0) throw new Error("잴 추출 결과가 없다. 번들 데이터(apps/mobile/data/announcements.json)를 먼저 채워야 한다");
 
 const total = list.reduce((s, e) => s + len(asLlmOutput(e)), 0);
+const totalV3 = list.reduce((s, e) => s + len(asLlmOutput(e, true)), 0);
 const rules = list.flatMap((e) => e.tracks.flatMap((t) => t.rules));
 const prices = list.flatMap((e) => e.tracks.flatMap((t) => t.pricing));
 
@@ -66,18 +76,16 @@ const emptyApplies = rules.filter((r) => !r.applies_to || Object.keys(r.applies_
 /** 항목: 줄일 수 있는 후보와 그 크기 */
 const candidates: [string, number][] = [
   ["source.text (근거 원문 — 줄이면 안 된다)", sum([...rules, ...prices].map((x) => len(x.source.text) + 8))],
-  [`applies_to 전부 null (${emptyApplies.length}/${rules.length}룰)`, emptyApplies.length * (len(Object.fromEntries(APPLIES.map((k) => [k, null]))) + 14)],
-  ["payment_schedule (분양 전용 — 엔진은 rental만 받는다)", sum(prices.map((p) => (p.payment_schedule ? len(p.payment_schedule) + 20 : 0)))],
   ["pricing의 null 필드", sum(prices.map((p) => sum(PRICE.map((k) => ((p as Record<string, unknown>)[k] ?? null) === null ? k.length + 8 : 0))))],
   ["notes 5번째 이후 (앱은 4개만 보여 준다)", sum(list.map((e) => len(e.notes.slice(4))))],
   [`confidence (${rules.filter((r) => r.confidence >= 0.8).length}/${rules.length}개가 0.8 이상 — 변별력이 없다)`, rules.length * 17],
 ];
 
-console.log(`추출 결과 ${list.length}건 — LLM 출력 모양 ${total.toLocaleString("ko-KR")}자`);
+console.log(`추출 결과 ${list.length}건 — LLM 출력 모양 ${total.toLocaleString("ko-KR")}자 (v3였다면 ${totalV3.toLocaleString("ko-KR")}자, ${(((totalV3 - total) / totalV3) * 100).toFixed(0)}% 줄임)`);
 console.log(`공고 1건당 ${Math.round(total / list.length).toLocaleString("ko-KR")}자 ≈ 출력 토큰 ${Math.round(total / list.length / CHARS_PER_TOKEN).toLocaleString("ko-KR")}개\n`);
 for (const [label, size] of [...candidates].sort((a, b) => b[1] - a[1])) {
   console.log(`  ${label.padEnd(44)}${size.toLocaleString("ko-KR").padStart(8)}자  ${((size / total) * 100).toFixed(1).padStart(5)}%`);
 }
 const cuttable = sum(candidates.slice(1).map(([, n]) => n));
-console.log(`\n근거 원문을 뺀 나머지를 다 걷어내면 ${cuttable.toLocaleString("ko-KR")}자 = ${((cuttable / total) * 100).toFixed(0)}% 절감`);
+console.log(`\n남은 후보를 더 걷어내면 ${cuttable.toLocaleString("ko-KR")}자 = ${((cuttable / total) * 100).toFixed(0)}% 더 절감`);
 console.log("스키마를 고치면 EXTRACTION_PROMPT_VERSION을 올리고 벤치마크를 다시 돌려 정확도를 확인한다.");

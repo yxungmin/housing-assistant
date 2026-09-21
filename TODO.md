@@ -149,11 +149,20 @@
 `payment_schedule`과 240번의 `applies_to: 전부 null`은 모델이 만들어 낼 필요가 없는 값이다.
 
 순서 (위험이 낮은 것부터):
-- [ ] `payment_schedule` 제거 (7.4%) — 분양 비용 계산을 붙이는 V0.2에 다시 넣는다. DB 컬럼은 둔다.
-- [ ] `notes` 개수 상한을 스키마에 적는다 (4.6%) — "가장 중요한 것 6개까지".
-- [ ] `applies_to`를 객체째 nullable (9.6%) — `conversion`이 이미 같은 방식이라 문법 위험이 낮다.
-      `LlmSchema`의 "모든 필드 필수" 원칙은 필드 5개를 각각 optional로 두는 조합 폭발을 피하려는 것이고,
-      객체 하나를 nullable로 두는 것은 거기 해당하지 않는다.
+- [x] `payment_schedule` 제거 — 분양 비용 계산을 붙이는 V0.2에 다시 넣는다. 내부 스키마와 DB 컬럼은 뒀다.
+- [x] `notes` 개수 상한을 설명에 적는다 — "가장 중요한 것 6개까지". 구조화 출력이 min/max를 안 받아 문법이 아니라 설명으로.
+- [x] `applies_to`를 객체째 nullable — `conversion`이 이미 같은 방식이라 문법 위험이 낮다.
+      셋을 합쳐 **출력 16% 감소**(기존 11건 기준 309,581자 → 260,196자). `EXTRACTION_PROMPT_VERSION` v3 → v4.
+      `notes` 상한은 모델이 지켜야 효과가 나므로 옛 데이터에는 안 잡힌다 — 실제로는 조금 더 줄어든다.
+- [ ] **v4 벤치마크 1회** — **막힘: 사용자 작업 필요**. 아직 아무도 v4로 추출해 본 적이 없다.
+      필요한 것: 공고문 PDF(`benchmark/pdfs/`가 비어 있다), `ANTHROPIC_API_KEY`, `EXTRACTION_ENABLED=true`.
+      ```
+      # collector/.env 에 ANTHROPIC_API_KEY, LH_API_KEY, EXTRACTION_ENABLED=true
+      npm run benchmark:fetch -- --count 5     # PDF 받기
+      npm run benchmark                        # 약 $4
+      npm run benchmark:compare                # v3 결과와 일치도 비교
+      ```
+      끝나면 `EXTRACTION_ENABLED`를 다시 지운다. 일치도가 89%(Opus 자기 일치도) 근처면 회귀 없음으로 본다.
 - [ ] `confidence`는 낮을 때만 (2.9%) — 다만 "낮은 confidence 규칙에 확인 필요 표시" 계획이 사라진다.
       쓸 생각이면 그대로 두고, 안 쓸 거면 빼는 게 맞다. **먼저 정할 것.**
 - [ ] `pricing`을 kind별로 가르기 (6.2%) — 유니온은 구조화 출력 문법에서 가장 위험하다. 마지막에.

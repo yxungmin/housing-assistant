@@ -5,6 +5,13 @@
  *  - 룰 값(value)은 유니온 대신 JSON 문자열 하나 (value_json)
  *  - 튜플·최소/최대 같은 문법 미지원 제약은 쓰지 않는다
  * 로 평탄화한다. toExtractionOutput()이 내부 스키마로 바꾸고 최종 검증한다.
+ *
+ * 출력 토큰이 추출 비용의 70%라, 모델이 만들 필요가 없는 값은 빼 뒀다 (2026-09-21, `npm run output:size`):
+ *  - `applies_to`는 객체째 nullable. 530룰 중 240번이 키 5개 전부 null이었다.
+ *  - `payment_schedule`은 아예 받지 않는다. 분양 전용인데 엔진은 rental만 받아 읽는 코드가 없다.
+ *    내부 스키마와 DB 컬럼은 그대로 두었으니 분양 계산을 붙일 때(V0.2) 여기만 되살리면 된다.
+ *  - `notes`는 개수 상한을 설명에 적는다. 앱은 4개만 보여 준다.
+ * 줄인 이유는 돈보다 정확도다 — 출력이 길수록 틀릴 자리가 늘어난다.
  */
 import { z } from "zod";
 import {
@@ -37,7 +44,7 @@ const LlmAppliesTo = z.object({
 const LlmRule = z.object({
   group_id: z.string().describe("rule_groups의 id"),
   category: RuleCategory,
-  applies_to: LlmAppliesTo,
+  applies_to: LlmAppliesTo.nullable().describe("이 룰이 일부 대상에게만 적용될 때만 채운다. 전체 적용이면 null"),
   operator: RuleOperator,
   value_json: z
     .string()
@@ -66,12 +73,6 @@ const LlmConversion = z.object({
   min_deposit: nnum.describe("최대 감액 시 보증금 (원)"),
 });
 
-const LlmInstallment = z.object({
-  label: z.string(),
-  ratio: z.number(),
-  due: nstr,
-});
-
 const LlmPricing = z.object({
   unit_type: z.string(),
   tier: nstr.describe("같은 주택형에서 임대조건이 갈리는 계층 이름. 없으면 null"),
@@ -80,7 +81,6 @@ const LlmPricing = z.object({
   monthly_rent: nnum.describe("월임대료 (원)"),
   sale_price: nnum.describe("분양가 (원)"),
   conversion: LlmConversion.nullable(),
-  payment_schedule: z.array(LlmInstallment).nullable(),
   maintenance_estimate: nnum,
   source: LlmSource,
 });
@@ -106,7 +106,7 @@ export const LlmExtraction = z.object({
     move_in: nstr,
   }),
   tracks: z.array(LlmTrack),
-  notes: z.array(z.string()),
+  notes: z.array(z.string()).describe("구조화하지 못한 중요 조건의 원문 발췌. 가장 중요한 것 6개까지만"),
 });
 export type LlmExtraction = z.infer<typeof LlmExtraction>;
 
@@ -149,13 +149,15 @@ export function toExtractionOutput(llm: LlmExtraction): ReturnType<typeof Extrac
       rules: t.rules.map((r) => ({
         group_id: r.group_id,
         category: r.category,
-        applies_to: {
-          household_size: und(r.applies_to.household_size),
-          household_size_min: und(r.applies_to.household_size_min),
-          household_size_max: und(r.applies_to.household_size_max),
-          income_type: und(r.applies_to.income_type),
-          marriage: und(r.applies_to.marriage),
-        },
+        applies_to: r.applies_to
+          ? {
+              household_size: und(r.applies_to.household_size),
+              household_size_min: und(r.applies_to.household_size_min),
+              household_size_max: und(r.applies_to.household_size_max),
+              income_type: und(r.applies_to.income_type),
+              marriage: und(r.applies_to.marriage),
+            }
+          : {},
         operator: r.operator,
         value: parseValue(r.value_json),
         unit: und(r.unit),
@@ -177,9 +179,6 @@ export function toExtractionOutput(llm: LlmExtraction): ReturnType<typeof Extrac
               max_deposit: und(p.conversion.max_deposit),
               min_deposit: und(p.conversion.min_deposit),
             }
-          : undefined,
-        payment_schedule: p.payment_schedule
-          ? p.payment_schedule.map((i) => ({ label: i.label, ratio: i.ratio, due: und(i.due) }))
           : undefined,
         maintenance_estimate: und(p.maintenance_estimate),
         source: p.source,
