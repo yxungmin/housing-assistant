@@ -3,6 +3,28 @@ import type { ExtractionOutput, HousingType, VersionStatus } from "@housing/sche
 
 export type Provider = "LH" | "SH";
 
+/** issue_reports.status — 앱의 lib/reports.ts와 같은 값을 쓴다 */
+export type ReportStatus = "OPEN" | "NO_CHANGE" | "FIXED" | "SOURCE_AMENDED" | "INVALID";
+
+export interface ReportRow {
+  id: string;
+  announcement_id: string | null;
+  target_kind: "rule" | "pricing" | "schedule" | "other";
+  track_index: number | null;
+  item_index: number | null;
+  /** 신고 당시 사용자 화면에 보이던 문장 */
+  label: string | null;
+  page: number | null;
+  message: string | null;
+  suggested: string | null;
+  version: number | null;
+  status: ReportStatus;
+  resolution: string | null;
+  resolved_at: string | null;
+  created_at: string;
+  announcements: { title: string; provider: Provider; lh_id: string } | null;
+}
+
 export interface AnnouncementRow {
   id: string;
   lh_id: string;
@@ -73,7 +95,10 @@ export class Repo {
     version: number;
     status: VersionStatus;
     source_modified_at?: string;
+    /** 게시를 막는 사유. 비어 있지 않으면 status는 CONFLICT다 */
     conflict_reasons: string[];
+    /** 게시하되 앱에 알리는 지적 */
+    checks?: string[];
     extraction: ExtractionOutput | null;
     model?: string;
     prompt_version?: string;
@@ -88,6 +113,7 @@ export class Repo {
         source_modified_at: input.source_modified_at ?? null,
         extracted_at: new Date().toISOString(),
         conflict_reasons: input.conflict_reasons,
+        checks: input.checks ?? [],
         extraction_model: input.model ?? null,
         prompt_version: input.prompt_version ?? null,
         raw_text_chars: input.raw_text_chars ?? null,
@@ -159,6 +185,40 @@ export class Repo {
     const { error: ue } = await this.sb.from("announcements").update({ latest_version: input.version }).eq("id", input.announcement_id);
     if (ue) throw ue;
     return versionId;
+  }
+
+  /**
+   * 자동 게시. 사람 승인 없이 이 버전을 앱에 내보낸다 (0006_auto_publish.sql).
+   * 사람이 하루 못 봐도 새 공고가 뜨게 하는 것이 목적이다. 사람 확인은 publish_version()이 따로 찍는다.
+   */
+  async autoPublish(versionId: string): Promise<void> {
+    const { error } = await this.sb.rpc("auto_publish_version", { p_version_id: versionId });
+    if (error) throw error;
+  }
+
+  /** 검수 큐: "이 숫자 이상해요" 신고. 확인 중인 것을 먼저, 그 안에서는 오래된 것부터 본다. */
+  async listReports(opts: { open?: boolean; limit?: number } = {}): Promise<ReportRow[]> {
+    let q = this.sb
+      .from("issue_reports")
+      .select("id, announcement_id, target_kind, track_index, item_index, label, page, message, suggested, version, status, resolution, resolved_at, created_at, announcements(title, provider, lh_id)")
+      .order("created_at", { ascending: true })
+      .limit(opts.limit ?? 200);
+    if (opts.open) q = q.eq("status", "OPEN");
+    const { data, error } = await q;
+    if (error) throw error;
+    return (data as unknown as ReportRow[]) ?? [];
+  }
+
+  /**
+   * 신고 처리. 값을 실제로 고치는 것은 재추출·버전 게시가 하고, 여기서는 사용자에게 보일 결과만 남긴다.
+   * resolution은 앱의 신고 내역에 그대로 보인다.
+   */
+  async resolveReport(id: string, status: Exclude<ReportStatus, "OPEN">, resolution: string): Promise<void> {
+    const { error } = await this.sb
+      .from("issue_reports")
+      .update({ status, resolution: resolution.trim() || null, resolved_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) throw error;
   }
 
   /** 지역·유형이 맞는 푸시 구독자 토큰 (service role 전용 읽기) */

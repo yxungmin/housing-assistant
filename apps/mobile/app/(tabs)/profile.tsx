@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { ageFromBirthDate, monthsBetween } from "@housing/engine";
 import { SubscriptionManageSheet } from "@/components/SubscriptionSheet";
-import { Card, Chip, ListRow, PageTitle, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { BottomSheet, Card, Chip, ListRow, PageTitle, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { LOAN_AS_OF } from "@/data/loans";
 import { useAnnouncements } from "@/data/announcements";
 import { remoteConfigured } from "@/data/remote";
@@ -11,6 +11,7 @@ import { daysLeft, PRICE_KRW } from "@/lib/billing";
 import { longDate, manwon, yearsMonths } from "@/lib/format";
 import { getPushToken, notificationsSupported, requestNotificationPermission } from "@/lib/notifications";
 import { REGIONS } from "@/lib/onboarding";
+import { isOpen, REPORT_STATUS_LABEL } from "@/lib/reports";
 import { useAppState, type ThemePref } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 
@@ -25,6 +26,8 @@ export default function Profile() {
   const feed = useAnnouncements();
   const [manage, setManage] = useState(false);
   const [notiMsg, setNotiMsg] = useState<string | null>(null);
+  const [reports, setReports] = useState(false);
+  const openReports = state.reports.filter(isOpen).length;
   const p = state.profile;
   const missing: string[] = [];
   if (p?.car_value === undefined) missing.push("자동차가액");
@@ -108,7 +111,12 @@ export default function Profile() {
         <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
           <ListRow icon="info" label="대출 금리 기준일" value={longDate(LOAN_AS_OF)} />
           <ListRow icon="house" label="공고 데이터" sub={feed.source === "remote" ? `서버 동기화 ${feed.syncedAt ? longDate(feed.syncedAt.slice(0, 10)) : ""}` : feed.source === "cache" ? "마지막 동기화 데이터 (오프라인)" : remoteConfigured ? "동기화 중" : "앱에 포함된 데이터"} value={`${feed.list.length}건`} />
-          <ListRow icon="alert" label="이 숫자 이상해요" sub="신고 내역 0건" onPress={() => {}} />
+          <ListRow
+            icon="alert"
+            label="이 숫자 이상해요"
+            sub={state.reports.length === 0 ? "공고 화면에서 이상한 줄을 눌러 알려 주세요" : `신고 ${state.reports.length}건${openReports ? ` · 확인 중 ${openReports}건` : ""}`}
+            onPress={state.reports.length > 0 ? () => setReports(true) : undefined}
+          />
           <View style={{ paddingVertical: 12, paddingHorizontal: 4, gap: 12 }}>
             <T variant="bodyMedium">화면 모드</T>
             <View style={{ flexDirection: "row", gap: 8 }}>
@@ -125,6 +133,25 @@ export default function Profile() {
         <T variant="small" color={colors.text3}>모든 데이터 지우고 처음부터</T>
       </Pressable>
       <SubscriptionManageSheet visible={manage} onClose={() => setManage(false)} />
+      <BottomSheet visible={reports} onClose={() => setReports(false)}>
+        <View style={{ gap: 8 }}>
+          <T variant="title">내가 보낸 신고</T>
+          <Sub>확인하고 결과를 여기에 남겨 드려요. 고쳐진 값은 공고 화면에 바로 반영됩니다.</Sub>
+        </View>
+        <View style={{ gap: 18 }}>
+          {state.reports.slice(0, 20).map((r) => (
+            <View key={r.id} style={{ gap: 4 }}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <Tag tone={r.status === "OPEN" ? "gray" : "primary"}>{REPORT_STATUS_LABEL[r.status]}</Tag>
+                <Sub tone="3" variant="caption">{longDate(r.createdAt.slice(0, 10))}</Sub>
+              </View>
+              <T variant="bodyMedium">{r.target.label}</T>
+              <Sub tone="3" variant="caption">{r.announcementTitle}</Sub>
+              {r.resolution ? <Sub variant="caption">{r.resolution}</Sub> : null}
+            </View>
+          ))}
+        </View>
+      </BottomSheet>
     </Screen>
   );
 }

@@ -5,7 +5,9 @@ import type { Pricing } from "@housing/schema";
 import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchAnnouncement } from "@housing/engine";
 import { Icon } from "@/components/Icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
-import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, FadeIn, Header, IconButton, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T } from "@/components/ui";
+import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, FadeIn, Header, IconButton, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { ReportSheet } from "@/components/ReportSheet";
+import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { getAnnouncement, useAnnouncements } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
 import { manwon, pct, won } from "@/lib/format";
@@ -20,7 +22,7 @@ export default function Cost() {
   const { id, auto } = useLocalSearchParams<{ id: string; auto?: string }>();
   const router = useRouter();
   const { colors } = useTheme();
-  const { state } = useAppState();
+  const { state, addReport } = useAppState();
   const { list } = useAnnouncements();
   const a = getAnnouncement(id ?? "", list);
   const profile = state.profile;
@@ -42,6 +44,7 @@ export default function Cost() {
   const [scenario, setScenario] = useState(false);
   const [picker, setPicker] = useState(false);
   const [subSheet, setSubSheet] = useState(!canOpenCost(state, id ?? ""));
+  const [report, setReport] = useState(false);
 
   const chosen = rentals[sel];
   const scenarioPricing = useMemo(() => {
@@ -66,6 +69,16 @@ export default function Cost() {
   }
 
   const base = chosen.pricing;
+  // 신고 대상: 지금 보고 있는 임대조건 한 행 (트랙 순번 + 그 트랙 안의 가격 순번)
+  const priceTrackIndex = a.extraction.tracks.findIndex((t) => t.pricing.includes(base));
+  const priceTarget: ReportTarget = {
+    kind: "pricing",
+    trackIndex: priceTrackIndex,
+    itemIndex: priceTrackIndex >= 0 ? a.extraction.tracks[priceTrackIndex]!.pricing.indexOf(base) : -1,
+    label: `${chosen.label} · 보증금 ${won(base.deposit ?? 0)} / 월 ${won(base.monthly_rent ?? 0)}`,
+    page: base.source.page,
+  };
+  const priceReport = findReport(state.reports, a.id, priceTarget);
   const conv = base.conversion;
   const minDep = conv?.min_deposit ?? base.deposit ?? 0;
   const maxDep = conv?.max_deposit ?? base.deposit ?? 0;
@@ -135,6 +148,10 @@ export default function Cost() {
           </Card>
         </View>
         </FadeIn>
+        <Pressable onPress={() => setReport(true)} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "flex-start", paddingHorizontal: 4, paddingVertical: 10, opacity: pressed ? 0.6 : 1 })}>
+          <Sub tone="3" variant="caption">보증금·월임대료가 공고문과 다른가요?</Sub>
+          {priceReport ? <Tag tone="info" icon="info">{REPORT_STATUS_LABEL[priceReport.status]}</Tag> : null}
+        </Pressable>
         <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>공고문과 {cost.loan?.as_of_date ?? LOANS[0]!.as_of_date} 기준 대출 조건으로 계산한 예상값이에요. 실제 계약 조건과 다를 수 있어요.</Sub>
         <View style={{ height: 24 }} />
       </View>
@@ -215,6 +232,16 @@ export default function Cost() {
       </BottomSheet>
 
       <SubscriptionSheet visible={subSheet} onClose={() => { setSubSheet(false); if (!canOpenCost(state, a.id)) router.back(); }} onStarted={() => setSubSheet(false)} />
+      <ReportSheet
+        visible={report}
+        onClose={() => setReport(false)}
+        title={priceTarget.label}
+        page={priceTarget.page}
+        sourceText={base.source.text}
+        pdfUrl={a.pdf_url}
+        existing={priceReport}
+        onSubmit={(message, suggested) => addReport(draftReport({ announcementId: a.id, announcementTitle: a.title, target: priceTarget, message, suggested }))}
+      />
     </Screen>
   );
 }

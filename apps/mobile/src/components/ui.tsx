@@ -221,22 +221,29 @@ export function Chip({ children, on, onPress }: PropsWithChildren<{ on?: boolean
 }
 
 /** 조건 행: 상태 타일 + 조건 + 내 입력 + 근거 쪽. 구분선 없음. */
-export function ConditionRow({ status, title, why, page }: { status: "MATCH" | "NEEDS_CHECK" | "MISMATCH"; title: string; why?: string; page?: number; first?: boolean }) {
+/** 조건 한 줄. onPress를 주면 눌러서 근거를 펴 보고 신고할 수 있다 (ReportSheet). */
+export function ConditionRow({ status, title, why, page, onPress, flag }: { status: "MATCH" | "NEEDS_CHECK" | "MISMATCH"; title: string; why?: string; page?: number; first?: boolean; onPress?: () => void; flag?: string }) {
   const { colors } = useTheme();
   const map = {
     MATCH: { icon: "check" as const, tone: "primary" as const },
     NEEDS_CHECK: { icon: "alert" as const, tone: "warn" as const },
     MISMATCH: { icon: "x" as const, tone: "danger" as const },
   }[status];
-  return (
-    <View style={{ flexDirection: "row", gap: 14, paddingVertical: 10, alignItems: "flex-start" }}>
+  const inner = (pressed: boolean) => (
+    <View style={{ flexDirection: "row", gap: 14, paddingVertical: 10, paddingHorizontal: 4, marginHorizontal: -4, borderRadius: radius.md, alignItems: "flex-start", backgroundColor: pressed ? colors.cardStrong : "transparent" }}>
       <IconTile name={map.icon} tone={map.tone} size={36} />
       <View style={{ flex: 1, gap: 2, paddingTop: 1 }}>
         <T variant="bodyMedium" style={{ fontSize: 15.5 }}>{title}</T>
         {why ? <Sub tone="3" variant="caption">{why}</Sub> : null}
+        {flag ? <View style={{ flexDirection: "row", paddingTop: 4 }}><Tag tone="info" icon="info">{flag}</Tag></View> : null}
       </View>
       {page ? <T variant="caption" color={colors.text4} style={{ paddingTop: 8 }}>p.{page}</T> : null}
     </View>
+  );
+  return onPress ? (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${title} 근거 보기`}>{({ pressed }) => inner(pressed)}</Pressable>
+  ) : (
+    inner(false)
   );
 }
 

@@ -1,12 +1,28 @@
 /**
- * 추출 결과 검수 뷰어 (로컬). benchmark/output/*.draft.json 과 benchmark/fixtures/*.json 을 표로 보여 준다.
+ * 검수 뷰어 (로컬). 두 가지를 본다.
+ *  - 추출 검수: benchmark/output/*.draft.json 과 benchmark/fixtures/*.json
+ *  - 신고 큐: 앱에서 온 "이 숫자 이상해요" (issue_reports). Supabase가 설정돼 있을 때만 보인다.
  *   npm run review   → http://localhost:4310
- * 의존성 없이 node:http 만 쓴다. M4 검수 어드민의 최소 버전.
+ * 화면은 의존성 없이 node:http + 인라인 HTML. M4 검수 어드민의 최소 버전.
  */
 import { createServer } from "node:http";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { loadEnv } from "./config";
+import { Repo, type ReportStatus } from "./db/supabase";
 import { fromRoot } from "./paths";
+
+const env = loadEnv();
+const repo =
+  env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY ? new Repo(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, env.PDF_BUCKET) : null;
+
+/** 신고를 끝내는 네 가지. 값을 실제로 고치는 것은 재추출·게시가 하고, 여기서는 결과만 남긴다. */
+const RESOLUTIONS: { status: Exclude<ReportStatus, "OPEN">; label: string; hint: string }[] = [
+  { status: "NO_CHANGE", label: "공고문과 같음", hint: "공고문을 다시 확인했고 값이 같아요." },
+  { status: "FIXED", label: "수정함", hint: "알려 주신 대로 고쳤어요. " },
+  { status: "SOURCE_AMENDED", label: "공고 정정", hint: "공고가 정정되어 값이 바뀌었어요." },
+  { status: "INVALID", label: "신고 아님", hint: "" },
+];
 
 const OUT = fromRoot("benchmark", "output");
 const FIXTURES = fromRoot("benchmark", "fixtures");
@@ -62,8 +78,15 @@ th{color:var(--muted);font-weight:500;white-space:nowrap}td.num{text-align:right
 .src{color:var(--muted);font-size:12px}.page{cursor:pointer;color:var(--primary);text-decoration:underline dotted}
 pre{white-space:pre-wrap;font:12px/1.5 ui-monospace,Consolas,monospace;background:#fafafa;border:1px solid var(--border);border-radius:8px;padding:10px;max-height:70vh;overflow:auto}
 .notes li{margin-bottom:6px}.empty{color:var(--muted);padding:40px;text-align:center}
+.rep{border-left:3px solid var(--warn);padding-left:12px;margin-bottom:18px}
+.rep.done{border-left-color:var(--border)}
+.rep .msg{background:#fafafa;border:1px solid var(--border);border-radius:8px;padding:10px;margin:8px 0}
+.acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
+.acts button{font:inherit;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:#fff;cursor:pointer}
+.acts button:hover{background:#f3f4f6}
+.acts input{font:inherit;flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--border);border-radius:8px}
 </style></head><body>
-<header><h1>공고 추출 검수</h1><select id="pick"></select><button id="reload">새로고침</button><span id="meta" class="src"></span></header>
+<header><h1>공고 검수</h1><select id="pick"></select><button id="reload">새로고침</button><button id="tabReports">신고 큐</button><span id="meta" class="src"></span></header>
 <main><section id="content"><div class="empty">초안을 고르세요</div></section><aside><div class="card"><h2 id="srcTitle">원문 페이지</h2><div class="src" id="srcHint">표의 쪽수를 누르면 그 페이지 원문이 여기 나옵니다 (npm run inspect -- &lt;pdf&gt; --text 로 저장된 경우)</div><pre id="srcText" hidden></pre></div></aside></main>
 <script>
 const won=n=>n==null?"":Number(n).toLocaleString("ko-KR");
@@ -105,11 +128,86 @@ async function showPage(p){
   if(!r.ok){t.hidden=true;document.getElementById("srcHint").textContent="원문 텍스트가 없습니다. npm run inspect -- benchmark/pdfs/"+current.id+".pdf --text 로 저장하세요.";return}
   document.getElementById("srcHint").textContent="";t.hidden=false;t.textContent=await r.text();
 }
-document.getElementById("pick").addEventListener("change",show);document.getElementById("reload").addEventListener("click",load);
-load();
+
+// ── 신고 큐 ───────────────────────────────────────────────────────────
+const RES=[["NO_CHANGE","공고문과 같음"],["FIXED","수정함"],["SOURCE_AMENDED","공고 정정"],["INVALID","신고 아님"]];
+const KIND={rule:"자격 조건",pricing:"임대조건",schedule:"일정",other:"기타"};
+const STATUS={OPEN:"확인 중",NO_CHANGE:"공고문과 같음",FIXED:"수정함",SOURCE_AMENDED:"공고 정정",INVALID:"신고 아님"};
+let view="drafts";
+
+function reportCard(r){
+  const done=r.status!=="OPEN";
+  const where=(r.page?" · p."+r.page:"")+(r.track_index!=null?" · 트랙 "+r.track_index+" 항목 "+r.item_index:"");
+  let h='<div class="rep'+(done?" done":"")+'">';
+  h+='<div><span class="badge '+(done?"ok":"warn")+'">'+esc(STATUS[r.status]||r.status)+'</span> <span class="src">'+esc((r.created_at||"").slice(0,10))+'</span></div>';
+  h+='<div style="margin-top:4px"><b>'+esc(r.label||"(대상 없음)")+'</b> <span class="src">'+esc(KIND[r.target_kind]||r.target_kind)+where+'</span></div>';
+  h+='<div class="src">'+esc(r.announcements?r.announcements.provider+" · "+r.announcements.title:(r.announcement_id||""))+'</div>';
+  h+='<div class="msg">'+esc(r.message||"(내용 없음)")+(r.suggested?'<div class="src">공고문에 적힌 값: '+esc(r.suggested)+'</div>':"")+'</div>';
+  if(done) h+=r.resolution?'<div class="src">→ '+esc(r.resolution)+'</div>':"";
+  else{
+    h+='<div class="acts"><input class="res" data-id="'+esc(r.id)+'" placeholder="사용자에게 보일 한 줄 (비우면 기본 문구)">';
+    for(const x of RES) h+='<button data-id="'+esc(r.id)+'" data-st="'+x[0]+'">'+x[1]+'</button>';
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+
+async function showReports(){
+  const c=document.getElementById("content");
+  const r=await (await fetch("/api/reports")).json();
+  if(!r.configured){
+    c.innerHTML='<div class="card"><h2>신고 큐</h2><div class="src">Supabase가 설정되지 않았습니다. .env에 SUPABASE_URL과 SUPABASE_SERVICE_ROLE_KEY를 넣으면 앱에서 온 신고가 여기 쌓입니다.<br>그 전까지 신고는 사용자 기기에 남아 있다가 연결되면 올라옵니다.</div></div>';
+    return;
+  }
+  if(r.error){c.innerHTML='<div class="card"><h2>신고 큐</h2><div class="src">읽기 실패: '+esc(r.error)+'</div></div>';return}
+  const open=r.reports.filter(x=>x.status==="OPEN"), done=r.reports.filter(x=>x.status!=="OPEN");
+  let h='<div class="card"><h2>확인 중 '+open.length+'건</h2>'+(open.length?open.map(reportCard).join(""):'<div class="src">확인할 신고가 없습니다.</div>')+'</div>';
+  if(done.length) h+='<div class="card"><h2>처리함 '+done.length+'건</h2>'+done.map(reportCard).join("")+'</div>';
+  c.innerHTML=h;
+  c.querySelectorAll(".acts button").forEach(b=>b.addEventListener("click",async()=>{
+    const input=c.querySelector('.res[data-id="'+b.dataset.id+'"]');
+    b.disabled=true;
+    const res=await fetch("/api/reports/resolve",{method:"POST",headers:{"content-type":"application/json"},
+      body:JSON.stringify({id:b.dataset.id,status:b.dataset.st,resolution:input?input.value:""})});
+    if(!res.ok){alert("처리 실패: "+await res.text());b.disabled=false;return}
+    showReports();refreshCount();
+  }));
+}
+
+async function refreshCount(){
+  try{
+    const r=await (await fetch("/api/reports")).json();
+    if(!r.configured||!r.reports) return;
+    const n=r.reports.filter(x=>x.status==="OPEN").length;
+    if(view!=="reports") document.getElementById("tabReports").textContent=n?"신고 큐 "+n:"신고 큐";
+  }catch(e){/* 무시 */}
+}
+
+document.getElementById("tabReports").addEventListener("click",()=>{
+  view=view==="reports"?"drafts":"reports";
+  const tab=document.getElementById("tabReports");
+  document.getElementById("pick").style.display=view==="reports"?"none":"";
+  if(view==="reports"){tab.textContent="추출 검수로";showReports()}
+  else{tab.textContent="신고 큐";show();refreshCount()}
+});
+document.getElementById("pick").addEventListener("change",show);
+document.getElementById("reload").addEventListener("click",()=>{view==="reports"?showReports():load();refreshCount()});
+load();refreshCount();
 </script></body></html>`;
 
-const server = createServer((req, res) => {
+function readBody(req: import("node:http").IncomingMessage): Promise<string> {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", (c) => {
+      body += c;
+      if (body.length > 100_000) reject(new Error("요청이 너무 크다"));
+    });
+    req.on("end", () => resolve(body));
+    req.on("error", reject);
+  });
+}
+
+const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
   try {
     if (url.pathname === "/") {
@@ -147,6 +245,24 @@ const server = createServer((req, res) => {
       res.writeHead(m ? 200 : 404, { "content-type": "text/plain; charset=utf-8" });
       return res.end(m ? m[1] : "");
     }
+    // ── 신고 큐 ───────────────────────────────────────────────────────
+    if (url.pathname === "/api/reports") {
+      if (!repo) return json(res, { configured: false, reports: [] });
+      try {
+        return json(res, { configured: true, reports: await repo.listReports() });
+      } catch (err) {
+        return json(res, { configured: true, reports: [], error: err instanceof Error ? err.message : String(err) });
+      }
+    }
+    if (url.pathname === "/api/reports/resolve" && req.method === "POST") {
+      if (!repo) return json(res, { error: "Supabase 미설정" }, 400);
+      const body = JSON.parse((await readBody(req)) || "{}") as { id?: string; status?: string; resolution?: string };
+      const choice = RESOLUTIONS.find((r) => r.status === body.status);
+      if (!body.id || !choice) return json(res, { error: "id와 status가 필요하다" }, 400);
+      // 한 줄을 비워 두면 그 상태의 기본 문구를 쓴다. 사용자 신고 내역에 그대로 보이므로 빈 채로 두지 않는다.
+      await repo.resolveReport(body.id, choice.status, body.resolution?.trim() || choice.hint);
+      return json(res, { ok: true });
+    }
     json(res, { error: "not found" }, 404);
   } catch (err) {
     json(res, { error: err instanceof Error ? err.message : String(err) }, 500);
@@ -154,5 +270,5 @@ const server = createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`검수 뷰어: http://localhost:${PORT}  (초안 ${listDrafts().length}건)`);
+  console.log(`검수 뷰어: http://localhost:${PORT}  (초안 ${listDrafts().length}건, 신고 큐 ${repo ? "켬" : "꺼짐 — SUPABASE_URL/SERVICE_ROLE_KEY 없음"})`);
 });

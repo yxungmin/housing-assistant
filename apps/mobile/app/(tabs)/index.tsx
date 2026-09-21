@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/Icon";
 import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
-import { getAnnouncement, matchAll, matching, useAnnouncements, type Matched } from "@/data/announcements";
+import { getAnnouncement, matchAll, matching, useAnnouncements, type Matched, isReadable } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { REGIONS } from "@/lib/onboarding";
 import { useAppState } from "@/store/appState";
@@ -37,8 +37,8 @@ export default function Home() {
     [all, myRegionOnly, rentalOnly, nearWork, hasWorkplace, state.profile?.region_code],
   );
   const matched = matching(filtered);
-  const pending = filtered.filter((m) => m.announcement.status !== "VERIFIED");
-  const others = filtered.filter((m) => m.announcement.status === "VERIFIED" && !m.match?.is_match);
+  const pending = filtered.filter((m) => !isReadable(m.announcement));
+  const others = filtered.filter((m) => isReadable(m.announcement) && !m.match?.is_match);
   const soon = matched.filter((m) => (daysUntil(m.announcement.apply_end) ?? 99) <= 14);
   const rest = matched.filter((m) => !soon.includes(m));
   const today = new Date();
@@ -129,7 +129,7 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
   const units = [...new Set(a.extraction.tracks.flatMap((t) => t.unit_types.map((u) => u.name)))];
   const unitLabel = units.length ? units.slice(0, 3).join(" · ") + (units.length > 3 ? ` 외 ${units.length - 3}` : "") : "";
   const status =
-    a.status !== "VERIFIED"
+    !isReadable(a)
       ? { tone: "warn" as const, icon: "alert" as const, text: "조건 분석 중" }
       : m.match?.is_match && m.matched > 0
         ? { tone: "primary" as const, icon: "check" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치${m.needsCheck ? ` · 확인 ${m.needsCheck}` : ""}` }

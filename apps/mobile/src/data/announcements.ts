@@ -3,6 +3,11 @@ import type { ExtractionOutput, HousingType, UserProfile } from "@housing/schema
 import { haversineKm, matchAnnouncement, type AnnouncementMatch, type TrackResult } from "@housing/engine";
 import raw from "../../data/announcements.json";
 
+export type DataStatus = "VERIFIED" | "AUTO" | "UNVERIFIED";
+
+/** 조건을 읽어 낸 공고인가 (매칭·계산을 할 수 있는가). 사람 검수 여부와는 다른 질문이다. */
+export const isReadable = (a: Announcement): boolean => a.status !== "UNVERIFIED";
+
 export interface Announcement {
   id: string;
   lh_id: string;
@@ -10,7 +15,14 @@ export interface Announcement {
   housing_type: HousingType;
   region_code: string;
   region_name: string;
-  status: "VERIFIED" | "UNVERIFIED";
+  /**
+   * VERIFIED   사람이 공고문과 대조함
+   * AUTO       공고문에서 자동으로 옮기고 자동 검증만 거침 (사람은 아직 안 봄)
+   * UNVERIFIED 아직 조건을 못 읽음 — 매칭·계산을 하지 않는다
+   */
+  status: DataStatus;
+  /** 자동 검증에서 걸린 것. 숨기지 않고 화면에 그대로 알린다 */
+  checks?: string[];
   notice_date?: string;
   apply_start?: string;
   apply_end?: string;
@@ -18,6 +30,8 @@ export interface Announcement {
   lat?: number;
   lng?: number;
   transit?: { nearest_station?: string; station_walk_min?: number };
+  /** 기관 사이트의 원문 공고문. 근거로 적은 쪽수를 실제로 열 수 있게 한다 */
+  pdf_url?: string;
   extraction: ExtractionOutput;
 }
 
@@ -57,7 +71,7 @@ export function getAnnouncement(id: string, list: Announcement[] = current): Ann
 
 export interface Matched {
   announcement: Announcement;
-  match: AnnouncementMatch | null; // UNVERIFIED면 null
+  match: AnnouncementMatch | null; // 조건을 못 읽은 공고(UNVERIFIED)는 null
   /** 조건 N/M (best_track 기준, 그룹 단위) */
   matched: number;
   needsCheck: number;
@@ -70,7 +84,7 @@ export function matchAll(profile: UserProfile | null, list: Announcement[] = cur
   return list.map((a) => {
     const distanceKm =
       profile?.workplace && a.lat !== undefined && a.lng !== undefined ? haversineKm(profile.workplace, { lat: a.lat, lng: a.lng }) : null;
-    if (a.status !== "VERIFIED" || !profile) {
+    if (!isReadable(a) || !profile) {
       return { announcement: a, match: null, matched: 0, needsCheck: 0, total: 0, distanceKm };
     }
     const match = matchAnnouncement(a.extraction, profile);

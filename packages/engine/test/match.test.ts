@@ -67,13 +67,15 @@ describe("matchTrack — newlywed track", () => {
     expect(r.groups.find((g) => g.group.id === "basic")!.status).toBe("MISMATCH");
   });
 
-  it("unverified rules are NEEDS_CHECK", () => {
+  it("검수 전 룰도 그대로 판정한다 (검수 여부는 화면이 알린다)", () => {
     const track = {
       ...newlywedTrack,
       rules: newlywedTrack.rules.map((rule) => ({ ...rule, verified: false })),
     };
     const r = matchTrack(track, marriedDualProfile);
-    expect(r.summary).toEqual({ matched: 0, needs_check: 3, mismatched: 0 });
+    expect(r.summary).toEqual(matchTrack(newlywedTrack, marriedDualProfile).summary);
+    // 판정은 같지만 근거는 남아 있어야 한다 — 화면이 "자동 확인"을 붙일 수 있게
+    expect(r.groups.flatMap((g) => g.rules).every((x) => x.rule.verified === false)).toBe(true);
   });
 
   it("unknown category field in a rule does not crash — treated as NEEDS_CHECK", () => {

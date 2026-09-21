@@ -1,1 +1,1 @@
-export default ["packages/*", "collector"];
+export default ["packages/*", "collector", "apps/mobile"];

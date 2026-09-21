@@ -159,11 +159,18 @@ export interface AnnouncementMatch {
   is_match: boolean;
 }
 
+/**
+ * 룰 하나를 프로필과 비교한다.
+ *
+ * `rule.verified`(사람이 공고문과 대조했는가)는 여기서 보지 않는다.
+ * 전에는 검수 전 룰을 전부 NEEDS_CHECK로 만들었는데, 그러면 사람이 보기 전까지 모든 공고가
+ * "확인 필요"로만 보여서 자격이 되는 사람에게 공고를 숨기게 된다. 그 오류는 아무도 신고하지 않는다.
+ * 검수 여부는 화면에서 사실대로 알리고(자동 확인 / 사람 확인), 판정 자체는 있는 값으로 한다.
+ */
 function evaluateRule(rule: EligibilityRule, profile: UserProfile): RuleResult {
   const app = applies(rule.applies_to, profile);
   if (app === false) return { rule, status: "MATCH", skipped: true, reason: "이 조건은 내 가구 유형에 해당하지 않음" };
   if (app === null) return { rule, status: "NEEDS_CHECK", skipped: false, reason: "가구원 수·맞벌이 여부를 입력하면 판별 가능" };
-  if (!rule.verified) return { rule, status: "NEEDS_CHECK", skipped: false, reason: "공고 조건 검수 전" };
   const actual = profileValueFor(rule.category, profile, rule.unit);
   if (actual === undefined || actual === null) {
     return { rule, status: "NEEDS_CHECK", skipped: false, reason: "입력하면 판별 가능" };
