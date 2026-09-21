@@ -34,8 +34,8 @@ describe("만료 후에도 뺏지 않는 것", () => {
     expect(canSeeAnnouncement(base, "saved-1")).toBe(true);
   });
 
-  it("저장하지 않은 공고는 만료 후 가린다", () => {
-    expect(canSeeAnnouncement(base, "new-1")).toBe(false);
+  it("저장하지 않은 공고도 만료 후 보인다 — 조건 매칭은 무료다", () => {
+    expect(canSeeAnnouncement(base, "new-1")).toBe(true);
   });
 
   it("구독 중에는 저장 여부와 무관하게 다 보인다", () => {

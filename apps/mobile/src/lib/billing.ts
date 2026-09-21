@@ -1,7 +1,7 @@
 /**
  * 구독 상태 규칙 + 결제 어댑터.
  *
- * 첫 달 0원 → 이후 월 2,900원 자동갱신. "첫 1건 무료"는 없앴다 — 무료 제안이 둘이면
+ * 첫 달 0원 → 이후 월 1,900원 자동갱신. "첫 1건 무료"는 없앴다 — 무료 제안이 둘이면
  * 사용자가 무엇이 언제 끝나는지 알 수 없다.
  *
  * 자동갱신을 정직하게 파는 조건이 셋 있고, 셋 다 화면에 드러나야 한다:
@@ -13,12 +13,12 @@
  * 지금은 `mockBilling`(기기 로컬 상태만), 배포 빌드에서는 RevenueCat 또는 react-native-iap 구현으로 교체하고
  * 영수증 검증은 Supabase Edge Function → subscriptions 테이블이 진실 원본이 된다.
  */
-export const PRICE_KRW = 2900;
+export const PRICE_KRW = 1900;
 /** 첫 달 0원. "한 달"을 30일로 셈한다 — 스토어 도입 혜택도 P1M 단위다 */
 export const TRIAL_DAYS = 30;
 /** 만료 후 오프라인 유예 (문서: 캐시된 구독 상태 3일) */
 export const GRACE_DAYS = 3;
-export const PRODUCT_ID = "housing_assistant_monthly_2900";
+export const PRODUCT_ID = "housing_assistant_monthly_1900";
 /** 첫 결제 며칠 전에 미리 알릴 것인가 */
 export const NOTICE_DAYS_BEFORE_CHARGE = 3;
 
