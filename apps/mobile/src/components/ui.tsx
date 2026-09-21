@@ -9,7 +9,7 @@ import { Animated, Easing, Image, Keyboard, LayoutAnimation, Modal, Platform, Pr
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space, type } from "@/theme/tokens";
-import { Icon, type IconName } from "./Icon";
+import { Icon, type IconName } from "./icon";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) UIManager.setLayoutAnimationEnabledExperimental(true);
 

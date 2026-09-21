@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
-import { Icon } from "@/components/Icon";
+import { Icon } from "@/components/icon";
 import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { commuteKm, getAnnouncement, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
@@ -48,7 +48,11 @@ export default function Home() {
       })
       .sort((x, y) => {
         if (f.nearWork && hasWorkplace) return (commuteKm(x) ?? 1e9) - (commuteKm(y) ?? 1e9);
-        // 기본 정렬도 가까운 곳이 먼저다. 마감만 보고 세우면 서울 사람 맨 위에 제주 공고가 온다.
+        // 접수가 끝난 것은 무조건 뒤로. 아직 넣을 수 있는 공고가 위에 있어야 한다.
+        const closed = (m: Matched) => ((daysUntil(m.announcement.apply_end) ?? 99) < 0 ? 1 : 0);
+        const c = closed(x) - closed(y);
+        if (c !== 0) return c;
+        // 그다음은 가까운 곳이 먼저다. 마감만 보고 세우면 서울 사람 맨 위에 제주 공고가 온다.
         const region = state.profile?.region_code;
         const d = listDistanceKm(x, region) - listDistanceKm(y, region);
         return d !== 0 ? d : (x.announcement.apply_end ?? "").localeCompare(y.announcement.apply_end ?? "");
@@ -73,7 +77,11 @@ export default function Home() {
   );
   const pending = filtered.filter((m) => !isReadable(m.announcement));
   const others = filtered.filter((m) => isReadable(m.announcement) && !m.match?.is_match);
-  const soon = matched.filter((m) => (daysUntil(m.announcement.apply_end) ?? 99) <= 14);
+  // 접수가 끝난 공고는 임박이 아니다. d가 음수인 것까지 넣으면 "마감"이 접수 임박 맨 위에 온다.
+  const soon = matched.filter((m) => {
+    const d = daysUntil(m.announcement.apply_end);
+    return d !== null && d >= 0 && d <= 14;
+  });
   const rest = matched.filter((m) => !soon.includes(m));
   const today = new Date();
   const regionLabel = REGIONS.find((r) => r.value === state.profile?.region_code)?.label ?? "내 지역";

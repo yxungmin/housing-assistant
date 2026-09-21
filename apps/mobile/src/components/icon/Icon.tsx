@@ -1,5 +1,5 @@
 import Svg, { Circle, Path, Rect } from "react-native-svg";
-import { ICONS, type IconName } from "./icons";
+import { ICONS, ICON_SIZE, ICON_STROKE_WIDTH, type IconName } from "./icons";
 import { useTheme } from "@/theme/ThemeProvider";
 
 export type { IconName };
@@ -25,7 +25,7 @@ interface Props {
  * 다만 색 자체가 의미인 자리에서는 `mono`로 한 가지 색만 쓴다 —
  * 거기서 초록을 섞으면 "빨간 ×인데 속은 초록"이 되어 의미가 흐려진다.
  */
-export function Icon({ name, size = 20, color, accent, mono, strokeWidth = 2 }: Props) {
+export function Icon({ name, size = ICON_SIZE, color, accent, mono, strokeWidth = ICON_STROKE_WIDTH }: Props) {
   const { colors } = useTheme();
   const tone = mono ? color : (accent ?? colors.primary);
 

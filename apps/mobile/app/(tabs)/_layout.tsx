@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Icon } from "@/components/Icon";
+import { Icon } from "@/components/icon";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts } from "@/theme/tokens";
 

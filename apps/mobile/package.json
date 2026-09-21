@@ -35,6 +35,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "icon:preview": "tsx scripts/icon-preview.ts",
     "test": "vitest run"
   },
   "private": true

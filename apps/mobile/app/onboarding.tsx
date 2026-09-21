@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
-import { Icon } from "@/components/Icon";
+import { Icon } from "@/components/icon";
 import { IncomeHelperSheet } from "@/components/IncomeHelperSheet";
 import { BottomCTA, FadeIn, Header, IconButton, Screen, Sub, T } from "@/components/ui";
 import { currentAnnouncements, matchAll, pickBest } from "@/data/announcements";

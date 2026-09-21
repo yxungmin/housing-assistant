@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View } from "react-native";
-import { Icon } from "./Icon";
+import { Icon } from "./icon";
 import { Card, IconTile, Sub, T } from "./ui";
 import { hasSource, openSource } from "@/lib/source";
 import { useTheme } from "@/theme/ThemeProvider";

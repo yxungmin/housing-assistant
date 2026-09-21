@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, View } from "react-native";
-import { Icon } from "./Icon";
+import { Icon } from "./icon";
 import { BottomSheet, Card, PrimaryButton, Row, Sub, T, Tag } from "./ui";
 import { billing, canUseFirstMonthFree, daysLeft, PRICE_KRW, TRIAL_DAYS } from "@/lib/billing";
 import { longDate } from "@/lib/format";

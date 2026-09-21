@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { haversineKm, matchAnnouncement, type RuleResult } from "@housing/engine";
-import { Icon, type IconName } from "@/components/Icon";
+import { Icon, type IconName } from "@/components/icon";
 import { ReportSheet } from "@/components/ReportSheet";
 import { SourceCard } from "@/components/SourceCard";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";

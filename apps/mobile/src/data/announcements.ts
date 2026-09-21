@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 import type { ExtractionOutput, HousingType, UserProfile } from "@housing/schema";
 import { haversineKm, matchAnnouncement, type AnnouncementMatch, type TrackResult } from "@housing/engine";
-import { placeFor } from "@housing/schema";
+import { parsePlaceLabel, placeFor } from "@housing/schema";
 import raw from "../../data/announcements.json";
 
 export type DataStatus = "VERIFIED" | "AUTO" | "UNVERIFIED";
@@ -131,8 +131,9 @@ export interface Matched {
   /** 배우자 직장까지 직선거리 (km). 안 넣었으면 null */
   distancePartnerKm: number | null;
   /**
-   * 사는 곳에서 공고지까지 직선거리 (km). 시도 중심 기준이라 거친 값이고, 정렬에만 쓴다.
-   * 직장을 안 넣은 사람에게도 "가까운 것부터" 보여 주려면 기준이 하나는 있어야 한다.
+   * 사는 곳에서 공고지까지 직선거리 (km). 시군구를 넣었으면 그 중심, 아니면 시도 중심 기준이다.
+   * 거친 값이라 화면에는 쓰지 않고 정렬에만 쓴다 — 직장을 안 넣은 사람에게도
+   * "가까운 것부터" 보여 주려면 기준이 하나는 있어야 한다.
    */
   residenceKm: number | null;
 }
@@ -143,7 +144,8 @@ export function matchAll(profile: UserProfile | null, list: Announcement[] = cur
       w && a.lat !== undefined && a.lng !== undefined ? haversineKm(w, { lat: a.lat, lng: a.lng }) : null;
     const distanceKm = to(profile?.workplace);
     const distancePartnerKm = to(profile?.workplace_partner);
-    const home = profile?.region_code ? placeFor(profile.region_code) : null;
+    const at = parsePlaceLabel(profile?.region_sigungu);
+    const home = at ? placeFor(at.regionCode, at.sigungu) : profile?.region_code ? placeFor(profile.region_code) : null;
     const residenceKm = to(home ?? undefined);
     if (!isReadable(a) || !profile) {
       return { announcement: a, match: null, matched: 0, needsCheck: 0, total: 0, distanceKm, distancePartnerKm, residenceKm };
