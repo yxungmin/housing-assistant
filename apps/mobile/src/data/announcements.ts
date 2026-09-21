@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { ExtractionOutput, HousingType, UserProfile } from "@housing/schema";
+import type { ExtractionOutput, HousingType, SupplyUnit, UserProfile } from "@housing/schema";
 import { haversineKm, matchAnnouncement, ruleCounts, type AnnouncementMatch, type TrackResult } from "@housing/engine";
 import { parsePlaceLabel, placeFor } from "@housing/schema";
 import raw from "../../data/announcements.json";
@@ -69,6 +69,11 @@ export interface Announcement {
   detail_url?: string;
   /** 기관이 공고에 붙여 둔 이미지. 우리가 공고문에서 뽑은 그림이 아니다 */
   images?: NoticeImage[];
+  /**
+   * 매입임대·전세임대처럼 집이 흩어져 있는 공고의 주택 목록 (lib/units.ts).
+   * 단지형 공고에는 없다 — 주소가 하나라 위 lat/lng로 충분하다.
+   */
+  units?: SupplyUnit[];
   extraction: ExtractionOutput;
 }
 

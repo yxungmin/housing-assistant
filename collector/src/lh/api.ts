@@ -320,6 +320,13 @@ export class LhClient {
   }
 
   /** 첨부 다운로드. LH는 octet-stream으로 주므로 %PDF 매직 바이트로 확인한다. */
+  /** 첨부 아무거나. 공고문 PDF는 downloadPdf가 형식까지 확인하므로 그쪽을 쓴다. */
+  async download(url: string): Promise<Uint8Array> {
+    const res = await this.fetchImpl(url);
+    if (!res.ok) throw new Error(`첨부 내려받기 실패 HTTP ${res.status}: ${url}`);
+    return new Uint8Array(await res.arrayBuffer());
+  }
+
   async downloadPdf(url: string): Promise<Uint8Array> {
     const res = await this.fetchImpl(url);
     if (!res.ok) throw new Error(`PDF 다운로드 실패 HTTP ${res.status}: ${url}`);

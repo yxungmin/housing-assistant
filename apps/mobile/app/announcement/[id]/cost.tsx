@@ -12,6 +12,7 @@ import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from 
 import { getAnnouncement, useAnnouncements } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
 import { manwon, maskDigits, pct, won, dateText } from "@/lib/format";
+import { unitLabel, unitSpec, unitsWithDistance } from "@/lib/units";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { accessLevel } from "@/lib/access";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -32,6 +33,33 @@ export default function Cost() {
   const [allTracks, setAllTracks] = useState(false);
   const { rentals, bestTrackName, otherCount } = useMemo(() => {
     if (!a || !profile) return { rentals: [] as { label: string; pricing: Pricing; trackName: string }[], bestTrackName: "", otherCount: 0 };
+
+    /**
+     * 흩어진 공고(매입임대·전세임대)는 임대조건이 주택형이 아니라 집마다 다르다.
+     * 공고문 본문에는 조건표가 없고 별도 엑셀에 집 목록으로 있다 (lib/units.ts).
+     * 그래서 고르는 대상 자체가 "36형"이 아니라 "강동구 구천면로 317 403호"다.
+     * 여기서 집을 가격 행으로 바꿔 두면 아래 계산(대출·필요 현금·월 합계)은 그대로 돈다 —
+     * 고르는 목록만 바뀌고 셈은 같다.
+     *
+     * 직장에서 가까운 순으로 세운다. 집이 수백 채라 순서가 곧 화면의 쓸모다.
+     */
+    if (a.units?.length) {
+      const rows = unitsWithDistance(a.units, profile)
+        .filter((u) => u.unit.deposit !== undefined)
+        .map(({ unit, km }) => ({
+          label: `${unitLabel(unit)}${unit.ho ? ` ${unit.ho}호` : ""}`,
+          trackName: km !== null ? `직장 ${km < 10 ? km.toFixed(1) : km.toFixed(0)}km · ${unitSpec(unit)}` : unitSpec(unit),
+          pricing: {
+            unit_type: unitLabel(unit),
+            kind: "rental" as const,
+            deposit: unit.deposit!,
+            monthly_rent: unit.monthly_rent ?? 0,
+            source: { page: 0, text: "공급주택목록 첨부" },
+          } as Pricing,
+        }));
+      return { rentals: rows, bestTrackName: "", otherCount: 0 };
+    }
+
     const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code });
     const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
     const ordered = [...(best ? [best] : []), ...match.tracks.filter((t) => t !== best)];
@@ -66,6 +94,8 @@ export default function Cost() {
     void signIn("kakao").finally(() => setSigningIn(false));
   };
 
+  // 흩어진 공고에서 고르는 것은 주택형이 아니라 집 한 채다. 말이 다르면 화면의 말도 달라야 한다.
+  const picksHouse = !!a?.units?.length;
   const chosen = rentals[sel];
   const scenarioPricing = useMemo(() => {
     if (!chosen) return null;
@@ -129,7 +159,7 @@ export default function Cost() {
           </View>
           <Pressable onPress={() => setPicker(true)} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: pressed ? colors.cardSoft : colors.card, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 14 })}>
             <View style={{ gap: 2 }}>
-              <Sub tone="3" variant="caption">주택형</Sub>
+              <Sub tone="3" variant="caption">{picksHouse ? "집" : "주택형"}</Sub>
               <T variant="bodyMedium">{chosen.label}</T>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
@@ -285,8 +315,16 @@ export default function Cost() {
 
       <BottomSheet visible={picker} onClose={() => setPicker(false)}>
         <View style={{ gap: 4 }}>
-          <T variant="heading">어떤 주택형으로 볼까요?</T>
-          <Sub tone="3">{bestTrackName ? `조건이 가장 잘 맞는 ${bestTrackName} 기준` : ""}</Sub>
+          <T variant="heading">{picksHouse ? "어떤 집으로 볼까요?" : "어떤 주택형으로 볼까요?"}</T>
+          <Sub tone="3">
+            {picksHouse
+              ? state.profile?.workplace
+                ? "직장에서 가까운 순이에요"
+                : "내 정보에 직장을 넣으면 가까운 순으로 보여드려요"
+              : bestTrackName
+                ? `조건이 가장 잘 맞는 ${bestTrackName} 기준`
+                : ""}
+          </Sub>
         </View>
         <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           {rentals.map((r, i) => {
@@ -296,7 +334,9 @@ export default function Cost() {
                 style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 16, borderRadius: radius.md, backgroundColor: on ? colors.primarySoft : colors.card }}>
                 <View style={{ gap: 2 }}>
                   <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{r.label}</T>
-                  <Sub tone="3" variant="caption">{allTracks ? r.trackName + " · " : ""}보증금 {manwon(r.pricing.deposit)} · 월 {won(r.pricing.monthly_rent)}</Sub>
+                  <Sub tone="3" variant="caption">
+                    {picksHouse || allTracks ? `${r.trackName} · ` : ""}보증금 {manwon(r.pricing.deposit)} · 월 {won(r.pricing.monthly_rent)}
+                  </Sub>
                 </View>
                 {on ? <Icon name="check" size={20} color={colors.primary} /> : null}
               </Pressable>

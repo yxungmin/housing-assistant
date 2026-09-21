@@ -12,6 +12,8 @@ import { geocodeAddress } from "./geo/kakao";
 import { isUsable, RentClient } from "./market/rent";
 import { fromRoot } from "./paths";
 import { LhClient, parseNoticeDetail, pickNoticePdf, resolveImages, type LhImage, type LhNoticeSummary } from "./lh/api";
+import { parseUnitList, pickUnitList } from "./units/list";
+import type { SupplyUnit } from "@housing/schema";
 import { shDetailUrl } from "./sh/api";
 import { commuteTable } from "./transit/table";
 import { WaitClient } from "./wait/myhome";
@@ -35,6 +37,7 @@ interface Row {
   pdf_url?: string;
   detail_url?: string;
   images?: LhImage[];
+  units?: SupplyUnit[];
   lat?: number;
   lng?: number;
   transit?: unknown;
@@ -86,8 +89,17 @@ async function fillSourceLinks(): Promise<number> {
       const images = detail.images.length ? await resolveImages(detail.images) : [];
       // 못 구했으면 지운다. 예전 값을 남겨 두면 고쳐 놓고도 깨진 주소가 그대로 나간다.
       row.images = images.length ? images : undefined;
+
+      // 매입임대·전세임대는 집이 흩어져 있고 그 목록이 별도 엑셀 첨부에 있다.
+      // 목록이 없으면 이 공고에서 사용자가 고를 수 있는 것이 아무것도 없다.
+      const listFile = pickUnitList(detail.attachments);
+      if (listFile) {
+        const bytes = await client.download(listFile.url).catch(() => null);
+        row.units = bytes ? parseUnitList(Buffer.from(bytes)) : undefined;
+        if (row.units?.length === 0) row.units = undefined;
+      }
     }
-    console.log(`${row.id}: 상세 링크 · 공고문 ${row.pdf_url ? "있음" : "없음"} · 이미지 ${row.images?.length ?? 0}장`);
+    console.log(`${row.id}: 상세 링크 · 공고문 ${row.pdf_url ? "있음" : "없음"} · 이미지 ${row.images?.length ?? 0}장${row.units ? ` · 주택목록 ${row.units.length}호` : ""}`);
     filled++;
   }
   return filled;
@@ -101,8 +113,50 @@ async function fillSourceLinks(): Promise<number> {
  */
 const save = () => writeFileSync(TARGET, JSON.stringify(rows, null, 1));
 
+/**
+ * 흩어진 집의 좌표.
+ *
+ * 한 건물에 여러 세대가 있어 주소는 겹친다. 그래서 지오코딩 호출은 집 수가 아니라 주소 수만큼이다
+ * (실측: 81호에 주소 30여 곳). 이 좌표가 없으면 목록이 있어도 "내 직장에서 가까운 집"을 고를 수 없고,
+ * 그러면 목록을 읽어 온 의미가 절반이다.
+ *
+ * 링크·목록과 한 묶음으로 돌린다. 아래 본 루프는 이미 채워진 공고를 통째로 건너뛰는데,
+ * 좌표·시세가 이미 있는 공고에도 주택 목록은 새로 붙기 때문이다.
+ */
+async function fillUnitCoords(): Promise<number> {
+  const targets = rows.filter((r) => r.units?.length && (force || r.units.some((u) => u.lat === undefined)));
+  if (targets.length === 0) return 0;
+  if (!env.KAKAO_REST_API_KEY) {
+    console.log(`주택 좌표: KAKAO_REST_API_KEY 없음 — ${targets.length}건 건너뜀`);
+    return 0;
+  }
+  let filled = 0;
+  for (const row of targets) {
+    const seen = new Map<string, { lat: number; lng: number } | null>();
+    for (const unit of row.units!) {
+      if (!force && unit.lat !== undefined) continue;
+      let at = seen.get(unit.address);
+      if (at === undefined) {
+        const geo = await geocodeAddress(unit.address, env.KAKAO_REST_API_KEY).catch(() => null);
+        at = geo ? { lat: geo.lat, lng: geo.lng } : null;
+        seen.set(unit.address, at);
+      }
+      if (at) {
+        unit.lat = at.lat;
+        unit.lng = at.lng;
+      }
+    }
+    const found = row.units!.filter((u) => u.lat !== undefined).length;
+    console.log(`${row.id}: 주택 좌표 ${found}/${row.units!.length}호 (주소 ${seen.size}곳)`);
+    filled++;
+    save();
+  }
+  return filled;
+}
+
 let changed = await fillSourceLinks();
 if (changed > 0) save();
+changed += await fillUnitCoords();
 if (linksOnly) {
   console.log(`\n원문 링크·그림 ${changed}건 갱신 → ${TARGET}`);
   process.exit(0);
@@ -148,6 +202,7 @@ for (const row of rows) {
     }
   }
   const bCode = (row as Row & { b_code?: string }).b_code;
+
 
   // 2) 주변 시세
   const area = representativeArea(row);

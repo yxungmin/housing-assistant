@@ -206,6 +206,37 @@ export const AnnouncementVersion = z.object({
 });
 export type AnnouncementVersion = z.infer<typeof AnnouncementVersion>;
 
+/**
+ * 매입임대·전세임대가 공급하는 집 한 채.
+ *
+ * 단지형 공고는 주소가 하나라 Announcement의 lat/lng로 끝나지만, 이 유형은 수십 채가 흩어져 있다.
+ * 좌표는 수집할 때 주소마다 한 번 찍어 둔다 — 한 건물에 여러 세대가 있어 주소는 겹치므로
+ * 지오코딩 호출은 집 수가 아니라 주소 수만큼이다.
+ */
+export const SupplyUnit = z.object({
+  /** 주소+동+호. 같은 건물의 다른 세대를 구분한다 */
+  id: z.string().min(1),
+  address: z.string().min(1),
+  dong: z.string().optional(),
+  ho: z.string().optional(),
+  /** 공고문이 붙인 주택군 이름 ("강동암사동(광채빌라)") */
+  complex: z.string().optional(),
+  /** 연립주택·도시형생활주택·다세대 등 */
+  housing_form: z.string().optional(),
+  exclusive_area_m2: z.number().optional(),
+  total_area_m2: z.number().optional(),
+  rooms: z.number().int().optional(),
+  /** 지하는 음수 */
+  floor: z.number().int().optional(),
+  elevator: z.boolean().optional(),
+  /** 기본 임대조건 (가장 낮은 소득 구간). 구간별 차이는 공고문에서 본다 */
+  deposit: z.number().int().optional(),
+  monthly_rent: z.number().int().optional(),
+  lat: z.number().optional(),
+  lng: z.number().optional(),
+});
+export type SupplyUnit = z.infer<typeof SupplyUnit>;
+
 export const Announcement = z.object({
   id: z.string().uuid(),
   lh_id: z.string().min(1),
@@ -219,6 +250,14 @@ export const Announcement = z.object({
   pdf_url: z.string().url().optional(),
   /** 기관의 공고 상세 페이지. 앱은 외부 브라우저로 연다 */
   detail_url: z.string().url().optional(),
+  /**
+   * 매입임대·전세임대처럼 단지가 아니라 흩어진 개별 주택을 공급하는 공고의 주택 목록.
+   *
+   * 이 유형은 공고문 본문에 "총 81호"만 있고 주택별 소재지는 별도 엑셀 첨부에 있다.
+   * 그 목록이 이 유형의 핵심이다 — 어느 집이 내 직장에서 가까운지가 신청 여부를 가른다.
+   * 단지형 공고에는 없다(주소가 하나뿐이라 announcement의 lat/lng로 충분하다).
+   */
+  units: z.array(SupplyUnit).optional(),
   /**
    * 기관이 공고에 이미지로 붙여 둔 것 (위치도·단지조감도 등).
    * 공고문 PDF에서 우리가 뽑은 그림이 아니라 기관이 이미지 파일로 준 것만 넣는다 —

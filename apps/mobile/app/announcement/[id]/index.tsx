@@ -11,6 +11,7 @@ import { BottomCTA, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, 
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
 import { userFacingNotes } from "@/lib/notes";
+import { isScattered, unitLabel, unitSpec, unitsWithDistance } from "@/lib/units";
 import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
@@ -45,7 +46,10 @@ export default function AnnouncementDetail() {
 
   const match = useMemo(() => (a && isReadable(a) && state.profile ? matchAnnouncement(a.extraction, state.profile, { announcement_region: a.region_code }) : null), [a, state.profile]);
   const track = match?.best_track ?? (match ? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0] ?? null : null);
-  const hasRental = !!a?.extraction.tracks.some((t) => t.pricing.some((p) => p.kind === "rental"));
+  // 흩어진 공고는 임대조건이 공고문 본문이 아니라 주택 목록에 집마다 붙어 있다.
+  // 목록을 읽었으면 계산할 수 있다 — 고르는 단위가 주택형이 아니라 집일 뿐이다.
+  const hasUnitPricing = !!a?.units?.some((u) => u.deposit !== undefined);
+  const hasRental = hasUnitPricing || !!a?.extraction.tracks.some((t) => t.pricing.some((p) => p.kind === "rental"));
   // 가격이 아예 없는 공고를 "분양"이라고 하면 사실이 아니다. 두 경우를 나눠 말한다.
   const hasAnyPricing = !!a?.extraction.tracks.some((t) => t.pricing.length > 0);
   const saved = !!a && state.saved.includes(a.id);
@@ -77,6 +81,14 @@ export default function AnnouncementDetail() {
   }
   const counts = track ? ruleCounts(track) : { matched: 0, needsCheck: 0, total: 0 };
   const notes = userFacingNotes(a.extraction.notes);
+  /**
+   * 집이 흩어져 있는 공고는 좌표가 하나일 수 없다.
+   * 그런데 주소가 "서울특별시"뿐이라 지오코딩이 시청 좌표를 돌려줬고, 통근 시간과 주변 시설이
+   * 전부 시청 기준으로 계산돼 화면에 올라가 있었다 (2026-09-22 확인). 없느니만 못한 정보다.
+   * 그래서 위치 섹션을 통째로 끄고, 대신 고를 수 있는 집 목록을 보여 준다.
+   */
+  const scattered = isScattered(a);
+  const nearby3 = a.units?.length ? unitsWithDistance(a.units, state.profile).slice(0, 3) : [];
   const trackIndex = track ? a.extraction.tracks.indexOf(track.track) : -1;
   /**
    * 값이 없어 판별을 못 한 줄에 "지금 입력하기"를 단다.
@@ -180,7 +192,43 @@ export default function AnnouncementDetail() {
 
         <NoticeImages images={a.images} />
 
-        {(a.lat !== undefined || a.transit || a.nearby?.length) ? (
+        {/*
+          집이 흩어져 있는 공고. 공고 하나의 좌표로 통근을 말할 수 없으니 대신 고를 수 있는 집을 보여 준다.
+          이 유형에서 사람이 실제로 묻는 것은 "이 공고가 나에게 맞나"보다 "어느 집을 고를 수 있나"다.
+        */}
+        {scattered ? (
+          <View style={{ gap: 12 }}>
+            <SectionTitle>{a.units?.length ? `고를 수 있는 집 ${a.units.length}곳` : "집이 흩어져 있어요"}</SectionTitle>
+            {nearby3.length > 0 ? (
+              <Card style={{ gap: 14 }}>
+                {nearby3.map(({ unit, km }) => (
+                  <Row
+                    key={unit.id}
+                    icon="house"
+                    tone="primary"
+                    title={`${unitLabel(unit)}${unit.ho ? ` ${unit.ho}호` : ""}`}
+                    detail={[km !== null ? `직장까지 직선거리 ${km < 10 ? km.toFixed(1) : km.toFixed(0)}km` : null, unitSpec(unit)].filter(Boolean).join(" · ")}
+                  />
+                ))}
+                <Sub tone="3" variant="caption">
+                  {state.profile?.workplace
+                    ? "직장에서 가까운 순으로 세 곳만 보여드려요. 예상 주거비에서 집마다 보증금·월세를 볼 수 있어요."
+                    : "내 정보에 직장을 넣으면 가까운 집부터 보여드려요. 예상 주거비에서 집마다 보증금·월세를 볼 수 있어요."}
+                </Sub>
+              </Card>
+            ) : (
+              <Card style={{ gap: 8 }}>
+                <T variant="bodyMedium">주택이 여러 곳에 흩어져 있어요</T>
+                <Sub tone="3">
+                  이 공고는 단지가 아니라 개별 주택을 모집해요. 주택별 소재지와 임대조건은 공고문에 함께 붙은
+                  공급주택목록에서 확인해 주세요.
+                </Sub>
+              </Card>
+            )}
+          </View>
+        ) : null}
+
+        {!scattered && (a.lat !== undefined || a.transit || a.nearby?.length) ? (
           <View style={{ gap: 12 }}>
             <SectionTitle>위치와 교통</SectionTitle>
             <Card style={{ gap: 16 }}>
