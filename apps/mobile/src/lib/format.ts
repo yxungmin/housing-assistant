@@ -51,10 +51,50 @@ export function shortDate(iso: string | undefined): string {
   return `${Number(m)}.${Number(d)}`;
 }
 
+/** 문장 안에서 쓰는 날짜: "2026년 9월 30일" */
 export function longDate(iso: string | undefined): string {
   if (!iso) return "-";
   const [y, m, d] = iso.split("-");
   return `${y}년 ${Number(m)}월 ${Number(d)}일`;
+}
+
+const pad = (v: string) => v.padStart(2, "0");
+
+/**
+ * 표에서 쓰는 날짜: "2026.09.30".
+ * 표 안에서는 자릿수가 맞아야 눈이 세로로 읽는다 (문장 안이면 longDate).
+ */
+export function dateText(iso: string | undefined): string {
+  if (!iso) return "-";
+  const [y, m, d] = iso.split("-");
+  if (!y || !m) return iso;
+  return d ? `${y}.${pad(m)}.${pad(d)}` : `${y}.${pad(m)}`;
+}
+
+/** 기간: "2026.09.29 ~ 10.01". 같은 해면 뒤쪽 연도를 생략한다 */
+export function dateRange(from: string | undefined, to: string | undefined): string {
+  if (!from && !to) return "-";
+  if (!from) return `~ ${dateText(to)}`;
+  if (!to) return `${dateText(from)} ~`;
+  const [fy, fm] = from.split("-");
+  const [ty, tm, td] = to.split("-");
+  if (fy !== ty) return `${dateText(from)} ~ ${dateText(to)}`;
+  if (fm === tm) return `${dateText(from)} ~ ${pad(td ?? "")}`;
+  return `${dateText(from)} ~ ${pad(tm ?? "")}.${pad(td ?? "")}`;
+}
+
+/**
+ * 공고문에서 온 날짜는 형태가 제각각이다 — "2027-02-18", "2027-02",
+ * 그리고 "공가 발생 시 개별 안내" 같은 문장도 온다. 날짜면 맞추고, 아니면 그대로 둔다.
+ */
+export function looseDate(value: string | undefined): string {
+  if (!value) return "-";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return dateText(value);
+  if (/^\d{4}-\d{2}$/.test(value)) {
+    const [y, m] = value.split("-");
+    return `${y}년 ${Number(m)}월`;
+  }
+  return value;
 }
 
 export const HOUSING_LABEL: Record<string, string> = {

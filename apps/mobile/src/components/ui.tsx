@@ -5,7 +5,7 @@
  * 원칙: 흰 화면 + grey50 카드, 헤어라인 대신 간격, 아이콘은 연한 타일 안에, 색은 CTA·상태에만.
  */
 import { useEffect, useRef, useState, type PropsWithChildren, type ReactNode } from "react";
-import { Animated, Easing, Keyboard, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { Animated, Easing, Image, Keyboard, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space, type } from "@/theme/tokens";
@@ -235,6 +235,11 @@ export function Tag({ children, tone = "primary", icon }: PropsWithChildren<{ to
       <Text {...wordWrap} style={[{ fontFamily: fonts.bold, fontSize: 12, color: fg, lineHeight: 16, letterSpacing: -0.1 }]}>{children}</Text>
     </View>
   );
+}
+
+/** 앱 마크. 아이콘 글리프 대신 실제 로고를 쓰는 자리 (홈 헤더 등) */
+export function Logo({ size = 56 }: { size?: number }) {
+  return <Image source={require("../../assets/logo.png")} style={{ width: size, height: size }} resizeMode="contain" accessibilityLabel="공공주택 비서" />;
 }
 
 /** 필터 칩: grey100 면, 선택은 검정 면 */

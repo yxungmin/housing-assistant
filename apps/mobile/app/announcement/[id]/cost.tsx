@@ -10,7 +10,7 @@ import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { getAnnouncement, useAnnouncements } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
-import { manwon, pct, won } from "@/lib/format";
+import { manwon, pct, won, dateText } from "@/lib/format";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space } from "@/theme/tokens";
@@ -119,7 +119,7 @@ export default function Cost() {
             <View style={{ gap: 14 }}>
               <KeyValue label="임대보증금" value={won(cost.deposit)} src={`공고문 ${base.source.page}쪽${deposit !== null ? " · 전환 적용" : ""}`} />
               {cost.loan ? (
-                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${won(cost.loan.amount)}`} src={`${cost.loan.product.provider} · ${cost.loan.as_of_date} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
+                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${won(cost.loan.amount)}`} src={`${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
               ) : (
                 <KeyValue label="적용 가능한 대출" value="없음" src="입력 조건에 맞는 전세자금대출 상품이 없어요" />
               )}
@@ -152,7 +152,7 @@ export default function Cost() {
           <Sub tone="3" variant="caption">보증금·월임대료가 공고문과 다른가요?</Sub>
           {priceReport ? <Tag tone="info" icon="info">{REPORT_STATUS_LABEL[priceReport.status]}</Tag> : null}
         </Pressable>
-        <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>공고문과 {cost.loan?.as_of_date ?? LOANS[0]!.as_of_date} 기준 대출 조건으로 계산한 예상값이에요. 실제 계약 조건과 다를 수 있어요.</Sub>
+        <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>공고문과 {dateText(cost.loan?.as_of_date ?? LOANS[0]!.as_of_date)} 기준 대출 조건으로 계산한 예상값이에요. 실제 계약 조건과 다를 수 있어요.</Sub>
         <View style={{ height: 24 }} />
       </View>
 
@@ -225,7 +225,7 @@ export default function Cost() {
           })}
           {otherCount > 0 && !allTracks ? (
             <Pressable onPress={() => { setAllTracks(true); }} accessibilityRole="button" style={{ padding: 14, alignItems: "center" }}>
-              <T variant="bodyMedium" color={colors.text2}>다른 트랙 주택형 {otherCount}개 더 보기</T>
+              <T variant="bodyMedium" color={colors.text2}>다른 공급 유형 주택형 {otherCount}개 더 보기</T>
             </Pressable>
           ) : null}
         </ScrollView>

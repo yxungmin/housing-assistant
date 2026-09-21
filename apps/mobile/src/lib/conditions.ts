@@ -75,25 +75,56 @@ export function ruleTitle(r: EligibilityRule): string {
   }
 }
 
-/** 내 입력값 설명 */
+/**
+ * 내 조건을 사람이 쓰는 말로. 조건 문장 아래에 한 줄로 붙는다.
+ *
+ * "입력: 혼인 0년"처럼 값을 그대로 옮기지 않는다. 0년은 혼인을 안 했다는 뜻이고,
+ * 자녀 0명은 "자녀 없음"이다. 숫자를 그대로 보여 주면 읽는 사람이 해석을 해야 한다.
+ */
 export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: RuleResult): string {
   if (!p) return "";
   if (result.status === "NEEDS_CHECK") return result.reason;
   switch (r.category) {
-    case "income": return `입력: ${won(p.monthly_income)}`;
-    case "asset": return `입력: ${manwon(p.total_assets)}`;
-    case "car_value": return `입력: ${manwon(p.car_value)}`;
-    case "debt": return `입력: 월 ${won(p.monthly_debt_payment)}`;
-    case "age": return p.birth_date ? `입력: ${p.birth_date.slice(0, 4)}년생 (만 ${ageFromBirthDate(p.birth_date)}세)` : `입력: 만 ${p.age}세`;
-    case "marriage": return r.unit === "status" ? `입력: ${MARRIAGE_LABEL[p.marriage ?? ""] ?? "-"}` : `입력: 혼인 ${p.marriage_years ?? 0}년`;
-    case "children": return r.unit === "child_age" ? `입력: 자녀 ${p.children_ages?.join(", ") ?? "-"}세` : `입력: 자녀 ${p.children_count ?? 0}명`;
-    case "housing": return p.is_homeless ? `입력: 무주택 ${yearsMonths(p.homeless_months)}` : "입력: 유주택";
-    case "residence": return `입력: ${p.region_sigungu ?? REGIONS.find((x) => x.value === p.region_code)?.label ?? p.region_code}`;
+    case "income":
+      return p.monthly_income ? `내 소득 월 ${manwon(p.monthly_income)}` : "소득 미입력";
+    case "asset":
+      return `내 자산 ${manwon(p.total_assets)}`;
+    case "car_value":
+      return !p.car_value ? "자동차 없음" : `내 자동차 ${manwon(p.car_value)}`;
+    case "debt":
+      return !p.monthly_debt_payment ? "부채 상환 없음" : `매달 갚는 돈 ${won(p.monthly_debt_payment)}`;
+    case "age":
+      return p.birth_date
+        ? `${p.birth_date.slice(0, 4)}년생 · 만 ${ageFromBirthDate(p.birth_date)}세`
+        : `만 ${p.age}세`;
+    case "marriage": {
+      const label = MARRIAGE_LABEL[p.marriage ?? ""] ?? "-";
+      if (r.unit === "status") return label;
+      // 혼인 기간 0년은 "아직 안 했다"는 뜻이다. 그대로 "0년"이라고 쓰지 않는다
+      if (p.marriage === "pre_marriage") return "아직 혼인 전";
+      if (!p.marriage_years) return p.marriage === "married" ? "혼인 1년 미만" : label;
+      return `혼인 ${p.marriage_years}년째`;
+    }
+    case "children": {
+      const count = p.children_count ?? 0;
+      if (count === 0) return "자녀 없음";
+      const ages = p.children_ages?.length ? ` · ${p.children_ages.map((a) => `만 ${a}세`).join(", ")}` : "";
+      return `자녀 ${count}명${r.unit === "child_age" ? ages : ""}`;
+    }
+    case "housing":
+      return p.is_homeless ? `무주택 ${yearsMonths(p.homeless_months)}째` : "집이 있어요";
+    case "residence":
+      return `${p.region_sigungu ?? REGIONS.find((x) => x.value === p.region_code)?.label ?? p.region_code} 거주`;
     case "subscription": {
       const elapsed = p.subscription_active && p.subscription_as_of ? monthsBetween(p.subscription_as_of) : 0;
-      return `입력: ${(p.subscription_months ?? 0) + elapsed}개월 · ${(p.subscription_deposits ?? 0) + elapsed}회${p.subscription_active ? " (납입 중, 매달 자동 반영)" : ""}`;
+      const months = (p.subscription_months ?? 0) + elapsed;
+      if (!months) return "청약통장 없음";
+      const deposits = (p.subscription_deposits ?? 0) + elapsed;
+      return `청약통장 ${months}개월 · ${deposits}회 납입${p.subscription_active ? " (매달 자동 반영)" : ""}`;
     }
-    case "commute": return `입력: ${p.commute_limit_min ?? "-"}분`;
-    case "status": return `입력: ${p.statuses?.length ? p.statuses.map((s) => STATUS_LABEL[s] ?? s).join(", ") : "해당 없음"}`;
+    case "commute":
+      return p.commute_limit_min ? `통근 ${p.commute_limit_min}분까지 괜찮아요` : "통근 시간 미입력";
+    case "status":
+      return p.statuses?.length ? p.statuses.map((s) => STATUS_LABEL[s] ?? s).join(", ") : "해당하는 자격 없음";
   }
 }

@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/Icon";
-import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { getAnnouncement, matchAll, matching, useAnnouncements, type Matched, isReadable } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { REGIONS } from "@/lib/onboarding";
@@ -58,7 +58,7 @@ export default function Home() {
           <BigNumber value={String(matched.length)} unit="개" size={44} />
           <Sub tone="3">{today.getMonth() + 1}월 {today.getDate()}일 기준 · 전체 공고 {feed.list.length}개</Sub>
         </View>
-        <IconTile name="house" tone="primary" size={56} />
+        <Logo size={56} />
       </FadeIn>
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         <Chip on={myRegionOnly} onPress={toggle(setMyRegionOnly)}>{regionLabel}만</Chip>

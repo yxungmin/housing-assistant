@@ -8,7 +8,7 @@ import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements } from "@/data/announcements";
 import { inputSummary, ruleTitle } from "@/lib/conditions";
-import { daysUntil, dday, HOUSING_LABEL, longDate, shortDate } from "@/lib/format";
+import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { hasSource, openSource } from "@/lib/source";
@@ -143,7 +143,7 @@ export default function AnnouncementDetail() {
               })}
             </Card>
             {match && match.tracks.length > 1 ? (
-              <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>다른 트랙 · {match.tracks.filter((t) => t !== track).map((t) => { const c = ruleCounts(t); return `${t.track.name} ${c.matched}/${c.total}`; }).join(" · ")}</Sub>
+              <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>다른 공급 유형 · {match.tracks.filter((t) => t !== track).map((t) => { const c = ruleCounts(t); return `${t.track.name} ${c.matched}/${c.total}`; }).join(" · ")}</Sub>
             ) : null}
           </View>
         ) : null}
@@ -172,10 +172,11 @@ export default function AnnouncementDetail() {
         <View style={{ gap: 12 }}>
           <SectionTitle>일정</SectionTitle>
           <Card style={{ gap: 14 }}>
-            <KeyValue label="공고일" value={longDate(a.notice_date)} />
-            <KeyValue label="접수" value={`${shortDate(a.apply_start)} ~ ${shortDate(a.apply_end)}`} />
-            {a.extraction.schedule.winner_announce ? <KeyValue label="당첨자 발표" value={longDate(a.extraction.schedule.winner_announce)} /> : null}
-            {a.extraction.schedule.move_in ? <KeyValue label="입주 예정" value={a.extraction.schedule.move_in} /> : null}
+            {/* 표 안에서는 자릿수를 맞춘다. 문장 안(알림·고지)에서만 "2026년 9월 17일" 꼴을 쓴다 */}
+            <KeyValue label="공고일" value={dateText(a.notice_date)} />
+            <KeyValue label="접수" value={dateRange(a.apply_start, a.apply_end)} />
+            {a.extraction.schedule.winner_announce ? <KeyValue label="당첨자 발표" value={looseDate(a.extraction.schedule.winner_announce)} /> : null}
+            {a.extraction.schedule.move_in ? <KeyValue label="입주 예정" value={looseDate(a.extraction.schedule.move_in)} /> : null}
           </Card>
         </View>
 
