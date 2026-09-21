@@ -53,6 +53,7 @@ npm run app:data                     # 초안/정답 → 앱 번들 데이터
 npm run db:check                     # 빈 Postgres에 마이그레이션 전체 적용 + 동작 확인 (Docker 필요)
 npm run fixture:check -- 018         # 초안 ↔ 공고문 PDF 1차 대조 (사람 검수 전)
 npm run review                       # 검수 뷰어 4310 — 추출 검수 + 신고 큐
+npm run output:size                  # 추출 출력이 어디서 커지는지 (비용의 70%가 출력 토큰)
 ```
 
 ## 규칙
