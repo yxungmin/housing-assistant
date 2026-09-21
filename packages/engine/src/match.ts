@@ -226,11 +226,73 @@ export function matchTrack(track: SupplyTrack, profile: UserProfile): TrackResul
   return { track, groups, summary };
 }
 
+export interface MatchOptions {
+  /**
+   * 공고가 속한 시도 코드. API 메타에서 오는 값이라 추출 결과와 달리 확실하다.
+   * 추출된 거주지 룰이 하나도 없을 때 이 값으로 안전망을 친다 (regionGuard 참고).
+   */
+  announcement_region?: string;
+}
+
+/**
+ * 거주 요건 안전망.
+ *
+ * 왜 필요한가: 공공임대는 해당 시·도 거주(또는 소재 직장·학교)를 거의 항상 요구하는데,
+ * 추출이 그 룰을 빠뜨리면 조용히 "전부 일치"가 된다.
+ * 실제로 제주 행복주택 공고에서 거주지 룰이 통째로 빠져, 서울 사는 사람에게
+ * "조건 7개 중 7개 일치"로 떴다. 454km 떨어진 집이다.
+ *
+ * 추출은 LLM이라 언제든 빠질 수 있다. 반면 공고의 시도 코드는 기관 API에서 오는 확실한 값이다.
+ * 그래서 트랙에 거주지 룰이 하나도 없고 공고 지역이 내 거주지와 다르면 "확인 필요"를 하나 얹는다.
+ *
+ * MISMATCH로 잘라내지 않는 이유: 전국 모집이거나 거주 요건이 없는 공고도 있다.
+ * 자격이 되는 사람에게 공고를 감추면 그 오류는 아무도 신고하지 못한다.
+ * 대신 "맞는다"고 단정하지도 않는다.
+ */
+export function regionGuard(
+  track: TrackResult,
+  profile: UserProfile,
+  announcementRegion: string | undefined,
+): TrackResult {
+  if (!announcementRegion || !profile.region_code) return track;
+  if (announcementRegion === profile.region_code) return track;
+  const hasResidenceRule = track.groups.some((g) => g.rules.some((r) => !r.skipped && r.rule.category === "residence"));
+  if (hasResidenceRule) return track;
+
+  const guard: RuleResult = {
+    rule: {
+      group_id: "__region_guard__",
+      category: "residence",
+      applies_to: {},
+      operator: "in",
+      value: [announcementRegion],
+      source: { page: 0, text: "공고문에서 거주 요건을 읽지 못했어요. 공고 지역과 사는 곳이 달라 확인이 필요해요." },
+      confidence: 0,
+      verified: false,
+    },
+    status: "NEEDS_CHECK",
+    reason: "공고문에서 거주 요건을 읽지 못했어요. 지역이 달라 신청 가능한지 공고문을 확인해 주세요.",
+    skipped: false,
+  };
+  const groups = [
+    ...track.groups,
+    { group: { id: "__region_guard__", mode: "all_of" as const, label: "거주 요건" }, status: "NEEDS_CHECK" as const, rules: [guard] },
+  ];
+  return {
+    ...track,
+    groups,
+    summary: { ...track.summary, needs_check: track.summary.needs_check + 1 },
+  };
+}
+
 export function matchAnnouncement(
   extraction: Pick<ExtractionOutput, "tracks">,
   profile: UserProfile,
+  options: MatchOptions = {},
 ): AnnouncementMatch {
-  const tracks = extraction.tracks.map((t) => matchTrack(t, profile));
+  const tracks = extraction.tracks
+    .map((t) => matchTrack(t, profile))
+    .map((t) => regionGuard(t, profile, options.announcement_region));
   const candidates = tracks.filter((t) => t.summary.mismatched === 0);
   candidates.sort((a, b) => b.summary.matched - a.summary.matched || a.summary.needs_check - b.summary.needs_check);
   const best = candidates[0] ?? null;

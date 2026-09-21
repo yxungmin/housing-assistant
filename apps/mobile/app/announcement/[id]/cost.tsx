@@ -32,7 +32,7 @@ export default function Cost() {
   const [allTracks, setAllTracks] = useState(false);
   const { rentals, bestTrackName, otherCount } = useMemo(() => {
     if (!a || !profile) return { rentals: [] as { label: string; pricing: Pricing; trackName: string }[], bestTrackName: "", otherCount: 0 };
-    const match = matchAnnouncement(a.extraction, profile);
+    const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code });
     const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
     const ordered = [...(best ? [best] : []), ...match.tracks.filter((t) => t !== best)];
     const rows = ordered.flatMap((t) => t.track.pricing.filter((p) => p.kind === "rental").map((p) => ({ label: `${p.unit_type}${p.tier ? ` · ${p.tier}` : ""}`, pricing: p, trackName: t.track.name })));

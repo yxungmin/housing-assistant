@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/Icon";
 import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
-import { commuteKm, getAnnouncement, isReadable, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
+import { commuteKm, getAnnouncement, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { REGIONS } from "@/lib/onboarding";
 import { commuteFor, commuteShort, splitStation } from "@/lib/commute";
@@ -46,7 +46,13 @@ export default function Home() {
         if (f.nearWork && hasWorkplace) { const km = commuteKm(m); if (km === null || km > NEAR_WORK_KM) return false; }
         return true;
       })
-      .sort((x, y) => (f.nearWork && hasWorkplace ? (commuteKm(x) ?? 1e9) - (commuteKm(y) ?? 1e9) : 0));
+      .sort((x, y) => {
+        if (f.nearWork && hasWorkplace) return (commuteKm(x) ?? 1e9) - (commuteKm(y) ?? 1e9);
+        // 기본 정렬도 가까운 곳이 먼저다. 마감만 보고 세우면 서울 사람 맨 위에 제주 공고가 온다.
+        const region = state.profile?.region_code;
+        const d = listDistanceKm(x, region) - listDistanceKm(y, region);
+        return d !== 0 ? d : (x.announcement.apply_end ?? "").localeCompare(y.announcement.apply_end ?? "");
+      });
 
   const filtered = useMemo(() => apply(filters), [all, myRegionOnly, rentalOnly, nearWork, hasWorkplace, state.profile?.region_code]);
   const matched = matching(filtered);

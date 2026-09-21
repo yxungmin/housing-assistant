@@ -103,8 +103,8 @@ for (const row of rows) {
   }
 
   // 4) 통근 (시군구 × 이 단지)
-  if ((force || row.commute === undefined) && row.lat !== undefined && env.TRANSIT_API_KEY) {
-    const t = await commuteTable({ lat: row.lat, lng: row.lng! }, regions, env.TRANSIT_API_KEY).catch(() => undefined);
+  if ((force || row.commute === undefined) && row.lat !== undefined) {
+    const t = await commuteTable({ lat: row.lat, lng: row.lng! }, regions, { kakao: env.KAKAO_REST_API_KEY, seoul: env.TRANSIT_API_KEY }).catch(() => undefined);
     if (t) {
       row.commute = t;
       const vals = Object.values(t).map((v) => v.minutes);

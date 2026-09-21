@@ -8,8 +8,13 @@
  *
  * 키는 앱이 프로필에 저장하는 형식과 같아야 한다 ("서울 마포구"). 표가 갈라지면 앱이 값을 못 찾는다 —
  * 그래서 좌표표를 packages/schema에 두고 앱·수집기가 같이 쓴다.
+ *
+ * 경로는 카카오맵으로 구한다. 서울시 API는 서울 구간만 답해서 경기·지방이 통째로 빈다
+ * (실측: 군산·제주·양산 공고에서 경로 없음). 카카오는 전국을 덮는다.
+ * 카카오가 답하지 않을 때만 서울시 API로 한 번 더 본다.
  */
 import { placeFor, REGION_LIST } from "@housing/schema";
+import { KakaoTransitClient } from "./kakao";
 import { TransitClient } from "./seoul";
 
 export type CommuteTable = Record<string, { minutes: number; transfers: number }>;
@@ -21,19 +26,23 @@ export type CommuteTable = Record<string, { minutes: number; transfers: number }
 export async function commuteTable(
   to: { lat: number; lng: number },
   regionCodes: string[],
-  apiKey: string,
+  keys: { kakao?: string; seoul?: string },
   fetchImpl: typeof fetch = fetch,
 ): Promise<CommuteTable | undefined> {
   const regions = regionCodes.length ? REGION_LIST.filter((r) => regionCodes.includes(r.code)) : REGION_LIST;
   if (regions.length === 0) return undefined;
 
-  const client = new TransitClient(apiKey, fetchImpl);
+  const kakao = keys.kakao ? new KakaoTransitClient(keys.kakao, fetchImpl) : null;
+  const seoul = keys.seoul ? new TransitClient(keys.seoul, fetchImpl) : null;
+  if (!kakao && !seoul) return undefined;
+
   const table: CommuteTable = {};
   for (const region of regions) {
     for (const sigungu of region.sigungu) {
       const from = placeFor(region.code, sigungu);
       if (!from) continue;
-      const commute = await client.commute({ lat: from.lat, lng: from.lng }, to);
+      const origin = { lat: from.lat, lng: from.lng };
+      const commute = (await kakao?.commute(origin, to)) ?? (await seoul?.commute(origin, to)) ?? null;
       // 경로를 못 구한 곳은 넣지 않는다. 화면은 값이 없으면 직선거리로 되돌아간다.
       if (commute) table[from.label] = { minutes: commute.minutes, transfers: commute.transfers };
     }

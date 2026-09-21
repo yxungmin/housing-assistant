@@ -184,3 +184,61 @@ describe("residence with 시군구 and subscription auto-increment", () => {
     expect(profileValueFor("subscription", { ...p, subscription_active: false }, undefined, today)).toBe(24);
   });
 });
+
+/**
+ * 거주 요건 안전망. 실제로 새어 나간 버그를 막는 자리라 테스트를 붙여 둔다 —
+ * 제주 행복주택 공고에서 거주지 룰이 통째로 빠져, 서울 사는 사람에게 "조건 7개 중 7개 일치"로 떴다.
+ */
+describe("regionGuard", () => {
+  const seoul: UserProfile = { ...marriedDualProfile, age: 30, marriage: "single", region_code: "11" };
+
+  it("거주지 룰이 없고 공고 지역이 다르면 확인 필요를 하나 얹는다", () => {
+    const plain = matchAnnouncement({ tracks: [youthTrack] }, seoul);
+    const guarded = matchAnnouncement({ tracks: [youthTrack] }, seoul, { announcement_region: "50" });
+    expect(guarded.tracks[0]!.summary.needs_check).toBe(plain.tracks[0]!.summary.needs_check + 1);
+    expect(guarded.tracks[0]!.groups.at(-1)!.group.label).toBe("거주 요건");
+  });
+
+  it("MISMATCH로 잘라내지 않는다 — 전국 모집이면 자격이 되는 사람에게서 공고를 감추게 된다", () => {
+    const guarded = matchAnnouncement({ tracks: [youthTrack] }, seoul, { announcement_region: "50" });
+    expect(guarded.tracks[0]!.summary.mismatched).toBe(0);
+    expect(guarded.is_match).toBe(true);
+  });
+
+  it("공고 지역이 내 지역이면 건드리지 않는다", () => {
+    const guarded = matchAnnouncement({ tracks: [youthTrack] }, seoul, { announcement_region: "11" });
+    expect(guarded.tracks[0]!.summary.needs_check).toBe(matchAnnouncement({ tracks: [youthTrack] }, seoul).tracks[0]!.summary.needs_check);
+  });
+
+  it("공고 지역을 모르거나 사는 곳을 모르면 건드리지 않는다", () => {
+    const noRegion: UserProfile = { ...seoul, region_code: undefined };
+    expect(matchAnnouncement({ tracks: [youthTrack] }, noRegion, { announcement_region: "50" }).tracks[0]!.summary.needs_check).toBe(
+      matchAnnouncement({ tracks: [youthTrack] }, noRegion).tracks[0]!.summary.needs_check,
+    );
+    expect(matchAnnouncement({ tracks: [youthTrack] }, seoul, {}).tracks[0]!.summary.needs_check).toBe(
+      matchAnnouncement({ tracks: [youthTrack] }, seoul).tracks[0]!.summary.needs_check,
+    );
+  });
+
+  it("공고문에서 거주 요건을 읽었으면 그 판정을 그대로 믿는다", () => {
+    const withResidence = {
+      ...youthTrack,
+      rules: [
+        ...youthTrack.rules,
+        {
+          group_id: "basic",
+          applies_to: {},
+          category: "residence" as const,
+          operator: "in" as const,
+          value: ["11", "50"],
+          unit: "region_code",
+          source: { page: 3, text: "제주특별자치도 또는 서울특별시 거주자" },
+          confidence: 0.95,
+          verified: true,
+        },
+      ],
+    };
+    const guarded = matchAnnouncement({ tracks: [withResidence] }, seoul, { announcement_region: "50" });
+    expect(guarded.tracks[0]!.groups.some((g) => g.group.label === "거주 요건")).toBe(false);
+  });
+});

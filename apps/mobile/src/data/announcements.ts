@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 import type { ExtractionOutput, HousingType, UserProfile } from "@housing/schema";
 import { haversineKm, matchAnnouncement, type AnnouncementMatch, type TrackResult } from "@housing/engine";
+import { placeFor } from "@housing/schema";
 import raw from "../../data/announcements.json";
 
 export type DataStatus = "VERIFIED" | "AUTO" | "UNVERIFIED";
@@ -129,6 +130,11 @@ export interface Matched {
   distanceKm: number | null;
   /** 배우자 직장까지 직선거리 (km). 안 넣었으면 null */
   distancePartnerKm: number | null;
+  /**
+   * 사는 곳에서 공고지까지 직선거리 (km). 시도 중심 기준이라 거친 값이고, 정렬에만 쓴다.
+   * 직장을 안 넣은 사람에게도 "가까운 것부터" 보여 주려면 기준이 하나는 있어야 한다.
+   */
+  residenceKm: number | null;
 }
 
 export function matchAll(profile: UserProfile | null, list: Announcement[] = current): Matched[] {
@@ -137,15 +143,17 @@ export function matchAll(profile: UserProfile | null, list: Announcement[] = cur
       w && a.lat !== undefined && a.lng !== undefined ? haversineKm(w, { lat: a.lat, lng: a.lng }) : null;
     const distanceKm = to(profile?.workplace);
     const distancePartnerKm = to(profile?.workplace_partner);
+    const home = profile?.region_code ? placeFor(profile.region_code) : null;
+    const residenceKm = to(home ?? undefined);
     if (!isReadable(a) || !profile) {
-      return { announcement: a, match: null, matched: 0, needsCheck: 0, total: 0, distanceKm, distancePartnerKm };
+      return { announcement: a, match: null, matched: 0, needsCheck: 0, total: 0, distanceKm, distancePartnerKm, residenceKm };
     }
-    const match = matchAnnouncement(a.extraction, profile);
+    const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code });
     const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
     // 화면에는 규칙 단위로 센다 ("조건 8개 중 7개 일치"). 일치 판정 자체는 엔진의 그룹 단위 결과를 따른다.
     const counts = best ? ruleCounts(best) : { matched: 0, needsCheck: 0, total: 0 };
     const { matched, needsCheck, total } = counts;
-    return { announcement: a, match, matched, needsCheck, total, distanceKm, distancePartnerKm };
+    return { announcement: a, match, matched, needsCheck, total, distanceKm, distancePartnerKm, residenceKm };
   });
 }
 
@@ -155,6 +163,19 @@ export function matchAll(profile: UserProfile | null, list: Announcement[] = cur
  */
 export const commuteKm = (m: Pick<Matched, "distanceKm" | "distancePartnerKm">): number | null =>
   m.distancePartnerKm === null ? m.distanceKm : m.distanceKm === null ? m.distancePartnerKm : Math.max(m.distanceKm, m.distancePartnerKm);
+
+/**
+ * 목록 정렬용 거리. 작을수록 위로.
+ *
+ * 왜 필요한가: 접수 임박순으로만 세우면 서울 사는 사람 화면 맨 위에 제주 공고(454km)가 올라온다.
+ * 마감이 급한 건 맞지만 그 사람이 넣을 수 있는 공고가 아니다.
+ * 공공임대는 해당 시·도 거주자가 먼저이므로 내 지역을 맨 앞에 두고, 나머지는 가까운 순으로 세운다.
+ * 직장을 넣었으면 직장까지 거리가 사람이 실제로 쓰는 기준이라 그쪽을 먼저 본다.
+ */
+export function listDistanceKm(m: Matched, regionCode: string | undefined): number {
+  if (regionCode && m.announcement.region_code === regionCode) return -1;
+  return commuteKm(m) ?? m.residenceKm ?? Number.MAX_SAFE_INTEGER;
+}
 
 /** 트랙의 규칙 단위 집계 (applies_to로 건너뛴 규칙 제외). any_of 그룹은 통과했으면 그 안의 불일치 규칙을 세지 않는다. */
 export function ruleCounts(track: TrackResult): { matched: number; needsCheck: number; total: number } {
