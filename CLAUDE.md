@@ -23,17 +23,20 @@
   자동 검증 지적은 둘로 갈린다 — `conflict_reasons`(게시 보류) / `checks`(게시하되 앱에 알림). `autoChecks`의 `blocking` 플래그가 기준.
   마이그레이션을 고치면 `npm run db:check`로 빈 DB에 처음부터 적용해 본다 (`supabase/test/`). 뷰는 `create or replace` 대신 지우고 다시 만든다.
   Supabase 프로젝트를 붙이는 절차는 `supabase/README.md`. 신고는 `issue_reports`(0005에서 대상·상태·처리 결과 추가)와
-  결과 조회용 `issue_report_status` 뷰. `supabase/seed` 대출 상품.
+  결과 조회용 `issue_report_status` 뷰. `supabase/seed` 대출 상품. 좌표·역·정류장·주변 인프라는 수집 때 Kakao Local 1회(`geo/kakao.ts`) — `KAKAO_REST_API_KEY`가 없으면 전부 빈 채로 저장되고 앱은 그 섹션을 숨긴다. `nearby`는 0007에서 더한 별도 컬럼이다.
 - `benchmark` 정답 fixtures + `npm run benchmark`. PDF는 `npm run benchmark:fetch`로 LH API에서 받고 `benchmark/pdfs/meta.json`에 공고 메타(지역·일정·주소)가 남는다. `npm run inspect -- <pdf> --extract`가 초안(`benchmark/output/*.draft.json`)을 만든다.
   초안을 정답으로 올리기 전에 `npm run fixture:check`가 룰·가격마다 인용문이 그 쪽에 실제로 있는지, 값이 인용문과 맞는지 대조한다
   (`benchmark/output/*.check.json`). 통과는 승격의 조건일 뿐이고 확정은 사람이 한다 — `--promote --reviewed-by <이름>`.
-- `apps/mobile` Expo 57 + Expo Router 앱. 화면은 `src/components/ui.tsx` 공통 컴포넌트(Screen·Card·BigNumber·Tag/Chip·ConditionRow·BottomCTA·BottomSheet) 조합으로만, 색은 `src/theme/tokens.ts` 토큰만. 매칭·계산은 `@housing/engine` 그대로. 데이터는 `src/data/announcements.ts`의 외부 스토어(`useAnnouncements`): 번들 `data/announcements.json`(`npm run app:data`) → 캐시 → Supabase `app_announcements` 뷰(`src/data/remote.ts`, `apps/mobile/.env`의 `EXPO_PUBLIC_SUPABASE_URL/ANON_KEY`가 있을 때만) 순으로 교체된다. 구독 규칙·결제 어댑터는 `src/lib/billing.ts`(지금은 로컬 목, M8에서 스토어 구현으로 교체), 알림은 `src/lib/notifications.ts`(관심 공고 마감 3일 전 기기 예약 + 푸시 토큰 등록). 직장 위치는 시군구 선택 → `src/lib/places.ts` 대표 좌표. 소득 도우미는 엔진 `income.ts`(건보료 역산).
+- `apps/mobile` Expo 57 + Expo Router 앱. 화면은 `src/components/ui.tsx` 공통 컴포넌트(Screen·Card·BigNumber·Tag/Chip·ConditionRow·BottomCTA·BottomSheet) 조합으로만, 색은 `src/theme/tokens.ts` 토큰만. 매칭·계산은 `@housing/engine` 그대로. 데이터는 `src/data/announcements.ts`의 외부 스토어(`useAnnouncements`): 번들 `data/announcements.json`(`npm run app:data`) → 캐시 → Supabase `app_announcements` 뷰(`src/data/remote.ts`, `apps/mobile/.env`의 `EXPO_PUBLIC_SUPABASE_URL/ANON_KEY`가 있을 때만) 순으로 교체된다. 구독 규칙·결제 어댑터는 `src/lib/billing.ts`(지금은 로컬 목, M8에서 스토어 구현으로 교체), 알림은 `src/lib/notifications.ts`(관심 공고 마감 3일 전 기기 예약 + 푸시 토큰 등록). 직장 위치는 시군구 선택 → `src/lib/places.ts` 대표 좌표. 신혼·예비신혼부부는 배우자 직장(`workplace_partner`)도 받고, "직장 근처" 필터·정렬은 두 사람 중 더 먼 쪽(`commuteKm`)을 쓴다. 소득 도우미는 엔진 `income.ts`(건보료 역산).
+  위치·교통 문구는 `src/lib/commute.ts` 한 곳에 둔다. 우리가 가진 건 최근접 역·정류장까지의 **직선거리**뿐이라 화면도 거기까지만 말한다 — 경로·환승·소요 시간은 교통 API를 붙여야 나온다. 지도는 시스템 지도 앱으로 넘긴다.
   "이 숫자 이상해요"는 항목 단위다: 조건·임대조건을 누르면 근거 원문이 펼쳐지고 거기서 신고한다(`components/ReportSheet.tsx`).
   신고는 `src/lib/reports.ts`로 기기에 먼저 쌓이고 Supabase가 붙으면 `appState`가 올려 보낸 뒤 처리 결과를 받아 온다.
   같은 자리에서 원문 공고문을 연다(`src/lib/source.ts`, `announcements.pdf_url`). 쪽 이동(`#page`)은 뷰어에 따라 무시된다.
   공고 상태는 셋이다: `VERIFIED`(사람이 대조함) · `AUTO`(자동 추출·검증만) · `UNVERIFIED`(조건을 못 읽음 — 매칭·계산 안 함).
   사람이 본 것만 VERIFIED다. `app-data.ts`는 `benchmark/fixtures/`에서 온 것만 그렇게 표시하고, 자동 검증 지적은 `checks`로 앱에 그대로 내려보낸다.
   `npm run app`으로 실행.
+  `npm run app:data`는 `benchmark/output`의 초안을 읽어 번들 데이터를 다시 쓴다. 초안은 커밋하지 않는 생성물이라
+  없는 작업본에서 돌리면 번들 12건이 통째로 날아갔었다(2026-09-21) — 지금은 읽은 공고가 0건이면 쓰지 않고 멈춘다.
 - `collector/src/review-server.ts` 검수 뷰어(4310). 추출 검수 화면과 신고 큐 두 가지.
   신고 큐는 `issue_reports`를 읽어 네 가지로 끝낸다(공고문과 같음·수정함·공고 정정·신고 아님).
   거기 적은 한 줄이 앱의 신고 내역에 그대로 보인다. Supabase가 없으면 큐만 꺼지고 나머지는 그대로 돈다.

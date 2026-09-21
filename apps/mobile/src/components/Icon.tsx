@@ -2,7 +2,8 @@ import Svg, { Circle, Path, Rect } from "react-native-svg";
 
 export type IconName =
   | "check" | "alert" | "x" | "left" | "right" | "heart" | "heart-filled" | "more" | "bell"
-  | "home" | "bookmark" | "user" | "house" | "delete" | "map-pin" | "info";
+  | "home" | "bookmark" | "user" | "house" | "delete" | "map-pin" | "info"
+  | "subway" | "bus" | "walk" | "school" | "cart" | "store" | "hospital" | "tree" | "baby";
 
 interface Props {
   name: IconName;
@@ -82,6 +83,68 @@ export function Icon({ name, size = 20, color, strokeWidth = 2 }: Props) {
         <>
           <Circle cx="12" cy="12" r="10" {...common} />
           <Path d="M12 16v-4M12 8h.01" {...common} />
+        </>
+      )}
+      {name === "subway" && (
+        <>
+          <Rect x="5" y="3" width="14" height="13" rx="3" {...common} />
+          <Path d="M5 10h14" {...common} />
+          <Path d="m7 21 2-3M17 21l-2-3" {...common} />
+          <Path d="M9 13h.01M15 13h.01" {...common} />
+        </>
+      )}
+      {name === "bus" && (
+        <>
+          <Rect x="4" y="3" width="16" height="13" rx="2" {...common} />
+          <Path d="M4 10h16" {...common} />
+          <Path d="M7 20v-2M17 20v-2" {...common} />
+          <Path d="M8 13h.01M16 13h.01" {...common} />
+        </>
+      )}
+      {name === "walk" && (
+        <>
+          <Circle cx="13" cy="4" r="2" {...common} />
+          <Path d="m10 21 2-6-2-3V8l4 2 3 1" {...common} />
+          <Path d="m12 12-3 3-3-1" {...common} />
+          <Path d="m14 15 2 6" {...common} />
+        </>
+      )}
+      {name === "school" && (
+        <>
+          <Path d="M12 3 2 8l10 5 10-5-10-5Z" {...common} />
+          <Path d="M6 10.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-5.5" {...common} />
+        </>
+      )}
+      {name === "cart" && (
+        <>
+          <Path d="M2 3h3l2.7 12.4A2 2 0 0 0 9.6 17h8.9a2 2 0 0 0 2-1.6L22 7H6" {...common} />
+          <Circle cx="10" cy="20.5" r="1.2" {...common} />
+          <Circle cx="18" cy="20.5" r="1.2" {...common} />
+        </>
+      )}
+      {name === "store" && (
+        <>
+          <Path d="M4 4h16l1 5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0l1-5Z" {...common} />
+          <Path d="M5 11v9h14v-9" {...common} />
+        </>
+      )}
+      {name === "hospital" && (
+        <>
+          <Rect x="4" y="4" width="16" height="16" rx="2" {...common} />
+          <Path d="M12 9v6M9 12h6" {...common} />
+        </>
+      )}
+      {name === "tree" && (
+        <>
+          <Path d="M12 3 6 12h3l-3 5h12l-3-5h3L12 3Z" {...common} />
+          <Path d="M12 17v4" {...common} />
+        </>
+      )}
+      {name === "baby" && (
+        <>
+          <Circle cx="12" cy="12" r="9" {...common} />
+          <Path d="M9 10h.01M15 10h.01" {...common} />
+          <Path d="M9.5 15a3.5 3.5 0 0 0 5 0" {...common} />
         </>
       )}
       {false && <Rect />}

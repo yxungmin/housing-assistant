@@ -4,6 +4,7 @@ import {
   HousingType,
   IncomeType,
   MarriageStatus,
+  NearbyKind,
   PricingKind,
   RuleCategory,
   RuleOperator,
@@ -218,14 +219,30 @@ export const Announcement = z.object({
   pdf_url: z.string().url().optional(),
   lat: z.number().optional(),
   lng: z.number().optional(),
+  /**
+   * 수집 시 좌표 주변에서 찾은 것. 직선거리이지 경로가 아니다 — 실제 통근 시간은 교통 API를 붙여야 나온다.
+   * 걷는 시간(walk_min)은 거리를 4km/h로 나눈 환산값이라 화면에서도 "약"을 붙여 쓴다.
+   */
   transit: z
     .object({
-      nearest_station: z.string().optional(),
+      nearest_station: z.string().optional().describe('가장 가까운 지하철역. Kakao는 "망원역 6호선"처럼 호선을 붙여 준다'),
       station_walk_min: z.number().optional(),
+      station_distance_m: z.number().optional(),
       nearest_bus_stop: z.string().optional(),
       bus_walk_min: z.number().optional(),
+      bus_distance_m: z.number().optional(),
     })
     .optional(),
+  nearby: z
+    .array(
+      z.object({
+        kind: NearbyKind,
+        name: z.string(),
+        distance_m: z.number(),
+      }),
+    )
+    .optional()
+    .describe("주변 생활 인프라. 종류마다 가장 가까운 한 곳만"),
   updated_at: z.string(),
 });
 export type Announcement = z.infer<typeof Announcement>;

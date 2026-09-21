@@ -3,9 +3,10 @@ import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/Icon";
 import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
-import { getAnnouncement, matchAll, matching, useAnnouncements, type Matched, isReadable } from "@/data/announcements";
+import { commuteKm, getAnnouncement, isReadable, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { REGIONS } from "@/lib/onboarding";
+import { commuteShort, splitStation } from "@/lib/commute";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius } from "@/theme/tokens";
@@ -31,9 +32,10 @@ export default function Home() {
       all.filter((m) => {
         if (myRegionOnly && state.profile?.region_code && m.announcement.region_code !== state.profile.region_code) return false;
         if (rentalOnly && m.announcement.housing_type === "public_sale") return false;
-        if (nearWork && hasWorkplace && (m.distanceKm === null || m.distanceKm > NEAR_WORK_KM)) return false;
+        // 부부는 더 먼 쪽이 그 집의 통근 부담이다 (commuteKm). 한 사람만 가까운 집은 후보가 아니다.
+        if (nearWork && hasWorkplace) { const km = commuteKm(m); if (km === null || km > NEAR_WORK_KM) return false; }
         return true;
-      }).sort((x, y) => (nearWork && hasWorkplace ? (x.distanceKm ?? 1e9) - (y.distanceKm ?? 1e9) : 0)),
+      }).sort((x, y) => (nearWork && hasWorkplace ? (commuteKm(x) ?? 1e9) - (commuteKm(y) ?? 1e9) : 0)),
     [all, myRegionOnly, rentalOnly, nearWork, hasWorkplace, state.profile?.region_code],
   );
   const matched = matching(filtered);
@@ -136,7 +138,10 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
         : m.match?.is_match
           ? { tone: "warn" as const, icon: "alert" as const, text: `조건 ${m.needsCheck}개 확인 필요` }
           : { tone: "danger" as const, icon: "x" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` };
-  const place = m.distanceKm !== null ? `직장까지 약 ${m.distanceKm.toFixed(0)}km` : a.transit?.nearest_station ? `${a.transit.nearest_station} 도보 ${a.transit.station_walk_min}분` : a.region_name;
+  // 직장을 넣었으면 통근이 먼저, 아니면 가장 가까운 역, 그것도 없으면 지역명
+  const place =
+    commuteShort(m.distanceKm, m.distancePartnerKm) ??
+    (a.transit?.nearest_station ? `${splitStation(a.transit.nearest_station).station} 도보 약 ${a.transit.station_walk_min}분` : a.region_name);
 
   return (
     <Card onPress={onPress} style={{ gap: 12 }}>

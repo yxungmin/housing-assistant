@@ -81,3 +81,10 @@ export type MarriageStatus = z.infer<typeof MarriageStatus>;
 
 export const IncomeType = z.enum(["single", "dual"]);
 export type IncomeType = z.infer<typeof IncomeType>;
+
+/**
+ * 주변 생활 인프라 종류. Kakao Local 카테고리 코드와 1:1로 대응한다 (collector/src/geo/kakao.ts).
+ * 살 집을 고를 때 실제로 묻는 것만 둔다 — 종류를 늘리면 화면이 지도 앱 흉내를 내기 시작한다.
+ */
+export const NearbyKind = z.enum(["daycare", "school", "mart", "convenience", "hospital", "park"]);
+export type NearbyKind = z.infer<typeof NearbyKind>;

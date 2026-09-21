@@ -109,7 +109,7 @@ declare missing text;
 begin
   select string_agg(c, ', ') into missing
   from unnest(array['id','lh_id','provider','title','housing_type','region_code','status',
-                    'notice_date','apply_start','apply_end','pdf_url','lat','lng','transit','extraction','checks']) c
+                    'notice_date','apply_start','apply_end','pdf_url','lat','lng','transit','nearby','extraction','checks']) c
   where not exists (
     select 1 from information_schema.columns
      where table_name = 'app_announcements' and column_name = c

@@ -3,9 +3,17 @@
   "type": "object",
   "properties": {
     "region_code": {
-      "description": "거주 시도 코드",
+      "description": "거주 시도 코드 (11 서울, 41 경기 …)",
       "type": "string",
       "minLength": 2
+    },
+    "region_sigungu": {
+      "description": "거주 시군구 \"시도약칭 시군구\" 형식 (예: \"경기 과천시\")",
+      "type": "string"
+    },
+    "birth_date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
     },
     "age": {
       "type": "integer",
@@ -84,16 +92,25 @@
       "type": "boolean"
     },
     "subscription_months": {
-      "description": "청약통장 가입기간 (개월)",
+      "description": "청약통장 가입기간 (개월, subscription_as_of 기준)",
       "type": "integer",
       "minimum": 0,
       "maximum": 9007199254740991
     },
     "subscription_deposits": {
-      "description": "납입 횟수",
+      "description": "납입 횟수 (subscription_as_of 기준)",
       "type": "integer",
       "minimum": 0,
       "maximum": 9007199254740991
+    },
+    "subscription_as_of": {
+      "description": "위 두 값을 입력한 날. 납입 중이면 이후 지난 달수를 더한다",
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "subscription_active": {
+      "description": "지금도 매달 납입 중인가",
+      "type": "boolean"
     },
     "cash_on_hand": {
       "description": "보유 현금 (원)",
@@ -124,6 +141,24 @@
       }
     },
     "workplace": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "number"
+        },
+        "lng": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ]
+    },
+    "workplace_partner": {
       "type": "object",
       "properties": {
         "label": {

@@ -1,17 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { haversineKm, matchAnnouncement, type RuleResult } from "@housing/engine";
-import { Icon } from "@/components/Icon";
+import { Icon, type IconName } from "@/components/Icon";
 import { ReportSheet } from "@/components/ReportSheet";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
-import { getAnnouncement, isReadable, ruleCounts, useAnnouncements } from "@/data/announcements";
+import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
 import { inputSummary, ruleTitle } from "@/lib/conditions";
 import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { hasSource, openSource } from "@/lib/source";
+import { commuteLines, mapUrl, openMap, transitLines } from "@/lib/commute";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { space } from "@/theme/tokens";
@@ -33,7 +34,10 @@ export default function AnnouncementDetail() {
   // 닫히는 동안에도 내용이 보여야 시트가 빈 채로 내려가지 않는다
   const lastReport = useRef<{ target: ReportTarget; sourceText?: string } | null>(null);
   if (report) lastReport.current = report;
-  const distanceKm = a && state.profile?.workplace && a.lat !== undefined && a.lng !== undefined ? haversineKm(state.profile.workplace, { lat: a.lat, lng: a.lng }) : null;
+  const to = (w: { lat: number; lng: number } | undefined) =>
+    a && w && a.lat !== undefined && a.lng !== undefined ? haversineKm(w, { lat: a.lat, lng: a.lng }) : null;
+  const distanceKm = to(state.profile?.workplace);
+  const distancePartnerKm = to(state.profile?.workplace_partner);
 
   const match = useMemo(() => (a && isReadable(a) && state.profile ? matchAnnouncement(a.extraction, state.profile) : null), [a, state.profile]);
   const track = match?.best_track ?? (match ? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0] ?? null : null);
@@ -148,14 +152,45 @@ export default function AnnouncementDetail() {
           </View>
         ) : null}
 
-        {(a.lat !== undefined || a.transit?.nearest_station) ? (
-          <Card style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
-            <IconTile name="map-pin" tone="info" />
-            <View style={{ flex: 1, gap: 2 }}>
-              <T variant="bodyMedium">{a.transit?.nearest_station ? `${a.transit.nearest_station} 도보 ${a.transit.station_walk_min}분` : "위치"}</T>
-              <Sub tone="3" variant="caption">{distanceKm !== null ? `직장(${state.profile?.workplace?.label ?? ""})까지 직선 약 ${distanceKm.toFixed(0)}km · 통근 시간은 준비 중` : state.profile?.workplace ? "위치 좌표가 없어 거리를 계산할 수 없어요" : "직장 위치를 넣으면 거리가 보여요"}</Sub>
-            </View>
-          </Card>
+        {(a.lat !== undefined || a.transit || a.nearby?.length) ? (
+          <View style={{ gap: 12 }}>
+            <SectionTitle>위치와 교통</SectionTitle>
+            <Card style={{ gap: 16 }}>
+              {mapUrl(a) ? (
+                <Row icon="map-pin" tone="info" title={a.address ?? a.region_name} detail="지도 앱에서 열기" onPress={() => void openMap(a)} chevron />
+              ) : null}
+
+              {transitLines(a.transit).map((t) => (
+                <Row key={t.title} icon={t.icon} tone="gray" title={t.title} detail={t.detail} />
+              ))}
+
+              {/* 통근은 두 사람 몫이 따로다. 부부는 한 쪽만 가까운 집을 고를 수 없다. */}
+              {commuteLines(state.profile, distanceKm, distancePartnerKm).map((c) => (
+                <Row
+                  key={c.who}
+                  icon="walk"
+                  tone="primary"
+                  title={`${c.who}까지 직선 약 ${c.km < 10 ? c.km.toFixed(1) : c.km.toFixed(0)}km`}
+                  detail={c.where ?? "직장 위치"}
+                />
+              ))}
+
+              {/* 있는 것만 말한다 — 경로·환승·소요 시간은 교통 API를 붙여야 나온다 */}
+              <Sub tone="3" variant="caption">
+                모두 직선거리예요. 걷는 시간은 4km/h로 환산한 값이고, 실제 통근 시간(환승·배차)은 아직 계산하지 않아요.
+                {state.profile?.workplace ? "" : " 직장 위치를 넣으면 거리가 보여요."}
+              </Sub>
+            </Card>
+
+            {a.nearby?.length ? (
+              <Card style={{ gap: 16 }}>
+                {a.nearby.map((n) => (
+                  <Row key={n.kind} icon={NEARBY_ICON[n.kind]} tone="gray" title={`${NEARBY_LABEL[n.kind]} · ${n.name}`} detail={`약 ${n.distance_m}m`} />
+                ))}
+                <Sub tone="3" variant="caption">종류마다 가장 가까운 한 곳만 보여드려요.</Sub>
+              </Card>
+            ) : null}
+          </View>
         ) : null}
 
         {hasSource(a.pdf_url) ? (
@@ -209,5 +244,59 @@ export default function AnnouncementDetail() {
         }
       />
     </Screen>
+  );
+}
+
+const NEARBY_LABEL: Record<Nearby["kind"], string> = {
+  daycare: "어린이집",
+  school: "학교",
+  mart: "마트",
+  convenience: "편의점",
+  hospital: "병원",
+  park: "공원",
+};
+
+const NEARBY_ICON: Record<Nearby["kind"], IconName> = {
+  daycare: "baby",
+  school: "school",
+  mart: "cart",
+  convenience: "store",
+  hospital: "hospital",
+  park: "tree",
+};
+
+/** 위치·교통·인프라 한 줄. 아이콘 타일 + 제목 + 보조 설명, 누를 수 있으면 화살표. */
+function Row({
+  icon,
+  tone,
+  title,
+  detail,
+  onPress,
+  chevron,
+}: {
+  icon: IconName;
+  tone: "gray" | "primary" | "info";
+  title: string;
+  detail: string;
+  onPress?: () => void;
+  chevron?: boolean;
+}) {
+  const { colors } = useTheme();
+  const body = (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+      <IconTile name={icon} tone={tone} />
+      <View style={{ flex: 1, gap: 2 }}>
+        <T variant="bodyMedium">{title}</T>
+        <Sub tone="3" variant="caption">{detail}</Sub>
+      </View>
+      {chevron ? <Icon name="right" size={18} color={colors.text4} /> : null}
+    </View>
+  );
+  return onPress ? (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={`${title} ${detail}`}>
+      {body}
+    </Pressable>
+  ) : (
+    body
   );
 }

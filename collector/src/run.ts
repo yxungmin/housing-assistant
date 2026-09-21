@@ -126,6 +126,7 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       lat: geo?.lat,
       lng: geo?.lng,
       transit: geo?.transit,
+      nearby: geo?.nearby,
     });
   }
   log(`  v${version} ${status}${blocking.length ? `: ${blocking.join(" / ")}` : ""}`);

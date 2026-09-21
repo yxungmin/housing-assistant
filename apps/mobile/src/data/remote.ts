@@ -7,7 +7,7 @@
 import { ExtractionOutput, type HousingType } from "@housing/schema";
 import { regionByCode } from "@/lib/regions";
 import { toPayload, type LocalReport, type ReportStatus } from "@/lib/reports";
-import type { Announcement } from "./announcements";
+import type { Announcement, Nearby, Transit } from "./announcements";
 
 const URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -29,7 +29,8 @@ interface FeedRow {
   pdf_url: string | null;
   lat: number | null;
   lng: number | null;
-  transit: { nearest_station?: string; station_walk_min?: number } | null;
+  transit: Transit | null;
+  nearby: Nearby[] | null;
   extraction: unknown | null;
 }
 
@@ -69,6 +70,7 @@ export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch):
       lat: r.lat ?? undefined,
       lng: r.lng ?? undefined,
       transit: r.transit ?? undefined,
+      nearby: r.nearby ?? undefined,
       extraction,
     });
   }

@@ -33,6 +33,8 @@ export default function Profile() {
   if (p?.car_value === undefined) missing.push("자동차가액");
   if (p?.monthly_debt_payment === undefined) missing.push("월 부채 상환액");
   if (!p?.workplace) missing.push("직장 위치");
+  // 부부는 두 사람 통근을 같이 봐야 후보가 제대로 걸러진다
+  else if ((p.marriage === "married" || p.marriage === "pre_marriage") && !p.workplace_partner) missing.push("배우자 직장 위치");
   const sub = state.subscription;
   const age = p?.birth_date ? `${p.birth_date.slice(0, 4)}년생 · 만 ${ageFromBirthDate(p.birth_date)}세` : p?.age !== undefined ? `만 ${p.age}세` : "";
   const subLabel = { none: "미구독", trial: "무료 체험 중", active: "구독 중", expired: "만료됨" }[sub.status];
@@ -76,7 +78,12 @@ export default function Profile() {
             <T variant="bodyMedium">{age} · {p.household_size}인 가구 · {MARRIAGE[p.marriage ?? ""]}{p.income_type === "dual" ? " 맞벌이" : ""} · {p.region_sigungu ?? REGIONS.find((r) => r.value === p.region_code)?.label}</T>
             <Sub>월 소득 {manwon(p.monthly_income)} · 자산 {manwon(p.total_assets)} · 현금 {manwon(p.cash_on_hand)}</Sub>
             <Sub>{p.is_homeless ? `무주택 ${yearsMonths(p.homeless_months)}` : "유주택"} · 청약통장 {(p.subscription_months ?? 0) + (p.subscription_active && p.subscription_as_of ? monthsBetween(p.subscription_as_of) : 0)}개월{p.subscription_active ? " (납입 중)" : ""}</Sub>
-            {p.workplace ? <Sub>직장 {p.workplace.label ?? "위치 저장됨"}</Sub> : null}
+            {p.workplace ? (
+              <Sub>
+                직장 {p.workplace.label ?? "위치 저장됨"}
+                {p.workplace_partner ? ` · ${p.marriage === "pre_marriage" ? "예비 배우자" : "배우자"} ${p.workplace_partner.label ?? "위치 저장됨"}` : ""}
+              </Sub>
+            ) : null}
           </View>
         ) : (
           <Sub>아직 조건을 입력하지 않았어요.</Sub>

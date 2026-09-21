@@ -15,8 +15,12 @@
   "lat": 37.4316,
   "lng": 126.9982,
   "transit": {
-   "nearest_station": "인덕원역",
-   "station_walk_min": 22
+   "nearest_station": "인덕원역 4호선",
+   "station_walk_min": 22,
+   "station_distance_m": 1480,
+   "nearest_bus_stop": "과천지식정보타운",
+   "bus_walk_min": 3,
+   "bus_distance_m": 190
   },
   "extraction": {
    "title": "과천지식정보타운 S-11BL 행복주택(리츠) 입주자 모집공고",
@@ -3050,7 +3054,24 @@
     "전환보증금: 보증금 증액(월세 감액) 이율 7.0%, 보증금 감액(월세 증액) 이율 3.5%, 100만원 단위 선택(p.7).",
     "최대 거주기간: 대학생·청년 10년, 신혼부부·한부모(무자녀 10년, 자녀 1명 이상 14년), 고령자·주거급여수급자 20년(p.34)."
    ]
-  }
+  },
+  "nearby": [
+   {
+    "kind": "school",
+    "name": "과천문원초등학교",
+    "distance_m": 690
+   },
+   {
+    "kind": "mart",
+    "name": "이마트 과천점",
+    "distance_m": 1320
+   },
+   {
+    "kind": "convenience",
+    "name": "세븐일레븐 과천점",
+    "distance_m": 210
+   }
+  ]
  },
  {
   "id": "002",
@@ -3068,8 +3089,12 @@
   "lat": 37.4784,
   "lng": 126.9517,
   "transit": {
-   "nearest_station": "봉천역",
-   "station_walk_min": 9
+   "nearest_station": "봉천역 2호선",
+   "station_walk_min": 9,
+   "station_distance_m": 620,
+   "nearest_bus_stop": "관악구청",
+   "bus_walk_min": 4,
+   "bus_distance_m": 250
   },
   "extraction": {
    "title": "관악봉천 행복주택 입주자 모집",
@@ -5204,7 +5229,24 @@
     "주거약자용 주택은 총 22세대이며 대학생 또는 청년계층인 주거약자에게 공급됩니다(p.1). 주거약자 트랙의 자산 기준은 신청 계층(대학생 1억원·자동차 미소유 / 청년 2억7,300만원·자동차 3,708만원 이하)에 따라 달라 별도 룰로 넣지 않았습니다.",
     "서류제출대상자 발표 2024-08-28, 서류접수 2024-09-02~09-04, 계약체결 전자계약 2024-12-18~12-20(현장계약 2024-12-19, 주거약자에 한함)."
    ]
-  }
+  },
+  "nearby": [
+   {
+    "kind": "school",
+    "name": "봉천중학교",
+    "distance_m": 540
+   },
+   {
+    "kind": "convenience",
+    "name": "CU 봉천역점",
+    "distance_m": 160
+   },
+   {
+    "kind": "hospital",
+    "name": "에이치플러스 양지병원",
+    "distance_m": 1100
+   }
+  ]
  },
  {
   "id": "003",
@@ -5787,8 +5829,12 @@
   "lat": 37.5586,
   "lng": 126.9095,
   "transit": {
-   "nearest_station": "망원역",
-   "station_walk_min": 7
+   "nearest_station": "망원역 6호선",
+   "station_walk_min": 7,
+   "station_distance_m": 470,
+   "nearest_bus_stop": "망원역2번출구",
+   "bus_walk_min": 2,
+   "bus_distance_m": 130
   },
   "extraction": {
    "title": "2024년 LH 청년특화형 주택(아츠스테이 성산2호점) 입주자 모집공고",
@@ -6186,7 +6232,39 @@
     "당첨자 발표: 자격심사 완료일로부터 2일 후(영업일 기준), 주택개방 및 계약체결: 예비자 발표 후 7일간, 입주: 계약체결일로부터 14일 이내(11~12월 중 예상)",
     "임대조건 범위(공고문 표기): 19㎡ 보증금 518.2~558.2만원·임대료 32.52~34.46만원, 24㎡ 보증금 647.6~677.6만원·임대료 41.16~41.9만원, 23㎡ 보증금 637.7만원·임대료 40.16만원, 29㎡ 보증금 727.2만원·임대료 46.05만원"
    ]
-  }
+  },
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "망원어린이집",
+    "distance_m": 240
+   },
+   {
+    "kind": "school",
+    "name": "망원초등학교",
+    "distance_m": 320
+   },
+   {
+    "kind": "mart",
+    "name": "망원시장",
+    "distance_m": 410
+   },
+   {
+    "kind": "convenience",
+    "name": "GS25 망원점",
+    "distance_m": 90
+   },
+   {
+    "kind": "hospital",
+    "name": "마포구립서부노인전문병원",
+    "distance_m": 1480
+   },
+   {
+    "kind": "park",
+    "name": "망원한강공원",
+    "distance_m": 760
+   }
+  ]
  },
  {
   "id": "005",

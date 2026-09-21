@@ -39,6 +39,46 @@ const todayIso = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
+/**
+ * 직장 위치 두 단계(시도 → 시군구). 본인과 배우자가 같은 모양이라 한 곳에서 만든다.
+ * 주소 검색 대신 시군구 선택으로 받는다 — 정확한 주소는 통근 계산에 필요한 만큼보다 많이 알게 된다.
+ */
+type WorkplaceKey = "workplace" | "workplace_partner";
+
+function workplaceSteps(key: WorkplaceKey, copy: { title: Step["title"]; hint: string; when?: (p: Partial<UserProfile>) => boolean }): Step[] {
+  const cur = (p: Partial<UserProfile>) => parsePlaceLabel(p[key]?.label);
+  return [
+    {
+      id: `${key}_region`, kind: "select", title: copy.title, hint: copy.hint, optional: true,
+      when: copy.when,
+      options: REGIONS,
+      apply: (p, v) => {
+        if (v === null) return { ...p, [key]: undefined };
+        const c = cur(p);
+        return { ...p, [key]: placeFor(String(v), c?.regionCode === String(v) ? c.sigungu : undefined) ?? undefined };
+      },
+      read: (p) => cur(p)?.regionCode ?? null,
+    },
+    {
+      id: `${key}_sigungu`, kind: "select",
+      title: (p) => `${regionByCode(cur(p)?.regionCode)?.label ?? ""} 어느 시·군·구인가요?`,
+      hint: "구청·시청 부근을 기준으로 직선거리를 계산해요.",
+      when: (p) => {
+        if (copy.when && !copy.when(p)) return false;
+        const code = cur(p)?.regionCode;
+        return !!code && (regionByCode(code)?.sigungu.length ?? 0) > 1;
+      },
+      options: (p) => (regionByCode(cur(p)?.regionCode)?.sigungu ?? []).map((s) => ({ value: s, label: s })),
+      apply: (p, v) => {
+        const code = cur(p)?.regionCode;
+        if (!code || v === null) return p;
+        return { ...p, [key]: placeFor(code, String(v)) ?? p[key] };
+      },
+      read: (p) => cur(p)?.sigungu ?? null,
+    },
+  ];
+}
+
 export const STEPS: Step[] = [
   {
     id: "region", kind: "select", title: "지금 어디에 살고 있나요?", hint: "공고 대부분이 거주지 기준으로 신청 자격을 봅니다.",
@@ -155,32 +195,16 @@ export const STEPS: Step[] = [
     id: "cash", kind: "won", title: "지금 바로 쓸 수 있는 현금은 얼마인가요?", hint: "보증금에 넣을 수 있는 돈. 부족액 계산에 씁니다.",
     apply: (p, v) => ({ ...p, cash_on_hand: Number(v) }), read: (p) => p.cash_on_hand ?? null,
   },
-  {
-    id: "workplace_region", kind: "select", title: "직장은 어느 지역인가요?", hint: "직장과 가까운 공고를 먼저 보여드려요. 위치는 기기에만 저장되고, 통근 시간 계산은 지도 연결 후 열립니다.", optional: true,
-    options: REGIONS,
-    apply: (p, v) => {
-      if (v === null) return { ...p, workplace: undefined };
-      const cur = parsePlaceLabel(p.workplace?.label);
-      return { ...p, workplace: placeFor(String(v), cur?.regionCode === String(v) ? cur.sigungu : undefined) ?? undefined };
-    },
-    read: (p) => parsePlaceLabel(p.workplace?.label)?.regionCode ?? null,
-  },
-  {
-    id: "workplace_sigungu", kind: "select",
-    title: (p) => `${regionByCode(parsePlaceLabel(p.workplace?.label)?.regionCode)?.label ?? ""} 어느 시·군·구인가요?`,
-    hint: "구청·시청 부근을 기준으로 직선거리를 계산해요.",
-    when: (p) => {
-      const code = parsePlaceLabel(p.workplace?.label)?.regionCode;
-      return !!code && (regionByCode(code)?.sigungu.length ?? 0) > 1;
-    },
-    options: (p) => (regionByCode(parsePlaceLabel(p.workplace?.label)?.regionCode)?.sigungu ?? []).map((s) => ({ value: s, label: s })),
-    apply: (p, v) => {
-      const code = parsePlaceLabel(p.workplace?.label)?.regionCode;
-      if (!code || v === null) return p;
-      return { ...p, workplace: placeFor(code, String(v)) ?? p.workplace };
-    },
-    read: (p) => parsePlaceLabel(p.workplace?.label)?.sigungu ?? null,
-  },
+  ...workplaceSteps("workplace", {
+    title: "직장은 어느 지역인가요?",
+    hint: "직장과 가까운 공고를 먼저 보여드려요. 위치는 기기에만 저장되고, 통근 시간 계산은 지도 연결 후 열립니다.",
+  }),
+  ...workplaceSteps("workplace_partner", {
+    title: (p) => (p.marriage === "pre_marriage" ? "예비 배우자 직장은 어느 지역인가요?" : "배우자 직장은 어느 지역인가요?"),
+    hint: "두 사람 통근을 같이 봐야 실제로 살 수 있는 집이 골라져요. 건너뛰어도 됩니다.",
+    // 본인 직장을 넣은 신혼·예비신혼부부에게만 묻는다. 한 쪽도 안 넣었으면 물을 이유가 없다.
+    when: (p) => isCouple(p) && !!p.workplace,
+  }),
 ];
 
 export function visibleSteps(p: Partial<UserProfile>): Step[] {

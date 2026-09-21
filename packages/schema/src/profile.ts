@@ -30,13 +30,12 @@ export const UserProfile = z.object({
   subscription_active: z.boolean().optional().describe("지금도 매달 납입 중인가"),
   cash_on_hand: z.number().int().min(0).optional().describe("보유 현금 (원)"),
   statuses: z.array(SpecialStatus).optional().describe("해당하는 계층 자격. 빈 배열 = 해당 없음, undefined = 미입력"),
-  workplace: z
-    .object({
-      label: z.string().optional(),
-      lat: z.number(),
-      lng: z.number(),
-    })
-    .optional(),
+  workplace: z.object({ label: z.string().optional(), lat: z.number(), lng: z.number() }).optional(),
+  /**
+   * 배우자(예비 배우자)의 직장. 신혼부부·예비신혼부부는 두 사람의 통근을 같이 보고 집을 고른다 —
+   * 한 쪽만 가까운 곳은 실제로는 후보가 아니다. 입력은 선택이고 기기에만 남는다.
+   */
+  workplace_partner: z.object({ label: z.string().optional(), lat: z.number(), lng: z.number() }).optional(),
   commute_limit_min: z.number().int().min(0).optional().describe("허용 통근 시간 상한 (분)"),
 });
 export type UserProfile = z.infer<typeof UserProfile>;
