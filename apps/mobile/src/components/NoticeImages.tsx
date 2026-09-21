@@ -8,7 +8,7 @@ import { useTheme } from "@/theme/ThemeProvider";
 import { radius, space } from "@/theme/tokens";
 
 /**
- * 공고에 붙어 있던 그림 (위치도·단지조감도).
+ * 기관이 공고에 올린 이미지 (위치도·단지조감도).
  *
  * 우리가 만든 그림이 아니라 기관이 이미지 파일로 올려 둔 것이다. 그 차이를 화면에서 말한다 —
  * 조건·금액은 우리가 공고문에서 읽어 옮긴 것이고, 이 그림은 기관이 준 것 그대로다.
@@ -25,11 +25,14 @@ export function NoticeImages({ images }: { images?: NoticeImage[] }) {
   const { colors } = useTheme();
   const [broken, setBroken] = useState<string[]>([]);
   const shown = (images ?? []).filter((i) => !broken.includes(i.url));
+  const kinds = [...new Set(shown.map((i) => i.kind).filter(Boolean))].join(" · ");
   if (shown.length === 0) return null;
 
   return (
     <View style={{ gap: 12 }}>
-      <SectionTitle>공고에 실린 그림</SectionTitle>
+      {/* 제목을 실제 들어 있는 것으로 짓는다 ("위치도·조감도"). 고정 문구를 쓰면
+          들어 있는 게 하나뿐일 때도 여러 종류인 척하게 된다 */}
+      <SectionTitle>{kinds || "단지 이미지"}</SectionTitle>
       <Card style={{ gap: 12, paddingHorizontal: 0 }}>
         <ScrollView
           horizontal
@@ -51,14 +54,14 @@ export function NoticeImages({ images }: { images?: NoticeImage[] }) {
                 style={{ width: 240, height: 160, borderRadius: radius.md, backgroundColor: colors.surface }}
               />
               <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <T variant="bodyMedium" style={{ fontSize: 14 }}>{img.kind || "공고 그림"}</T>
+                <T variant="bodyMedium" style={{ fontSize: 14 }}>{img.kind || "이미지"}</T>
                 <Icon name="right" size={14} color={colors.text4} />
               </View>
             </Pressable>
           ))}
         </ScrollView>
         <Sub tone="3" variant="caption" style={{ paddingHorizontal: space.lg }}>
-          공고에 붙어 있던 그림을 그대로 가져왔어요. 우리가 그린 것이 아니에요. 눌러서 원본을 열 수 있어요.
+          기관이 공고에 올린 이미지예요. 눌러서 원본을 볼 수 있어요.
         </Sub>
       </Card>
     </View>

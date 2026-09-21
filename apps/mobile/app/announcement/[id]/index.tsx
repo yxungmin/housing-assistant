@@ -18,7 +18,7 @@ import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from 
 import { commuteDetail, commuteFor, commuteLines, mapUrl, nearbyLines, openMap, transitLines } from "@/lib/commute";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { space } from "@/theme/tokens";
+import { radius, space } from "@/theme/tokens";
 
 /** 공고 상세: 조건 체크리스트(근거 쪽), 위치, 일정, 비용 계산 CTA */
 export default function AnnouncementDetail() {
@@ -309,27 +309,41 @@ export default function AnnouncementDetail() {
             {/* 표 안에서는 자릿수를 맞춘다. 문장 안(알림·고지)에서만 "2026년 9월 17일" 꼴을 쓴다 */}
             <KeyValue label="공고일" value={dateText(a.notice_date)} />
             <KeyValue label="접수" value={dateRange(a.apply_start, a.apply_end)} />
-            {a.extraction.schedule.winner_announce ? <KeyValue label="당첨자 발표" value={looseDate(a.extraction.schedule.winner_announce)} /> : null}
+            {a.extraction.schedule.winner_announce ? (
+              <>
+                <KeyValue label="당첨자 발표" value={looseDate(a.extraction.schedule.winner_announce)} />
+                {/* 날짜를 본 그 자리에 둔다. 카드 밖 아래쪽에 두었더니 있는 줄도 몰랐다.
+                    구독과 무관하게 무료다 — 알림을 잠그면 일정을 놓치게 된다. */}
+                <Pressable
+                  onPress={() => toggleApplied(a.id)}
+                  accessibilityRole="switch"
+                  accessibilityState={{ checked: applied }}
+                  style={({ pressed }) => ({
+                    flexDirection: "row", alignItems: "center", gap: 10,
+                    marginTop: 2, paddingVertical: 10, paddingHorizontal: 12,
+                    borderRadius: radius.md,
+                    backgroundColor: applied ? colors.primarySoft : pressed ? colors.cardStrong : colors.cardSoft,
+                  })}
+                >
+                  <Icon name={applied ? "check-circle" : "bell"} size={20} color={applied ? colors.primary : colors.text2} />
+                  <View style={{ flex: 1, gap: 1 }}>
+                    <T variant="bodyMedium" style={{ fontSize: 15 }}>
+                      {applied ? "발표일에 알려드릴게요" : "신청했다면 발표일에 알려드릴게요"}
+                    </T>
+                    <Sub tone="3" variant="caption">
+                      {applied
+                        ? announceDate
+                          ? "3일 전 · 1일 전 · 당일 오전 9시"
+                          : "발표일이 날짜로 적혀 있지 않아 알림을 걸지 못했어요"
+                        : "눌러서 신청한 공고로 표시하세요"}
+                    </Sub>
+                  </View>
+                </Pressable>
+              </>
+            ) : null}
             {a.extraction.schedule.move_in ? <KeyValue label="입주 예정" value={looseDate(a.extraction.schedule.move_in)} /> : null}
           </Card>
 
-          {/* 발표일을 놓치지 않게 한다. 구독과 무관하게 무료다 — 알림을 잠그면 마감을 놓치게 된다. */}
-          <Card onPress={() => toggleApplied(a.id)}>
-            {/* 이 파일에는 위치·교통용 지역 Row가 따로 있어 ui의 Row를 쓰지 않는다 */}
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-              <View style={{ flex: 1, gap: 2 }}>
-                <T variant="bodyMedium">{applied ? "신청한 공고예요" : "이 공고에 신청했어요"}</T>
-                <Sub tone="3" variant="caption">
-                  {applied
-                    ? announceDate
-                      ? `당첨자 발표 3일 전·1일 전·당일에 알려드릴게요`
-                      : "발표일이 공고문에 날짜로 적혀 있지 않아 알림을 걸지 못했어요"
-                    : "표시해 두면 당첨자 발표일에 알려드려요"}
-                </Sub>
-              </View>
-              <Icon name={applied ? "check-circle" : "bell"} size={22} color={applied ? colors.primary : colors.text4} />
-            </View>
-          </Card>
         </View>
 
         {/* 추출이 남긴 작업 메모는 거르고 공고문 내용만 낸다 (lib/notes.ts) */}
