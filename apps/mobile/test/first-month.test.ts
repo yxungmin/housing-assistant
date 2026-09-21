@@ -63,3 +63,35 @@ describe("hasAccess", () => {
     expect(hasAccess({ status: "expired", firstMonthUsedAt: used })).toBe(false);
   });
 });
+
+describe("초기화·재설치에도 남는가", () => {
+  /** appState의 reset이 하는 일과 같은 규칙 */
+  const afterReset = (sub: Subscription): Subscription =>
+    sub.firstMonthUsedAt ? { status: "none", firstMonthUsedAt: sub.firstMonthUsedAt } : { status: "none" };
+
+  it("모든 데이터 지우고 처음부터 해도 무료 달이 다시 생기지 않는다", () => {
+    const used = { status: "trial" as const, expiresAt: inDays(30), firstMonthUsedAt: "2026-09-21T00:00:00.000Z" };
+    const after = afterReset(used);
+    expect(after.status).toBe("none");
+    expect(canUseFirstMonthFree(after)).toBe(false);
+  });
+
+  it("쓴 적 없으면 초기화 후에도 쓸 수 있다", () => {
+    expect(canUseFirstMonthFree(afterReset({ status: "none" }))).toBe(true);
+  });
+
+  /** hydrate가 별도 키로 기록을 되살리는 규칙 */
+  const hydrate = (meta: Subscription | undefined, stored: string | null): Subscription => {
+    const sub = meta ?? { status: "none" as const };
+    return stored ? { ...sub, firstMonthUsedAt: sub.firstMonthUsedAt ?? stored } : sub;
+  };
+
+  it("meta가 지워져도 별도 키가 남아 있으면 되살린다", () => {
+    const revived = hydrate(undefined, "2026-09-21T00:00:00.000Z");
+    expect(canUseFirstMonthFree(revived)).toBe(false);
+  });
+
+  it("별도 키가 없으면 그대로 쓸 수 있다", () => {
+    expect(canUseFirstMonthFree(hydrate(undefined, null))).toBe(true);
+  });
+});

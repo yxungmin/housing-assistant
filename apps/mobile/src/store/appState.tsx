@@ -117,11 +117,21 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, reports: s.reports.map((r) => byId.get(r.id) ?? r) };
     }
     case "reset":
-      return { ...initial, loaded: true };
+      // "처음부터"가 무료 달을 다시 주는 문이 되면 안 된다. 첫 달을 썼다는 사실만 남긴다.
+      return {
+        ...initial,
+        subscription: s.subscription.firstMonthUsedAt ? { status: "none", firstMonthUsedAt: s.subscription.firstMonthUsedAt } : initial.subscription,
+        loaded: true,
+      };
   }
 }
 
-const KEYS = { profile: "profile.v1", meta: "meta.v1" } as const;
+/**
+ * firstMonth를 meta와 따로 두는 이유: meta는 "모든 데이터 지우고 처음부터"에서 통째로 지워지고,
+ * iOS는 SecureStore가 키체인을 쓰기 때문에 앱을 지워도 이 키가 남는다 (= 재설치로 무료 달이 다시 생기지 않는다).
+ * Android는 재설치하면 사라지고, 웹은 사이트 데이터를 지우면 사라진다. 완전한 차단은 스토어·서버 몫이다.
+ */
+const KEYS = { profile: "profile.v1", meta: "meta.v1", firstMonth: "first-month.v1" } as const;
 
 /**
  * 네이티브: SecureStore(암호화). 웹: 개발·시안 확인용으로만 쓰므로 localStorage.
@@ -178,10 +188,15 @@ export function AppStateProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     (async () => {
-      const [profile, meta] = await Promise.all([read(KEYS.profile), read(KEYS.meta)]);
+      const [profile, meta, firstMonth] = await Promise.all([read(KEYS.profile), read(KEYS.meta), read(KEYS.firstMonth)]);
       const parsedMeta = meta ? (JSON.parse(meta) as Partial<AppState>) : {};
       // 이 필드가 생기기 전에 깔린 기기에는 seen이 없다. 그 경우 다음 목록이 기준선이 된다.
       if (!parsedMeta.seen) parsedMeta.seen = emptySeen;
+      // meta가 지워졌어도 첫 달 기록이 남아 있으면 되살린다
+      if (firstMonth) {
+        const sub = parsedMeta.subscription ?? { status: "none" as const };
+        parsedMeta.subscription = { ...sub, firstMonthUsedAt: sub.firstMonthUsedAt ?? firstMonth };
+      }
       dispatch({ type: "hydrate", state: { ...parsedMeta, profile: profile ? (JSON.parse(profile) as UserProfile) : null } });
     })();
   }, []);
@@ -191,6 +206,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     void write(KEYS.profile, state.profile ? JSON.stringify(state.profile) : null);
     const { onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen } = state;
     void write(KEYS.meta, JSON.stringify({ onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen }));
+    // 한 번 쓰면 지우지 않는다 — 여기서 null을 쓰면 위 주석의 보호가 통째로 없어진다
+    if (subscription.firstMonthUsedAt) void write(KEYS.firstMonth, subscription.firstMonthUsedAt);
   }, [state]);
 
   // 신고 동기화: 못 보낸 건 보내고, 보낸 건의 처리 결과를 받아 "확인 중"을 끝맺는다.
