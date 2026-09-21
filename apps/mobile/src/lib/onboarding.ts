@@ -1,5 +1,5 @@
 import type { UserProfile } from "@housing/schema";
-import { ageFromBirthDate } from "@housing/engine";
+import { ageFromBirthDate, homelessBasis, homelessBasisReason } from "@housing/engine";
 import { parsePlaceLabel, placeFor } from "./places";
 import { REGION_LIST, regionByCode, sigunguValue } from "./regions";
 
@@ -16,7 +16,7 @@ export interface Step {
   id: string;
   kind: StepKind;
   title: string | ((p: Partial<UserProfile>) => string);
-  hint?: string;
+  hint?: string | ((p: Partial<UserProfile>) => string);
   helper?: string;
   options?: Option[] | ((p: Partial<UserProfile>) => Option[]);
   optional?: boolean;
@@ -31,6 +31,7 @@ export interface Step {
 export const REGIONS: Option[] = REGION_LIST.map((r) => ({ value: r.code, label: r.label }));
 
 export const stepTitle = (s: Step, p: Partial<UserProfile>) => (typeof s.title === "function" ? s.title(p) : s.title);
+export const stepHint = (s: Step, p: Partial<UserProfile>) => (typeof s.hint === "function" ? s.hint(p) : s.hint);
 export const stepOptions = (s: Step, p: Partial<UserProfile>) => (typeof s.options === "function" ? s.options(p) : s.options ?? []);
 
 const isCouple = (p: Partial<UserProfile>) => p.marriage === "married" || p.marriage === "pre_marriage";
@@ -139,9 +140,16 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, income_type: v as UserProfile["income_type"] }), read: (p) => p.income_type ?? null,
   },
   {
-    id: "monthly_income", kind: "won", title: "한 달 가구 소득은 얼마인가요?", hint: "세금 떼기 전 금액이에요. 맞벌이면 두 사람 소득을 더해 주세요.",
-    helper: "정확한 금액을 모르면 직장 건강보험료 납부액으로 역산해 드려요. 공고의 소득 기준이 이 값으로 판정됩니다.",
-    apply: (p, v) => ({ ...p, monthly_income: Number(v) }), read: (p) => p.monthly_income ?? null,
+    // 공고는 "월평균소득 100% 이하"처럼 월로 말하지만, 사람은 자기 소득을 연봉으로 기억한다.
+    // 그래서 받기는 연봉으로 받고 월로 환산해 판정에 쓴다. 환산값은 화면에 같이 적어 둔다.
+    id: "annual_income", kind: "won", title: "세전 연소득은 얼마인가요?", hint: "세금 떼기 전 1년 총액이에요. 맞벌이면 두 사람 소득을 더해 주세요.",
+    helper: "정확한 금액을 모르면 직장 건강보험료 납부액으로 역산해 드려요. 공고의 소득 기준은 월 환산액으로 판정됩니다.",
+    apply: (p, v) => {
+      const annual = Number(v);
+      return { ...p, annual_income: annual, monthly_income: Math.round(annual / 12) };
+    },
+    // 예전 프로필에는 연소득이 없다. 그때만 월소득에서 되돌린다.
+    read: (p) => p.annual_income ?? (p.monthly_income !== undefined ? p.monthly_income * 12 : null),
   },
   {
     id: "total_assets", kind: "won", title: "가구 총자산은 얼마쯤인가요?", hint: "부동산·자동차·금융자산을 더하고 부채를 뺀 금액. 대략이어도 괜찮아요.",
@@ -175,9 +183,19 @@ export const STEPS: Step[] = [
     read: (p) => (p.is_homeless === undefined ? null : p.is_homeless ? "yes" : "no"),
   },
   {
-    id: "homeless_months", kind: "duration", title: "무주택 기간은 얼마나 됐나요?", hint: "년 단위로 적고 필요하면 개월을 더해 주세요. 처음부터 집이 없었으면 나이만큼 적어도 됩니다.",
+    // "무주택 몇 년인가요?"는 답하기 어려운 질문이다. 태어나서부터도 아니고 자취 시작일도 아니다.
+    // 청약 가점제 규칙이 따로 있어서(만 30세부터, 그 전 혼인이면 혼인신고일부터) 그대로 계산해 채워 둔다.
+    // 확정하지는 않는다 — 혼인일을 연 단위로만 알고, 집을 팔았던 사람은 그날부터 다시 세야 한다.
+    id: "homeless_months", kind: "duration", title: "무주택 기간이 이렇게 되나요?",
+    hint: (p) => {
+      // 기산일을 셀 수 있으면 규칙을 다시 읊지 않는다. 계산 결과가 곧 규칙의 설명이다.
+      const sold = "집을 가졌다 판 적이 있으면 판 날부터 다시 세 주세요.";
+      const basis = homelessBasis(p);
+      return basis ? `${homelessBasisReason(basis)}. ${sold}` : `만 30세부터 세고, 그 전에 혼인했으면 혼인신고일부터예요. ${sold}`;
+    },
     when: (p) => p.is_homeless === true,
-    apply: (p, v) => ({ ...p, homeless_months: Number(v) }), read: (p) => p.homeless_months ?? null,
+    apply: (p, v) => ({ ...p, homeless_months: Number(v) }),
+    read: (p) => p.homeless_months ?? homelessBasis(p)?.months ?? null,
   },
   {
     id: "subscription_months", kind: "months", title: "청약통장은 얼마나 넣었나요?", hint: "가입 기간(개월). 없으면 0.",
@@ -210,6 +228,88 @@ export const STEPS: Step[] = [
 export function visibleSteps(p: Partial<UserProfile>): Step[] {
   return STEPS.filter((s) => !s.when || s.when(p));
 }
+
+/**
+ * 목록에 쓰는 짧은 이름. 단계의 title은 질문이라("세전 연소득은 얼마인가요?") 목록에 못 쓴다.
+ * 단계 객체마다 label을 더하지 않고 여기 한 표에 모은다 — 단계 정의는 질문에만 집중한다.
+ */
+const STEP_LABEL: Record<string, string> = {
+  region: "사는 지역",
+  sigungu: "사는 시군구",
+  birth_date: "생년월일",
+  marriage: "혼인 상태",
+  marriage_years: "혼인 기간",
+  household_size: "가구원 수",
+  children_count: "자녀 수",
+  youngest: "막내 나이",
+  income_type: "맞벌이 여부",
+  annual_income: "가구 연소득",
+  total_assets: "총자산",
+  car_value: "자동차 가액",
+  debt: "월 부채 상환액",
+  statuses: "해당 계층",
+  homeless: "무주택 여부",
+  homeless_months: "무주택 기간",
+  subscription_months: "청약통장 기간",
+  subscription_active: "청약통장 납입 중",
+  cash: "보유 현금",
+  workplace_region: "직장 지역",
+  workplace_sigungu: "직장 시군구",
+  workplace_partner_region: "배우자 직장 지역",
+  workplace_partner_sigungu: "배우자 직장 시군구",
+};
+
+export const stepLabel = (s: Step): string => STEP_LABEL[s.id] ?? s.id;
+
+const wonText = (n: number): string => {
+  if (n <= 0) return "0원";
+  const eok = Math.floor(n / 100_000_000);
+  const man = Math.round((n % 100_000_000) / 10_000);
+  if (eok > 0) return man > 0 ? `${eok}억 ${man.toLocaleString("ko-KR")}만 원` : `${eok}억 원`;
+  if (man > 0) return `${man.toLocaleString("ko-KR")}만 원`;
+  return `${n.toLocaleString("ko-KR")}원`;
+};
+
+const monthsText = (n: number): string => {
+  const y = Math.floor(n / 12);
+  const m = n % 12;
+  if (y === 0) return `${m}개월`;
+  return m === 0 ? `${y}년` : `${y}년 ${m}개월`;
+};
+
+/**
+ * 목록에 보여 줄 현재 값. 아직 안 넣었으면 null이고, 화면이 "입력 안 함"으로 적는다.
+ *
+ * 단계마다 형식을 따로 적지 않고 kind에서 끌어낸다. 단계가 늘어도 여기를 고칠 일이 거의 없다.
+ */
+export function stepDisplay(s: Step, p: Partial<UserProfile>): string | null {
+  const v = s.read(p);
+  if (v === null || v === "") return null;
+
+  if (s.kind === "select") return stepOptions(s, p).find((o) => o.value === String(v))?.label ?? String(v);
+  if (s.kind === "multi") {
+    const picked = String(v).split(",").filter(Boolean);
+    if (picked.length === 0) return "해당 없음";
+    const options = stepOptions(s, p);
+    return picked.map((x) => options.find((o) => o.value === x)?.label ?? x).join(" · ");
+  }
+  if (s.kind === "date") {
+    const d = String(v);
+    return d.length === 8 ? `${d.slice(0, 4)}.${d.slice(4, 6)}.${d.slice(6, 8)}` : d;
+  }
+
+  const n = Number(v);
+  if (!Number.isFinite(n)) return String(v);
+  if (s.kind === "won") return wonText(n) + (s.id === "annual_income" ? " / 년" : s.id === "debt" ? " / 월" : "");
+  if (s.kind === "count") return s.id === "marriage_years" ? `${n}년` : `${n}명`;
+  if (s.kind === "age") return `만 ${n}세`;
+  if (s.kind === "months" || s.kind === "duration") return monthsText(n);
+  return String(v);
+}
+
+/** 그 단계 하나만. 내 조건 목록에서 항목 하나를 눌러 들어올 때 쓴다. */
+export const stepById = (p: Partial<UserProfile>, id: string): Step | undefined => visibleSteps(p).find((s) => s.id === id);
+
 
 export function isComplete(p: Partial<UserProfile>): p is UserProfile {
   return p.region_code !== undefined && (p.birth_date !== undefined || p.age !== undefined) && p.marriage !== undefined && p.household_size !== undefined && p.monthly_income !== undefined && p.total_assets !== undefined && p.is_homeless !== undefined && p.cash_on_hand !== undefined;

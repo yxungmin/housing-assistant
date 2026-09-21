@@ -68,7 +68,7 @@ export default function Profile() {
     <Screen>
       <PageTitle title="내 정보" />
 
-      <Card onPress={() => router.push("/onboarding")} style={{ gap: 14 }}>
+      <Card onPress={() => router.push("/conditions")} style={{ gap: 14 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <T variant="subheading">내 조건</T>
           <Tag tone="gray">수정</Tag>

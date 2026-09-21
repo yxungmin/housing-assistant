@@ -18,7 +18,13 @@ export const UserProfile = z.object({
   children_count: z.number().int().min(0).optional(),
   children_ages: z.array(z.number().int().min(0)).optional(),
   income_type: IncomeType.optional(),
-  monthly_income: z.number().int().min(0).optional().describe("가구 월평균소득 (원, 세전)"),
+  /**
+   * 사람이 적은 세전 연소득 (원). 공고는 월평균소득으로 말하지만 사람은 연봉으로 기억한다.
+   * monthly_income은 여기서 12로 나눈 값이라, 되읽을 때 12를 곱해 복원하면 반올림 오차가 보인다.
+   * 그래서 적은 값을 그대로 남긴다. 판정에 쓰는 것은 monthly_income이다.
+   */
+  annual_income: z.number().int().min(0).optional().describe("세전 연소득 (원). 사람이 적은 원본"),
+  monthly_income: z.number().int().min(0).optional().describe("가구 월평균소득 (원, 세전). annual_income에서 계산"),
   total_assets: z.number().int().min(0).optional().describe("총자산 (원)"),
   car_value: z.number().int().min(0).optional(),
   monthly_debt_payment: z.number().int().min(0).optional().describe("기존 부채 월 상환액 (원)"),

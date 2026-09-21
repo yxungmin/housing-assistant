@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
@@ -7,19 +7,29 @@ import { Icon } from "@/components/icon";
 import { IncomeHelperSheet } from "@/components/IncomeHelperSheet";
 import { BottomCTA, FadeIn, Header, IconButton, Screen, Sub, T } from "@/components/ui";
 import { currentAnnouncements, matchAll, pickBest } from "@/data/announcements";
-import { isComplete, stepOptions, stepTitle, visibleSteps, type Step } from "@/lib/onboarding";
+import { isComplete, stepHint, stepLabel, stepOptions, stepTitle, visibleSteps, type Step } from "@/lib/onboarding";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space } from "@/theme/tokens";
 
-/** 조건 입력: 한 화면에 질문 하나, 하단 고정 CTA, 뒤로가기 자유. */
+/**
+ * 조건 입력: 한 화면에 질문 하나, 하단 고정 CTA, 뒤로가기 자유.
+ *
+ * 두 가지로 쓴다.
+ *  - 처음 가입: 모든 질문을 순서대로. `/onboarding`
+ *  - 한 항목만 고치기: 그 질문 하나만 띄우고 저장하면 돌아간다. `/onboarding?step=annual_income`
+ * 스무 개를 다 지나야 하나를 고칠 수 있으면 아무도 고치지 않는다.
+ */
 export default function Onboarding() {
   const router = useRouter();
   const { colors } = useTheme();
   const { state, setProfile } = useAppState();
+  const { step: only } = useLocalSearchParams<{ step?: string }>();
   const [draft, setDraft] = useState<Partial<UserProfile>>(state.profile ?? {});
   const [index, setIndex] = useState(0);
-  const steps = useMemo(() => visibleSteps(draft), [draft]);
+  const all = useMemo(() => visibleSteps(draft), [draft]);
+  // 한 항목만 고치는 중이면 그 단계만 남긴다. 없는 id를 받으면 평소대로 전부 보여 준다.
+  const steps = useMemo(() => (only ? all.filter((x) => x.id === only) : all), [all, only]);
   const step = steps[Math.min(index, steps.length - 1)]!;
   const value = step.read(draft);
   const [text, setText] = useState<string>(textFor(step, value));
@@ -27,12 +37,25 @@ export default function Onboarding() {
 
   const go = (next: number, patch?: Partial<UserProfile>) => {
     const merged = patch ?? draft;
+    // 한 항목만 고치는 중이면 저장하고 바로 돌아간다. 다음 질문으로 넘어가지 않는다.
+    if (only) return saveOne(merged);
     const nextSteps = visibleSteps(merged);
     if (next >= nextSteps.length) return finish(merged);
     setDraft(merged);
     setIndex(next);
     const s = nextSteps[next]!;
     setText(textFor(s, s.read(merged)));
+  };
+
+  /**
+   * 한 항목만 고쳤을 때. 온보딩을 마친 사람이므로 나머지 값은 이미 있다.
+   * isComplete가 아니어도 저장한다 — 안 그러면 비어 있던 선택 항목을 채우다가 저장이 막힌다.
+   */
+  const saveOne = (edited: Partial<UserProfile>) => {
+    const base: Partial<UserProfile> = state.profile ?? {};
+    const merged: Partial<UserProfile> = { ...base, ...edited };
+    if (isComplete(merged)) setProfile(merged, true);
+    router.back();
   };
 
   const finish = (p: Partial<UserProfile>) => {
@@ -70,16 +93,18 @@ export default function Onboarding() {
   return (
     <Screen scroll={false} padded={false}>
       <Header onBack={() => (index === 0 ? router.back() : go(index - 1))} right={<IconButton name="x" label="닫기" onPress={() => router.back()} color={colors.text2} />} />
-      <View style={{ height: 3, marginHorizontal: space.screen, borderRadius: 2, backgroundColor: colors.cardSoft, overflow: "hidden" }}>
-        <View style={{ height: "100%", width: `${((index + 1) / steps.length) * 100}%`, backgroundColor: colors.primary }} />
-      </View>
+      {only ? null : (
+        <View style={{ height: 3, marginHorizontal: space.screen, borderRadius: 2, backgroundColor: colors.cardSoft, overflow: "hidden" }}>
+          <View style={{ height: "100%", width: `${((index + 1) / steps.length) * 100}%`, backgroundColor: colors.primary }} />
+        </View>
+      )}
 
       <View style={{ flex: 1 }}>
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <FadeIn key={step.id} style={{ paddingHorizontal: space.screen, paddingTop: 32, gap: space.md }}>
-          <Sub tone="3">{index + 1} / {steps.length}</Sub>
+          <Sub tone="3">{only ? stepLabel(step) : `${index + 1} / ${steps.length}`}</Sub>
           <T variant="title">{stepTitle(step, draft)}</T>
-          {step.hint ? <T variant="body" color={colors.text2}>{step.hint}</T> : null}
+          {stepHint(step, draft) ? <T variant="body" color={colors.text2}>{stepHint(step, draft)}</T> : null}
 
           {(step.kind === "select" || step.kind === "multi") && (
             <View style={{ flexDirection: grid ? "row" : "column", flexWrap: grid ? "wrap" : "nowrap", gap: 10, marginTop: 12 }}>
@@ -121,7 +146,7 @@ export default function Onboarding() {
             퇴장 애니메이션을 하며 화면 한가운데 잠깐 남는다. 단계 전환은 즉시여야 한다. */}
         <BottomCTA
           key={step.id}
-          label={index + 1 >= steps.length ? "내 조건으로 공고 찾기" : step.kind === "multi" && selected.length === 0 ? "해당 없음" : "다음"}
+          label={only ? "저장" : index + 1 >= steps.length ? "내 조건으로 공고 찾기" : step.kind === "multi" && selected.length === 0 ? "해당 없음" : "다음"}
           onPress={onNext}
           appear={canNext}
           secondary={!!step.optional}
@@ -130,7 +155,7 @@ export default function Onboarding() {
         />
       </View>
 
-      <IncomeHelperSheet visible={helper} dual={draft.income_type === "dual"} onClose={() => setHelper(false)} onApply={(v) => { setText(String(v)); setHelper(false); }} />
+      <IncomeHelperSheet visible={helper} dual={draft.income_type === "dual"} onClose={() => setHelper(false)} onApply={(v) => { setText(String(step.id === "annual_income" ? v * 12 : v)); setHelper(false); }} />
     </Screen>
   );
 }
@@ -138,7 +163,9 @@ export default function Onboarding() {
 function NumberField({ step, text, onChange }: { step: Step; text: string; onChange: (t: string) => void }) {
   const { colors } = useTheme();
   const unit = { won: "원 / 월", count: "명", age: "세", months: "개월", date: "" }[step.kind as "won" | "count" | "age" | "months" | "date"];
-  const unitLabel = step.id === "total_assets" || step.id === "car_value" || step.id === "cash" ? "원" : step.id === "marriage_years" ? "년" : unit;
+  // 단위는 그 칸이 무엇을 묻는지의 절반이다. 연소득 칸에 "원 / 월"이 붙어 있으면 자릿수를 틀리게 적는다.
+  const byId: Record<string, string> = { total_assets: "원", car_value: "원", cash: "원", marriage_years: "년", annual_income: "원 / 년" };
+  const unitLabel = byId[step.id] ?? unit;
   const digits = text.replace(/[^0-9]/g, "");
   const isDate = step.kind === "date";
   const display = isDate ? formatDateDigits(digits) : text ? Number(digits).toLocaleString("ko-KR") : "";
@@ -146,6 +173,8 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
   const ageNote = valid ? `만 ${ageFromBirthDate(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`)}세` : isDate ? "예: 1998.03.15" : "";
   const isWon = step.kind === "won";
   const manwon = isWon && digits ? summarizeWon(Number(digits)) : "";
+  // 연소득으로 받지만 공고의 소득 기준은 월이다. 판정에 쓰는 값을 그 자리에서 같이 보여 준다.
+  const monthlyNote = step.id === "annual_income" && digits ? `월 ${summarizeWon(Math.round(Number(digits) / 12))} 기준으로 판정해요` : "";
   return (
     <View style={{ gap: 10, marginTop: 16 }}>
       <View style={{ flexDirection: "row", alignItems: "baseline", borderBottomWidth: 2, borderBottomColor: colors.primary, paddingBottom: 10, gap: 10 }}>
@@ -166,6 +195,7 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
       </View>
       {isDate ? <T variant="bodyMedium" color={valid ? colors.primary : colors.text3}>{ageNote}</T> : null}
       {isWon && manwon ? <T variant="bodyMedium" color={colors.primary}>{manwon}</T> : null}
+      {monthlyNote ? <Sub tone="3">{monthlyNote}</Sub> : null}
     </View>
   );
 }
