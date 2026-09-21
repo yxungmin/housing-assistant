@@ -25,8 +25,10 @@ export default function AnnouncementDetail() {
   const { list } = useAnnouncements();
   const a = getAnnouncement(id ?? "", list);
   const [sheet, setSheet] = useState(false);
-  // 들어올 때 한 번만 집는다. 본 것으로 표시해도 이 화면에서는 계속 보이게 하려고.
-  const [change] = useState(() => unseenChange(state.changes, id ?? ""));
+  // 동기화가 화면을 연 뒤에 끝날 수도 있으니 계속 지켜보다가, 오면 그때 집어서 들고 있는다.
+  // (본 것으로 표시하면 목록에서 사라지므로 이 화면에서는 따로 붙들어 둔다.)
+  const incoming = unseenChange(state.changes, id ?? "");
+  const [change, setChange] = useState(incoming);
   const [report, setReport] = useState<{ target: ReportTarget; sourceText?: string } | null>(null);
   // 닫히는 동안에도 내용이 보여야 시트가 빈 채로 내려가지 않는다
   const lastReport = useRef<{ target: ReportTarget; sourceText?: string } | null>(null);
@@ -40,9 +42,15 @@ export default function AnnouncementDetail() {
   const hasAnyPricing = !!a?.extraction.tracks.some((t) => t.pricing.length > 0);
   const saved = !!a && state.saved.includes(a.id);
 
+  // seeChange는 상태가 바뀔 때마다 새로 만들어진다. 막지 않으면
+  // 표시 → 상태 변경 → 새 함수 → 다시 표시로 무한히 돈다. 한 번만 부른다.
+  const marked = useRef(false);
   useEffect(() => {
-    if (change) seeChange(change.announcementId);
-  }, [change, seeChange]);
+    if (!incoming || marked.current) return;
+    marked.current = true;
+    setChange(incoming);
+    seeChange(incoming.announcementId);
+  }, [incoming, seeChange]);
 
   if (!a) {
     return (

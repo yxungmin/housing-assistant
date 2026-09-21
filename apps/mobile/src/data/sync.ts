@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { setAnnouncements, type Announcement } from "./announcements";
 import { readFeedCache, writeFeedCache } from "./cache";
 import { fetchRemoteAnnouncements, remoteConfigured } from "./remote";
@@ -11,8 +11,12 @@ import { detectChanges, type ChangeRecord } from "@/lib/changes";
  * 갱신할 때 관심 공고의 값이 바뀌었는지 직전 목록과 대조한다. 값이 바뀌는 이유는 둘뿐이다 —
  * 우리가 신고를 받아 고쳤거나, 공고가 정정되었거나. 어느 쪽이든 사용자에게 말해야 한다.
  */
-export function useAnnouncementSync(savedIds: string[] = [], onChanges?: (records: ChangeRecord[]) => void): void {
+export function useAnnouncementSync(ready: boolean, savedIds: string[], onChanges?: (records: ChangeRecord[]) => void): void {
+  // 관심 목록은 SecureStore에서 불러온 뒤에야 정확하다. 마운트 즉시 돌면 빈 배열이라 변경을 못 찾는다.
+  const done = useRef(false);
   useEffect(() => {
+    if (!ready || done.current) return;
+    done.current = true;
     let cancelled = false;
     (async () => {
       const cached = await readFeedCache();
@@ -37,7 +41,7 @@ export function useAnnouncementSync(savedIds: string[] = [], onChanges?: (record
     return () => {
       cancelled = true;
     };
-    // 목록 갱신은 앱을 열 때 한 번만 한다 (savedIds 변화로 다시 받지 않는다)
+    // 앱을 열 때 한 번만 받는다. savedIds가 바뀌어도 다시 받지 않는다 (done 플래그).
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [ready]);
 }
