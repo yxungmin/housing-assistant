@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { Icon } from "./Icon";
 import { BottomSheet, Card, PrimaryButton, Row, Sub, T, Tag } from "./ui";
-import { billing, daysLeft, PRICE_KRW, TRIAL_DAYS } from "@/lib/billing";
+import { billing, canUseFirstMonthFree, daysLeft, PRICE_KRW, TRIAL_DAYS } from "@/lib/billing";
 import { longDate } from "@/lib/format";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -11,8 +11,8 @@ const price = `월 ${PRICE_KRW.toLocaleString("ko-KR")}원`;
 
 /**
  * 구독 시트: 첫 무료 계산을 본 뒤 두 번째 공고에서 처음 뜬다.
- *  - 체험 전(none): 7일 무료 체험 시작
- *  - 체험·구독 만료(expired): 바로 구독 시작
+ *  - 첫 달 무료를 아직 안 썼으면: 첫 달 0원으로 시작
+ *  - 이미 썼으면(해지·만료 포함): 바로 월 결제. 첫 달만 무료다.
  * 결제는 billing 어댑터가 한다 (지금은 로컬 목 — 시트 하단에 표시).
  */
 export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: boolean; onClose: () => void; onStarted?: () => void }) {
@@ -20,6 +20,8 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
   const { state, setSubscription } = useAppState();
   const [busy, setBusy] = useState(false);
   const expired = state.subscription.status === "expired";
+  // 첫 달만 무료다. 해지했다 돌아와도 다시 주지 않는다.
+  const freeMonth = canUseFirstMonthFree(state.subscription);
 
   const run = async (fn: () => Promise<typeof state.subscription | null>) => {
     setBusy(true);
@@ -38,7 +40,7 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
   return (
     <BottomSheet visible={visible} onClose={onClose}>
       <View style={{ gap: 8 }}>
-        <T variant="title">{expired ? "무료 체험이 끝났어요" : "다른 공고의 주거비도\n계산해 볼까요?"}</T>
+        <T variant="title">{expired ? (freeMonth ? "구독이 끝났어요" : "첫 달 무료는 다 쓰셨어요") : "다른 공고의 주거비도\n계산해 볼까요?"}</T>
         <T variant="body" color={colors.text2}>
           {expired ? `이어서 계산하려면 ${price} 구독이 필요해요. 조건 확인과 공고 목록은 계속 무료예요.` : "공고 목록과 조건 확인은 계속 무료예요. 필요한 현금과 대출까지 계산하려면 구독이 필요해요."}
         </T>
@@ -54,13 +56,13 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
       <Card>
         <Row center>
           <View style={{ gap: 2 }}>
-            <T variant="heading">{expired ? price : `${TRIAL_DAYS}일 무료 체험`}</T>
-            <Sub>{expired ? "매달 자동 갱신 · 언제든 해지" : <>체험이 끝나면 <T variant="small" numeric style={{ fontSize: 15 }}>{price}</T></>}</Sub>
+            <T variant="heading">{freeMonth ? `첫 ${TRIAL_DAYS}일 0원` : price}</T>
+            <Sub>{freeMonth ? <>그 뒤로 <T variant="small" numeric style={{ fontSize: 15 }}>{price}</T> 자동 갱신</> : "매달 자동 갱신 · 언제든 해지"}</Sub>
           </View>
           <Tag tone="gray">언제든 해지</Tag>
         </Row>
       </Card>
-      <PrimaryButton label={busy ? "처리 중" : expired ? "구독 시작" : "무료 체험 시작"} disabled={busy} onPress={() => void run(() => (expired ? billing.purchase() : billing.startTrial()))} />
+      <PrimaryButton label={busy ? "처리 중" : freeMonth ? "첫 달 0원으로 시작" : "구독 시작"} disabled={busy} onPress={() => void run(() => (freeMonth ? billing.startTrial() : billing.purchase()))} />
       <Pressable onPress={() => void run(() => billing.restore())} accessibilityRole="button" style={{ alignItems: "center", paddingVertical: 4 }}>
         <T variant="small" color={colors.text3}>이미 구독했다면 구매 복원</T>
       </Pressable>
@@ -78,7 +80,7 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
   const sub = state.subscription;
   const [msg, setMsg] = useState<string | null>(null);
   const left = daysLeft(sub);
-  const label = { none: "미구독", trial: "무료 체험 중", active: "구독 중", expired: "만료됨" }[sub.status];
+  const label = { none: "미구독", trial: "첫 달 무료 이용 중", active: "구독 중", expired: "만료됨" }[sub.status];
 
   const restore = async () => {
     const r = await billing.restore();
@@ -96,14 +98,14 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
     <BottomSheet visible={visible} onClose={onClose}>
       <View style={{ gap: 8 }}>
         <T variant="title">구독 관리</T>
-        <T variant="body" color={colors.text2}>{price} · 첫 {TRIAL_DAYS}일 무료</T>
+        <T variant="body" color={colors.text2}>{price} · {canUseFirstMonthFree(sub) ? `첫 ${TRIAL_DAYS}일 0원` : "첫 달 무료는 사용함"}</T>
       </View>
       <Card style={{ gap: 6 }}>
         <Row center>
           <T variant="heading">{label}</T>
           {sub.cancelled ? <Tag tone="gray">갱신 해지됨</Tag> : sub.status === "trial" || sub.status === "active" ? <Tag tone="primary" icon="check">이용 중</Tag> : null}
         </Row>
-        {sub.expiresAt ? <Sub>{sub.status === "expired" ? "만료일" : sub.cancelled ? "이용 종료" : sub.status === "trial" ? "체험 종료" : "다음 결제"} {longDate(sub.expiresAt.slice(0, 10))}{left > 0 ? ` · ${left}일 남음` : ""}</Sub> : <Sub>공고 목록과 조건 확인은 무료예요. 자금 계산만 구독이 필요해요.</Sub>}
+        {sub.expiresAt ? <Sub>{sub.status === "expired" ? "만료일" : sub.cancelled ? "이용 종료" : sub.status === "trial" ? "첫 달 종료" : "다음 결제"} {longDate(sub.expiresAt.slice(0, 10))}{left > 0 ? ` · ${left}일 남음` : ""}</Sub> : <Sub>공고 목록과 조건 확인은 무료예요. 자금 계산만 구독이 필요해요.</Sub>}
       </Card>
       {msg ? <Sub style={{ textAlign: "center" }}>{msg}</Sub> : null}
       <View style={{ gap: 10 }}>

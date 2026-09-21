@@ -33,6 +33,12 @@ export interface Subscription {
   cancelled?: boolean;
   /** 언제 마지막으로 스토어와 맞췄나 */
   syncedAt?: string;
+  /**
+   * 첫 달 무료를 언제 썼는가. **첫 달만 무료다** — 로그아웃했다 다시 들어오거나
+   * 해지 후 재구독해도 다시 주지 않는다. 구독 상태를 갈아끼워도 이 값은 남긴다.
+   * 스토어 결제를 붙이면 이 판단은 스토어의 introductory offer 자격이 대신한다.
+   */
+  firstMonthUsedAt?: string;
 }
 
 const DAY = 86_400_000;
@@ -50,6 +56,11 @@ export function chargeDate(sub: Subscription): string | null {
   return sub.status === "trial" && sub.expiresAt && !sub.cancelled ? sub.expiresAt : null;
 }
 
+/** 첫 달 무료를 아직 쓰지 않았는가. 한 번 쓰면 그 뒤로는 바로 결제다 */
+export function canUseFirstMonthFree(sub: Subscription): boolean {
+  return !sub.firstMonthUsedAt;
+}
+
 export function hasAccess(sub: Subscription, now = Date.now()): boolean {
   const s = normalizeSubscription(sub, now);
   return s.status === "trial" || s.status === "active";
@@ -62,7 +73,7 @@ export function daysLeft(sub: Subscription, now = Date.now()): number {
 }
 
 export interface BillingAdapter {
-  /** 7일 무료 체험 시작 (스토어에서는 introductory offer) */
+  /** 첫 달 0원 시작 (스토어에서는 introductory offer). 자격 확인은 호출 전에 canUseFirstMonthFree로 한다 */
   startTrial(): Promise<Subscription>;
   /** 월 구독 결제 */
   purchase(): Promise<Subscription>;

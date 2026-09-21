@@ -6,7 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useReducer,
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import type { UserProfile } from "@housing/schema";
-import { billing, normalizeSubscription, type Subscription } from "@/lib/billing";
+import { billing, canUseFirstMonthFree, normalizeSubscription, type Subscription } from "@/lib/billing";
 import type { ChangeRecord } from "@/lib/changes";
 import { emptySeen, markOpened, noteSeen, type SeenState } from "@/lib/unseen";
 import { canOpenCost as canOpenCostRule, type Account } from "@/lib/access";
@@ -84,8 +84,13 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, account: null };
     case "toggleSaved":
       return { ...s, saved: s.saved.includes(a.id) ? s.saved.filter((x) => x !== a.id) : [...s.saved, a.id] };
-    case "setSubscription":
-      return { ...s, subscription: normalizeSubscription(a.subscription) };
+    case "setSubscription": {
+      // 첫 달 무료는 한 번뿐이다. 어느 경로로 구독을 바꾸든 여기서 기록을 지킨다 —
+      // 호출부마다 챙기게 두면 한 군데만 빠져도 무료 달이 다시 생긴다.
+      const next = normalizeSubscription(a.subscription);
+      const firstMonthUsedAt = s.subscription.firstMonthUsedAt ?? (next.status === "trial" ? new Date().toISOString() : undefined);
+      return { ...s, subscription: firstMonthUsedAt ? { ...next, firstMonthUsedAt } : next };
+    }
     case "setTheme":
       return { ...s, themePref: a.pref };
     case "setNotifications":
@@ -231,11 +236,14 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     () => ({
       state,
       setProfile: (profile, onboarded) => dispatch({ type: "setProfile", profile, onboarded }),
-      // 모의 로그인: 계정을 만들고 첫 달 0원을 시작한다. 실제 인증은 M8에서 이 자리에 들어간다.
+      // 모의 로그인: 계정을 만들고, 첫 달 무료를 아직 안 썼을 때만 시작한다.
+      // 첫 달만 무료다 — 로그아웃 후 다시 들어와도 또 주지 않는다. 실제 인증은 M8에서 이 자리에 들어간다.
       signIn: async (provider) => {
         const account: Account = { id: `mock-${provider}-${Date.now()}`, provider, signedInAt: new Date().toISOString() };
         dispatch({ type: "signIn", account });
-        dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
+        if (canUseFirstMonthFree(state.subscription)) {
+          dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
+        }
       },
       signOut: () => dispatch({ type: "signOut" }),
       toggleSaved: (id) => dispatch({ type: "toggleSaved", id }),

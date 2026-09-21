@@ -37,7 +37,7 @@ export default function Profile() {
   else if ((p.marriage === "married" || p.marriage === "pre_marriage") && !p.workplace_partner) missing.push("배우자 직장 위치");
   const sub = state.subscription;
   const age = p?.birth_date ? `${p.birth_date.slice(0, 4)}년생 · 만 ${ageFromBirthDate(p.birth_date)}세` : p?.age !== undefined ? `만 ${p.age}세` : "";
-  const subLabel = { none: "미구독", trial: "무료 체험 중", active: "구독 중", expired: "만료됨" }[sub.status];
+  const subLabel = { none: "미구독", trial: "첫 달 무료 이용 중", active: "구독 중", expired: "만료됨" }[sub.status];
   const subSub =
     sub.status === "trial" ? `${longDate(sub.expiresAt?.slice(0, 10))}까지 무료 · 이후 ${price}`
     : sub.status === "active" ? `${price}${sub.cancelled ? ` · ${longDate(sub.expiresAt?.slice(0, 10))}에 종료` : ` · ${daysLeft(sub)}일 뒤 갱신`}`
