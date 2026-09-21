@@ -103,16 +103,40 @@ export interface WaitSummary {
 }
 
 /**
+ * 마이홈의 시도 코드. 행정표준코드와 다른 것이 둘 있다 —
+ * 강원은 42가 아니라 51(강원특별자치도), 전북은 45가 아니라 52(전북특별자치도)다.
+ * 2026-09-21에 코드를 하나씩 던져 응답이 오는 것만 남겼다.
+ */
+const MYHOME_REGION: Record<string, string> = { "42": "51", "45": "52" };
+export const myhomeRegionCode = (regionCode: string): string => MYHOME_REGION[regionCode] ?? regionCode;
+
+/**
+ * 단지 이름을 비교용으로 다듬는다.
+ * 공고 제목은 "군산시 (군산나운4) 영구임대주택…"인데 대기현황 단지명은 "군산나운주공4단지"다.
+ * 사업 주체·유형을 나타내는 상투어와 공백을 걷어내면 "군산나운4"로 같아진다.
+ */
+export function normalizeComplex(name: string): string {
+  return name
+    // 괄호는 기호만 없앤다. 내용을 지우면 안 된다 —
+    // 공고 제목이 "군산시 (군산나운4) 영구임대주택…"처럼 괄호 안에 단지명을 넣는다.
+    .replace(/[(（)）[]]/g, "")
+    .replace(/주공|단지|휴먼시아|아파트|마을|타운|리츠|엘에이치|LH|SH/gi, "")
+    .replace(/[^0-9A-Za-z가-힣]/g, "");
+}
+
+/**
  * 공고 제목·주소로 단지를 고른다.
- * 정확히 일치하는 이름이 없을 때가 많아(공고 제목은 "과천지식정보타운 S-11BL 행복주택(리츠) 입주자 모집공고")
- * 단지명이 제목 안에 들어 있는지를 본다. 후보가 여럿이면 가장 긴 이름을 고른다 — 더 구체적인 쪽이다.
+ * 정확히 같은 이름이 오는 경우가 드물어 위 정규화를 거친 뒤 포함 관계를 본다.
+ * 후보가 여럿이면 정규화 이름이 가장 긴 것을 고른다 — 더 구체적인 쪽이다.
+ * 너무 짧은 이름(3자 미만)은 우연히 걸리므로 버린다. 남의 단지 숫자를 보여 주느니 안 보여 주는 게 낫다.
  */
 export function matchComplex(rows: WaitRow[], title: string, address?: string): WaitRow[] {
-  const hay = `${title} ${address ?? ""}`.replace(/\s+/g, "");
+  const hay = normalizeComplex(`${title} ${address ?? ""}`);
   const names = [...new Set(rows.map((r) => r.complex))]
-    .filter((n) => n.length >= 3 && hay.includes(n.replace(/\s+/g, "")))
-    .sort((a, b) => b.length - a.length);
-  const chosen = names[0];
+    .map((n) => ({ raw: n, norm: normalizeComplex(n) }))
+    .filter((n) => n.norm.length >= 3 && hay.includes(n.norm))
+    .sort((a, b) => b.norm.length - a.norm.length);
+  const chosen = names[0]?.raw;
   return chosen ? rows.filter((r) => r.complex === chosen) : [];
 }
 
@@ -136,7 +160,7 @@ export class WaitClient {
   ) {}
 
   /** 시도·시군구의 대기현황. 한 번에 다 받아 두고 단지명으로 맞춘다 */
-  async list(brtcCode: string, signguCode?: string, rows = 500): Promise<WaitRow[]> {
+  async list(brtcCode: string, signguCode?: string, rows = 5000): Promise<WaitRow[]> {
     const p = new URLSearchParams({ serviceKey: this.apiKey, brtcCode, numOfRows: String(rows), pageNo: "1", _type: "json" });
     if (signguCode) p.set("signguCode", signguCode);
     const res = await this.fetchImpl(`${BASE}/moveWaitStsList?${p.toString()}`);
@@ -151,7 +175,7 @@ export class WaitClient {
   }
 
   async forAnnouncement(brtcCode: string, title: string, address?: string): Promise<WaitSummary | null> {
-    const rows = await this.list(brtcCode).catch(() => []);
+    const rows = await this.list(myhomeRegionCode(brtcCode)).catch(() => []);
     return summarize(matchComplex(rows, title, address));
   }
 }

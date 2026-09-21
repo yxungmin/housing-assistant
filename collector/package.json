@@ -19,7 +19,8 @@
     "benchmark:compare": "tsx src/benchmark-compare.ts",
     "benchmark:rescore": "tsx src/benchmark-rescore.ts",
     "fixture:check": "tsx src/fixture-check.ts",
-    "output:size": "tsx src/output-size.ts"
+    "output:size": "tsx src/output-size.ts",
+    "app:enrich": "tsx src/enrich.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.127.0",

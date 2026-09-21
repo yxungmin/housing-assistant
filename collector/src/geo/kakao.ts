@@ -36,12 +36,50 @@ const NEARBY_CATEGORIES: { kind: NearbyKind; code: string; radius: number }[] = 
   { kind: "park", code: "AT4", radius: 1500 }, // 관광명소 — 공원이 이 코드로 들어온다
 ];
 
+/**
+ * 공고문 주소는 그대로 검색되지 않는 경우가 많다.
+ * "경기도 과천시 갈현동 일원(과천지식정보타운 공공주택지구 내 S-11BL)" 같은 꼴이라
+ * 괄호와 "일원" 같은 말을 떼고, 그래도 안 되면 시도·시군구·읍면동까지만 남겨 다시 찾는다.
+ * 뒤로 갈수록 정확도가 떨어지므로 순서대로 시도하고 첫 성공을 쓴다.
+ */
+export function addressCandidates(address: string): string[] {
+  const out: string[] = [];
+  const push = (v: string) => {
+    const t = v.replace(/\s+/g, " ").trim();
+    if (t.length >= 4 && !out.includes(t)) out.push(t);
+  };
+  push(address);
+  const noParen = address.replace(/[(（][^)）]*[)）]/g, " ");
+  push(noParen);
+  const noFiller = noParen.replace(/\b(일원|일대|내|부지|블록|블럭|지구)\b/g, " ").replace(/[A-Za-z]-?\d+BL?/gi, " ");
+  push(noFiller);
+  // 시도 시군구 읍면동까지만
+  const m = noFiller.match(/^(\S+(?:특별시|광역시|특별자치시|특별자치도|도))\s+(\S+[시군구])\s*(\S+[동읍면리])?/);
+  if (m) push([m[1], m[2], m[3]].filter(Boolean).join(" "));
+  return out;
+}
+
 export async function geocodeAddress(address: string, restKey: string, fetchImpl: typeof fetch = fetch): Promise<GeoResult | null> {
   const headers = { Authorization: `KakaoAK ${restKey}` };
-  const addr = await fetchImpl(`https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(address)}`, { headers });
-  if (!addr.ok) return null;
-  const addrJson = (await addr.json()) as { documents: { x: string; y: string; address?: { b_code?: string } }[] };
-  const doc = addrJson.documents[0];
+  let doc: { x: string; y: string; address?: { b_code?: string } } | undefined;
+  for (const query of addressCandidates(address)) {
+    const addr = await fetchImpl(`https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(query)}`, { headers });
+    if (!addr.ok) continue;
+    const addrJson = (await addr.json()) as { documents: { x: string; y: string; address?: { b_code?: string } }[] };
+    if (addrJson.documents?.[0]) {
+      doc = addrJson.documents[0];
+      break;
+    }
+  }
+  // 주소로 못 찾으면 장소 이름으로 한 번 더 (단지명이 주소 자리에 오는 공고가 있다)
+  if (!doc) {
+    const kw = await fetchImpl(`https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(address.replace(/[(（][^)）]*[)）]/g, " ").trim())}&size=1`, { headers });
+    if (kw.ok) {
+      const j = (await kw.json()) as { documents: { x: string; y: string; address_name?: string }[] };
+      const d = j.documents?.[0];
+      if (d) doc = { x: d.x, y: d.y };
+    }
+  }
   if (!doc) return null;
   const lng = Number(doc.x);
   const lat = Number(doc.y);

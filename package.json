@@ -26,7 +26,8 @@
     "benchmark:compare": "npm run benchmark:compare -w @housing/collector",
     "benchmark:rescore": "npm run benchmark:rescore -w @housing/collector --",
     "fixture:check": "npm run fixture:check -w @housing/collector --",
-    "db:check": "bash supabase/test/run.sh"
+    "db:check": "bash supabase/test/run.sh",
+    "app:enrich": "npm run app:enrich -w @housing/collector --"
   },
   "engines": {
     "node": ">=20"

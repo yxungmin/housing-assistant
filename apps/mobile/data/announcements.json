@@ -12,31 +12,43 @@
   "apply_start": "2026-09-30",
   "apply_end": "2026-10-02",
   "address": "경기도 과천시 갈현동 일원(과천지식정보타운 공공주택지구 내 S-11BL)",
-  "lat": 37.4316,
-  "lng": 126.9982,
+  "lat": 37.409788167445,
+  "lng": 126.982492149763,
   "transit": {
    "nearest_station": "인덕원역 4호선",
-   "station_walk_min": 22,
-   "station_distance_m": 1480,
-   "nearest_bus_stop": "과천지식정보타운",
-   "bus_walk_min": 3,
-   "bus_distance_m": 190
+   "station_distance_m": 1054,
+   "station_walk_min": 16
   },
   "nearby": [
    {
+    "kind": "daycare",
+    "name": "과천시립 누리봄어린이집",
+    "distance_m": 238
+   },
+   {
     "kind": "school",
-    "name": "과천문원초등학교",
-    "distance_m": 690
+    "name": "과천율목초등학교",
+    "distance_m": 238
    },
    {
     "kind": "mart",
-    "name": "이마트 과천점",
-    "distance_m": 1320
+    "name": "GS더프레시 안양동편마을점",
+    "distance_m": 1194
    },
    {
     "kind": "convenience",
-    "name": "세븐일레븐 과천점",
-    "distance_m": 210
+    "name": "이마트24 R과천지정타점",
+    "distance_m": 125
+   },
+   {
+    "kind": "hospital",
+    "name": "과천연세소아청소년과의원",
+    "distance_m": 209
+   },
+   {
+    "kind": "park",
+    "name": "포일숲속공원 황톳길",
+    "distance_m": 870
    }
   ],
   "extraction": {
@@ -3071,6 +3083,217 @@
     "전환보증금: 보증금 증액(월세 감액) 이율 7.0%, 보증금 감액(월세 증액) 이율 3.5%, 100만원 단위 선택(p.7).",
     "최대 거주기간: 대학생·청년 10년, 신혼부부·한부모(무자녀 10년, 자녀 1명 이상 14년), 고령자·주거급여수급자 20년(p.34)."
    ]
+  },
+  "commute": {
+   "서울 종로구": {
+    "minutes": 73,
+    "transfers": 1
+   },
+   "서울 중구": {
+    "minutes": 63,
+    "transfers": 1
+   },
+   "서울 용산구": {
+    "minutes": 63,
+    "transfers": 1
+   },
+   "서울 성동구": {
+    "minutes": 66,
+    "transfers": 2
+   },
+   "서울 광진구": {
+    "minutes": 74,
+    "transfers": 1
+   },
+   "서울 동대문구": {
+    "minutes": 80,
+    "transfers": 1
+   },
+   "서울 중랑구": {
+    "minutes": 93,
+    "transfers": 2
+   },
+   "서울 성북구": {
+    "minutes": 72,
+    "transfers": 1
+   },
+   "서울 강북구": {
+    "minutes": 77,
+    "transfers": 1
+   },
+   "서울 도봉구": {
+    "minutes": 92,
+    "transfers": 2
+   },
+   "서울 노원구": {
+    "minutes": 89,
+    "transfers": 1
+   },
+   "서울 은평구": {
+    "minutes": 90,
+    "transfers": 2
+   },
+   "서울 서대문구": {
+    "minutes": 90,
+    "transfers": 2
+   },
+   "서울 마포구": {
+    "minutes": 76,
+    "transfers": 2
+   },
+   "서울 양천구": {
+    "minutes": 77,
+    "transfers": 2
+   },
+   "서울 강서구": {
+    "minutes": 80,
+    "transfers": 1
+   },
+   "서울 구로구": {
+    "minutes": 71,
+    "transfers": 1
+   },
+   "서울 금천구": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "서울 영등포구": {
+    "minutes": 60,
+    "transfers": 1
+   },
+   "서울 동작구": {
+    "minutes": 56,
+    "transfers": 2
+   },
+   "서울 관악구": {
+    "minutes": 47,
+    "transfers": 1
+   },
+   "서울 서초구": {
+    "minutes": 45,
+    "transfers": 0
+   },
+   "서울 강남구": {
+    "minutes": 64,
+    "transfers": 1
+   },
+   "서울 송파구": {
+    "minutes": 73,
+    "transfers": 1
+   },
+   "서울 강동구": {
+    "minutes": 81,
+    "transfers": 2
+   },
+   "경기 성남시": {
+    "minutes": 73,
+    "transfers": 1
+   },
+   "경기 고양시": {
+    "minutes": 112,
+    "transfers": 2
+   },
+   "경기 용인시": {
+    "minutes": 143,
+    "transfers": 2
+   },
+   "경기 부천시": {
+    "minutes": 87,
+    "transfers": 1
+   },
+   "경기 안산시": {
+    "minutes": 83,
+    "transfers": 2
+   },
+   "경기 안양시": {
+    "minutes": 28,
+    "transfers": 0
+   },
+   "경기 남양주시": {
+    "minutes": 105,
+    "transfers": 2
+   },
+   "경기 화성시": {
+    "minutes": 100,
+    "transfers": 1
+   },
+   "경기 의정부시": {
+    "minutes": 123,
+    "transfers": 2
+   },
+   "경기 파주시": {
+    "minutes": 127,
+    "transfers": 2
+   },
+   "경기 광명시": {
+    "minutes": 71,
+    "transfers": 1
+   },
+   "경기 광주시": {
+    "minutes": 57,
+    "transfers": 1
+   },
+   "경기 군포시": {
+    "minutes": 38,
+    "transfers": 0
+   },
+   "경기 하남시": {
+    "minutes": 112,
+    "transfers": 2
+   },
+   "경기 오산시": {
+    "minutes": 116,
+    "transfers": 2
+   },
+   "경기 양주시": {
+    "minutes": 133,
+    "transfers": 2
+   },
+   "경기 구리시": {
+    "minutes": 102,
+    "transfers": 2
+   },
+   "경기 포천시": {
+    "minutes": 89,
+    "transfers": 1
+   },
+   "경기 의왕시": {
+    "minutes": 46,
+    "transfers": 0
+   },
+   "경기 과천시": {
+    "minutes": 20,
+    "transfers": 0
+   },
+   "경기 동두천시": {
+    "minutes": 142,
+    "transfers": 2
+   },
+   "경기 양평군": {
+    "minutes": 156,
+    "transfers": 2
+   },
+   "경기 가평군": {
+    "minutes": 231,
+    "transfers": 2
+   },
+   "경기 연천군": {
+    "minutes": 225,
+    "transfers": 2
+   }
+  },
+  "b_code": "4129010300",
+  "market": {
+   "lawd_cd": "41290",
+   "area_from": 11.8,
+   "area_to": 21.8,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 38,
+   "jeonse_median": 44250000,
+   "monthly_deposit_median": 60480000,
+   "monthly_rent_median": 200000,
+   "source": "국토교통부 전월세 실거래가"
   }
  },
  {
@@ -3086,31 +3309,43 @@
   "apply_start": "2026-09-25",
   "apply_end": "2026-09-29",
   "address": "서울특별시 관악구 봉천동 180-311번지(H1), 180-5번지(H2), 180-255번지(H3)",
-  "lat": 37.4784,
-  "lng": 126.9517,
+  "lat": 37.4825384917268,
+  "lng": 126.952165181187,
   "transit": {
-   "nearest_station": "봉천역 2호선",
-   "station_walk_min": 9,
-   "station_distance_m": 620,
-   "nearest_bus_stop": "관악구청",
-   "bus_walk_min": 4,
-   "bus_distance_m": 250
+   "nearest_station": "서울대입구역 2호선",
+   "station_distance_m": 147,
+   "station_walk_min": 2
   },
   "nearby": [
    {
+    "kind": "daycare",
+    "name": "구립아람어린이집",
+    "distance_m": 388
+   },
+   {
     "kind": "school",
-    "name": "봉천중학교",
-    "distance_m": 540
+    "name": "서울원당초등학교",
+    "distance_m": 402
+   },
+   {
+    "kind": "mart",
+    "name": "GS더프레시 관악점",
+    "distance_m": 456
    },
    {
     "kind": "convenience",
-    "name": "CU 봉천역점",
-    "distance_m": 160
+    "name": "세븐일레븐 관악센터점",
+    "distance_m": 71
    },
    {
     "kind": "hospital",
-    "name": "에이치플러스 양지병원",
-    "distance_m": 1100
+    "name": "이화이치과의원",
+    "distance_m": 82
+   },
+   {
+    "kind": "park",
+    "name": "행운동먹자골목",
+    "distance_m": 196
    }
   ],
   "extraction": {
@@ -5246,6 +5481,217 @@
     "주거약자용 주택은 총 22세대이며 대학생 또는 청년계층인 주거약자에게 공급됩니다(p.1). 주거약자 트랙의 자산 기준은 신청 계층(대학생 1억원·자동차 미소유 / 청년 2억7,300만원·자동차 3,708만원 이하)에 따라 달라 별도 룰로 넣지 않았습니다.",
     "서류제출대상자 발표 2024-08-28, 서류접수 2024-09-02~09-04, 계약체결 전자계약 2024-12-18~12-20(현장계약 2024-12-19, 주거약자에 한함)."
    ]
+  },
+  "b_code": "1162010100",
+  "market": {
+   "lawd_cd": "11620",
+   "area_from": 12.2,
+   "area_to": 22.6,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 500,
+   "jeonse_median": 162000000,
+   "monthly_deposit_median": 20000000,
+   "monthly_rent_median": 630000,
+   "source": "국토교통부 전월세 실거래가"
+  },
+  "commute": {
+   "서울 종로구": {
+    "minutes": 44,
+    "transfers": 1
+   },
+   "서울 중구": {
+    "minutes": 49,
+    "transfers": 1
+   },
+   "서울 용산구": {
+    "minutes": 41,
+    "transfers": 1
+   },
+   "서울 성동구": {
+    "minutes": 51,
+    "transfers": 2
+   },
+   "서울 광진구": {
+    "minutes": 56,
+    "transfers": 2
+   },
+   "서울 동대문구": {
+    "minutes": 60,
+    "transfers": 1
+   },
+   "서울 중랑구": {
+    "minutes": 70,
+    "transfers": 2
+   },
+   "서울 성북구": {
+    "minutes": 56,
+    "transfers": 1
+   },
+   "서울 강북구": {
+    "minutes": 48,
+    "transfers": 1
+   },
+   "서울 도봉구": {
+    "minutes": 73,
+    "transfers": 1
+   },
+   "서울 노원구": {
+    "minutes": 69,
+    "transfers": 1
+   },
+   "서울 은평구": {
+    "minutes": 57,
+    "transfers": 1
+   },
+   "서울 서대문구": {
+    "minutes": 50,
+    "transfers": 1
+   },
+   "서울 마포구": {
+    "minutes": 41,
+    "transfers": 1
+   },
+   "서울 양천구": {
+    "minutes": 40,
+    "transfers": 1
+   },
+   "서울 강서구": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "서울 구로구": {
+    "minutes": 26,
+    "transfers": 1
+   },
+   "서울 금천구": {
+    "minutes": 38,
+    "transfers": 1
+   },
+   "서울 영등포구": {
+    "minutes": 39,
+    "transfers": 1
+   },
+   "서울 동작구": {
+    "minutes": 20,
+    "transfers": 0
+   },
+   "서울 관악구": {
+    "minutes": 10,
+    "transfers": 0
+   },
+   "서울 서초구": {
+    "minutes": 30,
+    "transfers": 1
+   },
+   "서울 강남구": {
+    "minutes": 40,
+    "transfers": 1
+   },
+   "서울 송파구": {
+    "minutes": 41,
+    "transfers": 1
+   },
+   "서울 강동구": {
+    "minutes": 50,
+    "transfers": 1
+   },
+   "경기 수원시": {
+    "minutes": 79,
+    "transfers": 1
+   },
+   "경기 성남시": {
+    "minutes": 59,
+    "transfers": 1
+   },
+   "경기 고양시": {
+    "minutes": 73,
+    "transfers": 1
+   },
+   "경기 용인시": {
+    "minutes": 77,
+    "transfers": 1
+   },
+   "경기 부천시": {
+    "minutes": 55,
+    "transfers": 1
+   },
+   "경기 안산시": {
+    "minutes": 81,
+    "transfers": 1
+   },
+   "경기 안양시": {
+    "minutes": 60,
+    "transfers": 1
+   },
+   "경기 남양주시": {
+    "minutes": 69,
+    "transfers": 1
+   },
+   "경기 의정부시": {
+    "minutes": 102,
+    "transfers": 2
+   },
+   "경기 시흥시": {
+    "minutes": 47,
+    "transfers": 1
+   },
+   "경기 파주시": {
+    "minutes": 83,
+    "transfers": 1
+   },
+   "경기 광명시": {
+    "minutes": 39,
+    "transfers": 1
+   },
+   "경기 군포시": {
+    "minutes": 56,
+    "transfers": 1
+   },
+   "경기 하남시": {
+    "minutes": 78,
+    "transfers": 1
+   },
+   "경기 오산시": {
+    "minutes": 54,
+    "transfers": 1
+   },
+   "경기 양주시": {
+    "minutes": 103,
+    "transfers": 2
+   },
+   "경기 구리시": {
+    "minutes": 66,
+    "transfers": 1
+   },
+   "경기 포천시": {
+    "minutes": 77,
+    "transfers": 1
+   },
+   "경기 의왕시": {
+    "minutes": 72,
+    "transfers": 2
+   },
+   "경기 과천시": {
+    "minutes": 38,
+    "transfers": 1
+   },
+   "경기 동두천시": {
+    "minutes": 123,
+    "transfers": 1
+   },
+   "경기 양평군": {
+    "minutes": 139,
+    "transfers": 2
+   },
+   "경기 가평군": {
+    "minutes": 208,
+    "transfers": 2
+   },
+   "경기 연천군": {
+    "minutes": 190,
+    "transfers": 2
+   }
   }
  },
  {
@@ -5261,9 +5707,13 @@
   "apply_start": "2026-09-23",
   "apply_end": "2026-09-30",
   "address": "서울특별시",
-  "lat": 37.5665,
-  "lng": 126.978,
-  "transit": {},
+  "lat": 37.5668260046608,
+  "lng": 126.978652258309,
+  "transit": {
+   "nearest_station": "시청역 1호선",
+   "station_distance_m": 208,
+   "station_walk_min": 3
+  },
   "extraction": {
    "title": "2024년 서울특별시 영구임대주택 예비입주자 모집",
    "housing_type": "long_term_rental",
@@ -5811,6 +6261,245 @@
     "LH와 SH 영구임대주택 공고 중 1호에만 신청 가능하며 중복신청 시 전부 무효 (p.1, p.3).",
     "예비입주자 선정은 배점 합산순 → 서울시 전입일자가 오래된 자 → 신청자 연령이 높은 자 → 추첨 (p.9, 배점기준표 p.10)."
    ]
+  },
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "삼성화재을지로어린이집",
+    "distance_m": 129
+   },
+   {
+    "kind": "school",
+    "name": "서울덕수초등학교",
+    "distance_m": 411
+   },
+   {
+    "kind": "mart",
+    "name": "홈플러스익스프레스 광화문점",
+    "distance_m": 537
+   },
+   {
+    "kind": "convenience",
+    "name": "세븐일레븐 무교본점",
+    "distance_m": 48
+   },
+   {
+    "kind": "hospital",
+    "name": "이치과의원",
+    "distance_m": 36
+   },
+   {
+    "kind": "park",
+    "name": "하늘전망대",
+    "distance_m": 47
+   }
+  ],
+  "b_code": "1100000000",
+  "commute": {
+   "서울 종로구": {
+    "minutes": 13,
+    "transfers": 0
+   },
+   "서울 중구": {
+    "minutes": 19,
+    "transfers": 0
+   },
+   "서울 용산구": {
+    "minutes": 29,
+    "transfers": 1
+   },
+   "서울 성동구": {
+    "minutes": 28,
+    "transfers": 1
+   },
+   "서울 광진구": {
+    "minutes": 51,
+    "transfers": 1
+   },
+   "서울 동대문구": {
+    "minutes": 28,
+    "transfers": 1
+   },
+   "서울 중랑구": {
+    "minutes": 40,
+    "transfers": 1
+   },
+   "서울 성북구": {
+    "minutes": 25,
+    "transfers": 1
+   },
+   "서울 강북구": {
+    "minutes": 23,
+    "transfers": 1
+   },
+   "서울 도봉구": {
+    "minutes": 31,
+    "transfers": 1
+   },
+   "서울 노원구": {
+    "minutes": 28,
+    "transfers": 1
+   },
+   "서울 은평구": {
+    "minutes": 34,
+    "transfers": 1
+   },
+   "서울 서대문구": {
+    "minutes": 26,
+    "transfers": 1
+   },
+   "서울 마포구": {
+    "minutes": 29,
+    "transfers": 1
+   },
+   "서울 양천구": {
+    "minutes": 47,
+    "transfers": 1
+   },
+   "서울 강서구": {
+    "minutes": 52,
+    "transfers": 1
+   },
+   "서울 구로구": {
+    "minutes": 42,
+    "transfers": 1
+   },
+   "서울 금천구": {
+    "minutes": 56,
+    "transfers": 1
+   },
+   "서울 영등포구": {
+    "minutes": 37,
+    "transfers": 1
+   },
+   "서울 동작구": {
+    "minutes": 34,
+    "transfers": 0
+   },
+   "서울 관악구": {
+    "minutes": 39,
+    "transfers": 1
+   },
+   "서울 서초구": {
+    "minutes": 30,
+    "transfers": 0
+   },
+   "서울 강남구": {
+    "minutes": 40,
+    "transfers": 1
+   },
+   "서울 송파구": {
+    "minutes": 41,
+    "transfers": 1
+   },
+   "서울 강동구": {
+    "minutes": 52,
+    "transfers": 1
+   },
+   "경기 수원시": {
+    "minutes": 67,
+    "transfers": 1
+   },
+   "경기 성남시": {
+    "minutes": 41,
+    "transfers": 1
+   },
+   "경기 고양시": {
+    "minutes": 50,
+    "transfers": 0
+   },
+   "경기 용인시": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "경기 부천시": {
+    "minutes": 62,
+    "transfers": 1
+   },
+   "경기 안산시": {
+    "minutes": 104,
+    "transfers": 1
+   },
+   "경기 안양시": {
+    "minutes": 77,
+    "transfers": 2
+   },
+   "경기 남양주시": {
+    "minutes": 66,
+    "transfers": 2
+   },
+   "경기 화성시": {
+    "minutes": 81,
+    "transfers": 2
+   },
+   "경기 의정부시": {
+    "minutes": 57,
+    "transfers": 1
+   },
+   "경기 시흥시": {
+    "minutes": 62,
+    "transfers": 2
+   },
+   "경기 파주시": {
+    "minutes": 76,
+    "transfers": 0
+   },
+   "경기 광명시": {
+    "minutes": 51,
+    "transfers": 1
+   },
+   "경기 광주시": {
+    "minutes": 81,
+    "transfers": 1
+   },
+   "경기 군포시": {
+    "minutes": 70,
+    "transfers": 1
+   },
+   "경기 하남시": {
+    "minutes": 72,
+    "transfers": 1
+   },
+   "경기 오산시": {
+    "minutes": 36,
+    "transfers": 1
+   },
+   "경기 양주시": {
+    "minutes": 58,
+    "transfers": 1
+   },
+   "경기 구리시": {
+    "minutes": 52,
+    "transfers": 1
+   },
+   "경기 포천시": {
+    "minutes": 94,
+    "transfers": 1
+   },
+   "경기 의왕시": {
+    "minutes": 91,
+    "transfers": 2
+   },
+   "경기 과천시": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "경기 동두천시": {
+    "minutes": 93,
+    "transfers": 0
+   },
+   "경기 양평군": {
+    "minutes": 76,
+    "transfers": 1
+   },
+   "경기 가평군": {
+    "minutes": 180,
+    "transfers": 2
+   },
+   "경기 연천군": {
+    "minutes": 152,
+    "transfers": 1
+   }
   }
  },
  {
@@ -5826,46 +6515,43 @@
   "apply_start": "2026-09-22",
   "apply_end": "2026-10-06",
   "address": "서울시 마포구 월드컵북로 120(성산동52-12,13)",
-  "lat": 37.5586,
-  "lng": 126.9095,
+  "lat": 37.5639445701284,
+  "lng": 126.913343852391,
   "transit": {
-   "nearest_station": "망원역 6호선",
-   "station_walk_min": 7,
-   "station_distance_m": 470,
-   "nearest_bus_stop": "망원역2번출구",
-   "bus_walk_min": 2,
-   "bus_distance_m": 130
+   "nearest_station": "가좌역 경의중앙선",
+   "station_distance_m": 548,
+   "station_walk_min": 8
   },
   "nearby": [
    {
     "kind": "daycare",
-    "name": "망원어린이집",
-    "distance_m": 240
+    "name": "가온어린이집",
+    "distance_m": 359
    },
    {
     "kind": "school",
-    "name": "망원초등학교",
-    "distance_m": 320
+    "name": "서울중동초등학교",
+    "distance_m": 353
    },
    {
     "kind": "mart",
-    "name": "망원시장",
-    "distance_m": 410
+    "name": "홈플러스익스프레스 연남점",
+    "distance_m": 698
    },
    {
     "kind": "convenience",
-    "name": "GS25 망원점",
-    "distance_m": 90
+    "name": "CU 성산아리랑점",
+    "distance_m": 29
    },
    {
     "kind": "hospital",
-    "name": "마포구립서부노인전문병원",
-    "distance_m": 1480
+    "name": "제일성모가정의학과의원",
+    "distance_m": 179
    },
    {
     "kind": "park",
-    "name": "망원한강공원",
-    "distance_m": 760
+    "name": "성산",
+    "distance_m": 300
    }
   ],
   "extraction": {
@@ -6264,6 +6950,217 @@
     "당첨자 발표: 자격심사 완료일로부터 2일 후(영업일 기준), 주택개방 및 계약체결: 예비자 발표 후 7일간, 입주: 계약체결일로부터 14일 이내(11~12월 중 예상)",
     "임대조건 범위(공고문 표기): 19㎡ 보증금 518.2~558.2만원·임대료 32.52~34.46만원, 24㎡ 보증금 647.6~677.6만원·임대료 41.16~41.9만원, 23㎡ 보증금 637.7만원·임대료 40.16만원, 29㎡ 보증금 727.2만원·임대료 46.05만원"
    ]
+  },
+  "b_code": "1144012500",
+  "market": {
+   "lawd_cd": "11440",
+   "area_from": 13.5,
+   "area_to": 25,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 267,
+   "jeonse_median": 150000000,
+   "monthly_deposit_median": 53370000,
+   "monthly_rent_median": 400000,
+   "source": "국토교통부 전월세 실거래가"
+  },
+  "commute": {
+   "서울 종로구": {
+    "minutes": 32,
+    "transfers": 1
+   },
+   "서울 중구": {
+    "minutes": 41,
+    "transfers": 1
+   },
+   "서울 용산구": {
+    "minutes": 34,
+    "transfers": 1
+   },
+   "서울 성동구": {
+    "minutes": 45,
+    "transfers": 2
+   },
+   "서울 광진구": {
+    "minutes": 64,
+    "transfers": 1
+   },
+   "서울 동대문구": {
+    "minutes": 48,
+    "transfers": 1
+   },
+   "서울 중랑구": {
+    "minutes": 48,
+    "transfers": 1
+   },
+   "서울 성북구": {
+    "minutes": 46,
+    "transfers": 1
+   },
+   "서울 강북구": {
+    "minutes": 42,
+    "transfers": 1
+   },
+   "서울 도봉구": {
+    "minutes": 67,
+    "transfers": 1
+   },
+   "서울 노원구": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "서울 은평구": {
+    "minutes": 34,
+    "transfers": 1
+   },
+   "서울 서대문구": {
+    "minutes": 24,
+    "transfers": 1
+   },
+   "서울 마포구": {
+    "minutes": 13,
+    "transfers": 0
+   },
+   "서울 양천구": {
+    "minutes": 39,
+    "transfers": 1
+   },
+   "서울 강서구": {
+    "minutes": 33,
+    "transfers": 0
+   },
+   "서울 구로구": {
+    "minutes": 43,
+    "transfers": 2
+   },
+   "서울 금천구": {
+    "minutes": 60,
+    "transfers": 2
+   },
+   "서울 영등포구": {
+    "minutes": 21,
+    "transfers": 1
+   },
+   "서울 동작구": {
+    "minutes": 36,
+    "transfers": 2
+   },
+   "서울 관악구": {
+    "minutes": 44,
+    "transfers": 1
+   },
+   "서울 서초구": {
+    "minutes": 61,
+    "transfers": 1
+   },
+   "서울 강남구": {
+    "minutes": 68,
+    "transfers": 2
+   },
+   "서울 송파구": {
+    "minutes": 77,
+    "transfers": 2
+   },
+   "서울 강동구": {
+    "minutes": 73,
+    "transfers": 2
+   },
+   "경기 수원시": {
+    "minutes": 114,
+    "transfers": 2
+   },
+   "경기 성남시": {
+    "minutes": 67,
+    "transfers": 1
+   },
+   "경기 고양시": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "경기 용인시": {
+    "minutes": 81,
+    "transfers": 1
+   },
+   "경기 부천시": {
+    "minutes": 43,
+    "transfers": 1
+   },
+   "경기 안산시": {
+    "minutes": 103,
+    "transfers": 2
+   },
+   "경기 남양주시": {
+    "minutes": 95,
+    "transfers": 2
+   },
+   "경기 의정부시": {
+    "minutes": 102,
+    "transfers": 2
+   },
+   "경기 시흥시": {
+    "minutes": 94,
+    "transfers": 2
+   },
+   "경기 파주시": {
+    "minutes": 52,
+    "transfers": 1
+   },
+   "경기 광명시": {
+    "minutes": 50,
+    "transfers": 2
+   },
+   "경기 광주시": {
+    "minutes": 104,
+    "transfers": 2
+   },
+   "경기 군포시": {
+    "minutes": 84,
+    "transfers": 2
+   },
+   "경기 하남시": {
+    "minutes": 100,
+    "transfers": 2
+   },
+   "경기 오산시": {
+    "minutes": 83,
+    "transfers": 2
+   },
+   "경기 양주시": {
+    "minutes": 97,
+    "transfers": 2
+   },
+   "경기 구리시": {
+    "minutes": 85,
+    "transfers": 2
+   },
+   "경기 포천시": {
+    "minutes": 154,
+    "transfers": 2
+   },
+   "경기 의왕시": {
+    "minutes": 108,
+    "transfers": 2
+   },
+   "경기 과천시": {
+    "minutes": 67,
+    "transfers": 2
+   },
+   "경기 동두천시": {
+    "minutes": 117,
+    "transfers": 1
+   },
+   "경기 양평군": {
+    "minutes": 113,
+    "transfers": 2
+   },
+   "경기 가평군": {
+    "minutes": 205,
+    "transfers": 2
+   },
+   "경기 연천군": {
+    "minutes": 185,
+    "transfers": 2
+   }
   }
  },
  {
@@ -6279,8 +7176,8 @@
   "apply_start": "2026-09-29",
   "apply_end": "2026-09-29",
   "address": "전북특별자치도 군산시 문화로 36",
-  "lat": 35.9676,
-  "lng": 126.7106,
+  "lat": 35.9694641851937,
+  "lng": 126.709955551767,
   "transit": {},
   "extraction": {
    "title": "군산시 (군산나운4) 영구임대주택 입주자격완화 예비입주자 모집",
@@ -6473,6 +7370,84 @@
     "입주(계약)는 공가 발생 시 예비순번에 따라 개별 안내되므로 입주일(move_in) 정보 없음.",
     "전환보증금(상호전환) 관련 조건은 공고문에 기재되어 있지 않음."
    ]
+  },
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "나운어린이집",
+    "distance_m": 85
+   },
+   {
+    "kind": "school",
+    "name": "군산서흥중학교",
+    "distance_m": 220
+   },
+   {
+    "kind": "mart",
+    "name": "오픈박스 군산점",
+    "distance_m": 664
+   },
+   {
+    "kind": "convenience",
+    "name": "GS25 군산나운스타점",
+    "distance_m": 71
+   },
+   {
+    "kind": "hospital",
+    "name": "이형룡내과의원",
+    "distance_m": 57
+   },
+   {
+    "kind": "park",
+    "name": "고운빛깔",
+    "distance_m": 1031
+   }
+  ],
+  "b_code": "5213014400",
+  "market": {
+   "lawd_cd": "52130",
+   "area_from": 18.5,
+   "area_to": 34.3,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 56,
+   "jeonse_median": 25000000,
+   "monthly_deposit_median": 10600000,
+   "monthly_rent_median": 120000,
+   "source": "국토교통부 전월세 실거래가"
+  },
+  "waiting": {
+   "complex": "군산나운주공4단지",
+   "rows": [
+    {
+     "unit_type": "31",
+     "waiting": 126,
+     "terminated": 19
+    },
+    {
+     "unit_type": "26",
+     "waiting": 18,
+     "terminated": 67
+    },
+    {
+     "unit_type": "52",
+     "waiting": 14,
+     "terminated": 1
+    },
+    {
+     "unit_type": "26",
+     "waiting": 0,
+     "terminated": 1
+    },
+    {
+     "unit_type": "26",
+     "waiting": 0,
+     "terminated": 1
+    }
+   ],
+   "total_waiting": 158,
+   "as_of": "2026-09-21",
+   "source": "마이홈포털 예비입주자 대기현황"
   }
  },
  {
@@ -6488,8 +7463,8 @@
   "apply_start": "2026-10-01",
   "apply_end": "2026-10-02",
   "address": "제주특별자치도 제주시 삼성로 134(일도), 제주특별자치도 제주시 탑동로13길 27(삼도1), 제주특별자치도 제주시 탑동로13길 40(삼도2)",
-  "lat": 33.512,
-  "lng": 126.535,
+  "lat": 33.5116889090284,
+  "lng": 126.538093826205,
   "extraction": {
    "title": "제주일도·삼도 행복주택 예비입주자 모집",
    "housing_type": "happy",
@@ -7839,6 +8814,47 @@
     "대학생 계층은 신청자 부모와 본인의 월평균소득 합계를 기준으로 하며, 이혼 등의 사유로 가족관계가 단절된 상태인 경우 실질적으로 부양의무를 이행하고 있는 부 또는 모의 소득을 조회합니다.",
     "위 임대조건의 임대보증금 및 월임대료는 입주자모집공고일 현재 기준이며, 예비입주자로 선정된 분은 추후 공가가 발생하여 임대차계약을 체결하게 되는 시점의 주변시세를 반영한 변경 임대조건이 적용됩니다."
    ]
+  },
+  "transit": {},
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "파랑새어린이집",
+    "distance_m": 335
+   },
+   {
+    "kind": "school",
+    "name": "제주여자상업고등학교",
+    "distance_m": 381
+   },
+   {
+    "kind": "convenience",
+    "name": "CU 제주서반점",
+    "distance_m": 55
+   },
+   {
+    "kind": "hospital",
+    "name": "한라 동물종합병원",
+    "distance_m": 127
+   },
+   {
+    "kind": "park",
+    "name": "두맹이골목",
+    "distance_m": 405
+   }
+  ],
+  "b_code": "5011010200",
+  "market": {
+   "lawd_cd": "50110",
+   "area_from": 18.9,
+   "area_to": 35,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 315,
+   "jeonse_median": 111000000,
+   "monthly_deposit_median": 2000000,
+   "monthly_rent_median": 450000,
+   "source": "국토교통부 전월세 실거래가"
   }
  },
  {
@@ -7854,8 +8870,8 @@
   "apply_start": "2026-09-29",
   "apply_end": "2026-10-01",
   "address": "서울특별시 강서구 공항대로81길 14 (염창역 동문디이스트)",
-  "lat": 37.553,
-  "lng": 126.87,
+  "lat": 37.5478925034829,
+  "lng": 126.876846681902,
   "extraction": {
    "title": "강서염창 통합공공임대주택 입주자 모집공고",
    "housing_type": "other",
@@ -9722,6 +10738,258 @@
     "신청접수는 온라인접수[LH청약플러스 홈페이지 또는 모바일 앱]로 진행하며, 장애인 및 65세 이상의 고령자 등 온라인 접수가 어려우신 분에 한하여 현장접수가 가능합니다. 서류제출대상자 발표 ’26.10.13.(화) 17:00 이후, 서류제출 기간 ’26.10.14.(수)~19.(월) 등기우편.",
     "입주지정기간 : ’27.2.18.(목) ~ 4.19.(월). 전자계약 ’27.2.15.~16., 현장계약 ’27.2.17."
    ]
+  },
+  "transit": {
+   "nearest_station": "염창역 9호선",
+   "station_distance_m": 201,
+   "station_walk_min": 3
+  },
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "동아어린이집",
+    "distance_m": 197
+   },
+   {
+    "kind": "school",
+    "name": "서울양화초등학교",
+    "distance_m": 466
+   },
+   {
+    "kind": "mart",
+    "name": "GS더프레시 강서염창점",
+    "distance_m": 494
+   },
+   {
+    "kind": "convenience",
+    "name": "CU 염창오피스점",
+    "distance_m": 57
+   },
+   {
+    "kind": "hospital",
+    "name": "서울드림치과의원",
+    "distance_m": 165
+   },
+   {
+    "kind": "park",
+    "name": "용왕산",
+    "distance_m": 419
+   }
+  ],
+  "b_code": "1150010100",
+  "market": {
+   "lawd_cd": "11500",
+   "area_from": 42,
+   "area_to": 77.9,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 2401,
+   "jeonse_median": 400000000,
+   "monthly_deposit_median": 100000000,
+   "monthly_rent_median": 460000,
+   "source": "국토교통부 전월세 실거래가"
+  },
+  "commute": {
+   "서울 종로구": {
+    "minutes": 37,
+    "transfers": 1
+   },
+   "서울 중구": {
+    "minutes": 45,
+    "transfers": 1
+   },
+   "서울 용산구": {
+    "minutes": 32,
+    "transfers": 1
+   },
+   "서울 성동구": {
+    "minutes": 48,
+    "transfers": 1
+   },
+   "서울 광진구": {
+    "minutes": 66,
+    "transfers": 2
+   },
+   "서울 동대문구": {
+    "minutes": 52,
+    "transfers": 1
+   },
+   "서울 중랑구": {
+    "minutes": 73,
+    "transfers": 2
+   },
+   "서울 성북구": {
+    "minutes": 47,
+    "transfers": 1
+   },
+   "서울 강북구": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "서울 도봉구": {
+    "minutes": 70,
+    "transfers": 2
+   },
+   "서울 노원구": {
+    "minutes": 72,
+    "transfers": 2
+   },
+   "서울 은평구": {
+    "minutes": 38,
+    "transfers": 1
+   },
+   "서울 서대문구": {
+    "minutes": 28,
+    "transfers": 1
+   },
+   "서울 마포구": {
+    "minutes": 21,
+    "transfers": 1
+   },
+   "서울 양천구": {
+    "minutes": 24,
+    "transfers": 1
+   },
+   "서울 강서구": {
+    "minutes": 19,
+    "transfers": 0
+   },
+   "서울 구로구": {
+    "minutes": 38,
+    "transfers": 1
+   },
+   "서울 금천구": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "서울 영등포구": {
+    "minutes": 18,
+    "transfers": 1
+   },
+   "서울 동작구": {
+    "minutes": 34,
+    "transfers": 1
+   },
+   "서울 관악구": {
+    "minutes": 41,
+    "transfers": 1
+   },
+   "서울 서초구": {
+    "minutes": 51,
+    "transfers": 1
+   },
+   "서울 강남구": {
+    "minutes": 51,
+    "transfers": 1
+   },
+   "서울 송파구": {
+    "minutes": 60,
+    "transfers": 1
+   },
+   "서울 강동구": {
+    "minutes": 75,
+    "transfers": 2
+   },
+   "경기 수원시": {
+    "minutes": 100,
+    "transfers": 2
+   },
+   "경기 성남시": {
+    "minutes": 71,
+    "transfers": 1
+   },
+   "경기 고양시": {
+    "minutes": 69,
+    "transfers": 1
+   },
+   "경기 용인시": {
+    "minutes": 82,
+    "transfers": 1
+   },
+   "경기 부천시": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "경기 안산시": {
+    "minutes": 115,
+    "transfers": 2
+   },
+   "경기 안양시": {
+    "minutes": 85,
+    "transfers": 2
+   },
+   "경기 남양주시": {
+    "minutes": 98,
+    "transfers": 2
+   },
+   "경기 의정부시": {
+    "minutes": 104,
+    "transfers": 2
+   },
+   "경기 시흥시": {
+    "minutes": 116,
+    "transfers": 1
+   },
+   "경기 파주시": {
+    "minutes": 116,
+    "transfers": 1
+   },
+   "경기 광명시": {
+    "minutes": 43,
+    "transfers": 1
+   },
+   "경기 광주시": {
+    "minutes": 101,
+    "transfers": 2
+   },
+   "경기 군포시": {
+    "minutes": 82,
+    "transfers": 2
+   },
+   "경기 하남시": {
+    "minutes": 91,
+    "transfers": 1
+   },
+   "경기 오산시": {
+    "minutes": 56,
+    "transfers": 1
+   },
+   "경기 양주시": {
+    "minutes": 98,
+    "transfers": 2
+   },
+   "경기 구리시": {
+    "minutes": 85,
+    "transfers": 2
+   },
+   "경기 포천시": {
+    "minutes": 155,
+    "transfers": 2
+   },
+   "경기 의왕시": {
+    "minutes": 97,
+    "transfers": 2
+   },
+   "경기 과천시": {
+    "minutes": 60,
+    "transfers": 1
+   },
+   "경기 동두천시": {
+    "minutes": 120,
+    "transfers": 2
+   },
+   "경기 양평군": {
+    "minutes": 98,
+    "transfers": 2
+   },
+   "경기 가평군": {
+    "minutes": 208,
+    "transfers": 2
+   },
+   "경기 연천군": {
+    "minutes": 185,
+    "transfers": 2
+   }
   }
  },
  {
@@ -9737,8 +11005,8 @@
   "apply_start": "2026-09-28",
   "apply_end": "2026-09-29",
   "address": "경상남도 양산시 (물금2·물금5·사송A-4·사송A-5·금산휴먼시아·소주휴먼시아)",
-  "lat": 35.317,
-  "lng": 128.997,
+  "lat": 35.3349920568283,
+  "lng": 129.037272788805,
   "extraction": {
    "title": "양산시 국민임대주택 예비입주자 완화 모집 [소득·자산·무주택요건 완화/계약금 50만원 정액]",
    "housing_type": "national_rental",
@@ -10401,6 +11669,56 @@
     "월임대료의 임대보증금 전환 및 임대보증금의 월임대료 전환은 임차인의 선택사항으로 임대보증금 100만원 단위로 전환 가능하며, 전환 이율은 월임대료→보증금 6%, 보증금→월임대료 3.5%입니다.",
     "서류제출대상자 발표 2026.10.16.(금) 17:00 이후, 서류접수 2026.10.19.~23, 예비입주자 당첨발표 2026.11.27.(금) 17:00 이후"
    ]
+  },
+  "transit": {
+   "nearest_station": "양산역 부산2호선",
+   "station_distance_m": 1069,
+   "station_walk_min": 16
+  },
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "성아어린이집",
+    "distance_m": 294
+   },
+   {
+    "kind": "school",
+    "name": "중부초등학교",
+    "distance_m": 466
+   },
+   {
+    "kind": "mart",
+    "name": "GS더프레시 양산중부점",
+    "distance_m": 668
+   },
+   {
+    "kind": "convenience",
+    "name": "GS25 양산대동점",
+    "distance_m": 325
+   },
+   {
+    "kind": "hospital",
+    "name": "현대치과의원",
+    "distance_m": 500
+   },
+   {
+    "kind": "park",
+    "name": "양산젊음의거리",
+    "distance_m": 835
+   }
+  ],
+  "b_code": "4833000000",
+  "market": {
+   "lawd_cd": "48330",
+   "area_from": 20.4,
+   "area_to": 38,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 145,
+   "jeonse_median": 60000000,
+   "monthly_deposit_median": 16960000,
+   "monthly_rent_median": 170000,
+   "source": "국토교통부 전월세 실거래가"
   }
  },
  {
@@ -11636,6 +12954,252 @@
     "예비입주자 자격은 모집단위별 예비입주자 순번 발표일로부터 60일간 유지되며, 60일이 경과한 다음 날 예비입주자 지위가 소멸됩니다. 계약체결 후 60일 이내에 입주를 완료하여야 합니다.",
     "재계약 시 무주택세대구성원으로서 해당 세대의 월평균 소득이 전년도 도시근로자 가구당 월평균 소득의 105% 이하이고, 국민임대주택 자산기준을 충족한 경우 재계약이 가능합니다."
    ]
+  },
+  "lat": 37.5668260046608,
+  "lng": 126.978652258309,
+  "transit": {
+   "nearest_station": "시청역 1호선",
+   "station_distance_m": 208,
+   "station_walk_min": 3
+  },
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "삼성화재을지로어린이집",
+    "distance_m": 129
+   },
+   {
+    "kind": "school",
+    "name": "서울덕수초등학교",
+    "distance_m": 411
+   },
+   {
+    "kind": "mart",
+    "name": "홈플러스익스프레스 광화문점",
+    "distance_m": 537
+   },
+   {
+    "kind": "convenience",
+    "name": "세븐일레븐 무교본점",
+    "distance_m": 48
+   },
+   {
+    "kind": "hospital",
+    "name": "이치과의원",
+    "distance_m": 36
+   },
+   {
+    "kind": "park",
+    "name": "하늘전망대",
+    "distance_m": 47
+   }
+  ],
+  "b_code": "1100000000",
+  "commute": {
+   "서울 종로구": {
+    "minutes": 13,
+    "transfers": 0
+   },
+   "서울 중구": {
+    "minutes": 19,
+    "transfers": 0
+   },
+   "서울 용산구": {
+    "minutes": 29,
+    "transfers": 1
+   },
+   "서울 성동구": {
+    "minutes": 28,
+    "transfers": 1
+   },
+   "서울 광진구": {
+    "minutes": 51,
+    "transfers": 1
+   },
+   "서울 동대문구": {
+    "minutes": 28,
+    "transfers": 1
+   },
+   "서울 중랑구": {
+    "minutes": 40,
+    "transfers": 1
+   },
+   "서울 성북구": {
+    "minutes": 25,
+    "transfers": 1
+   },
+   "서울 강북구": {
+    "minutes": 23,
+    "transfers": 1
+   },
+   "서울 도봉구": {
+    "minutes": 31,
+    "transfers": 1
+   },
+   "서울 노원구": {
+    "minutes": 28,
+    "transfers": 1
+   },
+   "서울 은평구": {
+    "minutes": 34,
+    "transfers": 1
+   },
+   "서울 서대문구": {
+    "minutes": 26,
+    "transfers": 1
+   },
+   "서울 마포구": {
+    "minutes": 29,
+    "transfers": 1
+   },
+   "서울 양천구": {
+    "minutes": 47,
+    "transfers": 1
+   },
+   "서울 강서구": {
+    "minutes": 52,
+    "transfers": 1
+   },
+   "서울 구로구": {
+    "minutes": 42,
+    "transfers": 1
+   },
+   "서울 금천구": {
+    "minutes": 56,
+    "transfers": 1
+   },
+   "서울 영등포구": {
+    "minutes": 37,
+    "transfers": 1
+   },
+   "서울 동작구": {
+    "minutes": 34,
+    "transfers": 0
+   },
+   "서울 관악구": {
+    "minutes": 39,
+    "transfers": 1
+   },
+   "서울 서초구": {
+    "minutes": 30,
+    "transfers": 0
+   },
+   "서울 강남구": {
+    "minutes": 40,
+    "transfers": 1
+   },
+   "서울 송파구": {
+    "minutes": 41,
+    "transfers": 1
+   },
+   "서울 강동구": {
+    "minutes": 52,
+    "transfers": 1
+   },
+   "경기 수원시": {
+    "minutes": 67,
+    "transfers": 1
+   },
+   "경기 성남시": {
+    "minutes": 41,
+    "transfers": 1
+   },
+   "경기 고양시": {
+    "minutes": 50,
+    "transfers": 0
+   },
+   "경기 용인시": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "경기 부천시": {
+    "minutes": 62,
+    "transfers": 1
+   },
+   "경기 안산시": {
+    "minutes": 104,
+    "transfers": 1
+   },
+   "경기 안양시": {
+    "minutes": 77,
+    "transfers": 2
+   },
+   "경기 남양주시": {
+    "minutes": 66,
+    "transfers": 2
+   },
+   "경기 화성시": {
+    "minutes": 81,
+    "transfers": 2
+   },
+   "경기 의정부시": {
+    "minutes": 57,
+    "transfers": 1
+   },
+   "경기 시흥시": {
+    "minutes": 62,
+    "transfers": 2
+   },
+   "경기 파주시": {
+    "minutes": 76,
+    "transfers": 0
+   },
+   "경기 광명시": {
+    "minutes": 51,
+    "transfers": 1
+   },
+   "경기 광주시": {
+    "minutes": 81,
+    "transfers": 1
+   },
+   "경기 군포시": {
+    "minutes": 70,
+    "transfers": 1
+   },
+   "경기 하남시": {
+    "minutes": 72,
+    "transfers": 1
+   },
+   "경기 오산시": {
+    "minutes": 36,
+    "transfers": 1
+   },
+   "경기 양주시": {
+    "minutes": 58,
+    "transfers": 1
+   },
+   "경기 구리시": {
+    "minutes": 52,
+    "transfers": 1
+   },
+   "경기 포천시": {
+    "minutes": 94,
+    "transfers": 1
+   },
+   "경기 의왕시": {
+    "minutes": 91,
+    "transfers": 2
+   },
+   "경기 과천시": {
+    "minutes": 53,
+    "transfers": 1
+   },
+   "경기 동두천시": {
+    "minutes": 93,
+    "transfers": 0
+   },
+   "경기 양평군": {
+    "minutes": 76,
+    "transfers": 1
+   },
+   "경기 가평군": {
+    "minutes": 180,
+    "transfers": 2
+   },
+   "경기 연천군": {
+    "minutes": 152,
+    "transfers": 1
+   }
   }
  },
  {

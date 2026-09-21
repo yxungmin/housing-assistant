@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchComplex, parseAsOf, parseWaitRows, summarize, WaitClient, type WaitRow } from "../src/wait/myhome";
+import { matchComplex, myhomeRegionCode, normalizeComplex, parseAsOf, parseWaitRows, summarize, WaitClient, type WaitRow } from "../src/wait/myhome";
 
 /** 2026-09-21 마이홈 웹에서 실측한 행 모양 */
 const WEB = {
@@ -123,5 +123,29 @@ describe("WaitClient", () => {
     const fake: typeof fetch = async () => new Response(JSON.stringify(API), { status: 200 });
     const s = await new WaitClient("KEY", fake).forAnnouncement("11", "수서주공1단지 영구임대주택 예비입주자 모집공고");
     expect(s?.total_waiting).toBe(117);
+  });
+});
+
+describe("실데이터에서 드러난 것 (2026-09-21)", () => {
+  it("마이홈 시도 코드는 행정표준코드와 둘이 다르다 — 강원 51, 전북 52", () => {
+    expect(myhomeRegionCode("42")).toBe("51");
+    expect(myhomeRegionCode("45")).toBe("52");
+    expect(myhomeRegionCode("11")).toBe("11");
+    expect(myhomeRegionCode("41")).toBe("41");
+  });
+
+  it("단지명 상투어를 걷어내면 공고 제목과 맞는다", () => {
+    expect(normalizeComplex("군산나운주공4단지")).toBe("군산나운4");
+    expect(normalizeComplex("관악산휴먼시아 3단지")).toBe("관악산3");
+  });
+
+  it("괄호 안 단지명을 살린다 — 지우면 매칭이 깨진다", () => {
+    const rows: WaitRow[] = [{ complex: "군산나운주공4단지", waiting: 158 }];
+    expect(matchComplex(rows, "군산시 (군산나운4) 영구임대주택 입주자격완화 예비입주자 모집")[0]?.complex).toBe("군산나운주공4단지");
+  });
+
+  it("제목에 단지명이 없으면 맞추지 않는다 — 남의 단지 숫자를 보여 주느니 안 보여 준다", () => {
+    const rows: WaitRow[] = [{ complex: "관악산휴먼시아 3단지", waiting: 29 }];
+    expect(matchComplex(rows, "2024년 서울특별시 영구임대주택 예비입주자 모집")).toEqual([]);
   });
 });
