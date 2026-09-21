@@ -26,15 +26,22 @@ interface Meta {
   apply_end?: string;
   lat?: number;
   lng?: number;
-  transit?: { nearest_station?: string; station_walk_min?: number };
+  transit?: { nearest_station?: string; station_walk_min?: number; station_distance_m?: number; nearest_bus_stop?: string; bus_walk_min?: number; bus_distance_m?: number };
+  nearby?: { kind: string; name: string; distance_m: number }[];
 }
 
 /** 초기 벤치마크 PDF(001~004)는 API 메타 없이 받았으므로 손으로 채운 값. 접수일은 시안 기준일(2026-09-20) 근처. */
 const MANUAL_META: Record<string, Meta> = {
-  "001": { lh_id: "MOCK-001", region_code: "41", region_name: "경기 과천시", apply_start: "2026-09-30", apply_end: "2026-10-02", lat: 37.4316, lng: 126.9982, transit: { nearest_station: "인덕원역", station_walk_min: 22 } },
-  "002": { lh_id: "MOCK-002", region_code: "11", region_name: "서울 관악구", apply_start: "2026-09-25", apply_end: "2026-09-29", lat: 37.4784, lng: 126.9517, transit: { nearest_station: "봉천역", station_walk_min: 9 } },
+  "001": { lh_id: "MOCK-001", region_code: "41", region_name: "경기 과천시", apply_start: "2026-09-30", apply_end: "2026-10-02", lat: 37.4316, lng: 126.9982,
+    transit: { nearest_station: "인덕원역 4호선", station_walk_min: 22, station_distance_m: 1480, nearest_bus_stop: "과천지식정보타운", bus_walk_min: 3, bus_distance_m: 190 },
+    nearby: [{ kind: "school", name: "과천문원초등학교", distance_m: 690 }, { kind: "mart", name: "이마트 과천점", distance_m: 1320 }, { kind: "convenience", name: "세븐일레븐 과천점", distance_m: 210 }] },
+  "002": { lh_id: "MOCK-002", region_code: "11", region_name: "서울 관악구", apply_start: "2026-09-25", apply_end: "2026-09-29", lat: 37.4784, lng: 126.9517,
+    transit: { nearest_station: "봉천역 2호선", station_walk_min: 9, station_distance_m: 620, nearest_bus_stop: "관악구청", bus_walk_min: 4, bus_distance_m: 250 },
+    nearby: [{ kind: "school", name: "봉천중학교", distance_m: 540 }, { kind: "convenience", name: "CU 봉천역점", distance_m: 160 }, { kind: "hospital", name: "에이치플러스 양지병원", distance_m: 1100 }] },
   "003": { lh_id: "MOCK-003", region_code: "11", region_name: "서울", apply_start: "2026-09-23", apply_end: "2026-09-30", lat: 37.5665, lng: 126.978, transit: {} },
-  "004": { lh_id: "MOCK-004", region_code: "11", region_name: "서울 마포구", apply_start: "2026-09-22", apply_end: "2026-10-06", lat: 37.5586, lng: 126.9095, transit: { nearest_station: "망원역", station_walk_min: 7 } },
+  "004": { lh_id: "MOCK-004", region_code: "11", region_name: "서울 마포구", apply_start: "2026-09-22", apply_end: "2026-10-06", lat: 37.5586, lng: 126.9095,
+    transit: { nearest_station: "망원역 6호선", station_walk_min: 7, station_distance_m: 470, nearest_bus_stop: "망원역2번출구", bus_walk_min: 2, bus_distance_m: 130 },
+    nearby: [{ kind: "daycare", name: "망원어린이집", distance_m: 240 }, { kind: "school", name: "망원초등학교", distance_m: 320 }, { kind: "mart", name: "망원시장", distance_m: 410 }, { kind: "convenience", name: "GS25 망원점", distance_m: 90 }, { kind: "hospital", name: "마포구립서부노인전문병원", distance_m: 1480 }, { kind: "park", name: "망원한강공원", distance_m: 760 }] },
   "005": { lh_id: "2015122300020801", region_code: "45", region_name: "전북 군산시", apply_start: "2026-09-29", apply_end: "2026-09-29", lat: 35.9676, lng: 126.7106, transit: {} },
 };
 
@@ -90,7 +97,8 @@ export interface AppAnnouncement {
   address?: string;
   lat?: number;
   lng?: number;
-  transit?: { nearest_station?: string; station_walk_min?: number };
+  transit?: { nearest_station?: string; station_walk_min?: number; station_distance_m?: number; nearest_bus_stop?: string; bus_walk_min?: number; bus_distance_m?: number };
+  nearby?: { kind: string; name: string; distance_m: number }[];
   /** 기관 사이트의 원문 공고문. 앱이 근거 쪽수를 실제로 열 수 있게 한다 */
   pdf_url?: string;
   pdf_pages?: number;
@@ -141,6 +149,7 @@ for (const f of files) {
     lat: meta?.lat,
     lng: meta?.lng,
     transit: meta?.transit,
+    nearby: meta?.nearby,
     pdf_url: meta?.pdf_url,
     extraction,
   });
@@ -159,6 +168,19 @@ items.push({
   apply_end: "2026-09-29",
   extraction: { title: "", housing_type: "newlywed_hope", schedule: {}, tracks: [{ name: "-", unit_types: [], rule_groups: [], rules: [], pricing: [] }], notes: [] },
 });
+/**
+ * 초안(benchmark/output/*.draft.json)과 정답(benchmark/fixtures/)은 커밋하지 않는 생성물이다.
+ * 그게 없는 작업본에서 이 스크립트를 돌리면 "분석 중" 예시 1건만 남은 파일을 써서
+ * 앱의 번들 데이터를 통째로 날린다. 실제로 한 번 날렸다 (2026-09-21).
+ * 그래서 읽어 온 공고가 없으면 쓰지 않고 멈춘다 — 덮어쓰기는 되돌릴 수 없다.
+ */
+const fromSources = items.filter((i) => i.id !== "pending-001").length;
+if (fromSources === 0) {
+  console.error(`초안·정답을 하나도 못 읽었습니다 (${OUT}, ${FIXTURES}). ${TARGET}를 덮어쓰지 않고 멈춥니다.`);
+  console.error("초안을 먼저 만드세요: npm run benchmark:fetch → npm run inspect -- <pdf> --extract");
+  process.exit(1);
+}
+
 mkdirSync(join(TARGET, ".."), { recursive: true });
 writeFileSync(TARGET, JSON.stringify(items, null, 1));
 console.log(`wrote ${TARGET} (${items.length}건: ${items.map((i) => i.id).join(", ")})`);
