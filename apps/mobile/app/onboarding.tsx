@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
+import { Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/Icon";
@@ -75,7 +75,7 @@ export default function Onboarding() {
         <View style={{ height: "100%", width: `${((index + 1) / steps.length) * 100}%`, backgroundColor: colors.primary }} />
       </View>
 
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <FadeIn key={step.id} style={{ paddingHorizontal: space.screen, paddingTop: 32, gap: space.md }}>
           <Sub tone="3">{index + 1} / {steps.length}</Sub>
@@ -117,7 +117,7 @@ export default function Onboarding() {
           ) : null}
         </FadeIn>
         </ScrollView>
-        {/* CTA는 KeyboardAvoidingView 안에 둔다. 밖에 두면 키패드가 버튼을 덮는다. */}
+        {/* CTA는 재어 둔 키보드 높이만큼 스스로 올라간다 (BottomCTA의 useKeyboardHeight) */}
         <BottomCTA
           label={index + 1 >= steps.length ? "내 조건으로 공고 찾기" : step.kind === "multi" && selected.length === 0 ? "해당 없음" : "다음"}
           onPress={onNext}
@@ -126,7 +126,7 @@ export default function Onboarding() {
           secondaryLabel="나중에 입력할게요"
           onSecondary={onSkip}
         />
-      </KeyboardAvoidingView>
+      </View>
 
       <IncomeHelperSheet visible={helper} dual={draft.income_type === "dual"} onClose={() => setHelper(false)} onApply={(v) => { setText(String(v)); setHelper(false); }} />
     </Screen>

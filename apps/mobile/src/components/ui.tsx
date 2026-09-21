@@ -5,7 +5,7 @@
  * 원칙: 흰 화면 + grey50 카드, 헤어라인 대신 간격, 아이콘은 연한 타일 안에, 색은 CTA·상태에만.
  */
 import { useEffect, useRef, useState, type PropsWithChildren, type ReactNode } from "react";
-import { Animated, Easing, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { Animated, Easing, Keyboard, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space, type } from "@/theme/tokens";
@@ -310,14 +310,36 @@ export function KeyValue({ label, value, src, strong }: { label: string; value: 
 
 /** 하단 고정 CTA: 높이 56, 라운드 16. Screen의 footer 슬롯에 넣으면 스크롤과 무관하게 고정된다. */
 /**
+ * 지금 올라와 있는 키보드 높이 (없으면 0).
+ * KeyboardAvoidingView는 헤더가 있는 화면에서 밀어 올리는 양을 덜 잡는 일이 있어,
+ * 하단 버튼이 키보드에 반쯤 가린다. 재서 그만큼 올리는 편이 확실하다.
+ */
+export function useKeyboardHeight(): number {
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillChangeFrame" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const show = Keyboard.addListener(showEvent, (e) => setHeight(e.endCoordinates?.height ?? 0));
+    const hide = Keyboard.addListener(hideEvent, () => setHeight(0));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+  return height;
+}
+
+/**
  * 하단 CTA.
  * disabled 대신 `appear`를 주면 할 수 있을 때 버튼이 올라온다 — 흐린 버튼을 계속 보여 주는 대신
  * 버튼이 나타나는 것 자체를 "다 됐다"는 신호로 쓴다. 건너뛰기(secondary)는 그동안에도 남는다.
  */
 export function BottomCTA({ label, onPress, disabled, appear, secondary, secondaryLabel, onSecondary }: { label: string; onPress: () => void; disabled?: boolean; appear?: boolean; secondary?: boolean; secondaryLabel?: string; onSecondary?: () => void }) {
   const { colors } = useTheme();
+  // 키보드가 올라오면 그 위로 붙는다. 홈 인디케이터 여백(28)은 키보드가 대신하므로 줄인다.
+  const keyboard = useKeyboardHeight();
   return (
-    <View style={{ paddingHorizontal: space.xl, paddingTop: 12, paddingBottom: 28, gap: 4, backgroundColor: colors.surface }}>
+    <View style={{ paddingHorizontal: space.xl, paddingTop: 12, paddingBottom: keyboard > 0 ? 10 : 28, marginBottom: keyboard, gap: 4, backgroundColor: colors.surface }}>
       {appear !== undefined ? (
         <SlideUp visible={appear}>
           <PrimaryButton label={label} onPress={onPress} />
