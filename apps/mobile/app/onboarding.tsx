@@ -117,8 +117,11 @@ export default function Onboarding() {
           ) : null}
         </FadeIn>
         </ScrollView>
-        {/* CTA는 재어 둔 키보드 높이만큼 스스로 올라간다 (BottomCTA의 useKeyboardHeight) */}
+        {/* CTA는 재어 둔 키보드 높이만큼 스스로 올라간다 (BottomCTA의 useKeyboardHeight).
+            key로 단계마다 새로 만든다 — 그러지 않으면 다음 단계로 넘어갈 때 이전 버튼이
+            퇴장 애니메이션을 하며 화면 한가운데 잠깐 남는다. 단계 전환은 즉시여야 한다. */}
         <BottomCTA
+          key={step.id}
           label={index + 1 >= steps.length ? "내 조건으로 공고 찾기" : step.kind === "multi" && selected.length === 0 ? "해당 없음" : "다음"}
           onPress={onNext}
           appear={canNext}
