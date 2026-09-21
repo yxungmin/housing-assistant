@@ -11,8 +11,8 @@ const WEB = {
   ],
 };
 
-/** 공공데이터포털 표준 응답 껍데기 */
-const API = { response: { body: { items: { item: WEB.resultList } } } };
+/** 2026-09-21 공식 API 실응답 껍데기 (items로 싸지 않고 body.item이 바로 배열) */
+const API = { response: { body: { totalCount: "3778", numOfRows: "5", pageNo: "1", item: WEB.resultList } } };
 
 describe("parseWaitRows", () => {
   it("웹 응답을 읽는다", () => {
@@ -21,8 +21,18 @@ describe("parseWaitRows", () => {
     expect(rows[0]).toMatchObject({ complex: "수서주공1단지", provider: "LH서울", unit_type: "039.12", households: 2565, waiting: 72, terminated: 51, as_of: "2026-09-21" });
   });
 
-  it("공공데이터포털 껍데기도 읽는다", () => {
+  it("공식 API 껍데기(body.item)를 읽는다", () => {
     expect(parseWaitRows(API)).toHaveLength(3);
+  });
+
+  it("items로 한 겹 더 싼 형태도 읽는다", () => {
+    expect(parseWaitRows({ response: { body: { items: { item: WEB.resultList } } } })).toHaveLength(3);
+  });
+
+  it("기준일이 없으면 받아온 날짜로 채운다 — 공식 API는 lastUpdtDt를 주지 않는다", () => {
+    const rows = parseWaitRows({ response: { body: { item: [{ hsmpNm: "관악산휴먼시아 3단지", waitCo: 29, trmnatCo: 10, styleNm: "39" }] } } }, "2026-09-21");
+    expect(rows[0]!.as_of).toBe("2026-09-21");
+    expect(rows[0]!.households).toBeUndefined();
   });
 
   it("단지명이나 대기자 수가 없으면 버린다", () => {

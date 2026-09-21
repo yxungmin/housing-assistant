@@ -7,8 +7,10 @@
  *   http://ws.bus.go.kr/api/rest/pathinfo/getPathInfoByBusNSub   버스+지하철 환승
  *   http://ws.bus.go.kr/api/rest/pathinfo/getPathInfoBySubway    지하철만
  *   http://ws.bus.go.kr/api/rest/pathinfo/getPathInfoByBus       버스만
- * 요청: startX, startY, endX, endY (경위도). 응답(XML): distance, time(소요시간), pathList,
- *       routeNm(노선명), fname/tname(탑승·하차지명) 등.
+ * 요청: startX, startY, endX, endY (경위도).
+ * 2026-09-21 실응답으로 확인: <itemList>가 경로 하나이고 19개가 온다. 각 itemList에
+ *   distance(미터) · time(분) · pathList(구간들: fid/fname/fx/fy, routeId/routeNm, tid/tname/tx/ty) · railLinkList.
+ * 마포구청 → 과천지식정보타운: 21,541m, 가장 빠른 경로 66분.
  *
  * 서울시가 제공하는 서비스라 경기 구간은 답이 없을 수 있다. 그때는 호출부가 직선거리로 되돌아간다.
  *

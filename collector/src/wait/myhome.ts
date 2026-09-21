@@ -8,13 +8,15 @@
  *   apis.data.go.kr/1613000/HWSPR03/moveWaitStsList
  * 파라미터는 마이홈 웹과 같은 이름을 쓴다: brtcCode(시도), signguCode(시군구), suplyTy, houseTy, hsmpNm(단지명).
  *
- * 응답 필드는 마이홈 웹의 같은 화면(selectMoveWaitStsList.do)에서 실측했다:
- *   hsmpNm 단지명 · rtsInsttNm 공급기관 · suplyTyNm 공급유형 · styleNm 주택형
- *   hshldCo 총세대수 · waitCo 대기자 수 · trmnatCo 해지 수 · lastUpdtDt 기준일시 · rnAdres 도로명주소
- * 예: 수서주공1단지 영구임대 039.12형 — 2,565세대에 대기 72명.
+ * 2026-09-21 공식 API 실응답으로 확인한 구조 (서울 3,778건):
+ *   { response: { body: { totalCount, numOfRows, pageNo, item: [...] } } }   ← items로 한 겹 더 싸지 않는다
+ *   item: rtsInsttNm 공급기관 · brtcNm 시도 · signguNm 시군구 · rnAdres 도로명주소 · hsmpSn 단지일련번호
+ *         hsmpNm 단지명 · houseTyNm 주택유형 · suplyTyNm 공급유형 · styleNm 주택형 · drwtUnit 추첨단위
+ *         waitCo 대기자 수 · trmnatCo 해지 수
+ *   예: 관악산휴먼시아 3단지 50년임대 39형 — 대기 29명, 해지 10명.
  *
- * 공식 API 응답도 같은 필드로 오리라 보지만 활용신청 전이라 실물로 확인하지 못했다.
- * 그래서 파서는 필드가 없거나 이름이 달라도 터지지 않고 빈 배열을 돌려준다.
+ * 마이홈 웹에는 있는 hshldCo(총세대수)·lastUpdtDt(기준일시)가 공식 API에는 없다.
+ * 그래서 기준일은 우리가 받아온 시각으로 대신하고 화면에도 "기준"이 아니라 "확인"이라고 적는다.
  */
 const BASE = "https://apis.data.go.kr/1613000/HWSPR03";
 
@@ -51,9 +53,21 @@ export function parseAsOf(v: unknown): string | undefined {
   return s.length >= 8 ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : undefined;
 }
 
-export function parseWaitRows(payload: unknown): WaitRow[] {
-  const body = (payload as { response?: { body?: { items?: unknown } } })?.response?.body?.items ?? (payload as { resultList?: unknown })?.resultList;
-  const list = Array.isArray(body) ? body : Array.isArray((body as { item?: unknown })?.item) ? (body as { item: unknown[] }).item : [];
+export function parseWaitRows(payload: unknown, fetchedAt?: string): WaitRow[] {
+  // 공식 API는 response.body.item, 마이홈 웹은 resultList. items로 한 겹 더 싸는 형태도 대비해 둔다.
+  const body = payload as { response?: { body?: { item?: unknown; items?: unknown } }; resultList?: unknown };
+  const candidates = [body?.response?.body?.item, body?.response?.body?.items, body?.resultList];
+  let list: unknown[] = [];
+  for (const c of candidates) {
+    if (Array.isArray(c)) {
+      list = c;
+      break;
+    }
+    if (Array.isArray((c as { item?: unknown })?.item)) {
+      list = (c as { item: unknown[] }).item;
+      break;
+    }
+  }
   const out: WaitRow[] = [];
   for (const raw of list) {
     const r = raw as Record<string, unknown>;
@@ -68,7 +82,8 @@ export function parseWaitRows(payload: unknown): WaitRow[] {
       households: num(r.hshldCo),
       waiting,
       terminated: num(r.trmnatCo),
-      as_of: parseAsOf(r.lastUpdtDt),
+      // 공식 API는 기준일을 주지 않는다. 받아온 시각으로 대신하고 화면은 "확인"이라고 말한다.
+      as_of: parseAsOf(r.lastUpdtDt) ?? fetchedAt,
       address: typeof r.rnAdres === "string" ? r.rnAdres : undefined,
     });
   }
@@ -128,7 +143,7 @@ export class WaitClient {
     if (!res.ok) throw new Error(`대기현황 HTTP ${res.status}`);
     const text = await res.text();
     try {
-      return parseWaitRows(JSON.parse(text));
+      return parseWaitRows(JSON.parse(text), new Date().toISOString().slice(0, 10));
     } catch {
       // 키가 등록되지 않았을 때 XML 오류가 온다. 시세와 마찬가지로 없으면 그냥 넘어간다.
       return [];
