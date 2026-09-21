@@ -25,6 +25,15 @@ export function yearsMonths(months: number | undefined | null): string {
   return r ? `${y}년 ${r}개월` : `${y}년`;
 }
 
+/**
+ * 잠긴 값. 자릿수와 쉼표는 남기고 숫자만 가린다 — 빈칸이면 "뭘 사는 건지" 알 수 없고,
+ * 자릿수가 보이면 가려진 게 비어 있지 않다는 증거가 된다 (통행료가 아니라 궁금증이 되게).
+ * 가짜 숫자를 보여 주지는 않는다.
+ */
+export function maskDigits(text: string): string {
+  return text.replace(/\d/g, "•");
+}
+
 export function pct(ratio: number | null | undefined, digits = 1): string {
   if (ratio === null || ratio === undefined) return "-";
   return `${(ratio * 100).toFixed(digits)}%`;

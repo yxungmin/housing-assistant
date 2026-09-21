@@ -11,7 +11,7 @@ import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { getAnnouncement, useAnnouncements } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
-import { manwon, pct, won, dateText } from "@/lib/format";
+import { manwon, maskDigits, pct, won, dateText } from "@/lib/format";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space } from "@/theme/tokens";
@@ -44,8 +44,14 @@ export default function Cost() {
   const [loanId, setLoanId] = useState<string | undefined>(undefined);
   const [scenario, setScenario] = useState(false);
   const [picker, setPicker] = useState(false);
-  const [subSheet, setSubSheet] = useState(!canOpenCost(state));
+  const [subSheet, setSubSheet] = useState(false);
   const [report, setReport] = useState(false);
+
+  // 확정된 선: 조건 매칭은 무료, 자금 계산은 유료.
+  // 잠겼어도 화면은 그대로 보여 준다 — 보증금·월임대료는 공고문에 적힌 공개 사실이라 가리지 않고,
+  // 우리가 계산한 값(필요 현금·부족액·대출·월 합계)만 가린다.
+  const locked = !canOpenCost(state);
+  const hide = (text: string) => (locked ? maskDigits(text) : text);
 
   const chosen = rentals[sel];
   const scenarioPricing = useMemo(() => {
@@ -91,7 +97,12 @@ export default function Cost() {
     <Screen
       padded={false}
       header={<Header onBack={() => (auto ? router.replace("/(tabs)") : router.back())} title="예상 주거비" right={<IconButton name="more" label="더보기" color={colors.text2} />} />}
-      footer={<BottomCTA label={conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"} onPress={() => setScenario(true)} />}
+      footer={
+        <BottomCTA
+          label={locked ? "구독하고 계산 보기" : conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"}
+          onPress={() => (locked ? setSubSheet(true) : setScenario(true))}
+        />
+      }
     >
       <View style={{ paddingHorizontal: space.screen, gap: space.section }}>
         <View style={{ gap: 16 }}>
@@ -112,15 +123,30 @@ export default function Cost() {
           </Pressable>
         </View>
 
+        {locked ? (
+          <Notice icon="info">보증금과 월임대료는 공고문에 적힌 그대로예요. 가려진 것은 이 조건으로 우리가 계산한 값이에요.</Notice>
+        ) : null}
+
         <FadeIn key={`${sel}-${deposit ?? "base"}-${loanId ?? "auto"}`} style={{ gap: space.section }}>
         <View style={{ gap: 12 }}>
           <SectionTitle>지금 필요한 현금</SectionTitle>
           <Card style={{ gap: 20 }}>
-            <BigNumber value={cashLabel} unit="원" size={40} sub={cost.shortfall > 0 ? `보유 현금 ${manwon(profile.cash_on_hand)}으로는 ${manwon(cost.shortfall)} 부족해요` : `보유 현금 ${manwon(profile.cash_on_hand)}으로 감당돼요`} />
+            <BigNumber
+              value={hide(cashLabel)}
+              unit="원"
+              size={40}
+              sub={
+                locked
+                  ? "보증금에서 받을 수 있는 대출을 빼고 계산해요"
+                  : cost.shortfall > 0
+                    ? `보유 현금 ${manwon(profile.cash_on_hand)}으로는 ${manwon(cost.shortfall)} 부족해요`
+                    : `보유 현금 ${manwon(profile.cash_on_hand)}으로 감당돼요`
+              }
+            />
             <View style={{ gap: 14 }}>
               <KeyValue label="임대보증금" value={won(cost.deposit)} src={`공고문 ${base.source.page}쪽${deposit !== null ? " · 전환 적용" : ""}`} />
               {cost.loan ? (
-                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${won(cost.loan.amount)}`} src={`${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
+                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${hide(won(cost.loan.amount))}`} src={locked ? `${cost.loan.product.provider} · 구독하면 한도와 금리를 봐요` : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
               ) : (
                 <KeyValue label="적용 가능한 대출" value="없음" src="입력 조건에 맞는 전세자금대출 상품이 없어요" />
               )}
@@ -132,19 +158,19 @@ export default function Cost() {
           <SectionTitle>매달 나가는 돈</SectionTitle>
           <Card style={{ gap: 20 }}>
             <Row center>
-              <BigNumber value={won(cost.monthly_housing_cost).replace("원", "")} unit="원" size={34} />
+              <BigNumber value={hide(won(cost.monthly_housing_cost).replace("원", ""))} unit="원" size={34} />
               {incomeRatio !== null ? (
                 <View style={{ alignItems: "flex-end", gap: 2 }}>
                   <Sub tone="3" variant="caption">월 소득 대비</Sub>
-                  <T variant="heading" numeric color={incomeRatio > 0.3 ? colors.warning : colors.text}>{pct(incomeRatio)}</T>
+                  <T variant="heading" numeric color={locked ? colors.text3 : incomeRatio > 0.3 ? colors.warning : colors.text}>{hide(pct(incomeRatio))}</T>
                 </View>
               ) : null}
             </Row>
             <View style={{ gap: 14 }}>
               <KeyValue label="월임대료" value={won(cost.monthly_rent)} />
-              {cost.loan ? <KeyValue label={cost.loan.interest_only ? "대출 이자" : "대출 원리금"} value={won(cost.loan.monthly_payment)} /> : null}
+              {cost.loan ? <KeyValue label={cost.loan.interest_only ? "대출 이자" : "대출 원리금"} value={hide(won(cost.loan.monthly_payment))} /> : null}
               <KeyValue label="관리비" value={won(cost.maintenance_estimate)} src={base.maintenance_estimate === undefined ? "공고문에 없어 추정값을 썼어요" : `공고문 ${base.source.page}쪽`} />
-              {cost.monthly_debt_payment > 0 ? <KeyValue label="기존 부채 상환" value={won(cost.monthly_debt_payment)} src="부담률 계산에만 포함" /> : null}
+              {cost.monthly_debt_payment > 0 ? <KeyValue label="기존 부채 상환" value={hide(won(cost.monthly_debt_payment))} src="부담률 계산에만 포함" /> : null}
             </View>
           </Card>
         </View>
@@ -233,7 +259,8 @@ export default function Cost() {
         </ScrollView>
       </BottomSheet>
 
-      <SubscriptionSheet visible={subSheet} onClose={() => { setSubSheet(false); if (!canOpenCost(state)) router.back(); }} onStarted={() => setSubSheet(false)} />
+      {/* 닫아도 내보내지 않는다 — 잠긴 화면 그대로 두는 편이 무엇을 사는지 더 잘 보여 준다 */}
+      <SubscriptionSheet visible={subSheet} onClose={() => setSubSheet(false)} onStarted={() => setSubSheet(false)} />
       <ReportSheet
         visible={report}
         onClose={() => setReport(false)}
