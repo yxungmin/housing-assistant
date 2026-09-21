@@ -16,7 +16,7 @@ import { geocodeAddress } from "./geo/kakao";
 import { isUsable, RentClient } from "./market/rent";
 import { commuteTable } from "./transit/table";
 import { WaitClient } from "./wait/myhome";
-import { LhClient } from "./lh/api";
+import { LhClient, resolveImages } from "./lh/api";
 import { extractFromText } from "./llm/extract";
 import { extractPdfText, ocrFallback } from "./pdf/extract";
 import { buildSections, sectionsToPrompt } from "./pdf/sections";
@@ -63,6 +63,7 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
     notice_date: notice.notice_date,
     apply_start: detail.apply_start,
     apply_end: detail.apply_end ?? notice.apply_end,
+    detail_url: notice.detail_url,
     source_modified_at: detail.modified_key,
   });
   const version = (existing?.latest_version ?? 0) + 1;
@@ -140,6 +141,9 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       ? await commuteTable({ lat: geo.lat, lng: geo.lng }, regions, { kakao: env.KAKAO_REST_API_KEY, seoul: env.TRANSIT_API_KEY })
       : undefined;
     if (commute) log(`  통근 시간: 시군구 ${Object.keys(commute).length}곳에서 계산`);
+
+    const images = detail.images?.length ? await resolveImages(detail.images) : [];
+    if (images.length) log(`  공고 그림 ${images.length}장: ${[...new Set(images.map((i) => i.kind))].join(", ")}`);
     await repo.upsertAnnouncement({
       provider: notice.provider,
       lh_id: notice.external_id,
@@ -150,6 +154,9 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       apply_start: detail.apply_start ?? result.output.schedule.apply_start,
       apply_end: detail.apply_end ?? result.output.schedule.apply_end ?? notice.apply_end,
       pdf_url: pdfUrl,
+      detail_url: notice.detail_url,
+      // 기관이 준 그림. 주소를 한 번 펼쳐야 그림 파일이 나온다 (lh/api.ts resolveImages).
+      images: images.length ? images : undefined,
       source_modified_at: detail.modified_key,
       lat: geo?.lat,
       lng: geo?.lng,

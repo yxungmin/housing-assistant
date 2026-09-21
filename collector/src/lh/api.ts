@@ -15,6 +15,9 @@ import type { HousingType } from "@housing/schema";
  *  - 상세: dsSbd(LGDN_ADR 단지주소, LCC_NT_NM 단지명, HSH_CNT 총세대수, DDO_AR 전용면적, MVIN_XPC_YM),
  *    dsSplScdl(SBSC_ACP_ST_DT/SBSC_ACP_CLSG_DT 접수기간, PZWR_ANC_DT 당첨자발표),
  *    dsAhflInfo(AHFL_URL, SL_PAN_AHFL_DS_CD_NM "공고문(PDF)"/"공고문(hwp)", CMN_AHFL_NM), dsEtcInfo(CRC_RSN 정정/취소사유).
+ *    dsSbdAhfl(AHFL_URL, LS_SPL_INF_UPL_FL_DS_CD_NM "위치도"/"단지조감도", CMN_AHFL_NM) — 단지 이미지.
+ *    lhImageView2.do?fileid=... 로 바로 열리는 그림이다. 첨부(dsAhflInfo)와 별개 데이터셋이라 따로 읽는다.
+ *    붙어 있는 공고가 더 적다 (2026-09-21 표본 3건 중 1건).
  *  - AHFL_URL은 lhFile.do?fileid=... 형태로 확장자가 없고 Content-Disposition에 파일명이 온다.
  */
 const BASE = "https://apis.data.go.kr/B552555";
@@ -47,8 +50,16 @@ export interface LhAttachment {
   kind?: string; // SL_PAN_AHFL_DS_CD_NM
 }
 
+/** 단지 이미지 (위치도·단지조감도). 기관이 이미지로 준 것만이라 출처가 분명하다. */
+export interface LhImage {
+  kind: string; // LS_SPL_INF_UPL_FL_DS_CD_NM
+  name?: string; // CMN_AHFL_NM
+  url: string; // AHFL_URL
+}
+
 export interface LhNoticeDetail {
   attachments: LhAttachment[];
+  images: LhImage[];
   address?: string;
   complex_name?: string;
   households?: number;
@@ -131,6 +142,57 @@ export function parseNoticeList(payload: unknown): LhNoticeSummary[] {
     .filter((x): x is LhNoticeSummary => x !== null);
 }
 
+
+/**
+ * 단지 이미지 주소를 그림 파일 주소로 바꾼다.
+ *
+ * AHFL_URL로 오는 건 그림이 아니라 그림 한 장을 담은 HTML 페이지다 (2026-09-21 확인):
+ *   GET lhImageView2.do?fileid=68586052 → <img src="/upload/Files/.../2026091468586052.jpg">
+ * 앱이 그 주소를 <img>에 그대로 넣으면 HTML을 그리려다 깨진 그림이 된다.
+ *
+ * 그 HTML을 파싱하는 길은 버렸다. 같은 요청이 curl에는 진짜 경로를, Node fetch에는
+ * noImg.gif를 돌려준다. 무엇 때문에 갈리는지 알아내지 못했고, 알아낸다 해도 서버 사정에
+ * 기대는 코드가 된다. 조용히 빈 그림을 저장하게 될 자리다.
+ *
+ * 대신 같은 fileid를 파일 내려받기 엔드포인트에 넣는다. 공고문 PDF를 받는 그 엔드포인트다:
+ *   GET lhFile.do?fileid=68586052 → 518,310바이트 JPEG (ff d8 ff)
+ * 페이지가 가리키던 파일과 크기까지 같다. Content-Type은 octet-stream으로 오지만
+ * <img>는 내용을 보고 그림으로 읽는다.
+ */
+export const directImageUrl = (viewUrl: string): string => viewUrl.replace(/lhImageView2?\.do/i, "lhFile.do");
+
+/** 파일 앞머리 몇 바이트로 그림인지 본다. 본문 전체(장당 0.5MB)를 받지 않으려고 읽자마자 끊는다. */
+async function isImage(url: string, fetchImpl: typeof fetch): Promise<boolean> {
+  try {
+    const res = await fetchImpl(url, { headers: { Range: "bytes=0-7" } });
+    if (!res.ok || !res.body) return false;
+    const reader = res.body.getReader();
+    const { value } = await reader.read();
+    await reader.cancel();
+    if (!value || value.length < 3) return false;
+    const [a, b, c] = value;
+    // JPEG(ff d8 ff) · PNG(89 50 4e) · GIF(47 49 46)
+    return (a === 0xff && b === 0xd8 && c === 0xff) || (a === 0x89 && b === 0x50 && c === 0x4e) || (a === 0x47 && b === 0x49 && c === 0x46);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 그림으로 확인된 것만 남긴다. 순서는 공고가 준 대로 (위치도 → 조감도 → 배치도) 둔다.
+ * 확인하지 못한 것은 버린다 — 화면의 깨진 그림 한 장은 "이 앱이 고장났다"로 읽힌다.
+ */
+export async function resolveImages(images: LhImage[], fetchImpl: typeof fetch = fetch): Promise<LhImage[]> {
+  const out: LhImage[] = [];
+  for (const img of images) {
+    const url = directImageUrl(img.url);
+    if (await isImage(url, fetchImpl)) out.push({ ...img, url });
+  }
+  return out;
+}
+
+const isHttp = (url: string): boolean => /^https?:\/\//.test(url);
+
 export function parseNoticeDetail(payload: unknown): LhNoticeDetail {
   const datasets = collectDatasets(payload);
   const attachments: LhAttachment[] = (datasets.dsAhflInfo ?? [])
@@ -140,12 +202,17 @@ export function parseNoticeDetail(payload: unknown): LhNoticeDetail {
       kind: str(f, "SL_PAN_AHFL_DS_CD_NM"),
     }))
     .filter((f) => /^https?:\/\//.test(f.url));
+  // 단지 이미지는 별도 데이터셋이다. dsSbdAhflNm은 라벨 행이라 쓰지 않는다 (dsAhflInfo/dsAhflInfoNm과 같은 규칙).
+  const images: LhImage[] = (datasets.dsSbdAhfl ?? [])
+    .map((f) => ({ kind: str(f, "LS_SPL_INF_UPL_FL_DS_CD_NM") ?? "", name: str(f, "CMN_AHFL_NM"), url: str(f, "AHFL_URL") ?? "" }))
+    .filter((f) => isHttp(f.url));
   const sbd = datasets.dsSbd?.[0];
   const scdl = datasets.dsSplScdl?.[0];
   const etc = datasets.dsEtcInfo?.[0];
   const households = Number(str(sbd, "HSH_CNT"));
   return {
     attachments,
+    images,
     address: str(sbd, "LGDN_ADR"),
     complex_name: str(sbd, "LCC_NT_NM"),
     households: Number.isFinite(households) && households > 0 ? households : undefined,

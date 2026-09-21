@@ -31,6 +31,9 @@ const VIEW_PATH = "/main/lay2/program/S1T294C297/www/brd/m_247/view.do";
 const FILE_PATH = "/main/com/file/innoFD.do";
 const PAGE_SIZE = 10;
 
+/** 게시판 seq → 공고 상세 페이지. 목록·수집기·번들 채우기가 같은 주소를 쓰도록 여기 한 곳에 둔다. */
+export const shDetailUrl = (seq: string): string => `${BASE}${VIEW_PATH}?multi_itm_seq=2&seq=${seq}`;
+
 /** SH 공고는 모두 서울이다 */
 export const SH_REGION_CODE = "11";
 export const SH_REGION_NAME = "서울";
@@ -130,7 +133,7 @@ export function parseNoticeList(html: string, supplyTypeName?: string): ShNotice
       region_name: SH_REGION_NAME,
       notice_date,
       department,
-      detail_url: `${BASE}${VIEW_PATH}?multi_itm_seq=2&seq=${seq}`,
+      detail_url: shDetailUrl(seq),
       corrected: /\(\s*수정\s*\)|정정/.test(title),
       unknown_codes: mapped.unknown ? [`sh_housing_type:${mapped.unknown}`] : [],
     });

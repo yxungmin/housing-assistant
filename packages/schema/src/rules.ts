@@ -217,6 +217,23 @@ export const Announcement = z.object({
   apply_start: z.string().optional(),
   apply_end: z.string().optional(),
   pdf_url: z.string().url().optional(),
+  /** 기관의 공고 상세 페이지. 앱은 외부 브라우저로 연다 */
+  detail_url: z.string().url().optional(),
+  /**
+   * 기관이 공고에 이미지로 붙여 둔 것 (위치도·단지조감도 등).
+   * 공고문 PDF에서 우리가 뽑은 그림이 아니라 기관이 이미지 파일로 준 것만 넣는다 —
+   * 출처가 분명해야 "이건 공고에 있던 그림"이라고 말할 수 있다.
+   * LH는 상세 응답의 dsSbdAhfl에 준다. 없는 공고가 더 많다.
+   */
+  images: z
+    .array(
+      z.object({
+        kind: z.string().describe('기관이 붙인 구분 ("위치도", "단지조감도")'),
+        name: z.string().optional().describe("원본 파일명"),
+        url: z.string().url(),
+      }),
+    )
+    .optional(),
   lat: z.number().optional(),
   lng: z.number().optional(),
   /**

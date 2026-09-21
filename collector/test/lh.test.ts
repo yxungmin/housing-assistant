@@ -79,6 +79,12 @@ const realDetailPayload = [
     ],
     dsSbd: [{ LGDN_ADR: "전북특별자치도 군산시 문화로 36(나운동,군산 나운 영구임대아파트)", LGDN_DTL_ADR: "", HSH_CNT: "1954", HTN_FMLA_DESC: "중앙가스난방", LCC_NT_NM: "군산나운4단지", DDO_AR: "26.37~52.74", MVIN_XPC_YM: "1993.05" }],
     dsAhflInfoNm: [{ AHFL_URL: "다운로드", SL_PAN_AHFL_DS_CD_NM: "파일구분명", CMN_AHFL_NM: "첨부파일명" }],
+    // 단지 이미지. 첨부(dsAhflInfo)와 다른 데이터셋이고, lhImageView2.do로 바로 열리는 그림이다.
+    dsSbdAhfl: [
+      { LCC_NT_NM: "효천주공A-1BL", LS_SPL_INF_UPL_FL_DS_CD_NM: "위치도", CMN_AHFL_NM: "0416-효천2지구 1블럭위치도(기본.jpg", AHFL_URL: "https://apply.lh.or.kr/lhapply/lhImageView2.do?fileid=24548013" },
+      { LCC_NT_NM: "효천주공A-1BL", LS_SPL_INF_UPL_FL_DS_CD_NM: "단지조감도", CMN_AHFL_NM: "효천주공A-1BL_조감도점선(기본.jpg", AHFL_URL: "https://apply.lh.or.kr/lhapply/lhImageView2.do?fileid=24548012" },
+    ],
+    dsSbdAhflNm: [{ LCC_NT_NM: "단지명", LS_SPL_INF_UPL_FL_DS_CD_NM: "파일구분명", CMN_AHFL_NM: "첨부파일명", AHFL_URL: "다운로드" }],
     resHeader: [{ RS_DTTM: "20260920062804", SS_CODE: "Y" }],
   },
 ];
@@ -118,6 +124,19 @@ describe("LH payload parsing (real 2026-09-20 shape)", () => {
     expect(d.correction_reason).toBeUndefined();
     // 헤더 행(dsAhflInfoNm의 "다운로드")은 URL이 아니므로 첨부에서 제외된다
     expect(d.attachments).toHaveLength(2);
+  });
+  it("단지 이미지를 첨부와 따로 읽는다 — 기관이 이미지로 준 것만 화면에 그림으로 쓴다", () => {
+    const d = parseNoticeDetail(realDetailPayload);
+    expect(d.images).toHaveLength(2);
+    expect(d.images.map((i) => i.kind)).toEqual(["위치도", "단지조감도"]);
+    expect(d.images[0]!.url).toBe("https://apply.lh.or.kr/lhapply/lhImageView2.do?fileid=24548013");
+    // 라벨 행(dsSbdAhflNm의 "다운로드")은 URL이 아니라 빠진다
+    expect(d.images.every((i) => i.url.startsWith("https://"))).toBe(true);
+    // 공고문 PDF가 그림 목록에 섞이지 않는다
+    expect(d.images.some((i) => i.url.includes("lhFile.do"))).toBe(false);
+  });
+  it("단지 이미지가 없는 공고는 빈 배열 — 없는 것을 있는 척하지 않는다", () => {
+    expect(parseNoticeDetail([{ dsAhflInfo: [] }]).images).toEqual([]);
   });
   it("prefers the 공고문(PDF) attachment even though the URL has no .pdf extension", () => {
     const d = parseNoticeDetail(realDetailPayload);

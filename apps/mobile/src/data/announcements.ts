@@ -63,7 +63,21 @@ export interface Announcement {
   commute?: Record<string, { minutes: number; transfers: number }>;
   /** 기관 사이트의 원문 공고문. 근거로 적은 쪽수를 실제로 열 수 있게 한다 */
   pdf_url?: string;
+  /** 기관의 공고 상세 페이지. 공고문 PDF가 없는 공고에도 있다 */
+  detail_url?: string;
+  /** 기관이 공고에 붙여 둔 이미지. 우리가 공고문에서 뽑은 그림이 아니다 */
+  images?: NoticeImage[];
   extraction: ExtractionOutput;
+}
+
+/**
+ * 기관이 이미지 파일로 준 그림 (위치도·단지조감도).
+ * 공고문 PDF 안의 평면도는 여기 없다 — 그건 우리가 뽑아야 하고, 뽑은 것과 받은 것은 구분해서 말한다.
+ */
+export interface NoticeImage {
+  kind: string;
+  name?: string;
+  url: string;
 }
 
 /**

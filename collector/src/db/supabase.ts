@@ -65,6 +65,8 @@ export class Repo {
     apply_start?: string;
     apply_end?: string;
     pdf_url?: string;
+    detail_url?: string;
+    images?: object[];
     source_modified_at?: string;
     lat?: number;
     lng?: number;

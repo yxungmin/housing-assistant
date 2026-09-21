@@ -32,6 +32,9 @@
   "이 숫자 이상해요"는 항목 단위다: 조건·임대조건을 누르면 근거 원문이 펼쳐지고 거기서 신고한다(`components/ReportSheet.tsx`).
   신고는 `src/lib/reports.ts`로 기기에 먼저 쌓이고 Supabase가 붙으면 `appState`가 올려 보낸 뒤 처리 결과를 받아 온다.
   같은 자리에서 원문 공고문을 연다(`src/lib/source.ts`, `announcements.pdf_url`). 쪽 이동(`#page`)은 뷰어에 따라 무시된다.
+  공고문 파일이 없으면 기관의 공고 상세 페이지(`detail_url`)로 연다 — 둘 다 외부 브라우저다.
+  기관이 올린 그림(`images`: 위치도·단지조감도·배치도)은 `components/NoticeImages.tsx`. 우리가 공고문에서 뽑은 그림이 아니라
+  기관이 이미지 파일로 준 것만 넣는다 — 화면도 그렇게 말한다. 평면도는 여기 없다(공고문 PDF 안에 있다).
   공고 상태는 셋이다: `VERIFIED`(사람이 대조함) · `AUTO`(자동 추출·검증만) · `UNVERIFIED`(조건을 못 읽음 — 매칭·계산 안 함).
   사람이 본 것만 VERIFIED다. `app-data.ts`는 `benchmark/fixtures/`에서 온 것만 그렇게 표시하고, 자동 검증 지적은 `checks`로 앱에 그대로 내려보낸다.
   `npm run app`으로 실행.
@@ -50,6 +53,7 @@ npm run lh:dump                      # LH API 원본 응답 확인 (LH_API_KEY �
 npm run benchmark                    # 추출 벤치마크 (ANTHROPIC_API_KEY 필요)
 npm run benchmark:fetch -- --count 10   # LH API에서 공고문 PDF 추가 수집 (LH_API_KEY 필요)
 npm run app:data                     # 초안/정답 → 앱 번들 데이터
+npm run app:enrich [-- --links]      # 번들에 원문 링크·그림·좌표·시세·대기·통근 (LLM 없음, --links는 링크·그림만)
 npm run db:check                     # 빈 Postgres에 마이그레이션 전체 적용 + 동작 확인 (Docker 필요)
 npm run fixture:check -- 018         # 초안 ↔ 공고문 PDF 1차 대조 (사람 검수 전)
 npm run review                       # 검수 뷰어 4310 — 추출 검수 + 신고 큐
@@ -59,6 +63,8 @@ npm run output:size                  # 추출 출력이 어디서 커지는지 (
 ## 규칙
 - 스키마를 바꾸면 `packages/schema` 테스트 + 엔진 테스트 + `benchmark/fixtures/000.example.json`을 함께 고친다.
 - 추출 프롬프트(`collector/src/llm/extract.ts`)를 바꾸면 `EXTRACTION_PROMPT_VERSION`을 올리고 벤치마크를 다시 돌린다.
+- 단지 그림은 LH 상세의 `dsSbdAhfl`에서 온다(첨부 `dsAhflInfo`와 별개 데이터셋).
+  `AHFL_URL`은 그림이 아니라 그림 한 장을 담은 HTML 페이지다. 같은 fileid를 `lhFile.do`에 넣어야 그림 파일이 나온다(`resolveImages`).
 - 기관 응답 필드명은 기관 모듈 한 곳에만 둔다(`lh/api.ts`, `sh/api.ts`). 주택유형 매핑은 `lh/mapping.ts` 공통 표를 LH·SH가 같이 쓰고, 미지 값은 `other`로 두고 한 줄 추가한다.
 - 새 공급기관을 붙일 때는 `sources.ts`에 `Source` 하나를 더한다. 그 뒤 파이프라인은 기관과 무관하다.
 - SH는 공개 API가 없어 게시판 HTML을 파싱한다. 구조가 바뀌면 깨지므로 파서 변경 시 `collector/test/sh.test.ts`의 실제 HTML 조각을 함께 갱신한다.

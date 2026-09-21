@@ -4,6 +4,7 @@ import { Pressable, View } from "react-native";
 import { haversineKm, matchAnnouncement, type RuleResult } from "@housing/engine";
 import { Icon, type IconName } from "@/components/icon";
 import { ReportSheet } from "@/components/ReportSheet";
+import { NoticeImages } from "@/components/NoticeImages";
 import { SourceCard } from "@/components/SourceCard";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
@@ -162,7 +163,9 @@ export default function AnnouncementDetail() {
           </View>
         ) : null}
 
-        <SourceCard pdfUrl={a.pdf_url} what="위 조건과 임대조건은" />
+        <SourceCard pdfUrl={a.pdf_url} detailUrl={a.detail_url} what="위 조건과 임대조건은" />
+
+        <NoticeImages images={a.images} />
 
         {(a.lat !== undefined || a.transit || a.nearby?.length) ? (
           <View style={{ gap: 12 }}>

@@ -27,6 +27,8 @@ interface FeedRow {
   apply_start: string | null;
   apply_end: string | null;
   pdf_url: string | null;
+  detail_url: string | null;
+  images: Announcement["images"] | null;
   lat: number | null;
   lng: number | null;
   transit: Transit | null;
@@ -70,6 +72,8 @@ export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch):
       apply_end: r.apply_end ?? extraction.schedule.apply_end,
       address: extraction.address,
       pdf_url: r.pdf_url ?? undefined,
+      detail_url: r.detail_url ?? undefined,
+      images: r.images?.length ? r.images : undefined,
       lat: r.lat ?? undefined,
       lng: r.lng ?? undefined,
       transit: r.transit ?? undefined,

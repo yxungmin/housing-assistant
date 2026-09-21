@@ -1,5 +1,5 @@
 /**
- * 번들 데이터(apps/mobile/data/announcements.json)에 좌표·주변·시세·대기현황·통근을 채운다.
+ * 번들 데이터(apps/mobile/data/announcements.json)에 원문 링크·단지 이미지·좌표·주변·시세·대기현황·통근을 채운다.
  *   npm run app:enrich
  *
  * Supabase가 붙기 전까지 쓰는 다리다. 수집기(run.ts)는 같은 일을 DB에 하고,
@@ -11,21 +11,30 @@ import { loadEnv } from "./config";
 import { geocodeAddress } from "./geo/kakao";
 import { isUsable, RentClient } from "./market/rent";
 import { fromRoot } from "./paths";
+import { LhClient, parseNoticeDetail, pickNoticePdf, resolveImages, type LhImage, type LhNoticeSummary } from "./lh/api";
+import { shDetailUrl } from "./sh/api";
 import { commuteTable } from "./transit/table";
 import { WaitClient } from "./wait/myhome";
 
 const TARGET = fromRoot("apps", "mobile", "data", "announcements.json");
 const env = loadEnv();
 const force = process.argv.includes("--force");
+/** 원문 링크·그림만 다시 채운다. --force는 통근표까지 다시 불러 하루 한도를 크게 쓴다. */
+const linksOnly = process.argv.includes("--links");
 const onlyIdx = process.argv.indexOf("--only");
 const only = onlyIdx >= 0 ? process.argv[onlyIdx + 1] : undefined;
 
 interface Row {
   id: string;
+  provider?: string;
+  lh_id?: string;
   title: string;
   status: string;
   region_code: string;
   address?: string;
+  pdf_url?: string;
+  detail_url?: string;
+  images?: LhImage[];
   lat?: number;
   lng?: number;
   transit?: unknown;
@@ -39,6 +48,66 @@ interface Row {
 const rows = JSON.parse(readFileSync(TARGET, "utf8")) as Row[];
 const regions = env.COLLECT_REGIONS.split(",").map((r) => r.trim()).filter(Boolean);
 
+/**
+ * 원문 링크와 단지 이미지. 기관 목록·상세만 읽으면 되니 LLM도 PDF 다운로드도 없다.
+ *
+ * 초안으로 만든 번들 행에는 공고 주소가 통째로 없어서 앱이 "원문 주소가 아직 없어요"만 말했다.
+ * 목록 응답에는 상세 페이지 주소가 언제나 들어 있고, 상세 응답에는 공고문 PDF와
+ * 단지 이미지(위치도·단지조감도)가 있다. lh_id가 진짜인 행에만 붙는다 (MOCK-*는 건너뛴다).
+ */
+async function fillSourceLinks(): Promise<number> {
+  // SH 상세 주소는 게시판 seq만 있으면 만들어진다. 호출이 필요 없으니 먼저 채운다.
+  for (const r of rows) {
+    if (r.provider === "SH" && r.lh_id && (force || linksOnly || r.detail_url === undefined)) r.detail_url = shDetailUrl(r.lh_id);
+  }
+  const refill = force || linksOnly;
+  const targets = rows.filter((r) => r.provider === "LH" && r.lh_id && !r.lh_id.startsWith("MOCK") && (refill || r.detail_url === undefined));
+  if (targets.length === 0) return rows.filter((r) => r.provider === "SH" && r.detail_url).length > 0 ? 1 : 0;
+  if (!env.LH_API_KEY) {
+    console.log(`원문 링크: LH_API_KEY 없음 — ${targets.length}건 건너뜀`);
+    return 0;
+  }
+  const client = new LhClient(env.LH_API_KEY);
+  const index = new Map<string, LhNoticeSummary>();
+  for (const n of await client.listAllHousingNotices()) index.set(n.lh_id, n);
+  let filled = 0;
+  for (const row of targets) {
+    const summary = index.get(row.lh_id!);
+    if (!summary) {
+      console.log(`${row.id}: 목록에 없음 (최근 90일 밖) — 링크 건너뜀`);
+      continue;
+    }
+    row.detail_url = summary.detail_url;
+    const detail = await client.getNoticeDetail(summary).then(parseNoticeDetail).catch(() => null);
+    if (detail) {
+      // 기관이 준 주소를 그대로 쓴다. 우리 Storage에 올리는 것은 Supabase를 붙일 때 한다.
+      row.pdf_url = pickNoticePdf(detail.attachments)?.url ?? row.pdf_url;
+      // 주소를 한 번 펼쳐야 앱이 그림으로 띄울 수 있다 (resolveImages 주석 참고)
+      const images = detail.images.length ? await resolveImages(detail.images) : [];
+      // 못 구했으면 지운다. 예전 값을 남겨 두면 고쳐 놓고도 깨진 주소가 그대로 나간다.
+      row.images = images.length ? images : undefined;
+    }
+    console.log(`${row.id}: 상세 링크 · 공고문 ${row.pdf_url ? "있음" : "없음"} · 이미지 ${row.images?.length ?? 0}장`);
+    filled++;
+  }
+  return filled;
+}
+
+/**
+ * 지금까지 채운 것을 바로 파일에 쓴다.
+ *
+ * 처음에는 마지막에 한 번만 썼는데, 공고 하나에서 통근표(시군구 56회)를 만드는 동안
+ * 프로세스가 끊기면 그 앞의 API 호출 결과가 통째로 날아갔다. 호출은 하루 한도가 있는 자원이다.
+ */
+const save = () => writeFileSync(TARGET, JSON.stringify(rows, null, 1));
+
+let changed = await fillSourceLinks();
+if (changed > 0) save();
+if (linksOnly) {
+  console.log(`\n원문 링크·그림 ${changed}건 갱신 → ${TARGET}`);
+  process.exit(0);
+}
+
 /** 시세를 비교할 기준 면적: 가장 많이 나오는 전용면적 */
 function representativeArea(r: Row): number | undefined {
   const areas = r.extraction.tracks.flatMap((t) => t.unit_types.map((u) => u.exclusive_area_m2)).filter((a): a is number => typeof a === "number" && a > 0);
@@ -48,7 +117,6 @@ function representativeArea(r: Row): number | undefined {
   return [...counts.entries()].sort((x, y) => y[1] - x[1] || x[0] - y[0])[0]![0];
 }
 
-let changed = 0;
 for (const row of rows) {
   if (only && row.id !== only) continue;
   if (row.status !== "VERIFIED" && row.status !== "AUTO") continue;
@@ -112,7 +180,8 @@ for (const row of rows) {
     } else console.log(`  통근 경로 없음`);
   }
   changed++;
+  save();
 }
 
-writeFileSync(TARGET, JSON.stringify(rows, null, 1));
+save();
 console.log(`\n${changed}건 갱신 → ${TARGET}`);

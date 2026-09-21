@@ -5,7 +5,7 @@
  */
 import type { HousingType } from "@housing/schema";
 import type { Provider } from "./db/supabase";
-import { LhClient, parseNoticeDetail as parseLhDetail, pickNoticePdf as pickLhPdf, type LhNoticeSummary } from "./lh/api";
+import { LhClient, parseNoticeDetail as parseLhDetail, pickNoticePdf as pickLhPdf, type LhImage, type LhNoticeSummary } from "./lh/api";
 import { ShClient, pickNoticePdf as pickShPdf } from "./sh/api";
 
 /** 목록까지만 읽은 공고. 상세·PDF는 resolve()에서 가져온다 (수정 없으면 호출하지 않는다). */
@@ -19,6 +19,8 @@ export interface CollectedNotice {
   notice_date?: string;
   apply_end?: string;
   status_raw?: string;
+  /** 기관 사이트의 공고 상세 페이지. 앱이 외부 브라우저로 연다 */
+  detail_url?: string;
   unknown_codes: string[];
   /** 목록만으로 만든 수정 탐지 키. 이 값이 그대로면 상세를 부르지 않는다. */
   list_key: string;
@@ -36,6 +38,12 @@ export interface ResolvedNotice {
   pdf?: { bytes: Uint8Array; name: string; url: string };
   /** PDF를 못 구한 이유 (CONFLICT 사유로 기록) */
   missing_pdf?: string;
+  /**
+   * 기관이 공고에 이미지로 붙여 둔 것 (위치도·단지조감도).
+   * 공고문 PDF에서 우리가 뽑은 그림이 아니다 — 기관이 이미지 파일로 준 것만 담는다.
+   * SH는 게시판에 이런 이미지가 없어 항상 비어 있다.
+   */
+  images?: LhImage[];
 }
 
 export interface Source {
@@ -65,6 +73,7 @@ function toLhNotice(client: LhClient, n: LhNoticeSummary): CollectedNotice {
     notice_date: n.notice_date,
     apply_end: n.apply_end,
     status_raw: n.status_raw,
+    detail_url: n.detail_url,
     unknown_codes: n.unknown_codes,
     list_key,
     resolve: async () => {
@@ -76,6 +85,7 @@ function toLhNotice(client: LhClient, n: LhNoticeSummary): CollectedNotice {
         apply_start: detail.apply_start,
         apply_end: detail.apply_end ?? n.apply_end,
         correction_reason: detail.correction_reason,
+        images: detail.images,
       };
       if (!pdf) return { ...resolved, missing_pdf: "모집공고문 PDF 첨부를 찾지 못함" };
       return { ...resolved, pdf: { bytes: await client.downloadPdf(pdf.url), name: pdf.name, url: pdf.url } };
@@ -99,6 +109,7 @@ export function shSource(client: ShClient): Source {
           region_code: n.region_code,
           notice_date: n.notice_date,
           status_raw: n.corrected ? "정정공고" : undefined,
+          detail_url: n.detail_url,
           unknown_codes: n.unknown_codes,
           list_key,
           resolve: async (): Promise<ResolvedNotice> => {
