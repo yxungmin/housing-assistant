@@ -8,11 +8,16 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yxungmin.housingassistant"
+      "bundleIdentifier": "com.yxungmin.housingassistant",
+      "icon": {
+        "light": "./assets/icon.png",
+        "dark": "./assets/icon-dark.png",
+        "tinted": "./assets/icon-tinted.png"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#e4f5ea",
+        "backgroundColor": "#E6F8EE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -27,7 +32,18 @@
       "expo-router",
       "expo-secure-store",
       "expo-font",
-      "expo-splash-screen"
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "backgroundColor": "#FFFFFF",
+          "imageWidth": 180,
+          "dark": {
+            "image": "./assets/splash-icon-dark.png",
+            "backgroundColor": "#17171C"
+          }
+        }
+      ]
     ],
     "scheme": "housingassistant"
   }
