@@ -72,7 +72,6 @@ export default function Home() {
   const today = new Date();
   const regionLabel = REGIONS.find((r) => r.value === state.profile?.region_code)?.label ?? "내 지역";
   const open = (id: string) => router.push(`/announcement/${id}`);
-  const free = state.subscription.status === "none" && state.freeUnlockId ? getAnnouncement(state.freeUnlockId, feed.list) : undefined;
   const toggle = (setter: (f: (v: boolean) => boolean) => void) => () => {
     animateLayout();
     setter((v) => !v);
@@ -97,20 +96,6 @@ export default function Home() {
         {hasWorkplace ? <Chip on={nearWork} count={chipCount.nearWork} onPress={toggle(setNearWork)}>직장 {NEAR_WORK_KM}km 이내</Chip> : null}
       </View>
 
-      {free ? (
-        <FadeIn delay={80}>
-          <Pressable onPress={() => router.push(`/announcement/${free.id}/cost?auto=1`)} accessibilityRole="button"
-            style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 14, backgroundColor: pressed ? colors.primaryPressed : colors.primary, borderRadius: radius.lg, padding: 18 })}>
-            <IconTile name="check" tone="primary" size={40} />
-            <View style={{ flex: 1, gap: 2 }}>
-              <T variant="label" color={colors.onPrimary} style={{ opacity: 0.85 }}>조건이 가장 잘 맞는 공고 · 무료 계산</T>
-              <T variant="bodyMedium" color={colors.onPrimary} lines={1}>{free.title}</T>
-              <T variant="caption" color={colors.onPrimary} style={{ opacity: 0.85 }}>예상 주거비를 먼저 확인해 보세요</T>
-            </View>
-            <Icon name="right" size={20} color={colors.onPrimary} />
-          </Pressable>
-        </FadeIn>
-      ) : null}
 
       <FadeIn delay={120} style={{ gap: 20 }}>
         {soon.length > 0 ? <Section title="접수 임박" items={soon} onOpen={open} /> : null}

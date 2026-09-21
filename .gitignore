@@ -12,3 +12,6 @@ coverage/
 apps/mobile/.expo/
 apps/mobile/dist/
 apps/mobile/web-build/
+
+# 아이콘 미리보기는 icons.ts에서 만들어 쓰는 생성물
+apps/mobile/scripts/icon-preview.html

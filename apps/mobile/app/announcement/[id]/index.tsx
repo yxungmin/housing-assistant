@@ -89,7 +89,7 @@ export default function AnnouncementDetail() {
   const households = a.extraction.tracks.reduce((s, t) => s + (t.households ?? 0), 0);
   const days = daysUntil(a.apply_end);
   const openCost = () => {
-    if (canOpenCost(state, a.id)) router.push(`/announcement/${a.id}/cost`);
+    if (canOpenCost(state)) router.push(`/announcement/${a.id}/cost`);
     else setSheet(true);
   };
 

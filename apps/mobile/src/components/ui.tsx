@@ -211,7 +211,9 @@ export function IconTile({ name, tone = "gray", size = 40 }: { name: IconName; t
   const fg = { gray: colors.text2, primary: colors.primary, warn: colors.warning, danger: colors.danger, info: colors.info }[tone];
   return (
     <View style={{ width: size, height: size, borderRadius: size * 0.3, backgroundColor: bg, alignItems: "center", justifyContent: "center" }}>
-      <Icon name={name} size={Math.round(size * 0.5)} color={fg} strokeWidth={2.4} />
+      {/* 의미색을 쓰는 타일(일치·확인 필요·불일치)은 한 색으로 둔다 — 거기서는 색이 곧 판정이다.
+          중립 타일(회색·정보)에서만 두 톤을 쓴다. */}
+      <Icon name={name} size={Math.round(size * 0.5)} color={fg} mono={tone === "primary" || tone === "warn" || tone === "danger"} strokeWidth={2.2} />
     </View>
   );
 }

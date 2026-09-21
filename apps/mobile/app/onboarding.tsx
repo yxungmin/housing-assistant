@@ -16,7 +16,7 @@ import { fonts, radius, space } from "@/theme/tokens";
 export default function Onboarding() {
   const router = useRouter();
   const { colors } = useTheme();
-  const { state, setProfile, setFreeUnlock } = useAppState();
+  const { state, setProfile } = useAppState();
   const [draft, setDraft] = useState<Partial<UserProfile>>(state.profile ?? {});
   const [index, setIndex] = useState(0);
   const steps = useMemo(() => visibleSteps(draft), [draft]);
@@ -39,9 +39,8 @@ export default function Onboarding() {
     if (!isComplete(p)) return;
     const profile: UserProfile = { ...p, subscription_deposits: p.subscription_deposits ?? p.subscription_months };
     setProfile(profile, true);
-    // 첫 무료 계산 대상만 정해 두고, 결과는 홈 목록에서 먼저 보게 한다 (사용자 피드백: 바로 상세로 가면 인지가 어렵다)
-    const best = state.freeUnlockId ? null : pickBest(matchAll(profile, currentAnnouncements()));
-    if (best) setFreeUnlock(best.announcement.id);
+    // 결과는 홈 목록에서 먼저 보게 한다 (바로 상세로 가면 무엇을 본 건지 인지가 어렵다).
+    // 로그인 게이트도 거기서 뜬다 — 조건에 맞는 공고가 몇 개인지 보여 준 다음이라야 가입을 물을 수 있다.
     router.replace("/(tabs)");
   };
 

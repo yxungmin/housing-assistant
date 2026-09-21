@@ -6,9 +6,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useReducer,
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import type { UserProfile } from "@housing/schema";
-import { hasAccess, normalizeSubscription, type Subscription } from "@/lib/billing";
+import { billing, normalizeSubscription, type Subscription } from "@/lib/billing";
 import type { ChangeRecord } from "@/lib/changes";
 import { emptySeen, markOpened, noteSeen, type SeenState } from "@/lib/unseen";
+import { canOpenCost as canOpenCostRule, type Account } from "@/lib/access";
 import { canSend, type LocalReport } from "@/lib/reports";
 import { fetchReportStatuses, remoteConfigured, sendIssueReport } from "@/data/remote";
 
@@ -19,8 +20,11 @@ export interface AppState {
   loaded: boolean;
   profile: UserProfile | null;
   onboarded: boolean;
-  /** 첫 1건 무료 해제 (기기에만 기록) */
-  freeUnlockId: string | null;
+  /**
+   * 로그인 계정. 지금은 모의 값이고 실제 인증(Supabase Auth 카카오·Apple)은 M8에서 붙인다.
+   * 프로필(소득·자산)은 로그인 뒤에도 기기에만 둔다 — 계정은 구독 상태만 들고 있는다.
+   */
+  account: Account | null;
   saved: string[];
   subscription: Subscription;
   themePref: ThemePref;
@@ -38,7 +42,8 @@ export interface AppState {
 type Action =
   | { type: "hydrate"; state: Partial<AppState> }
   | { type: "setProfile"; profile: UserProfile; onboarded?: boolean }
-  | { type: "setFreeUnlock"; id: string }
+  | { type: "signIn"; account: Account }
+  | { type: "signOut" }
   | { type: "toggleSaved"; id: string }
   | { type: "setSubscription"; subscription: Subscription }
   | { type: "setTheme"; pref: ThemePref }
@@ -55,7 +60,7 @@ const initial: AppState = {
   loaded: false,
   profile: null,
   onboarded: false,
-  freeUnlockId: null,
+  account: null,
   saved: [],
   subscription: { status: "none" },
   themePref: "system",
@@ -72,8 +77,11 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, ...a.state, subscription: normalizeSubscription(a.state.subscription ?? s.subscription), loaded: true };
     case "setProfile":
       return { ...s, profile: a.profile, onboarded: a.onboarded ?? s.onboarded };
-    case "setFreeUnlock":
-      return s.freeUnlockId ? s : { ...s, freeUnlockId: a.id };
+    case "signIn":
+      return { ...s, account: a.account };
+    case "signOut":
+      // 프로필·저장 목록은 기기에 남긴다. 로그아웃이 입력한 걸 지우는 일이 되면 안 된다.
+      return { ...s, account: null };
     case "toggleSaved":
       return { ...s, saved: s.saved.includes(a.id) ? s.saved.filter((x) => x !== a.id) : [...s.saved, a.id] };
     case "setSubscription":
@@ -141,7 +149,9 @@ async function write(key: string, value: string | null): Promise<void> {
 interface Ctx {
   state: AppState;
   setProfile: (profile: UserProfile, onboarded?: boolean) => void;
-  setFreeUnlock: (id: string) => void;
+  /** 지금은 모의 로그인이다. 계정을 만들고 첫 달 0원을 시작한다 */
+  signIn: (provider: Account["provider"]) => Promise<void>;
+  signOut: () => void;
   toggleSaved: (id: string) => void;
   setSubscription: (subscription: Subscription) => void;
   setTheme: (pref: ThemePref) => void;
@@ -174,8 +184,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!state.loaded) return;
     void write(KEYS.profile, state.profile ? JSON.stringify(state.profile) : null);
-    const { onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports, changes, seen } = state;
-    void write(KEYS.meta, JSON.stringify({ onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports, changes, seen }));
+    const { onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen } = state;
+    void write(KEYS.meta, JSON.stringify({ onboarded, account, saved, subscription, themePref, notifications, pushToken, reports, changes, seen }));
   }, [state]);
 
   // 신고 동기화: 못 보낸 건 보내고, 보낸 건의 처리 결과를 받아 "확인 중"을 끝맺는다.
@@ -221,7 +231,13 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     () => ({
       state,
       setProfile: (profile, onboarded) => dispatch({ type: "setProfile", profile, onboarded }),
-      setFreeUnlock: (id) => dispatch({ type: "setFreeUnlock", id }),
+      // 모의 로그인: 계정을 만들고 첫 달 0원을 시작한다. 실제 인증은 M8에서 이 자리에 들어간다.
+      signIn: async (provider) => {
+        const account: Account = { id: `mock-${provider}-${Date.now()}`, provider, signedInAt: new Date().toISOString() };
+        dispatch({ type: "signIn", account });
+        dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
+      },
+      signOut: () => dispatch({ type: "signOut" }),
       toggleSaved: (id) => dispatch({ type: "toggleSaved", id }),
       setSubscription: (subscription) => dispatch({ type: "setSubscription", subscription }),
       setTheme: (pref) => dispatch({ type: "setTheme", pref }),
@@ -244,13 +260,7 @@ export function useAppState(): Ctx {
   return ctx;
 }
 
-/** 계산 화면을 열 수 있는가: 첫 무료 1건 또는 체험·구독 중 (만료 후 3일 유예는 billing.ts) */
-export function canOpenCost(state: AppState, announcementId: string): boolean {
-  if (state.freeUnlockId === announcementId) return true;
-  return hasAccess(state.subscription);
-}
+/** 계산 화면을 열 수 있는가. 규칙은 lib/access.ts 한 곳에 있고 여기서는 스토어 모양으로 넘겨 줄 뿐이다. */
+export const canOpenCost = (state: AppState): boolean => canOpenCostRule(state);
 
-export const useCanOpenCost = (id: string) => {
-  const { state } = useAppState();
-  return useCallback(() => canOpenCost(state, id), [state, id])();
-};
+export const useCanOpenCost = (): boolean => canOpenCost(useAppState().state);

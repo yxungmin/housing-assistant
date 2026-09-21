@@ -44,7 +44,7 @@ export default function Cost() {
   const [loanId, setLoanId] = useState<string | undefined>(undefined);
   const [scenario, setScenario] = useState(false);
   const [picker, setPicker] = useState(false);
-  const [subSheet, setSubSheet] = useState(!canOpenCost(state, id ?? ""));
+  const [subSheet, setSubSheet] = useState(!canOpenCost(state));
   const [report, setReport] = useState(false);
 
   const chosen = rentals[sel];
@@ -233,7 +233,7 @@ export default function Cost() {
         </ScrollView>
       </BottomSheet>
 
-      <SubscriptionSheet visible={subSheet} onClose={() => { setSubSheet(false); if (!canOpenCost(state, a.id)) router.back(); }} onStarted={() => setSubSheet(false)} />
+      <SubscriptionSheet visible={subSheet} onClose={() => { setSubSheet(false); if (!canOpenCost(state)) router.back(); }} onStarted={() => setSubSheet(false)} />
       <ReportSheet
         visible={report}
         onClose={() => setReport(false)}
