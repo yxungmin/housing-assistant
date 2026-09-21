@@ -41,6 +41,9 @@ npm run typecheck
 ## 환경 변수
 
 `.env.example`을 `.env`로 복사한다. GitHub Actions에서는 같은 이름의 Secrets를 쓴다.
+
+**`EXTRACTION_ENABLED`는 기본 꺼짐이다.** 돈이 나가는 곳은 LLM 추출 한 군데뿐이라(공고 1건 약 1,300원)
+켜는 것을 명시적인 행동으로 뒀다. 꺼져 있으면 수집기는 목록·신규 판정까지만 하고, 벤치마크·`inspect --extract`도 거부한다.
 저장소는 공개로 둔다 (비공개는 Actions 무료 2,000분/월을 넘긴다). 키는 코드에 넣지 않는다.
 
 ## 설계 메모
