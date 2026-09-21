@@ -4,6 +4,7 @@ import { Pressable, View } from "react-native";
 import { haversineKm, matchAnnouncement, type RuleResult } from "@housing/engine";
 import { Icon, type IconName } from "@/components/Icon";
 import { ReportSheet } from "@/components/ReportSheet";
+import { SourceCard } from "@/components/SourceCard";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
@@ -11,7 +12,6 @@ import { inputSummary, ruleTitle } from "@/lib/conditions";
 import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
-import { hasSource, openSource } from "@/lib/source";
 import { commuteLines, mapUrl, openMap, transitLines } from "@/lib/commute";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -152,6 +152,8 @@ export default function AnnouncementDetail() {
           </View>
         ) : null}
 
+        <SourceCard pdfUrl={a.pdf_url} what="위 조건과 임대조건은" />
+
         {(a.lat !== undefined || a.transit || a.nearby?.length) ? (
           <View style={{ gap: 12 }}>
             <SectionTitle>위치와 교통</SectionTitle>
@@ -193,16 +195,6 @@ export default function AnnouncementDetail() {
           </View>
         ) : null}
 
-        {hasSource(a.pdf_url) ? (
-          <Card onPress={() => void openSource(a.pdf_url!)} style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
-            <IconTile name="info" tone="gray" />
-            <View style={{ flex: 1, gap: 2 }}>
-              <T variant="bodyMedium">공고문 원문 보기</T>
-              <Sub tone="3" variant="caption">기관 사이트의 공고문 PDF · 접수 전에 원본을 꼭 확인하세요</Sub>
-            </View>
-            <Icon name="right" size={18} color={colors.text4} />
-          </Card>
-        ) : null}
 
         <View style={{ gap: 12 }}>
           <SectionTitle>일정</SectionTitle>

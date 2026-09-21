@@ -5,6 +5,7 @@ import type { Pricing } from "@housing/schema";
 import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchAnnouncement } from "@housing/engine";
 import { Icon } from "@/components/Icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
+import { SourceCard } from "@/components/SourceCard";
 import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, FadeIn, Header, IconButton, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
@@ -148,6 +149,8 @@ export default function Cost() {
           </Card>
         </View>
         </FadeIn>
+        {/* 가장 큰 숫자를 보여 준 화면인데 여기서 원문으로 갈 길이 없었다 */}
+        <SourceCard pdfUrl={a.pdf_url} what="보증금·월임대료는" />
         <Pressable onPress={() => setReport(true)} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "flex-start", paddingHorizontal: 4, paddingVertical: 10, opacity: pressed ? 0.6 : 1 })}>
           <Sub tone="3" variant="caption">보증금·월임대료가 공고문과 다른가요?</Sub>
           {priceReport ? <Tag tone="info" icon="info">{REPORT_STATUS_LABEL[priceReport.status]}</Tag> : null}
