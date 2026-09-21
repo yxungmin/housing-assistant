@@ -62,7 +62,9 @@ npm run output:size                  # 추출 출력이 어디서 커지는지 (
 - 기관 응답 필드명은 기관 모듈 한 곳에만 둔다(`lh/api.ts`, `sh/api.ts`). 주택유형 매핑은 `lh/mapping.ts` 공통 표를 LH·SH가 같이 쓰고, 미지 값은 `other`로 두고 한 줄 추가한다.
 - 새 공급기관을 붙일 때는 `sources.ts`에 `Source` 하나를 더한다. 그 뒤 파이프라인은 기관과 무관하다.
 - SH는 공개 API가 없어 게시판 HTML을 파싱한다. 구조가 바뀌면 깨지므로 파서 변경 시 `collector/test/sh.test.ts`의 실제 HTML 조각을 함께 갱신한다.
-- 분양(sale) 비용 계산은 V0.2. 엔진은 rental만 받는다.
+- 제품 한 줄: 공고를 찾는 앱이 아니라 "이 공고가 나한테 맞는지 판단하는 앱". 지도·커뮤니티·복지정보는 V0.1에서 만들지 않는다 (`TODO.md`의 제품 포지션).
+- 비용 계산은 임대와 분양 둘 다 V0.1이다. 임대는 `engine/cost.ts`, 분양 납부 계획은 `engine/sale.ts`.
+  분양 비율은 공고문에서 읽은 payment_schedule만 쓰고 표준 비율을 짐작해 채우지 않는다.
 - 앱 상대 import에 `.js` 확장자를 붙이지 않는다 (Metro가 .ts로 못 푼다).
 - 수집기 `insertVersion`은 정규화 테이블과 함께 `announcement_versions.extraction`(jsonb)도 채운다. 앱은 그 jsonb만 읽는다.
 - 건강보험료율 등 연도별 상수는 엔진 한 곳(`income.ts`)에 기준일과 함께 둔다.
