@@ -42,7 +42,7 @@ figcaption{margin-top:5px;font-size:9px;color:${light.text4};word-break:break-al
 .dark h3{color:${dark.text4}}
 </style>
 
-${section("검토 — 96px (다듬는 중인 것만)", grid(["walk", "user-edit", "user", "alert", "settings", "delete"], 96, "ink"))}
+${section("검토 — 96px (다듬는 중인 것만)", grid(["home", "home-filled", "bookmark", "bookmark-filled", "user", "user-filled", "calendar"], 96, "ink"))}
 ${section("선 아이콘 (MONO) — 48px, 본문색", grid(MONO_ICON_NAMES, 48, "ink"))}
 ${section(`선 아이콘 — ${ICON_SIZE}px (실제 사용 크기)`, grid(MONO_ICON_NAMES, ICON_SIZE, "ink"))}
 ${section("선 아이콘 — 16px (가장 작게 쓰는 크기)", grid(MONO_ICON_NAMES, 16, "ink"))}
