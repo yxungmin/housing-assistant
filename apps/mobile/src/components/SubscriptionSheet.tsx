@@ -40,7 +40,7 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
       <View style={{ gap: 8 }}>
         <T variant="title">{expired ? "무료 체험이 끝났어요" : "다른 공고의 주거비도\n계산해 볼까요?"}</T>
         <T variant="body" color={colors.text2}>
-          {expired ? `이어서 계산하려면 ${price} 구독이 필요해요. 조건 확인과 공고 목록은 계속 무료예요.` : "첫 공고 1건은 무료로 계산해 드렸어요. 이어서 보려면 구독이 필요해요."}
+          {expired ? `이어서 계산하려면 ${price} 구독이 필요해요. 조건 확인과 공고 목록은 계속 무료예요.` : "공고 목록과 조건 확인은 계속 무료예요. 필요한 현금과 대출까지 계산하려면 구독이 필요해요."}
         </T>
       </View>
       <View style={{ gap: 12 }}>
@@ -103,7 +103,7 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
           <T variant="heading">{label}</T>
           {sub.cancelled ? <Tag tone="gray">갱신 해지됨</Tag> : sub.status === "trial" || sub.status === "active" ? <Tag tone="primary" icon="check">이용 중</Tag> : null}
         </Row>
-        {sub.expiresAt ? <Sub>{sub.status === "expired" ? "만료일" : sub.cancelled ? "이용 종료" : sub.status === "trial" ? "체험 종료" : "다음 결제"} {longDate(sub.expiresAt.slice(0, 10))}{left > 0 ? ` · ${left}일 남음` : ""}</Sub> : <Sub>첫 공고 1건은 무료로 계산할 수 있어요.</Sub>}
+        {sub.expiresAt ? <Sub>{sub.status === "expired" ? "만료일" : sub.cancelled ? "이용 종료" : sub.status === "trial" ? "체험 종료" : "다음 결제"} {longDate(sub.expiresAt.slice(0, 10))}{left > 0 ? ` · ${left}일 남음` : ""}</Sub> : <Sub>공고 목록과 조건 확인은 무료예요. 자금 계산만 구독이 필요해요.</Sub>}
       </Card>
       {msg ? <Sub style={{ textAlign: "center" }}>{msg}</Sub> : null}
       <View style={{ gap: 10 }}>
