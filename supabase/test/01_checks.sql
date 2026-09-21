@@ -63,10 +63,16 @@ update announcement_versions set status = 'VERIFIED' where id = '22222222-2222-4
 insert into issue_reports (announcement_id, client_id, target_kind, track_index, item_index, label, page, message)
 values ('11111111-1111-4111-8111-111111111111', 'client-abc', 'pricing', 0, 3, '59A 보증금 5억', 15, '공고문과 달라요');
 
--- 앱이 쓰는 경로와 같은 모양 (PostgREST on_conflict=client_id + ignore-duplicates)
-insert into issue_reports (announcement_id, client_id, target_kind, label, message)
-values ('11111111-1111-4111-8111-111111111111', 'client-abc', 'pricing', '59A 보증금 5억', '재전송')
-on conflict (client_id) do nothing;
+-- 앱은 upsert를 쓰지 않는다 (PostgREST upsert는 UPDATE 정책까지 요구한다).
+-- 재전송은 유일 인덱스에 막혀 409가 되고, 앱은 그걸 "이미 들어감"으로 본다.
+do $$ begin
+  begin
+    insert into issue_reports (announcement_id, client_id, target_kind, label, message)
+    values ('11111111-1111-4111-8111-111111111111', 'client-abc', 'pricing', '59A 보증금 5억', '재전송');
+    raise exception '같은 client_id가 두 번 들어갔다';
+  exception when unique_violation then null;
+  end;
+end $$;
 
 do $$ declare n int; begin
   select count(*) into n from issue_reports where client_id = 'client-abc';

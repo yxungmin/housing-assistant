@@ -24,8 +24,9 @@ alter table issue_reports drop constraint if exists issue_reports_status_check;
 alter table issue_reports add constraint issue_reports_status_check
   check (status in ('OPEN', 'NO_CHANGE', 'FIXED', 'SOURCE_AMENDED', 'INVALID'));
 
--- 부분 인덱스(where client_id is not null)로 두면 ON CONFLICT (client_id)가 이 인덱스를 못 고른다.
--- null은 원래 서로 충돌하지 않으니 조건 없이 건다.
+-- 같은 신고가 두 번 들어오지 않게 한다. 앱은 upsert를 쓰지 않고 그냥 넣은 뒤
+-- 중복(409)이면 이미 보낸 것으로 본다 — upsert는 UPDATE 정책을 요구하는데,
+-- 신고 테이블에 UPDATE를 열면 누구나 남의 신고를 고칠 수 있다.
 create unique index if not exists issue_reports_client_idx on issue_reports (client_id);
 create index if not exists issue_reports_queue_idx on issue_reports (status, created_at desc);
 create index if not exists issue_reports_announcement_idx on issue_reports (announcement_id);

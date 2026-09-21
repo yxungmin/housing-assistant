@@ -89,14 +89,16 @@ export async function registerPushSubscription(expoToken: string, regions: strin
 /** "이 숫자 이상해요" 신고 한 건. client_id가 같으면 서버에 한 건으로 남는다. */
 export async function sendIssueReport(report: LocalReport, fetchImpl: typeof fetch = fetch): Promise<boolean> {
   if (!remoteConfigured) return false;
-  // 신고는 한 번 쓰면 끝이다. merge-duplicates는 UPDATE라 RLS(삽입만 허용)에 막히므로
-  // 같은 client_id가 다시 와도 조용히 넘어가게 한다 (ON CONFLICT DO NOTHING).
-  const res = await fetchImpl(`${URL}/rest/v1/issue_reports?on_conflict=client_id`, {
+  // 신고는 한 번 쓰면 끝이다. upsert(on_conflict)는 쓰지 않는다 —
+  // PostgREST의 upsert는 INSERT 정책만으론 통과하지 못하고 UPDATE 정책까지 요구하는데
+  // (2026-09-21 실측: 42501 RLS 위반), 신고 테이블에 UPDATE를 열어 주면 누구나 남의 신고를 고칠 수 있다.
+  // 대신 client_id 유일 인덱스가 중복을 막고, 재전송으로 409가 오면 이미 들어간 것이니 성공으로 본다.
+  const res = await fetchImpl(`${URL}/rest/v1/issue_reports`, {
     method: "POST",
-    headers: { ...headers(), Prefer: "resolution=ignore-duplicates,return=minimal" },
+    headers: { ...headers(), Prefer: "return=minimal" },
     body: JSON.stringify(toPayload(report)),
   });
-  return res.ok;
+  return res.ok || res.status === 409;
 }
 
 export interface RemoteReportStatus {
