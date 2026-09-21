@@ -156,7 +156,6 @@ export default function Cost() {
           {priceReport ? <Tag tone="info" icon="info">{REPORT_STATUS_LABEL[priceReport.status]}</Tag> : null}
         </Pressable>
         <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>공고문과 {dateText(cost.loan?.as_of_date ?? LOANS[0]!.as_of_date)} 기준 대출 조건으로 계산한 예상값이에요. 실제 계약 조건과 다를 수 있어요.</Sub>
-        <View style={{ height: 24 }} />
       </View>
 
       <BottomSheet visible={scenario} onClose={() => setScenario(false)}>

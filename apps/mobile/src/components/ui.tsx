@@ -63,14 +63,22 @@ export function FadeIn({ children, style, delay = 0, distance = 12 }: PropsWithC
  * 화면 틀. header·footer는 스크롤 밖에 두어 항상 고정된다 (스크롤 안에 두면 같이 밀려 올라간다).
  * 본문만 스크롤하고, footer가 있으면 아래 여백을 줄인다.
  */
-export function Screen({ children, scroll = true, padded = true, style, bottomInset = 140, header, footer }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number; header?: ReactNode; footer?: ReactNode }>) {
+/**
+ * 화면 뼈대. 스크롤 영역 + 선택적 header/footer.
+ *
+ * `bottomInset`은 마지막 요소 아래 여백이다. 예전 기본값이 140이었는데, 그건 시안에서
+ * CTA가 내용 위에 떠 있던 때의 값이다. 지금은 탭 바도 BottomCTA도 떠 있지 않다 —
+ * 탭 바는 화면 영역 밖이고 footer는 이 컴포넌트의 형제라 제 자리를 차지한다.
+ * 그래서 140은 아무것도 안 가리면서 탭 화면마다 빈 스크롤만 140px씩 만들고 있었다.
+ */
+export function Screen({ children, scroll = true, padded = true, style, bottomInset = space.section, header, footer }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number; header?: ReactNode; footer?: ReactNode }>) {
   const { colors } = useTheme();
   const inner = padded ? { paddingHorizontal: space.screen } : undefined;
   return (
     <SafeAreaView style={[{ flex: 1, backgroundColor: colors.surface }, style]} edges={["top", "left", "right"]}>
       {header}
       {scroll ? (
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={[inner, { paddingBottom: footer ? space.xl : bottomInset, gap: space.xl }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={[inner, { paddingBottom: bottomInset, gap: space.xl }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           {children}
         </ScrollView>
       ) : (
