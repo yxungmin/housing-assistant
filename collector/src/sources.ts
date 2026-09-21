@@ -3,10 +3,11 @@
  * 그 뒤(PDF → 텍스트 → 섹션 → LLM → 검증 → 저장)는 완전히 같다.
  * 새 기관을 붙일 때는 이 파일에 Source 하나를 더하면 된다.
  */
-import type { HousingType } from "@housing/schema";
+import type { HousingType, SupplyUnit } from "@housing/schema";
 import type { Provider } from "./db/supabase";
 import { LhClient, parseNoticeDetail as parseLhDetail, pickNoticePdf as pickLhPdf, type LhImage, type LhNoticeSummary } from "./lh/api";
 import { ShClient, pickNoticePdf as pickShPdf } from "./sh/api";
+import { parseUnitList, pickUnitList } from "./units/list";
 
 /** 목록까지만 읽은 공고. 상세·PDF는 resolve()에서 가져온다 (수정 없으면 호출하지 않는다). */
 export interface CollectedNotice {
@@ -44,6 +45,11 @@ export interface ResolvedNotice {
    * SH는 게시판에 이런 이미지가 없어 항상 비어 있다.
    */
   images?: LhImage[];
+  /**
+   * 흩어진 집 목록 (매입임대·전세임대). 공고문이 아니라 별도 엑셀 첨부에 있다.
+   * 이 유형은 총 호수만으로는 아무것도 고를 수 없어서 목록이 곧 내용이다.
+   */
+  units?: SupplyUnit[];
 }
 
 export interface Source {
@@ -87,8 +93,12 @@ function toLhNotice(client: LhClient, n: LhNoticeSummary): CollectedNotice {
         correction_reason: detail.correction_reason,
         images: detail.images,
       };
-      if (!pdf) return { ...resolved, missing_pdf: "모집공고문 PDF 첨부를 찾지 못함" };
-      return { ...resolved, pdf: { bytes: await client.downloadPdf(pdf.url), name: pdf.name, url: pdf.url } };
+      // 매입임대·전세임대는 집 목록이 별도 엑셀로 온다. 없으면 없는 대로 둔다 (단지형 공고).
+      const listFile = pickUnitList(detail.attachments);
+      const units = listFile ? await client.download(listFile.url).then((b) => parseUnitList(Buffer.from(b))).catch(() => undefined) : undefined;
+      const withUnits = { ...resolved, units: units?.length ? units : undefined };
+      if (!pdf) return { ...withUnits, missing_pdf: "모집공고문 PDF 첨부를 찾지 못함" };
+      return { ...withUnits, pdf: { bytes: await client.downloadPdf(pdf.url), name: pdf.name, url: pdf.url } };
     },
   };
 }

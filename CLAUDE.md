@@ -22,6 +22,11 @@
   무주택 기간은 `homeless.ts`가 청약 가점제 규칙으로 계산한다(만 30세부터, 그 전 혼인이면 혼인신고일부터). 사람이 적은 값보다 규칙이 이긴다.
   룰의 `verified`(사람 검수 여부)는 판정에 쓰지 않는다 — 검수 전이라고 숨기면 자격이 되는 사람에게 공고를 감추게 된다. 화면이 사실대로 알린다.
 - `collector` 기관 목록 → PDF → 텍스트/섹션 → Claude 구조화 추출(`llm/extract.ts`) → `autoChecks` → Supabase(`db/supabase.ts`, 버저닝). 기관 어댑터는 `sources.ts` 한 곳(LH는 공공데이터포털 API, SH는 게시판 HTML 파싱 `sh/api.ts`). 수집 범위는 `COLLECT_PROVIDERS`·`COLLECT_REGIONS`(기본 LH,SH / 서울·경기)로 줄여 비용을 통제한다.
+- `supabase/functions/transit` 흩어진 집까지의 대중교통 소요를 카카오에 물어 캐시한다(`commute_cache`).
+  앱이 직접 못 부르는 이유는 REST 키를 앱에 넣을 수 없어서고, 미리 계산 못 하는 이유는
+  집 주소 176곳 × 시군구 56곳 = 9,856회인데 하루 한도가 1,000회라서다. 고른 집 하나만 부르면 1회다.
+  저장하는 것은 (공고, 집, 출발 시군구) → 분뿐이고 출발점이 시군구 중심이라 사용자를 가리키지 않는다.
+  배포·키 설정은 `supabase/README.md` 2-2.
 - `supabase/migrations` 테이블·RLS. 게시는 자동이다(0006): 자동 검증을 통과하면 `auto_publish_version()`이 바로 내보내고,
   `publish_version()`은 "사람이 대조했다"는 도장만 찍는다. 사람을 게시 경로에 두면 하루만 못 봐도 새 공고가 앱에 안 뜬다.
   자동 검증 지적은 둘로 갈린다 — `conflict_reasons`(게시 보류) / `checks`(게시하되 앱에 알림). `autoChecks`의 `blocking` 플래그가 기준.

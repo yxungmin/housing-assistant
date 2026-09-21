@@ -67,6 +67,8 @@ export class Repo {
     pdf_url?: string;
     detail_url?: string;
     images?: object[];
+    /** 흩어진 집 목록 (매입임대·전세임대). 단지형 공고에는 없다 */
+    units?: object[];
     source_modified_at?: string;
     lat?: number;
     lng?: number;

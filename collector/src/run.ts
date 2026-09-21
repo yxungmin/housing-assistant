@@ -157,6 +157,8 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       detail_url: notice.detail_url,
       // 기관이 준 그림. 주소를 한 번 펼쳐야 그림 파일이 나온다 (lh/api.ts resolveImages).
       images: images.length ? images : undefined,
+      // 흩어진 집 목록. 좌표는 아직 없다 — 주소마다 한 번 찍는 일은 enrich가 한다.
+      units: detail.units,
       source_modified_at: detail.modified_key,
       lat: geo?.lat,
       lng: geo?.lng,

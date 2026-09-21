@@ -29,6 +29,7 @@ interface FeedRow {
   pdf_url: string | null;
   detail_url: string | null;
   images: Announcement["images"] | null;
+  units: Announcement["units"] | null;
   lat: number | null;
   lng: number | null;
   transit: Transit | null;
@@ -74,6 +75,7 @@ export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch):
       pdf_url: r.pdf_url ?? undefined,
       detail_url: r.detail_url ?? undefined,
       images: r.images?.length ? r.images : undefined,
+      units: r.units?.length ? r.units : undefined,
       lat: r.lat ?? undefined,
       lng: r.lng ?? undefined,
       transit: r.transit ?? undefined,

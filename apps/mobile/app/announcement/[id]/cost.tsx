@@ -17,6 +17,7 @@ import { nearbyLines, transitLines } from "@/lib/commute";
 import type { IconName } from "@/components/icon";
 import type { SupplyUnit } from "@housing/schema";
 import type { UnitRent } from "@/lib/units";
+import { fetchUnitCommute, transitConfigured, type UnitCommute } from "@/data/transit";
 
 /**
  * 고를 수 있는 임대조건 한 줄.
@@ -157,6 +158,34 @@ export default function Cost() {
    * 공고 하나의 좌표로 그리던 위치 섹션은 이 유형에서 꺼 두었다(시청 좌표였다). 여기가 그 자리를 대신한다.
    */
   const spot = picksHouse ? chosen?.unit : undefined;
+  /**
+   * 고른 집까지의 대중교통 소요.
+   *
+   * 미리 계산할 수 없어서(집 × 시군구 조합이 하루 한도를 넘는다) 고른 집 하나만 그때 부른다.
+   * 서버가 캐시하므로 같은 시군구에서 같은 집을 보는 두 번째 사람부터는 호출이 없다.
+   * 못 구하면 null로 두고 화면은 직선거리로 되돌아간다 — 없는 값을 지어내지 않는다.
+   */
+  const [commute, setCommute] = useState<UnitCommute | null>(null);
+  const [commuteLoading, setCommuteLoading] = useState(false);
+  useEffect(() => {
+    if (!a || !spot || !transitConfigured) {
+      setCommute(null);
+      return;
+    }
+    let cancelled = false;
+    setCommute(null);
+    setCommuteLoading(true);
+    void fetchUnitCommute(a.id, spot, state.profile)
+      .then((r) => {
+        if (!cancelled) setCommute(r);
+      })
+      .finally(() => {
+        if (!cancelled) setCommuteLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [a?.id, spot?.id, state.profile?.workplace?.label]);
   /** 목록에서 (i)를 눌러 펼친 집. 고르는 것과는 별개다 — 보기만 하고 닫을 수 있어야 한다 */
   const [detail, setDetail] = useState<RentalChoice | null>(null);
   const scenarioPricing = useMemo(() => {
@@ -276,11 +305,21 @@ export default function Cost() {
               {transitLines(spot.transit).map((t) => (
                 <NearRow key={t.title} icon={t.icon} title={t.title} detail={t.detail} />
               ))}
+              {commute ? (
+                <NearRow
+                  icon="walk"
+                  title={`직장까지 대중교통 약 ${commute.minutes}분${commute.transfers ? ` · 환승 ${commute.transfers}회` : ""}`}
+                  detail={`${state.profile?.workplace?.label ?? "직장"} 기준${commute.fare ? ` · 편도 ${won(commute.fare)}` : ""}`}
+                />
+              ) : commuteLoading ? (
+                <NearRow icon="walk" title="직장까지 걸리는 시간을 재는 중이에요" detail="잠시만요" />
+              ) : null}
               {nearbyLines(spot.nearby).map((n) => (
                 <NearRow key={n.kind} icon={n.icon as IconName} title={n.title} detail={n.detail} />
               ))}
               <Sub tone="3" variant="caption">
-                {chosen?.label} 기준이에요. 종류마다 가장 가까운 한 곳만 보여드리고, 모두 직선거리예요.
+                {chosen?.label} 기준이에요. 종류마다 가장 가까운 한 곳만 보여드리고, 역·시설까지는 직선거리예요.
+                {commute ? " 통근 시간은 직장이 있는 시군구 중심에서 출발한 대중교통 경로예요." : ""}
               </Sub>
             </Card>
           </View>

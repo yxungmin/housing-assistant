@@ -26,12 +26,18 @@
 `supabase/migrations/` 의 파일을 **번호 순서대로** 하나씩 붙여 넣고 각각 Run.
 
 ```
-0001_init.sql          테이블·RLS·Storage 버킷
+0001_init.sql            테이블·RLS·Storage 버킷
 0002_publish_version.sql
 0003_app_feed.sql
 0004_provider.sql
 0005_issue_reports.sql   "이 숫자 이상해요" 신고
 0006_auto_publish.sql    자동 게시
+0007_nearby.sql          주변 생활 인프라
+0008_market.sql          주변 전월세 실거래 요약
+0009_waiting.sql         예비입주자 대기현황
+0010_commute.sql         시군구별 통근 시간표 (단지형)
+0011_source_links.sql    공고 상세 주소·단지 그림
+0012_commute_cache.sql   흩어진 집의 통근 시간 캐시 (매입임대)
 ```
 
 한 번에 몰아 붙이지 말 것 — 어디서 틀어졌는지 알 수 없다. 각 파일은 `Success. No rows returned`가 나오면 된 것이다.
@@ -40,6 +46,27 @@
 
 **확인**: Table Editor에 `announcements`, `announcement_versions`, `issue_reports` … 가 보이고,
 SQL Editor에서 `select * from app_announcements;` 가 에러 없이 빈 결과를 주면 성공이다.
+
+## 2-2. Edge Function 올리기 (5분)
+
+매입임대처럼 집이 흩어진 공고에서 **고른 집까지 몇 분 걸리는지**를 재는 함수다.
+앱이 카카오를 직접 부르지 못하는 이유는 하나다 — REST 키를 앱에 넣으면 누구나 뽑아 쓴다.
+
+미리 계산해 둘 수도 없다. 집 주소 176곳 × 시군구 56곳 = 9,856회인데 카카오 대중교통 경로는
+하루 1,000회다. 사람이 고른 집 하나만 부르면 1회이고, 결과를 캐시하니 호출은 곧 0으로 수렴한다.
+
+```bash
+npx supabase login                       # 브라우저가 열린다
+npx supabase link --project-ref <ref>    # ref는 Project URL의 xxxx 부분
+npx supabase functions deploy transit
+npx supabase secrets set KAKAO_REST_API_KEY=<카카오 REST 키>
+```
+
+**확인**: 대시보드 **Edge Functions → transit → Logs**에 배포가 보이면 된 것이다.
+앱에서 매입임대 공고의 예상 주거비를 열고 집을 고르면 "직장까지 대중교통 약 N분"이 뜬다.
+
+서버에 남는 것은 (공고, 집, 출발 시군구) → 분·환승·요금뿐이다. 출발점은 정확한 직장이 아니라
+시군구 대표 좌표라 같은 시군구 사람이 한 줄을 같이 쓰고, 누가 물었는지는 남지 않는다.
 
 ## 3. 키 꺼내기 (2분)
 
@@ -114,3 +141,8 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=eyJ...anon...
 - **앱이 서버 데이터를 못 받음** — `apps/mobile/.env`는 Expo를 **다시 시작해야** 반영된다 (`EXPO_PUBLIC_` 값은 빌드 타임에 박힌다)
 - **신고가 안 올라감** — 앱 로컬 데이터(`"018"` 같은 id)에서 한 신고는 서버 공고 uuid가 아니라 보내지 않는다. 서버에서 받은 공고에서 신고해야 올라간다
 - **바꾼 마이그레이션을 다시 적용** — `npm run db:check`로 빈 DB에서 전체를 먼저 돌려 본다
+- **통근 시간이 안 뜸** — 셋을 본다. `apps/mobile/.env`의 두 값이 있는지(Expo 재시작 필요),
+  `functions deploy transit`이 됐는지, `secrets set KAKAO_REST_API_KEY`가 됐는지.
+  셋 중 하나라도 없으면 화면은 조용히 직선거리로 되돌아간다 — 없는 값을 지어내지 않는 쪽을 택했다
+- **"오늘 계산 한도를 다 썼어요"** — 하루 900회를 넘겼다. 카카오 한도(1,000)에 여유를 둔 값이고
+  `supabase/functions/transit/index.ts`의 `DAILY_BUDGET`에 있다. 캐시가 차면 이 숫자는 잘 안 쓰인다

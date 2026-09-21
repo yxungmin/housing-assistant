@@ -15,3 +15,7 @@ apps/mobile/web-build/
 
 # 아이콘 미리보기는 icons.ts에서 만들어 쓰는 생성물
 apps/mobile/scripts/icon-preview.html
+
+# Supabase CLI 작업 파일 (버전 캐시·링크 정보). 커밋하지 않는다
+supabase/.temp/
+supabase/.branches/
