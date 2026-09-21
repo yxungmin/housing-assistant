@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { loadEnvFile } from "node:process";
 import { z } from "zod";
+import { SERVICE_REGIONS } from "@housing/schema";
 import { fromRoot } from "./paths";
 
 // 루트 .env를 읽는다 (Node 20.12+ 내장). GitHub Actions에서는 파일이 없고 Secrets가 env로 들어온다.
@@ -33,8 +34,12 @@ const Env = z.object({
     .transform((v) => v.toLowerCase() === "true" || v === "1"),
   /** 수집할 공급기관. 쉼표 구분 (LH, SH) */
   COLLECT_PROVIDERS: z.string().default("LH,SH"),
-  /** 수집할 시도 코드. 쉼표 구분, 빈 값이면 전국. 기본은 서울·경기 (비용 통제) */
-  COLLECT_REGIONS: z.string().default("11,41"),
+  /**
+   * 수집할 시도 코드. 쉼표 구분, 빈 값이면 전국. 기본은 비용 통제를 위해 서울·경기다.
+   * 기본값은 packages/schema의 SERVICE_REGIONS에서 온다 — 앱이 "서울·경기만 제공해요"라고
+   * 고지하는 근거가 같은 값이어야 한다. 갈리면 고지해 놓고 다른 지역 공고를 보여 주게 된다.
+   */
+  COLLECT_REGIONS: z.string().default(SERVICE_REGIONS.join(",")),
   /** 한 번 실행에서 처리할 최대 공고 수 (LLM 비용 상한) */
   MAX_ANNOUNCEMENTS_PER_RUN: z.coerce.number().int().min(1).default(10),
   PDF_BUCKET: z.string().default("announcement-pdfs"),

@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/icon";
-import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { commuteKm, getAnnouncement, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
+import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
 import { REGIONS } from "@/lib/onboarding";
 import { commuteFor, commuteShort, splitStation } from "@/lib/commute";
 import { isUnseen, unseenCount } from "@/lib/unseen";
@@ -89,6 +90,9 @@ export default function Home() {
   const rest = matched.filter((m) => !soon.includes(m));
   const today = new Date();
   const regionLabel = REGIONS.find((r) => r.value === state.profile?.region_code)?.label ?? "내 지역";
+  // 수집 범위 밖에 사는 사람에게는 목록이 거의 비어 보인다. 왜 비었는지 말하지 않으면
+  // "나한테 맞는 게 없구나"로 읽힌다 — 사실은 우리가 아직 그 지역을 안 모으는 것이다.
+  const outsideService = !isServiceRegion(state.profile?.region_code);
   const open = (id: string) => router.push(`/announcement/${id}`);
   const toggle = (setter: (f: (v: boolean) => boolean) => void) => () => {
     animateLayout();
@@ -115,6 +119,12 @@ export default function Home() {
       </View>
 
 
+      {outsideService ? (
+        <Notice tone="info" icon="info">
+          지금은 {SERVICE_REGION_LABEL} 공고만 모으고 있어요. {regionLabel} 공고는 아직 없어요.
+        </Notice>
+      ) : null}
+
       <FadeIn delay={120} style={{ gap: 20 }}>
         {soon.length > 0 ? <Section title="접수 임박" items={soon} onOpen={open} /> : null}
         {rest.length > 0 ? <Section title={soon.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} /> : null}
@@ -122,7 +132,11 @@ export default function Home() {
           <Card style={{ alignItems: "center", paddingVertical: 32, gap: 8 }}>
             <IconTile name="bookmark" size={48} />
             <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 조건에 맞는 공고가 없어요</T>
-            <Sub style={{ textAlign: "center" }}>새 공고가 올라오면 알려드릴게요. 내 정보에서 비어 있는 조건을 채우면 판별되는 공고가 늘어날 수 있어요.</Sub>
+            <Sub style={{ textAlign: "center" }}>
+              {outsideService
+                ? `지금은 ${SERVICE_REGION_LABEL} 공고만 모으고 있어요. ${regionLabel}까지 넓히면 알려드릴게요.`
+                : "새 공고가 올라오면 알려드릴게요. 내 정보에서 비어 있는 조건을 채우면 판별되는 공고가 늘어날 수 있어요."}
+            </Sub>
           </Card>
         ) : null}
         {pending.length > 0 ? <Section title="조건 분석 중" items={pending} onOpen={open} /> : null}
@@ -161,7 +175,9 @@ export default function Home() {
 
       <View style={{ flexDirection: "row", gap: 8, paddingTop: 8, paddingHorizontal: 4 }}>
         <Icon name="info" size={16} color={colors.text4} />
-        <Sub tone="3" variant="caption" style={{ flex: 1 }}>"조건 일치"는 공고문 조건과 입력값을 비교한 결과이며 신청 자격을 보장하지 않아요.</Sub>
+        <Sub tone="3" variant="caption" style={{ flex: 1 }}>
+          지금은 {SERVICE_REGION_LABEL}의 LH·SH 공고만 모으고 있어요. "조건 일치"는 공고문 조건과 입력값을 비교한 결과이며 신청 자격을 보장하지 않아요.
+        </Sub>
       </View>
     </Screen>
   );

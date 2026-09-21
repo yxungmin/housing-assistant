@@ -155,3 +155,21 @@ export function parsePlaceLabel(label: string | undefined): { regionCode: string
   if (!region) return null;
   return { regionCode: region.code, sigungu: rest.length ? rest.join(" ") : undefined };
 }
+
+/**
+ * 지금 공고를 모으고 있는 시도.
+ *
+ * 수집기는 `COLLECT_REGIONS` 환경변수로 이 범위를 정하고, 앱은 화면에 고지할 때 쓴다.
+ * 두 곳이 갈리면 앱이 "서울·경기만 제공해요"라고 적어 놓고 다른 지역 공고를 보여 주게 된다.
+ * 그래서 기본값을 여기 한 곳에 두고 수집기 기본값도 이 값을 쓴다.
+ *
+ * 넓힐 때 고치는 곳: 이 배열 하나. 화면 문구는 SERVICE_REGION_LABEL에서 만들어진다.
+ */
+export const SERVICE_REGIONS = ["11", "41"] as const;
+
+/** 고지에 쓰는 이름 ("서울·경기"). 코드 목록이 바뀌면 문구도 따라 바뀐다 */
+export const SERVICE_REGION_LABEL: string = SERVICE_REGIONS.map((c) => regionByCode(c)?.label ?? c).join("·");
+
+/** 이 시도의 공고를 모으고 있는가. 코드가 없으면(입력 전) 판단하지 않고 true */
+export const isServiceRegion = (regionCode: string | undefined): boolean =>
+  regionCode === undefined || (SERVICE_REGIONS as readonly string[]).includes(regionCode);

@@ -10,6 +10,7 @@ import { remoteConfigured } from "@/data/remote";
 import { daysLeft, PRICE_KRW } from "@/lib/billing";
 import { longDate, manwon, yearsMonths } from "@/lib/format";
 import { getPushToken, notificationsSupported, requestNotificationPermission } from "@/lib/notifications";
+import { SERVICE_REGION_LABEL } from "@housing/schema";
 import { REGIONS } from "@/lib/onboarding";
 import { isOpen, REPORT_STATUS_LABEL } from "@/lib/reports";
 import { useAppState, type ThemePref } from "@/store/appState";
@@ -118,6 +119,7 @@ export default function Profile() {
         <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
           <ListRow icon="info" label="대출 금리 기준일" value={longDate(LOAN_AS_OF)} />
           <ListRow icon="house" label="공고 데이터" sub={feed.source === "remote" ? `서버 동기화 ${feed.syncedAt ? longDate(feed.syncedAt.slice(0, 10)) : ""}` : feed.source === "cache" ? "마지막 동기화 데이터 (오프라인)" : remoteConfigured ? "동기화 중" : "앱에 포함된 데이터"} value={`${feed.list.length}건`} />
+          <ListRow icon="map-pin" label="제공 지역" sub="다른 지역은 아직 모으지 않아요" value={SERVICE_REGION_LABEL} />
           <ListRow
             icon="alert"
             label="이 숫자 이상해요"

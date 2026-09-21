@@ -1,5 +1,6 @@
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate, homelessBasis, homelessBasisReason } from "@housing/engine";
+import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
 import { parsePlaceLabel, placeFor } from "./places";
 import { REGION_LIST, regionByCode, sigunguValue } from "./regions";
 
@@ -82,7 +83,12 @@ function workplaceSteps(key: WorkplaceKey, copy: { title: Step["title"]; hint: s
 
 export const STEPS: Step[] = [
   {
-    id: "region", kind: "select", title: "지금 어디에 살고 있나요?", hint: "공고 대부분이 거주지 기준으로 신청 자격을 봅니다.",
+    id: "region", kind: "select", title: "지금 어디에 살고 있나요?",
+    // 수집 범위 밖을 고르면 그 자리에서 알린다. 스무 질문을 다 답하고 빈 목록을 보는 것보다 낫다.
+    hint: (p) =>
+      isServiceRegion(p.region_code)
+        ? "공고 대부분이 거주지 기준으로 신청 자격을 봅니다."
+        : `공고 대부분이 거주지 기준으로 신청 자격을 봅니다. 다만 지금은 ${SERVICE_REGION_LABEL} 공고만 모으고 있어요 — 고른 지역 공고는 아직 없어요.`,
     options: REGIONS,
     apply: (p, v) => ({ ...p, region_code: String(v), region_sigungu: p.region_code === String(v) ? p.region_sigungu : undefined }),
     read: (p) => p.region_code ?? null,
