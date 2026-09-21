@@ -1,6 +1,7 @@
 /**
  * 알림 (M7).
  *  - 관심 공고 마감 3일 전 09:00 기기 예약 알림: 서버 없이 기기에서만 예약한다.
+ *  - 관심 공고의 값이 바뀌면 즉시 알림: 조용히 바꾸지 않기 위한 것이다 (changes.ts).
  *  - 신규 공고 푸시: Expo 푸시 토큰을 받아 Supabase push_subscriptions에 지역·유형과 함께 등록한다 (remote.ts).
  * 웹은 알림을 지원하지 않으므로 모두 no-op.
  */
@@ -26,6 +27,7 @@ export async function setupNotificationHandler(): Promise<void> {
   if (Platform.OS === "android") {
     void Notifications.setNotificationChannelAsync("deadline", { name: "접수 마감 알림", importance: Notifications.AndroidImportance.DEFAULT });
     void Notifications.setNotificationChannelAsync("new", { name: "새 공고 알림", importance: Notifications.AndroidImportance.DEFAULT });
+    void Notifications.setNotificationChannelAsync("change", { name: "관심 공고 변경 알림", importance: Notifications.AndroidImportance.HIGH });
   }
 }
 
@@ -70,6 +72,29 @@ export async function syncDeadlineReminders(items: DeadlineItem[], enabled: bool
     return scheduled;
   } catch {
     return 0;
+  }
+}
+
+/**
+ * 관심 공고의 값이 바뀌었다고 지금 알린다.
+ * 예약이 아니라 즉시 표시라 syncDeadlineReminders의 cancelAll에 지워지지 않는다.
+ */
+export async function notifyChange(announcementId: string, title: string, body: string): Promise<boolean> {
+  if (!native) return false;
+  try {
+    const Notifications = await mod();
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: `${title} 정보가 바뀌었어요`,
+        body,
+        data: { announcementId },
+        ...(Platform.OS === "android" ? { channelId: "change" } : {}),
+      },
+      trigger: null,
+    });
+    return true;
+  } catch {
+    return false;
   }
 }
 

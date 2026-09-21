@@ -7,6 +7,7 @@ import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import type { UserProfile } from "@housing/schema";
 import { hasAccess, normalizeSubscription, type Subscription } from "@/lib/billing";
+import type { ChangeRecord } from "@/lib/changes";
 import { canSend, type LocalReport } from "@/lib/reports";
 import { fetchReportStatuses, remoteConfigured, sendIssueReport } from "@/data/remote";
 
@@ -27,6 +28,8 @@ export interface AppState {
   pushToken: string | null;
   /** "이 숫자 이상해요" 신고. 기기에 먼저 쌓고 보낼 수 있을 때 보낸다 */
   reports: LocalReport[];
+  /** 관심 공고에서 값이 바뀐 기록. 공고를 열면 seen 처리한다 */
+  changes: ChangeRecord[];
 }
 
 type Action =
@@ -39,6 +42,8 @@ type Action =
   | { type: "setNotifications"; on: boolean; pushToken?: string | null }
   | { type: "addReport"; report: LocalReport }
   | { type: "mergeReports"; reports: LocalReport[] }
+  | { type: "addChanges"; records: ChangeRecord[] }
+  | { type: "seeChange"; announcementId: string }
   | { type: "reset" };
 
 const initial: AppState = {
@@ -52,6 +57,7 @@ const initial: AppState = {
   notifications: false,
   pushToken: null,
   reports: [],
+  changes: [],
 };
 
 function reducer(s: AppState, a: Action): AppState {
@@ -72,6 +78,13 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, notifications: a.on, pushToken: a.pushToken === undefined ? s.pushToken : a.pushToken };
     case "addReport":
       return { ...s, reports: [a.report, ...s.reports] };
+    case "addChanges": {
+      // 같은 공고의 이전 기록은 새 것으로 덮는다. 쌓아 두면 "무엇이 최신인지"를 사용자가 판단해야 한다.
+      const ids = new Set(a.records.map((r) => r.announcementId));
+      return { ...s, changes: [...a.records, ...s.changes.filter((c) => !ids.has(c.announcementId))].slice(0, 30) };
+    }
+    case "seeChange":
+      return { ...s, changes: s.changes.map((c) => (c.announcementId === a.announcementId ? { ...c, seen: true } : c)) };
     case "mergeReports": {
       const byId = new Map(a.reports.map((r) => [r.id, r]));
       return { ...s, reports: s.reports.map((r) => byId.get(r.id) ?? r) };
@@ -120,6 +133,8 @@ interface Ctx {
   setTheme: (pref: ThemePref) => void;
   setNotifications: (on: boolean, pushToken?: string | null) => void;
   addReport: (report: LocalReport) => void;
+  addChanges: (records: ChangeRecord[]) => void;
+  seeChange: (announcementId: string) => void;
   reset: () => void;
 }
 
@@ -139,8 +154,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!state.loaded) return;
     void write(KEYS.profile, state.profile ? JSON.stringify(state.profile) : null);
-    const { onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports } = state;
-    void write(KEYS.meta, JSON.stringify({ onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports }));
+    const { onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports, changes } = state;
+    void write(KEYS.meta, JSON.stringify({ onboarded, freeUnlockId, saved, subscription, themePref, notifications, pushToken, reports, changes }));
   }, [state]);
 
   // 신고 동기화: 못 보낸 건 보내고, 보낸 건의 처리 결과를 받아 "확인 중"을 끝맺는다.
@@ -192,6 +207,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       setTheme: (pref) => dispatch({ type: "setTheme", pref }),
       setNotifications: (on, pushToken) => dispatch({ type: "setNotifications", on, pushToken }),
       addReport: (report) => dispatch({ type: "addReport", report }),
+      addChanges: (records) => dispatch({ type: "addChanges", records }),
+      seeChange: (announcementId) => dispatch({ type: "seeChange", announcementId }),
       reset: () => dispatch({ type: "reset" }),
     }),
     [state],

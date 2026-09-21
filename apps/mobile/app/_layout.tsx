@@ -6,7 +6,8 @@ import * as SplashScreen from "expo-splash-screen";
 import { useAnnouncements } from "@/data/announcements";
 import { registerPushSubscription } from "@/data/remote";
 import { useAnnouncementSync } from "@/data/sync";
-import { setupNotificationHandler, syncDeadlineReminders } from "@/lib/notifications";
+import { changeSummary } from "@/lib/changes";
+import { notifyChange, setupNotificationHandler, syncDeadlineReminders } from "@/lib/notifications";
 import { AppStateProvider, useAppState } from "@/store/appState";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 
@@ -15,8 +16,13 @@ void setupNotificationHandler();
 
 function Root() {
   const { colors, scheme } = useTheme();
-  const { state } = useAppState();
-  useAnnouncementSync();
+  const { state, addChanges } = useAppState();
+  // 관심 공고의 값이 바뀌면 기록하고, 알림을 켠 사용자에게는 바로 알린다
+  useAnnouncementSync(state.saved, (records) => {
+    addChanges(records);
+    if (!state.notifications) return;
+    for (const r of records) void notifyChange(r.announcementId, r.title, changeSummary(r));
+  });
   useReminderSync();
   // Pretendard 정적 otf (npm pretendard). 키 이름은 src/theme/tokens.ts의 fonts와 같아야 한다.
   const [fontsLoaded, fontError] = useFonts({

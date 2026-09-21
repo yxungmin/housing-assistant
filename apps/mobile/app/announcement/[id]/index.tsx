@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View } from "react-native";
 import { haversineKm, matchAnnouncement, type RuleResult } from "@housing/engine";
@@ -9,6 +9,7 @@ import { BottomCTA, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, 
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements } from "@/data/announcements";
 import { inputSummary, ruleTitle } from "@/lib/conditions";
 import { daysUntil, dday, HOUSING_LABEL, longDate, shortDate } from "@/lib/format";
+import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { hasSource, openSource } from "@/lib/source";
 import { canOpenCost, useAppState } from "@/store/appState";
@@ -20,10 +21,12 @@ export default function AnnouncementDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { colors } = useTheme();
-  const { state, toggleSaved, addReport } = useAppState();
+  const { state, toggleSaved, addReport, seeChange } = useAppState();
   const { list } = useAnnouncements();
   const a = getAnnouncement(id ?? "", list);
   const [sheet, setSheet] = useState(false);
+  // 들어올 때 한 번만 집는다. 본 것으로 표시해도 이 화면에서는 계속 보이게 하려고.
+  const [change] = useState(() => unseenChange(state.changes, id ?? ""));
   const [report, setReport] = useState<{ target: ReportTarget; sourceText?: string } | null>(null);
   // 닫히는 동안에도 내용이 보여야 시트가 빈 채로 내려가지 않는다
   const lastReport = useRef<{ target: ReportTarget; sourceText?: string } | null>(null);
@@ -36,6 +39,10 @@ export default function AnnouncementDetail() {
   // 가격이 아예 없는 공고를 "분양"이라고 하면 사실이 아니다. 두 경우를 나눠 말한다.
   const hasAnyPricing = !!a?.extraction.tracks.some((t) => t.pricing.length > 0);
   const saved = !!a && state.saved.includes(a.id);
+
+  useEffect(() => {
+    if (change) seeChange(change.announcementId);
+  }, [change, seeChange]);
 
   if (!a) {
     return (
@@ -81,6 +88,12 @@ export default function AnnouncementDetail() {
           <T variant="title" style={{ fontSize: 26, lineHeight: 34 }}>{a.title}</T>
           <Sub variant="body">{a.address ?? a.region_name}{households ? ` · 총 ${households.toLocaleString("ko-KR")}세대` : ""}</Sub>
         </View>
+
+        {change ? (
+          <Notice tone="info" icon="bell">
+            {longDate(change.at.slice(0, 10))}에 바뀌었어요 — {change.changes.map((c) => c.text).join(" · ")}
+          </Notice>
+        ) : null}
 
         {!isReadable(a) ? (
           <Notice tone="warn" icon="alert">공고 조건을 분석하고 있어요. 다 읽으면 조건 일치와 비용 계산이 열립니다.</Notice>
