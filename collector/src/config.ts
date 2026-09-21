@@ -16,6 +16,8 @@ const Env = z.object({
   KAKAO_REST_API_KEY: z.string().optional(),
   /** 국토교통부 실거래가 (공공데이터포털). LH 키와 같은 계정 키지만 서비스마다 활용신청이 필요하다 */
   MOLIT_API_KEY: z.string().optional(),
+  /** 마이홈포털 예비입주자 대기현황 (공공데이터포털) */
+  MYHOME_API_KEY: z.string().optional(),
   /** 추출 모델. 벤치마크로 바꿔가며 비교한다. */
   EXTRACTION_MODEL: z.string().default("claude-opus-5"),
   /**

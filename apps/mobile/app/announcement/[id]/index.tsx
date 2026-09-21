@@ -204,6 +204,34 @@ export default function AnnouncementDetail() {
         ) : null}
 
 
+        {/* 조건이 맞고 돈이 되면 마지막 질문이 "그래서 순번이 오나"다.
+            단정하지 않는다 — 지금 몇 명이 기다리는지라는 사실만 적고 기준일과 출처를 단다. */}
+        {a.waiting && a.waiting.total_waiting > 0 ? (
+          <View style={{ gap: 12 }}>
+            <SectionTitle>대기 현황</SectionTitle>
+            <Card style={{ gap: 14 }}>
+              <KeyValue
+                label={a.waiting.complex}
+                value={`대기 ${a.waiting.total_waiting.toLocaleString("ko-KR")}명`}
+                src={a.waiting.households ? `총 ${a.waiting.households.toLocaleString("ko-KR")}세대` : undefined}
+                strong
+              />
+              {a.waiting.rows.slice(0, 4).map((r, i) => (
+                <KeyValue
+                  key={`${r.unit_type ?? i}`}
+                  label={r.unit_type ? `${r.unit_type}형` : "주택형 미상"}
+                  value={`${r.waiting.toLocaleString("ko-KR")}명`}
+                  src={r.terminated ? `최근 해지 ${r.terminated}건` : undefined}
+                />
+              ))}
+              <Sub tone="3" variant="caption">
+                {a.waiting.as_of ? `${dateText(a.waiting.as_of)} 기준 · ` : ""}
+                {a.waiting.source}. 이 공고의 경쟁률이 아니라 같은 단지에서 지금 기다리는 사람 수예요.
+              </Sub>
+            </Card>
+          </View>
+        ) : null}
+
         <View style={{ gap: 12 }}>
           <SectionTitle>일정</SectionTitle>
           <Card style={{ gap: 14 }}>

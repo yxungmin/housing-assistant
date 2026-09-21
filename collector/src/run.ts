@@ -14,6 +14,7 @@ import { loadEnv, requireEnv } from "./config";
 import { Repo } from "./db/supabase";
 import { geocodeAddress } from "./geo/kakao";
 import { isUsable, RentClient } from "./market/rent";
+import { WaitClient } from "./wait/myhome";
 import { LhClient } from "./lh/api";
 import { extractFromText } from "./llm/extract";
 import { extractPdfText, ocrFallback } from "./pdf/extract";
@@ -125,6 +126,12 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
             .catch(() => null)
         : null;
     if (market) log(`  주변 시세: ${market.deals}건 (전용 ${market.area_from}~${market.area_to}㎡, ${market.from}~${market.to})`);
+
+    // 예비입주자 대기현황: 단지명이 공고 제목·주소에 들어 있을 때만 맞춘다. 못 맞추면 없는 채로 둔다.
+    const waiting = env.MYHOME_API_KEY
+      ? await new WaitClient(env.MYHOME_API_KEY).forAnnouncement(notice.region_code, notice.title, address).catch(() => null)
+      : null;
+    if (waiting) log(`  대기현황: ${waiting.complex} 대기 ${waiting.total_waiting}명 (${waiting.as_of ?? "기준일 미상"})`);
     await repo.upsertAnnouncement({
       provider: notice.provider,
       lh_id: notice.external_id,
@@ -141,6 +148,7 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       transit: geo?.transit,
       nearby: geo?.nearby,
       market: market ?? undefined,
+      waiting: waiting ?? undefined,
     });
   }
   log(`  v${version} ${status}${blocking.length ? `: ${blocking.join(" / ")}` : ""}`);

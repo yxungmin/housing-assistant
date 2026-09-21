@@ -32,6 +32,7 @@ interface FeedRow {
   transit: Transit | null;
   nearby: Nearby[] | null;
   market: Announcement["market"] | null;
+  waiting: Announcement["waiting"] | null;
   extraction: unknown | null;
 }
 
@@ -73,6 +74,7 @@ export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch):
       transit: r.transit ?? undefined,
       nearby: r.nearby ?? undefined,
       market: r.market ?? undefined,
+      waiting: r.waiting ?? undefined,
       extraction,
     });
   }

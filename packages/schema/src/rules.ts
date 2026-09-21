@@ -261,6 +261,20 @@ export const Announcement = z.object({
       source: z.string(),
     })
     .optional(),
+  /**
+   * 같은 단지의 예비입주자 대기현황. "조건은 맞는데 붙을까"에 답하는 값이다.
+   * 단지명이 공고 제목과 정확히 같지 않아 못 맞출 때가 많고, 그때는 없는 채로 둔다.
+   */
+  waiting: z
+    .object({
+      complex: z.string(),
+      households: z.number().optional(),
+      rows: z.array(z.object({ unit_type: z.string().optional(), waiting: z.number(), terminated: z.number().optional() })),
+      total_waiting: z.number(),
+      as_of: z.string().optional(),
+      source: z.string(),
+    })
+    .optional(),
   updated_at: z.string(),
 });
 export type Announcement = z.infer<typeof Announcement>;

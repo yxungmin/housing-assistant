@@ -21,6 +21,15 @@ export interface MarketRent {
   source: string;
 }
 
+export interface WaitStatus {
+  complex: string;
+  households?: number;
+  rows: { unit_type?: string; waiting: number; terminated?: number }[];
+  total_waiting: number;
+  as_of?: string;
+  source: string;
+}
+
 export interface Announcement {
   id: string;
   lh_id: string;
@@ -47,6 +56,8 @@ export interface Announcement {
   nearby?: Nearby[];
   /** 같은 법정동 최근 전월세 실거래 요약. 표본이 적으면 없다 */
   market?: MarketRent;
+  /** 같은 단지 예비입주자 대기현황. 단지를 못 맞추면 없다 */
+  waiting?: WaitStatus;
   /** 기관 사이트의 원문 공고문. 근거로 적은 쪽수를 실제로 열 수 있게 한다 */
   pdf_url?: string;
   extraction: ExtractionOutput;

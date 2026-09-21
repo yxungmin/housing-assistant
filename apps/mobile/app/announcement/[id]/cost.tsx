@@ -192,7 +192,7 @@ export default function Cost() {
                 <KeyValue label="주변 월세 중앙값" value={`보증금 ${manwon(a.market.monthly_deposit_median)} / 월 ${won(a.market.monthly_rent_median)}`} />
               ) : null}
               <Sub tone="3" variant="caption">
-                {a.market.from}~{a.market.to} {a.market.source}. 공공임대와 민간 전월세는 조건이 달라 그대로 견주기 어려워요.
+                {a.market.from.replace("-", ".")}~{a.market.to.replace("-", ".")} {a.market.source}. 공공임대와 민간 전월세는 조건이 달라 그대로 견주기 어려워요.
               </Sub>
             </Card>
           </View>
