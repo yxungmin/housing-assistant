@@ -10,7 +10,12 @@
  */
 import type { EligibilityRule, ExtractionOutput, Pricing, SupplyTrack } from "@housing/schema";
 
-/** 모델별 100만 토큰당 단가 (USD). 실제 청구액과 다를 수 있으니 콘솔 사용량으로 확인한다. */
+/**
+ * 100만 토큰당 USD. 2026-09-21 실제 청구액으로 확인했다 —
+ * 9/20 사용량(Opus 1.27M/0.50M, Sonnet 0.29M/0.14M, Haiku 0.51M/0.10M)의 청구액이 $21.62였고
+ * 이 표로 계산하면 $22.58이다. 차이 4%는 캐시 토큰 배수(쓰기 1.25× · 읽기 0.1×) 가정 때문이고,
+ * 한때 의심했던 $15/$75였다면 $67.74가 나왔어야 한다. 이 표가 맞다.
+ */
 export const MODEL_PRICES: Record<string, { input: number; output: number }> = {
   "claude-opus-5": { input: 5, output: 25 },
   "claude-sonnet-5": { input: 3, output: 15 },
