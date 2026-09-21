@@ -275,6 +275,14 @@ export const Announcement = z.object({
       source: z.string(),
     })
     .optional(),
+  /**
+   * 시군구 대표 좌표에서 이 단지까지의 대중교통 통근 시간. 키는 "서울 마포구" 형식.
+   *
+   * 사용자마다 부르지 않고 수집할 때 미리 계산한다. 그래야 두 가지가 된다:
+   *  - 호출이 사용자 수에 비례하지 않는다 (공고 1건당 시군구 수만큼, 새 공고에서 한 번)
+   *  - 직장 위치가 서버로 나가지 않는다. 앱은 표에서 찾아보기만 한다.
+   */
+  commute: z.record(z.string(), z.object({ minutes: z.number(), transfers: z.number() })).optional(),
   updated_at: z.string(),
 });
 export type Announcement = z.infer<typeof Announcement>;

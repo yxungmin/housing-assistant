@@ -3,7 +3,8 @@
  *
  * 우리가 실제로 가진 건 둘뿐이다 — 공고지 좌표와, 그 좌표에서 가장 가까운 지하철역·버스정류장까지의
  * 거리(수집 시 Kakao Local, `collector/src/geo/kakao.ts`). 경로·환승·문 앞에서 문 앞까지 걸리는 시간은
- * 교통 API를 붙여야 나온다. 그래서 문구도 거기까지만 말한다 — "약 40분"처럼 없는 값을 지어내지 않는다.
+ * 교통 API를 붙여야 나온다. 수집할 때 시군구 대표 좌표에서 미리 계산해 둔 값이 있으면(`Announcement.commute`)
+ * 시간으로 말하고, 없으면 직선거리로 되돌아간다 — "약 40분"처럼 없는 값을 지어내지 않는다.
  *
  * 걷는 시간은 거리에서 환산한 값이라(4km/h) "약"을 뗄 수 없다. 화면도 "약 7분"으로 쓴다.
  */
@@ -17,25 +18,58 @@ export interface CommuteLine {
   /** 직장 라벨 ("서울 강남구") */
   where?: string;
   km: number;
+  /** 미리 계산해 둔 대중교통 소요 (분). 없으면 거리만 말한다 */
+  minutes?: number;
+  transfers?: number;
+}
+
+/** 미리 계산한 표에서 이 직장 라벨의 값을 찾는다 */
+export const commuteFor = (
+  commute: Record<string, { minutes: number; transfers: number }> | undefined,
+  label: string | undefined,
+): { minutes: number; transfers: number } | undefined => (commute && label ? commute[label] : undefined);
+
+/** "약 42분 · 환승 1회" / "약 21분" */
+export function commuteDetail(line: CommuteLine): string {
+  if (line.minutes === undefined) return `직선 약 ${line.km < 10 ? line.km.toFixed(1) : line.km.toFixed(0)}km`;
+  const transfer = line.transfers ? ` · 환승 ${line.transfers}회` : "";
+  return `대중교통 약 ${line.minutes}분${transfer}`;
 }
 
 export function commuteLines(
   profile: UserProfile | null | undefined,
   distanceKm: number | null,
   distancePartnerKm: number | null,
+  commute?: Record<string, { minutes: number; transfers: number }>,
 ): CommuteLine[] {
   const out: CommuteLine[] = [];
   const couple = distancePartnerKm !== null;
-  if (distanceKm !== null) out.push({ who: couple ? "내 직장" : "직장", where: profile?.workplace?.label, km: distanceKm });
+  if (distanceKm !== null) {
+    out.push({ who: couple ? "내 직장" : "직장", where: profile?.workplace?.label, km: distanceKm, ...commuteFor(commute, profile?.workplace?.label) });
+  }
   if (distancePartnerKm !== null) {
     const who = profile?.marriage === "pre_marriage" ? "예비 배우자 직장" : "배우자 직장";
-    out.push({ who, where: profile?.workplace_partner?.label, km: distancePartnerKm });
+    out.push({ who, where: profile?.workplace_partner?.label, km: distancePartnerKm, ...commuteFor(commute, profile?.workplace_partner?.label) });
   }
   return out;
 }
 
-/** 목록 한 줄에 쓰는 짧은 꼴. "직장 12km" / "직장 12km · 배우자 8km" */
-export function commuteShort(distanceKm: number | null, distancePartnerKm: number | null): string | null {
+/**
+ * 목록 한 줄에 쓰는 짧은 꼴. 시간을 알면 시간으로 말한다 ("직장 42분") —
+ * 거리보다 시간이 사람이 실제로 쓰는 기준이다. 모르면 거리로 돌아간다 ("직장 12km").
+ */
+export function commuteShort(
+  distanceKm: number | null,
+  distancePartnerKm: number | null,
+  mine?: { minutes: number },
+  partner?: { minutes: number },
+): string | null {
+  if (mine || partner) {
+    const parts: string[] = [];
+    if (mine) parts.push(`직장 ${mine.minutes}분`);
+    if (partner) parts.push(`${mine ? "배우자" : "배우자 직장"} ${partner.minutes}분`);
+    if (parts.length) return parts.join(" · ");
+  }
   const km = (v: number) => `${v < 10 ? v.toFixed(1) : v.toFixed(0)}km`;
   if (distanceKm === null && distancePartnerKm === null) return null;
   if (distancePartnerKm === null) return `직장 ${km(distanceKm!)}`;

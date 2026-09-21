@@ -12,7 +12,7 @@ import { inputSummary, ruleTitle } from "@/lib/conditions";
 import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
-import { commuteLines, mapUrl, openMap, transitLines } from "@/lib/commute";
+import { commuteDetail, commuteFor, commuteLines, mapUrl, openMap, transitLines } from "@/lib/commute";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { space } from "@/theme/tokens";
@@ -36,6 +36,8 @@ export default function AnnouncementDetail() {
   if (report) lastReport.current = report;
   const to = (w: { lat: number; lng: number } | undefined) =>
     a && w && a.lat !== undefined && a.lng !== undefined ? haversineKm(w, { lat: a.lat, lng: a.lng }) : null;
+  // 미리 계산해 둔 통근 시간이 이 사람 시군구에 있는가. 있으면 문구가 달라진다.
+  const hasCommuteTime = !!commuteFor(a?.commute, state.profile?.workplace?.label) || !!commuteFor(a?.commute, state.profile?.workplace_partner?.label);
   const distanceKm = to(state.profile?.workplace);
   const distancePartnerKm = to(state.profile?.workplace_partner);
 
@@ -175,19 +177,21 @@ export default function AnnouncementDetail() {
               ))}
 
               {/* 통근은 두 사람 몫이 따로다. 부부는 한 쪽만 가까운 집을 고를 수 없다. */}
-              {commuteLines(state.profile, distanceKm, distancePartnerKm).map((c) => (
+              {commuteLines(state.profile, distanceKm, distancePartnerKm, a.commute).map((c) => (
                 <Row
                   key={c.who}
                   icon="walk"
                   tone="primary"
-                  title={`${c.who}까지 직선 약 ${c.km < 10 ? c.km.toFixed(1) : c.km.toFixed(0)}km`}
-                  detail={c.where ?? "직장 위치"}
+                  title={`${c.who}까지 ${commuteDetail(c)}`}
+                  detail={c.where ? `${c.where} 기준` : "직장 위치"}
                 />
               ))}
 
-              {/* 있는 것만 말한다 — 경로·환승·소요 시간은 교통 API를 붙여야 나온다 */}
+              {/* 있는 것만 말한다. 통근 시간이 있으면 그렇게 말하고, 없으면 직선거리까지만 말한다 */}
               <Sub tone="3" variant="caption">
-                모두 직선거리예요. 걷는 시간은 4km/h로 환산한 값이고, 실제 통근 시간(환승·배차)은 아직 계산하지 않아요.
+                {hasCommuteTime
+                  ? "통근 시간은 시군구 중심에서 출발한 대중교통 경로 기준이고, 역·정류장까지 걷는 시간은 4km/h로 환산한 값이에요."
+                  : "모두 직선거리예요. 걷는 시간은 4km/h로 환산한 값이고, 실제 통근 시간(환승·배차)은 아직 계산하지 않아요."}
                 {state.profile?.workplace ? "" : " 직장 위치를 넣으면 거리가 보여요."}
               </Sub>
             </Card>

@@ -18,6 +18,8 @@ const Env = z.object({
   MOLIT_API_KEY: z.string().optional(),
   /** 마이홈포털 예비입주자 대기현황 (공공데이터포털) */
   MYHOME_API_KEY: z.string().optional(),
+  /** 서울시 대중교통 환승경로 (공공데이터포털). 통근 시간 계산용 */
+  TRANSIT_API_KEY: z.string().optional(),
   /** 추출 모델. 벤치마크로 바꿔가며 비교한다. */
   EXTRACTION_MODEL: z.string().default("claude-opus-5"),
   /**

@@ -71,6 +71,7 @@ export class Repo {
     transit?: Record<string, unknown>;
     market?: object;
     waiting?: object;
+    commute?: object;
     nearby?: Record<string, unknown>[];
   }): Promise<string> {
     const { data, error } = await this.sb

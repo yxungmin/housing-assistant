@@ -14,6 +14,7 @@ import { loadEnv, requireEnv } from "./config";
 import { Repo } from "./db/supabase";
 import { geocodeAddress } from "./geo/kakao";
 import { isUsable, RentClient } from "./market/rent";
+import { commuteTable } from "./transit/table";
 import { WaitClient } from "./wait/myhome";
 import { LhClient } from "./lh/api";
 import { extractFromText } from "./llm/extract";
@@ -132,6 +133,12 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       ? await new WaitClient(env.MYHOME_API_KEY).forAnnouncement(notice.region_code, notice.title, address).catch(() => null)
       : null;
     if (waiting) log(`  대기현황: ${waiting.complex} 대기 ${waiting.total_waiting}명 (${waiting.as_of ?? "기준일 미상"})`);
+
+    // 통근 시간: 수집 대상 시도의 시군구 대표 좌표에서 이 단지까지 미리 계산한다.
+    // 사용자마다 부르면 호출이 사용자 수에 비례하고 직장 위치도 서버로 나가야 한다.
+    const commute =
+      geo && env.TRANSIT_API_KEY ? await commuteTable({ lat: geo.lat, lng: geo.lng }, regions, env.TRANSIT_API_KEY) : undefined;
+    if (commute) log(`  통근 시간: 시군구 ${Object.keys(commute).length}곳에서 계산`);
     await repo.upsertAnnouncement({
       provider: notice.provider,
       lh_id: notice.external_id,
@@ -149,6 +156,7 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       nearby: geo?.nearby,
       market: market ?? undefined,
       waiting: waiting ?? undefined,
+      commute,
     });
   }
   log(`  v${version} ${status}${blocking.length ? `: ${blocking.join(" / ")}` : ""}`);

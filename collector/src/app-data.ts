@@ -30,6 +30,7 @@ interface Meta {
   nearby?: { kind: string; name: string; distance_m: number }[];
   market?: Record<string, unknown>;
   waiting?: Record<string, unknown>;
+  commute?: Record<string, { minutes: number; transfers: number }>;
 }
 
 /** 초기 벤치마크 PDF(001~004)는 API 메타 없이 받았으므로 손으로 채운 값. 접수일은 시안 기준일(2026-09-20) 근처. */

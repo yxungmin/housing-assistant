@@ -6,7 +6,7 @@ import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Screen, S
 import { commuteKm, getAnnouncement, isReadable, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { REGIONS } from "@/lib/onboarding";
-import { commuteShort, splitStation } from "@/lib/commute";
+import { commuteFor, commuteShort, splitStation } from "@/lib/commute";
 import { isUnseen, unseenCount } from "@/lib/unseen";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -156,7 +156,12 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
           : { tone: "danger" as const, icon: "x" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` };
   // 직장을 넣었으면 통근이 먼저, 아니면 가장 가까운 역, 그것도 없으면 지역명
   const place =
-    commuteShort(m.distanceKm, m.distancePartnerKm) ??
+    commuteShort(
+      m.distanceKm,
+      m.distancePartnerKm,
+      commuteFor(a.commute, state.profile?.workplace?.label),
+      commuteFor(a.commute, state.profile?.workplace_partner?.label),
+    ) ??
     (a.transit?.nearest_station ? `${splitStation(a.transit.nearest_station).station} 도보 약 ${a.transit.station_walk_min}분` : a.region_name);
 
   return (

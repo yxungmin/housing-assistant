@@ -58,6 +58,8 @@ export interface Announcement {
   market?: MarketRent;
   /** 같은 단지 예비입주자 대기현황. 단지를 못 맞추면 없다 */
   waiting?: WaitStatus;
+  /** 시군구 대표 좌표에서 여기까지 대중교통 소요. 키는 "서울 마포구" */
+  commute?: Record<string, { minutes: number; transfers: number }>;
   /** 기관 사이트의 원문 공고문. 근거로 적은 쪽수를 실제로 열 수 있게 한다 */
   pdf_url?: string;
   extraction: ExtractionOutput;
