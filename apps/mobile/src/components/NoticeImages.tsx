@@ -27,7 +27,7 @@ import { radius, space } from "@/theme/tokens";
 export function NoticeImages({ images }: { images?: NoticeImage[] }) {
   const { colors } = useTheme();
   const [broken, setBroken] = useState<string[]>([]);
-  const [open, setOpen] = useState<NoticeImage | null>(null);
+  const [openAt, setOpenAt] = useState<number | null>(null);
   const shown = (images ?? []).filter((i) => !broken.includes(i.url));
   const kinds = [...new Set(shown.map((i) => i.kind).filter(Boolean))].join(" · ");
   if (shown.length === 0) return null;
@@ -43,10 +43,10 @@ export function NoticeImages({ images }: { images?: NoticeImage[] }) {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: space.md, paddingHorizontal: space.lg }}
         >
-          {shown.map((img) => (
+          {shown.map((img, i) => (
             <Pressable
               key={img.url}
-              onPress={() => setOpen(img)}
+              onPress={() => setOpenAt(i)}
               accessibilityRole="button"
               accessibilityLabel={`${img.kind} 크게 보기`}
               style={{ width: 240, gap: 8 }}
@@ -68,7 +68,7 @@ export function NoticeImages({ images }: { images?: NoticeImage[] }) {
           기관이 공고에 올린 이미지예요. 눌러서 크게 볼 수 있어요.
         </Sub>
       </Card>
-      <ImageViewer url={open?.url ?? null} label={open?.kind} onClose={() => setOpen(null)} />
+      <ImageViewer images={shown} index={openAt} onClose={() => setOpenAt(null)} />
     </View>
   );
 }

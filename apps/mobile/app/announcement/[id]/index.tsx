@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import Constants from "expo-constants";
 import { Pressable, View } from "react-native";
 import { haversineKm, matchAnnouncement, type RuleResult } from "@housing/engine";
 import { Icon, type IconName } from "@/components/icon";
@@ -7,7 +8,7 @@ import { ReportSheet } from "@/components/ReportSheet";
 import { NoticeImages } from "@/components/NoticeImages";
 import { SourceCard } from "@/components/SourceCard";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
-import { BottomCTA, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
 import { userFacingNotes } from "@/lib/notes";
@@ -15,7 +16,8 @@ import { isScattered, unitLabel, unitSpec, unitsWithDistance } from "@/lib/units
 import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
-import { commuteDetail, commuteFor, commuteLines, mapUrl, nearbyLines, openMap, transitLines } from "@/lib/commute";
+import { commuteDetail, commuteFor, commuteLines, mapPlace, nearbyLines, openMapTarget, transitLines } from "@/lib/commute";
+import { mapTargets } from "@/lib/maps";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, space } from "@/theme/tokens";
@@ -34,6 +36,10 @@ export default function AnnouncementDetail() {
   const incoming = unseenChange(state.changes, id ?? "");
   const [change, setChange] = useState(incoming);
   const [report, setReport] = useState<{ target: ReportTarget; sourceText?: string } | null>(null);
+  const [mapOpen, setMapOpen] = useState(false);
+  // 네이버 지도는 호출한 앱의 식별자를 요구한다 (없으면 앱만 열리고 아무 일도 안 한다)
+  const APP_ID = Constants.expoConfig?.ios?.bundleIdentifier ?? "com.yxungmin.housingassistant";
+  const place = a ? mapPlace(a) : null;
   // 닫히는 동안에도 내용이 보여야 시트가 빈 채로 내려가지 않는다
   const lastReport = useRef<{ target: ReportTarget; sourceText?: string } | null>(null);
   if (report) lastReport.current = report;
@@ -235,8 +241,8 @@ export default function AnnouncementDetail() {
           <View style={{ gap: 12 }}>
             <SectionTitle>위치와 교통</SectionTitle>
             <Card style={{ gap: 16 }}>
-              {mapUrl(a) ? (
-                <Row icon="map-pin" tone="info" title={a.address ?? a.region_name} detail="지도 앱에서 열기" onPress={() => void openMap(a)} chevron />
+              {place ? (
+                <Row icon="map-pin" tone="info" title={a.address ?? a.region_name} detail="지도에서 보기" onPress={() => setMapOpen(true)} chevron />
               ) : null}
 
               {transitLines(a.transit).map((t) => (
@@ -360,6 +366,28 @@ export default function AnnouncementDetail() {
           {a.status === "VERIFIED" ? " 이 공고의 조건은 사람이 공고문과 대조했어요." : ""} 숫자가 이상하면 그 줄을 눌러 알려 주세요.
         </Sub>
       </View>
+
+      {/* 한국 사용자는 시세·학군까지 그쪽 앱에서 본다. 좌표만 정확히 넘겨 주고 나머지는 맡긴다. */}
+      <BottomSheet visible={mapOpen} onClose={() => setMapOpen(false)}>
+        <View style={{ gap: 6 }}>
+          <T variant="title" style={{ fontSize: 20, lineHeight: 28 }}>지도에서 보기</T>
+          <Sub tone="3" variant="caption">{a.address ?? a.region_name}</Sub>
+        </View>
+        <View style={{ gap: 8 }}>
+          {(place ? mapTargets(place, APP_ID) : []).map((t) => (
+            <PrimaryButton
+              key={t.id}
+              tone="soft"
+              label={t.label}
+              onPress={() => {
+                setMapOpen(false);
+                void openMapTarget(t);
+              }}
+            />
+          ))}
+        </View>
+        <Sub tone="3" variant="caption">앱이 없으면 웹 지도로 열려요.</Sub>
+      </BottomSheet>
 
       <SubscriptionSheet visible={sheet} onClose={() => setSheet(false)} onStarted={() => router.push(`/announcement/${a.id}/cost`)} />
       <ReportSheet

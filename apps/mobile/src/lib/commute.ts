@@ -11,6 +11,7 @@
 import { Linking, Platform } from "react-native";
 import type { Announcement, Nearby, Transit } from "@/data/announcements";
 import type { UserProfile } from "@housing/schema";
+import type { MapPlace, MapTarget } from "./maps";
 
 /** 한 사람 몫의 통근 표시. 부부는 두 줄이 된다. */
 export interface CommuteLine {
@@ -167,6 +168,36 @@ export async function openMap(a: Pick<Announcement, "lat" | "lng" | "title" | "a
   if (!url) return false;
   try {
     await Linking.openURL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** 공고의 좌표·이름을 지도에 넘길 꼴로. 이름은 주소가 있으면 주소를 쓴다 — 단지명만으로는 다른 곳이 잡힌다. */
+export function mapPlace(a: Pick<Announcement, "lat" | "lng" | "title" | "address">): MapPlace | null {
+  if (a.lat === undefined || a.lng === undefined) return null;
+  return { lat: a.lat, lng: a.lng, name: a.address || a.title };
+}
+
+/**
+ * 고른 지도 앱으로 연다. 앱이 없으면 웹으로 떨어진다.
+ * iOS의 `canOpenURL`은 Info.plist의 `LSApplicationQueriesSchemes`에 적힌 스킴만 true를 주므로
+ * app.json에 kakaomap·nmap을 등록해 두었다. 빠지면 앱이 깔려 있어도 늘 웹으로 간다.
+ */
+export async function openMapTarget(t: MapTarget): Promise<boolean> {
+  if (t.appUrl) {
+    try {
+      if (await Linking.canOpenURL(t.appUrl)) {
+        await Linking.openURL(t.appUrl);
+        return true;
+      }
+    } catch {
+      // 앱이 없거나 스킴이 등록되지 않았다 — 웹으로 간다
+    }
+  }
+  try {
+    await Linking.openURL(t.webUrl);
     return true;
   } catch {
     return false;
