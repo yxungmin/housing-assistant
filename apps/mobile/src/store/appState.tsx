@@ -218,6 +218,11 @@ interface Ctx {
    * 실제로 실패하면 던진다 — 호출부가 `signInErrorText`로 옮겨 보여 준다.
    */
   signIn: (provider: AuthProvider) => Promise<boolean>;
+  /**
+   * 개발 빌드 전용 우회. 제공자를 아직 안 켠 동안에도 게이트 뒤를 볼 수 있어야 한다.
+   * 배포 빌드에서는 아무 일도 하지 않는다 — 여기가 유료선이라 실수로 열리면 제품이 없어진다.
+   */
+  devSignIn: () => Promise<void>;
   signOut: () => Promise<void>;
   toggleSaved: (id: string) => void;
   toggleApplied: (id: string) => void;
@@ -350,6 +355,13 @@ export function AppStateProvider({ children }: PropsWithChildren) {
           dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
         }
         return true;
+      },
+      devSignIn: async () => {
+        if (!__DEV__) return;
+        dispatch({ type: "signIn", account: { id: `dev-${Date.now()}`, provider: "kakao", signedInAt: new Date().toISOString() } });
+        if (canUseFirstMonthFree(state.subscription)) {
+          dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
+        }
       },
       // 토큰부터 지우고 상태를 바꾼다. 순서가 뒤집히면 화면은 로그아웃인데 키체인에 토큰이 남는다.
       signOut: async () => {

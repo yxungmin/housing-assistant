@@ -17,7 +17,7 @@ import { BottomSheet, Sub, T } from "./ui";
  * 사용자가 창을 닫은 것은 실패가 아니다 (`signInErrorText`가 null을 준다) — 아무 말도 하지 않는다.
  */
 export function SignInButtons({ onDone }: { onDone?: () => void }) {
-  const { signIn } = useAppState();
+  const { signIn, devSignIn } = useAppState();
   const [busy, setBusy] = useState<AuthProvider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,6 +42,17 @@ export function SignInButtons({ onDone }: { onDone?: () => void }) {
       ))}
       {error ? (
         <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>{error}</Sub>
+      ) : null}
+      {/* 개발 빌드에서만. 제공자를 아직 안 켠 동안에도 게이트 뒤를 확인할 수 있어야 한다.
+          __DEV__는 배포 빌드에서 false라 이 줄은 번들에서 사라진다. */}
+      {__DEV__ ? (
+        <Pressable
+          onPress={() => void devSignIn().then(() => onDone?.())}
+          accessibilityRole="button"
+          style={{ paddingVertical: 12, alignItems: "center" }}
+        >
+          <Sub tone="3" variant="caption">개발용: 로그인 없이 보기</Sub>
+        </Pressable>
       ) : null}
     </View>
   );
