@@ -229,7 +229,11 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
   return (
     <Card onPress={onPress} style={{ gap: 12 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-        <Sub tone="3" variant="caption" lines={1} style={{ flex: 1 }}>{HOUSING_LABEL[a.housing_type]}{unitLabel ? ` · ${unitLabel}` : ""}</Sub>
+        <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 6 }}>
+          {/* 기관을 먼저 보여 준다 — 같은 조건이라도 신청처와 절차가 다르다 */}
+          {a.provider ? <Tag tone="gray">{a.provider}</Tag> : null}
+          <Sub tone="3" variant="caption" lines={1} style={{ flex: 1 }}>{HOUSING_LABEL[a.housing_type]}{unitLabel ? ` · ${unitLabel}` : ""}</Sub>
+        </View>
         {days !== null ? <T variant="label" color={days <= 14 ? colors.danger : colors.text3} style={{ fontFamily: fonts.bold, flexShrink: 0 }}>{dday(a.apply_end)}</T> : null}
       </View>
       <View style={{ gap: 4 }}>

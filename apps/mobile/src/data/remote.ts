@@ -17,6 +17,7 @@ export const remoteConfigured = !!URL && !!KEY;
 interface FeedRow {
   id: string;
   lh_id: string;
+  provider: string | null;
   title: string;
   housing_type: HousingType;
   region_code: string;
@@ -62,6 +63,7 @@ export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch):
     out.push({
       id: r.id,
       lh_id: r.lh_id,
+      provider: (r.provider as Announcement["provider"]) ?? undefined,
       title: r.title,
       housing_type: r.housing_type,
       region_code: r.region_code,

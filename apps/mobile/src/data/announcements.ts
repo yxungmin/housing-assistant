@@ -33,9 +33,14 @@ export interface WaitStatus {
   source: string;
 }
 
+/** 공급기관. 같은 조건이라도 신청처·절차가 달라서 목록에서부터 구분이 되어야 한다. */
+export type Provider = "LH" | "SH" | "GH" | "HUG" | "기타";
+
 export interface Announcement {
   id: string;
   lh_id: string;
+  /** 어느 기관 공고인가. 뷰(app_announcements)와 번들 데이터 모두 내려 준다 */
+  provider?: Provider;
   title: string;
   housing_type: HousingType;
   region_code: string;

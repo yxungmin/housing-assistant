@@ -138,7 +138,9 @@ export default function AnnouncementDetail() {
     >
       <View style={{ paddingHorizontal: space.screen, gap: space.section }}>
         <View style={{ gap: 12, paddingTop: 4 }}>
-          <View style={{ flexDirection: "row", gap: 6 }}>
+          <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
+            {/* 기관이 먼저다 — 신청처와 절차가 기관마다 다르다 */}
+            {a.provider ? <Tag tone="info">{a.provider}</Tag> : null}
             <Tag tone="gray">{HOUSING_LABEL[a.housing_type]}</Tag>
             {days !== null ? <Tag tone={days <= 14 ? "danger" : "gray"}>{dday(a.apply_end)}</Tag> : null}
           </View>
