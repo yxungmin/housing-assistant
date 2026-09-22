@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
-import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchAnnouncement } from "@housing/engine";
+import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchAnnouncement, shortfallPlans } from "@housing/engine";
 import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SourceCard } from "@/components/SourceCard";
@@ -195,6 +195,18 @@ export default function Cost() {
     return { ...chosen.pricing, deposit: s.deposit, monthly_rent: s.monthly_rent };
   }, [chosen, deposit]);
   const cost = useMemo(() => (scenarioPricing && profile ? computeRentalCost(scenarioPricing, LOANS, profile, { preferredLoanId: loanId }) : null), [scenarioPricing, profile, loanId]);
+  // 부족액을 더 빌렸을 때의 월 부담. 잠겨 있으면 계산하지 않는다 (유료 화면의 값이다).
+  const plans = useMemo(
+    () =>
+      cost && !locked
+        ? shortfallPlans({
+            shortfall: cost.shortfall,
+            monthlyHousingCost: cost.monthly_housing_cost,
+            monthlyIncome: profile?.monthly_income,
+          })
+        : [],
+    [cost, locked, profile?.monthly_income],
+  );
   const loans = useMemo(() => (profile && scenarioPricing ? eligibleLoans(LOANS, profile).map((l) => loanLimit(l, scenarioPricing.deposit ?? 0, profile)) : []), [profile, scenarioPricing]);
 
   useEffect(() => {
@@ -295,6 +307,39 @@ export default function Cost() {
               )}
             </View>
           </Card>
+
+          {/* 부족액을 더 빌리면 월에 얼마가 되는지. 상품을 권하지 않고 계산만 보여 준다 —
+              공공임대 대상은 소득·자산 기준에 걸린 사람들이라, 권하는 순간 감당 못 할 위험이
+              가장 큰 쪽에 가장 비싼 돈을 밀어 넣는 일이 된다. 판단은 사람이 한다. */}
+          {!locked && plans.length > 0 ? (
+            <Card style={{ gap: 12 }}>
+              <View style={{ gap: 4 }}>
+                <T variant="bodyMedium">{manwon(cost.shortfall)}을 더 빌리면</T>
+                <Sub tone="3" variant="caption">월 부담이 이렇게 돼요. 연 금리별로 원리금균등 5년 기준이에요.</Sub>
+              </View>
+              <View style={{ gap: 10 }}>
+                {plans.map((p) => (
+                  <View key={p.annual_rate} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                    <T variant="label" color={colors.text3} style={{ width: 52 }}>연 {(p.annual_rate * 100).toFixed(0)}%</T>
+                    <View style={{ flex: 1, gap: 1 }}>
+                      <T variant="bodyMedium" style={{ fontSize: 15 }}>
+                        월 {manwon(p.monthly_total)}
+                        <T variant="caption" color={colors.text3}>{"  "}(+{manwon(p.monthly_payment)})</T>
+                      </T>
+                      {p.income_ratio !== null ? (
+                        <Sub tone="3" variant="caption">소득의 {Math.round(p.income_ratio * 100)}%</Sub>
+                      ) : null}
+                    </View>
+                    {p.heavy ? <Tag tone="warn">부담 큼</Tag> : null}
+                  </View>
+                ))}
+              </View>
+              <Sub tone="3" variant="caption">
+                월 주거비가 소득의 30%를 넘으면 부담이 크다고 봐요. 이자만 내면 월 부담은 줄지만 원금이 그대로 남아요.
+                대출 비교는 준비 중이에요 — 지금은 계산만 보여드려요.
+              </Sub>
+            </Card>
+          ) : null}
         </View>
 
         {spot && (spot.transit || spot.nearby?.length) ? (

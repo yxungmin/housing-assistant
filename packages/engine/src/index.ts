@@ -3,3 +3,4 @@ export * from "./cost";
 export * from "./homeless";
 export * from "./income";
 export * from "./sale";
+export * from "./shortfall";
