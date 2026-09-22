@@ -288,6 +288,24 @@ const STEP_LABEL: Record<string, string> = {
 export const stepLabel = (s: Step): string => STEP_LABEL[s.id] ?? s.id;
 
 /**
+ * "내 조건" 화면의 묶음. 사람이 한 번에 떠올리는 단위로 나눈다 —
+ * 단계 순서는 처음 입력할 때의 순서이고, 고칠 때 찾는 순서와는 다르다.
+ *
+ * 화면이 아니라 여기 두는 이유: 단계 id를 바꿀 때 같이 고쳐야 하는 표라서 옆에 있어야 한다.
+ * 실제로 직장 단계를 검색으로 바꾸며 id가 바뀌었을 때 이 표가 옛 id를 들고 있어
+ * 직장이 "그 밖에"로 떨어졌다 (2026-09-22). 테스트가 그걸 잡는다.
+ */
+export const CONDITION_GROUPS: { title: string; ids: string[] }[] = [
+  { title: "나와 가구", ids: ["birth_date", "marriage", "marriage_years", "household_size", "children_count", "youngest", "statuses"] },
+  { title: "사는 곳과 직장", ids: ["region", "sigungu", "workplace_place", "workplace_partner_place"] },
+  { title: "소득과 자산", ids: ["income_type", "annual_income", "total_assets", "car_value", "debt", "cash"] },
+  { title: "주택과 청약", ids: ["homeless", "homeless_months", "homeless_months_manual", "subscription_months", "subscription_active"] },
+];
+
+/** 단계 id 전부 (테스트가 표들이 최신인지 확인하는 데 쓴다) */
+export const STEP_IDS: string[] = STEPS.map((s) => s.id);
+
+/**
  * 규칙으로 정해지는 값을 다시 매긴다. 프로필을 저장할 때마다 한 번 지난다.
  *
  * 무주택 기간이 그렇다. 생년월일과 혼인 여부가 정해지면 청약 가점제 규칙이 값을 정한다 —

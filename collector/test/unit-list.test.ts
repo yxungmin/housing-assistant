@@ -35,9 +35,16 @@ describe("pickUnitList", () => {
 
 /**
  * 실제 파일로 확인한다. 열 위치를 짐작해서 만든 파서라 진짜 파일이 아니면 검증이 안 된다.
- * 파일은 커밋하지 않으므로(생성물) 없으면 건너뛴다 — `npm run app:enrich`가 받아 둔다.
+ *
+ * 그래서 실제 첨부를 고정 파일로 커밋해 뒀다 (`test/fixtures/unit-list.xlsx`, 32KB).
+ * 전에는 `.cache`에만 있었는데 그건 커밋하지 않는 생성물이라, 이 파일에 달린 검사 7개가
+ * 이 맥에서도 CI에서도 한 번도 돈 적이 없었다 (2026-09-22에 확인). 파서가 조용히 깨져도
+ * 아무도 몰랐을 자리다.
+ *
+ * 내용은 LH가 공개한 공급주택 목록이다 (주소·면적·임대조건). 개인정보는 없다.
+ * 공고가 바뀌어 파서를 고칠 때는 이 파일도 새 첨부로 갈아 끼운다.
  */
-const REAL = fromRoot("collector", ".cache", "unit-list.xlsx");
+const REAL = fromRoot("collector", "test", "fixtures", "unit-list.xlsx");
 describe.skipIf(!existsSync(REAL))("parseUnitList (실제 파일 2026-09-22)", () => {
   // describe 콜백은 skip 여부와 무관하게 수집 단계에서 실행된다. 파일 읽기를 여기 바로 두면
   // 파일이 없는 곳에서 skip이 걸리기도 전에 수집이 터진다 — 실제로 이 파일은 아무 데서도 안 돌고 있었다.
