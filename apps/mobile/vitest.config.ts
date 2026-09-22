@@ -1,4 +1,4 @@
-import { fileURLToPath } from "node:url";
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 /**
@@ -13,7 +13,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "react-native": "react-native-web",
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
+      "@": path.resolve(__dirname, "src"),
     },
   },
 });
