@@ -34,7 +34,7 @@ describe("단계 표들이 최신인가", () => {
 });
 
 describe("첫 온보딩은 핵심만 묻는다", () => {
-  it("core 단계는 일곱 개다 — 처음에 스무 개를 물으면 목록을 보기도 전에 지친다", () => {
+  it("core는 여덟 개다 — 목록이 쓸모 있어지는 최소치 + 내 직장", () => {
     expect(STEPS.filter((s) => s.core).map((s) => s.id)).toEqual([
       "region",
       "birth_date",
@@ -43,7 +43,12 @@ describe("첫 온보딩은 핵심만 묻는다", () => {
       "annual_income",
       "total_assets",
       "homeless",
+      "workplace_place",
     ]);
+  });
+
+  it("배우자 직장은 core가 아니다 — 혼인 상태와 내 직장을 채운 뒤에만 묻는다", () => {
+    expect(STEPS.find((s) => s.id === "workplace_partner_place")?.core).toBeFalsy();
   });
 
   it("coreOnly면 core 단계만 나온다", () => {
@@ -51,8 +56,8 @@ describe("첫 온보딩은 핵심만 묻는다", () => {
     expect(shown.every((s) => s.core)).toBe(true);
   });
 
-  it("coreOnly가 아니면 직장 검색도 나온다 — 내 조건 화면에서 고칠 수 있어야 한다", () => {
-    const ids = visibleSteps({ region_code: "11" }).map((s) => s.id);
-    expect(ids).toContain("workplace_place");
+  it("금액은 만 원 단위로 받는다 — 원으로 받으면 0을 여덟 개 세야 한다", () => {
+    const money = ["annual_income", "total_assets", "car_value", "debt", "cash"];
+    for (const id of money) expect(STEPS.find((s) => s.id === id)?.kind).toBe("manwon");
   });
 });

@@ -69,11 +69,12 @@ export default function Onboarding() {
     router.replace("/(tabs)");
   };
 
-  const numeric = step.kind === "won" || step.kind === "count" || step.kind === "age" || step.kind === "months" || step.kind === "date";
+  const numeric = step.kind === "won" || step.kind === "manwon" || step.kind === "count" || step.kind === "age" || step.kind === "months" || step.kind === "date";
   const isDuration = step.kind === "duration";
   const digits = text.replace(/[^0-9]/g, "");
   const duration = parseDuration(text);
-  const parsed = isDuration ? duration.total : numeric ? Number(digits) : NaN;
+  // 만원 칸은 사람이 만 원 단위로 치고 프로필에는 원으로 들어간다. 엔진·판정은 계속 원을 쓴다.
+  const parsed = isDuration ? duration.total : numeric ? Number(digits) * (step.kind === "manwon" ? 10_000 : 1) : NaN;
   const dateOk = step.kind === "date" && isValidBirthDate(digits);
   const canNext = step.kind === "select" || step.kind === "place" ? value !== null : step.kind === "skip-info" || step.kind === "multi" ? true : step.kind === "date" ? dateOk : isDuration ? duration.years !== "" : text !== "" && Number.isFinite(parsed);
   const selected = step.kind === "multi" ? String(value ?? "").split(",").filter(Boolean) : [];
@@ -174,25 +175,27 @@ export default function Onboarding() {
 
 function NumberField({ step, text, onChange }: { step: Step; text: string; onChange: (t: string) => void }) {
   const { colors } = useTheme();
-  const unit = { won: "원 / 월", count: "명", age: "세", months: "개월", date: "" }[step.kind as "won" | "count" | "age" | "months" | "date"];
+  const unit = { won: "원 / 월", manwon: "만 원", count: "명", age: "세", months: "개월", date: "" }[step.kind as "won" | "manwon" | "count" | "age" | "months" | "date"];
   // 단위는 그 칸이 무엇을 묻는지의 절반이다. 연소득 칸에 "원 / 월"이 붙어 있으면 자릿수를 틀리게 적는다.
-  const byId: Record<string, string> = { total_assets: "원", car_value: "원", cash: "원", marriage_years: "년", annual_income: "원 / 년" };
+  const byId: Record<string, string> = { marriage_years: "년", annual_income: "만 원 / 년", debt: "만 원 / 월" };
   const unitLabel = byId[step.id] ?? unit;
   const digits = text.replace(/[^0-9]/g, "");
   const isDate = step.kind === "date";
   const display = isDate ? formatDateDigits(digits) : text ? Number(digits).toLocaleString("ko-KR") : "";
   const valid = isDate && isValidBirthDate(digits);
   const ageNote = valid ? `만 ${ageFromBirthDate(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`)}세` : isDate ? "예: 1998.03.15" : "";
-  const isWon = step.kind === "won";
-  const manwon = isWon && digits ? summarizeWon(Number(digits)) : "";
+  const isWon = step.kind === "won" || step.kind === "manwon";
+  // 치는 값이 만 원 단위라 "5,000"이 얼마인지 바로 안 보인다. 원으로 환산해 그 자리에 적는다.
+  const won = step.kind === "manwon" ? Number(digits) * 10_000 : Number(digits);
+  const manwon = isWon && digits ? summarizeWon(won) : "";
   // 연소득으로 받지만 공고의 소득 기준은 월이다. 판정에 쓰는 값을 그 자리에서 같이 보여 준다.
-  const monthlyNote = step.id === "annual_income" && digits ? `월 ${summarizeWon(Math.round(Number(digits) / 12))} 기준으로 판정해요` : "";
+  const monthlyNote = step.id === "annual_income" && digits ? `월 ${summarizeWon(Math.round(won / 12))} 기준으로 판정해요` : "";
   return (
     <View style={{ gap: 10, marginTop: 16 }}>
       <View style={{ flexDirection: "row", alignItems: "baseline", borderBottomWidth: 2, borderBottomColor: colors.primary, paddingBottom: 10, gap: 10 }}>
         <TextInput
           value={display}
-          onChangeText={(t) => onChange(t.replace(/[^0-9]/g, "").slice(0, isDate ? 8 : 15))}
+          onChangeText={(t) => onChange(t.replace(/[^0-9]/g, "").slice(0, isDate ? 8 : step.kind === "manwon" ? 7 : 15))}
           keyboardType="number-pad"
           autoFocus
           placeholder={isDate ? "1998.03.15" : "0"}
@@ -226,6 +229,8 @@ function ClearButton({ onPress }: { onPress: () => void }) {
 /** 단계별 입력 문자열 초기값. duration은 "년:개월" 형식으로 들고 다닌다. */
 function textFor(step: Step, value: string | number | null): string {
   if (value === null) return "";
+  // 프로필에는 원으로 저장돼 있다. 만원 칸에 되돌려 넣을 때는 나눠서 보여 준다.
+  if (step.kind === "manwon") return String(Math.round(Number(value) / 10_000));
   if (step.kind === "duration") {
     const m = Number(value);
     return `${Math.floor(m / 12)}:${m % 12 ? m % 12 : ""}`;

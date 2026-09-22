@@ -4,8 +4,14 @@ import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
 import { parsePlaceLabel, placeFor } from "./places";
 import { REGION_LIST, regionByCode, sigunguValue } from "./regions";
 
-/** duration: 년 + 개월(선택) 두 칸으로 받아 개월 수로 저장 */
-export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "duration" | "date" | "skip-info" | "place";
+/**
+ * duration: 년 + 개월(선택) 두 칸으로 받아 개월 수로 저장.
+ *
+ * manwon: 사람이 만 원 단위로 치고 저장은 원으로 한다. 연봉·자산·대출은 억 단위라
+ * 원으로 받으면 0을 여덟 개 세야 하고 한 자리만 틀려도 판정이 뒤집힌다.
+ * 바꾸는 곳은 화면이고(입력·표시), 프로필과 엔진은 계속 원을 쓴다.
+ */
+export type StepKind = "select" | "multi" | "won" | "manwon" | "count" | "age" | "months" | "duration" | "date" | "skip-info" | "place";
 
 export interface Option {
   value: string;
@@ -58,10 +64,10 @@ export const NO_WORKPLACE = "none";
 
 type WorkplaceKey = "workplace" | "workplace_partner";
 
-function workplaceSteps(key: WorkplaceKey, copy: { title: Step["title"]; hint: string; when?: (p: Partial<UserProfile>) => boolean }): Step[] {
+function workplaceSteps(key: WorkplaceKey, copy: { title: Step["title"]; hint: string; core?: boolean; when?: (p: Partial<UserProfile>) => boolean }): Step[] {
   return [
     {
-      id: `${key}_place`, kind: "place", title: copy.title, hint: copy.hint, optional: true,
+      id: `${key}_place`, kind: "place", core: copy.core, title: copy.title, hint: copy.hint, optional: true,
       when: copy.when,
       // 모두가 직장에 다니는 건 아니다. 학생·구직 중·은퇴·육아 전담이면 통근을 물을 이유가 없고,
       // 건너뛰기와도 다르다 — "없다"는 답이고 건너뛰기는 "아직 모르겠다"다.
@@ -150,7 +156,7 @@ export const STEPS: Step[] = [
   {
     // 공고는 "월평균소득 100% 이하"처럼 월로 말하지만, 사람은 자기 소득을 연봉으로 기억한다.
     // 그래서 받기는 연봉으로 받고 월로 환산해 판정에 쓴다. 환산값은 화면에 같이 적어 둔다.
-    id: "annual_income", core: true, kind: "won", title: "세전 연소득은 얼마인가요?", hint: "세금 떼기 전 1년 총액이에요. 맞벌이면 두 사람 소득을 더해 주세요.",
+    id: "annual_income", core: true, kind: "manwon", title: "세전 연소득은 얼마인가요?", hint: "세금 떼기 전 1년 총액이에요. 맞벌이면 두 사람 소득을 더해 주세요.",
     helper: "정확한 금액을 모르면 직장 건강보험료 납부액으로 역산해 드려요. 공고의 소득 기준은 월 환산액으로 판정됩니다.",
     apply: (p, v) => {
       const annual = Number(v);
@@ -160,15 +166,15 @@ export const STEPS: Step[] = [
     read: (p) => p.annual_income ?? (p.monthly_income !== undefined ? p.monthly_income * 12 : null),
   },
   {
-    id: "total_assets", core: true, kind: "won", title: "가구 총자산은 얼마쯤인가요?", hint: "부동산·자동차·금융자산을 더하고 부채를 뺀 금액. 대략이어도 괜찮아요.",
+    id: "total_assets", core: true, kind: "manwon", title: "가구 총자산은 얼마쯤인가요?", hint: "부동산·자동차·금융자산을 더하고 부채를 뺀 금액. 대략이어도 괜찮아요.",
     apply: (p, v) => ({ ...p, total_assets: Number(v) }), read: (p) => p.total_assets ?? null,
   },
   {
-    id: "car_value", kind: "won", title: "자동차가 있다면 가액은 얼마인가요?", hint: "없으면 0. 나중에 입력해도 됩니다.", optional: true,
+    id: "car_value", kind: "manwon", title: "자동차가 있다면 가액은 얼마인가요?", hint: "없으면 0. 나중에 입력해도 됩니다.", optional: true,
     apply: (p, v) => ({ ...p, car_value: v === null ? undefined : Number(v) }), read: (p) => p.car_value ?? null,
   },
   {
-    id: "debt", kind: "won", title: "매달 갚는 대출이 있나요?", hint: "월 상환액. 없으면 0. 주거비 부담률 계산에 씁니다.", optional: true,
+    id: "debt", kind: "manwon", title: "매달 갚는 대출이 있나요?", hint: "월 상환액. 없으면 0. 주거비 부담률 계산에 씁니다.", optional: true,
     apply: (p, v) => ({ ...p, monthly_debt_payment: v === null ? undefined : Number(v) }), read: (p) => p.monthly_debt_payment ?? null,
   },
   {
@@ -233,10 +239,11 @@ export const STEPS: Step[] = [
     read: (p) => (p.subscription_active === undefined ? null : p.subscription_active ? "yes" : "no"),
   },
   {
-    id: "cash", kind: "won", title: "지금 바로 쓸 수 있는 현금은 얼마인가요?", hint: "보증금에 넣을 수 있는 돈. 부족액 계산에 씁니다.",
+    id: "cash", kind: "manwon", title: "지금 바로 쓸 수 있는 현금은 얼마인가요?", hint: "보증금에 넣을 수 있는 돈. 부족액 계산에 씁니다.",
     apply: (p, v) => ({ ...p, cash_on_hand: Number(v) }), read: (p) => p.cash_on_hand ?? null,
   },
   ...workplaceSteps("workplace", {
+    core: true,
     title: "직장이 어디인가요?",
     hint: "역·회사 이름을 검색하세요. 정확할수록 통근 시간이 맞습니다. 위치는 이 기기에만 저장돼요.",
   }),
@@ -362,7 +369,7 @@ export function stepDisplay(s: Step, p: Partial<UserProfile>): string | null {
 
   const n = Number(v);
   if (!Number.isFinite(n)) return String(v);
-  if (s.kind === "won") return wonText(n) + (s.id === "annual_income" ? " / 년" : s.id === "debt" ? " / 월" : "");
+  if (s.kind === "won" || s.kind === "manwon") return wonText(n) + (s.id === "annual_income" ? " / 년" : s.id === "debt" ? " / 월" : "");
   if (s.kind === "count") return s.id === "marriage_years" ? `${n}년` : `${n}명`;
   if (s.kind === "age") return `만 ${n}세`;
   if (s.kind === "months" || s.kind === "duration") return monthsText(n);

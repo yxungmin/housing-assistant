@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { setAnnouncements, type Announcement } from "./announcements";
+import { currentAnnouncements, setAnnouncements, type Announcement } from "./announcements";
 import { readFeedCache, writeFeedCache } from "./cache";
 import { fetchRemoteAnnouncements, remoteConfigured } from "./remote";
 import { detectChanges, type ChangeRecord } from "@/lib/changes";
@@ -11,6 +11,29 @@ import { detectChanges, type ChangeRecord } from "@/lib/changes";
  * 갱신할 때 관심 공고의 값이 바뀌었는지 직전 목록과 대조한다. 값이 바뀌는 이유는 둘뿐이다 —
  * 우리가 신고를 받아 고쳤거나, 공고가 정정되었거나. 어느 쪽이든 사용자에게 말해야 한다.
  */
+/**
+ * 서버에서 한 번 받아 반영한다. 앱을 열 때와 사용자가 당겨서 새로고침할 때가 같은 일이다.
+ * 실패하면 조용히 돌아간다 — 캐시·번들 데이터로 화면은 그대로 돌고, 사용자가 할 수 있는 일이 없다.
+ */
+export async function syncAnnouncementsOnce(savedIds: string[], onChanges?: (records: ChangeRecord[]) => void): Promise<boolean> {
+  if (!remoteConfigured) return false;
+  try {
+    const before = currentAnnouncements();
+    const list = await fetchRemoteAnnouncements();
+    const syncedAt = new Date().toISOString();
+    setAnnouncements(list, "remote", syncedAt);
+    await writeFeedCache({ syncedAt, list });
+    // 직전 목록이 없으면 "바뀐 것"을 셀 수 없다 (첫 동기화는 전부 새 값이다)
+    if (before.length > 0 && onChanges) {
+      const records = detectChanges(before, list, savedIds);
+      if (records.length > 0) onChanges(records);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function useAnnouncementSync(ready: boolean, savedIds: string[], onChanges?: (records: ChangeRecord[]) => void): void {
   // 관심 목록은 SecureStore에서 불러온 뒤에야 정확하다. 마운트 즉시 돌면 빈 배열이라 변경을 못 찾는다.
   const done = useRef(false);

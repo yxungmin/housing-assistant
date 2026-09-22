@@ -10,6 +10,7 @@ import { REGIONS } from "@/lib/onboarding";
 import { commuteFor, commuteShort, splitStation } from "@/lib/commute";
 import { isUnseen, unseenCount } from "@/lib/unseen";
 import { fundsFor, fundsNote } from "@/lib/funds";
+import { syncAnnouncementsOnce } from "@/data/sync";
 import { LOANS } from "@/data/loans";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -20,7 +21,7 @@ const NEAR_WORK_KM = 20;
 
 /** 홈: "조건에 맞는 공고 N개" 한 문장과 큰 숫자로 시작한다. */
 export default function Home() {
-  const { state, noteSeen } = useAppState();
+  const { state, noteSeen, addChanges } = useAppState();
   const { colors } = useTheme();
   const router = useRouter();
   const [myRegionOnly, setMyRegionOnly] = useState(false);
@@ -29,6 +30,17 @@ export default function Home() {
   const [showFar, setShowFar] = useState(false);
   const [nearWork, setNearWork] = useState(false);
   const feed = useAnnouncements();
+  const [refreshing, setRefreshing] = useState(false);
+  /**
+   * 당겨서 새로고침. 앱을 열 때 한 번 받는 것과 같은 일을 사용자가 직접 부른다 —
+   * 마감이 걸린 정보라 "지금 최신인가"를 확인할 길이 있어야 한다.
+   * 바뀐 값이 있으면 앱을 열 때와 똑같이 알린다.
+   */
+  const refresh = () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    void syncAnnouncementsOnce(state.saved, addChanges).finally(() => setRefreshing(false));
+  };
   const hasWorkplace = !!state.profile?.workplace;
 
   const all = useMemo(() => matchAll(state.profile, feed.list), [state.profile, feed.list]);
@@ -102,7 +114,7 @@ export default function Home() {
   };
 
   return (
-    <Screen>
+    <Screen onRefresh={refresh} refreshing={refreshing}>
       <FadeIn style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", paddingTop: 28 }}>
         <View style={{ gap: 6 }}>
           <T variant="body" color={colors.text2}>내 조건에 맞는 공고</T>

@@ -5,7 +5,7 @@
  * 원칙: 흰 화면 + grey50 카드, 헤어라인 대신 간격, 아이콘은 연한 타일 안에, 색은 CTA·상태에만.
  */
 import { useEffect, useRef, useState, type PropsWithChildren, type ReactNode } from "react";
-import { Animated, Dimensions, Easing, Image, Keyboard, LayoutAnimation, Modal, Platform, Pressable, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { Animated, Dimensions, Easing, Image, Keyboard, LayoutAnimation, Modal, Platform, Pressable, RefreshControl, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useScrollToTop } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -73,7 +73,7 @@ export function FadeIn({ children, style, delay = 0, distance = 12 }: PropsWithC
  * 탭 바는 화면 영역 밖이고 footer는 이 컴포넌트의 형제라 제 자리를 차지한다.
  * 그래서 140은 아무것도 안 가리면서 탭 화면마다 빈 스크롤만 140px씩 만들고 있었다.
  */
-export function Screen({ children, scroll = true, padded = true, style, bottomInset = space.section, header, footer }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number; header?: ReactNode; footer?: ReactNode }>) {
+export function Screen({ children, scroll = true, padded = true, style, bottomInset = space.section, header, footer, onRefresh, refreshing }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number; header?: ReactNode; footer?: ReactNode; onRefresh?: () => void; refreshing?: boolean }>) {
   const { colors } = useTheme();
   const inner = padded ? { paddingHorizontal: space.screen } : undefined;
   /**
@@ -89,7 +89,16 @@ export function Screen({ children, scroll = true, padded = true, style, bottomIn
     <SafeAreaView style={[{ flex: 1, backgroundColor: colors.surface }, style]} edges={["top", "left", "right"]}>
       {header}
       {scroll ? (
-        <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={[inner, { paddingBottom: bottomInset, gap: space.xl }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ScrollView
+          ref={scroller}
+          style={{ flex: 1 }}
+          contentContainerStyle={[inner, { paddingBottom: bottomInset, gap: space.xl }]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            onRefresh ? <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor={colors.text3} colors={[colors.primary]} /> : undefined
+          }
+        >
           {children}
         </ScrollView>
       ) : (

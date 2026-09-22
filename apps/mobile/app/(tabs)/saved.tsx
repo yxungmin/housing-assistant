@@ -1,15 +1,22 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Card, IconTile, Notice, PageTitle, Screen, Sub, T } from "@/components/ui";
 import { matchAll, useAnnouncements } from "@/data/announcements";
 import { daysUntil, longDate } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { useAppState } from "@/store/appState";
+import { syncAnnouncementsOnce } from "@/data/sync";
 import { AnnouncementCard } from "./index";
 
 /** 관심 공고: D-day 순. 마감 D-3 알림은 기기 예약 알림(M7)으로 붙는다. */
 export default function Saved() {
-  const { state } = useAppState();
+  const { state, addChanges } = useAppState();
+  const [refreshing, setRefreshing] = useState(false);
+  const refresh = () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    void syncAnnouncementsOnce(state.saved, addChanges).finally(() => setRefreshing(false));
+  };
   const router = useRouter();
   const { list } = useAnnouncements();
   const items = useMemo(
@@ -26,7 +33,7 @@ export default function Saved() {
   });
 
   return (
-    <Screen>
+    <Screen onRefresh={refresh} refreshing={refreshing}>
       <PageTitle title={`관심 공고 ${items.length}개`} sub="접수 마감 3일 전에 알려드려요" />
       {changed.length > 0 ? (
         <Notice tone="info" icon="bell">
