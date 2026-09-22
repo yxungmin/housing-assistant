@@ -21,7 +21,7 @@ import {
 import { emptySeen, markOpened, noteSeen, type SeenState } from "@/lib/unseen";
 import { canOpenCost as canOpenCostRule, type Account } from "@/lib/access";
 import { CANCELLED, type AuthProvider } from "@/lib/auth";
-import { authConfigured, loadSession, refreshIfNeeded, signInWith, signOutRemote } from "@/data/auth";
+import { authConfigured, deleteAccountRemote, loadSession, refreshIfNeeded, signInWith, signOutRemote } from "@/data/auth";
 import { canSend, type LocalReport } from "@/lib/reports";
 import { fetchReportStatuses, remoteConfigured, sendIssueReport } from "@/data/remote";
 
@@ -224,6 +224,11 @@ interface Ctx {
    */
   devSignIn: () => Promise<void>;
   signOut: () => Promise<void>;
+  /**
+   * 계정 삭제 (App Store 5.1.1(v)). 서버 계정과 기기의 모든 입력을 함께 지운다.
+   * 서버 삭제가 실패하면 던진다 — 기기만 비우고 끝내면 지워진 줄 알고 떠나는데 계정은 남는다.
+   */
+  deleteAccount: () => Promise<void>;
   toggleSaved: (id: string) => void;
   toggleApplied: (id: string) => void;
   setSubscription: (subscription: Subscription) => void;
@@ -367,6 +372,14 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       signOut: async () => {
         await signOutRemote(await loadSession());
         dispatch({ type: "signOut" });
+      },
+      // 서버를 먼저 지운다. 여기서 실패하면 기기 데이터는 건드리지 않고 던진다 —
+      // 계정은 남았는데 입력만 사라지는 것이 가장 나쁜 결말이다.
+      deleteAccount: async () => {
+        const session = await loadSession();
+        if (session) await deleteAccountRemote(session);
+        else if (authConfigured && !__DEV__) throw new Error("로그인이 만료됐어요. 다시 로그인한 뒤 삭제해 주세요.");
+        dispatch({ type: "reset" });
       },
       toggleSaved: (id) => dispatch({ type: "toggleSaved", id }),
       toggleApplied: (id) => dispatch({ type: "toggleApplied", id }),

@@ -139,3 +139,23 @@ export async function signOutRemote(session: AuthSession | null): Promise<void> 
   }
   await saveSession(null);
 }
+
+/**
+ * 계정 삭제. 서버에서 사용자를 지우고 기기의 토큰도 지운다.
+ *
+ * 지울 대상은 함수가 토큰에서 정한다 — 앱이 user id를 보내지 않는다.
+ * 실패하면 던진다. 조용히 로그아웃만 시키면 사용자는 지워진 줄 알고 떠나는데
+ * 계정은 서버에 그대로 남는다. 되돌릴 수 없는 일에서 제일 나쁜 결말이다.
+ */
+export async function deleteAccountRemote(session: AuthSession): Promise<void> {
+  if (!authConfigured) throw new Error("서버 설정이 없어요");
+  const res = await fetch(`${URL}/functions/v1/delete-account`, {
+    method: "POST",
+    headers: { ...headers(), Authorization: `Bearer ${session.accessToken}` },
+  });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(body?.error ?? `삭제하지 못했어요 (${res.status})`);
+  }
+  await saveSession(null);
+}

@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { ageFromBirthDate, monthsBetween } from "@housing/engine";
 import { SubscriptionManageSheet } from "@/components/SubscriptionSheet";
-import { BottomSheet, Card, Chip, ListRow, PageTitle, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { BottomSheet, Card, Chip, ListRow, Notice, PageTitle, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { LOAN_AS_OF } from "@/data/loans";
 import { useAnnouncements } from "@/data/announcements";
 import { remoteConfigured } from "@/data/remote";
@@ -23,13 +23,16 @@ const price = `월 ${PRICE_KRW.toLocaleString("ko-KR")}원`;
 
 /** 내 정보: 조건 수정(항상 무료), 구독 상태, 알림, 데이터 기준일, 화면 모드 */
 export default function Profile() {
-  const { state, setTheme, setNotifications, reset, signOut } = useAppState();
+  const { state, setTheme, setNotifications, reset, signOut, deleteAccount } = useAppState();
   const { colors } = useTheme();
   const router = useRouter();
   const feed = useAnnouncements();
   const [manage, setManage] = useState(false);
   const [signInSheet, setSignInSheet] = useState(false);
   const [confirmOut, setConfirmOut] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [notiMsg, setNotiMsg] = useState<string | null>(null);
   const [reports, setReports] = useState(false);
   const openReports = state.reports.filter(isOpen).length;
@@ -108,6 +111,9 @@ export default function Profile() {
                 sub={state.account.email ?? "계정에는 구독 상태만 저장돼요"}
               />
               <ListRow icon="left" label="로그아웃" sub="조건과 저장한 공고는 이 기기에 그대로 남아요" onPress={() => setConfirmOut(true)} />
+              {/* App Store 5.1.1(v): 계정을 만들 수 있으면 앱 안에서 삭제도 시작할 수 있어야 한다.
+                  숨겨 두면 조항을 어기는 것이고, 애초에 남의 계정을 우리가 쥐고 있을 이유가 없다. */}
+              <ListRow icon="trash" label="계정 삭제" sub="계정과 이 기기의 입력을 모두 지워요" danger onPress={() => { setDeleteError(null); setConfirmDelete(true); }} />
             </>
           ) : (
             <ListRow icon="user" label="로그인" sub="로그인하면 첫 달은 0원이에요" onPress={() => setSignInSheet(true)} />
@@ -166,6 +172,48 @@ export default function Profile() {
       </Pressable>
       <SubscriptionManageSheet visible={manage} onClose={() => setManage(false)} />
       <SignInSheet visible={signInSheet} onClose={() => setSignInSheet(false)} />
+      {/* 되돌릴 수 없는 일이라 무엇이 사라지는지 먼저 다 적는다. 누른 뒤에 알게 되면 늦다. */}
+      <BottomSheet visible={confirmDelete} onClose={() => (deleting ? undefined : setConfirmDelete(false))}>
+        <View style={{ gap: 16 }}>
+          <View style={{ gap: 6 }}>
+            <T variant="title">계정을 삭제할까요?</T>
+            <Sub variant="body">되돌릴 수 없어요. 같은 계정으로 다시 로그인해도 복구되지 않아요.</Sub>
+          </View>
+          <Card style={{ gap: 8 }}>
+            <T variant="bodyMedium">지워지는 것</T>
+            <Sub tone="3" variant="caption">
+              서버의 계정과 구독 기록, 그리고 이 기기에 저장한 조건·소득·자산·저장한 공고·알림 설정이 모두 사라져요.
+            </Sub>
+            <T variant="bodyMedium" style={{ paddingTop: 4 }}>남는 것</T>
+            <Sub tone="3" variant="caption">
+              결제 기록은 세무 근거라 남지만 누구 것인지는 남지 않아요. 기기에는 "첫 달 무료를 썼다"는 표시 하나만 남아요.
+            </Sub>
+          </Card>
+          {state.subscription.status === "trial" || state.subscription.status === "active" ? (
+            <Notice tone="warn" icon="alert">
+              구독은 스토어에서 따로 해지하셔야 해요. 계정을 지워도 스토어 결제는 멈추지 않아요.
+            </Notice>
+          ) : null}
+          {deleteError ? <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>{deleteError}</Sub> : null}
+          <ListRow
+            icon="trash"
+            label={deleting ? "지우는 중" : "계정 삭제"}
+            danger
+            onPress={
+              deleting
+                ? undefined
+                : () => {
+                    setDeleting(true);
+                    setDeleteError(null);
+                    void deleteAccount()
+                      .then(() => setConfirmDelete(false))
+                      .catch((e: unknown) => setDeleteError(e instanceof Error ? e.message : "삭제하지 못했어요."))
+                      .finally(() => setDeleting(false));
+                  }
+            }
+          />
+        </View>
+      </BottomSheet>
       {/* 로그아웃은 한 번 묻는다. 눌러서 바로 나가면 되돌릴 방법이 로그인뿐이다 */}
       <BottomSheet visible={confirmOut} onClose={() => setConfirmOut(false)}>
         <View style={{ gap: 16 }}>
