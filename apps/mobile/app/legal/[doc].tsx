@@ -28,8 +28,9 @@ export default function Legal() {
     );
   }
 
+  // 헤더에 제목을 또 넣지 않는다 — 바로 아래 큰 제목과 겹쳐 같은 말이 두 번 나온다
   return (
-    <Screen header={<Header onBack={() => router.back()} title={legal.title} />}>
+    <Screen header={<Header onBack={() => router.back()} />}>
       <View style={{ gap: 6, paddingTop: 8 }}>
         <T variant="display" style={{ fontSize: 26, lineHeight: 36 }}>{legal.title}</T>
         <Sub tone="3" variant="caption">
