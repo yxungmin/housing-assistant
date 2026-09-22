@@ -38,8 +38,8 @@ export interface LocalReport {
 export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
   OPEN: "확인 중",
   NO_CHANGE: "공고문과 같음",
-  FIXED: "수정했어요",
-  SOURCE_AMENDED: "공고가 정정됨",
+  FIXED: "수정함",
+  SOURCE_AMENDED: "공고 정정됨",
   INVALID: "확인 불가",
 };
 

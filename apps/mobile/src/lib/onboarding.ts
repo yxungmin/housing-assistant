@@ -111,7 +111,7 @@ export const STEPS: Step[] = [
     read: (p) => (p.region_sigungu ? p.region_sigungu.split(" ").slice(1).join(" ") : null),
   },
   {
-    id: "birth_date", core: true, kind: "date", title: "생년월일을 알려주세요", hint: "공고는 출생일 기준으로 청년·고령자 계층을 나눕니다. 만 나이는 자동으로 계산해요.",
+    id: "birth_date", core: true, kind: "date", title: "생년월일을 알려주세요", hint: "공고는 출생일 기준으로 청년·고령자 계층을 나눠요. 만 나이는 자동으로 계산해요.",
     apply: (p, v) => {
       const s = String(v ?? "").replace(/[^0-9]/g, "");
       if (s.length !== 8) return p;
@@ -130,12 +130,12 @@ export const STEPS: Step[] = [
     read: (p) => p.marriage ?? null,
   },
   {
-    id: "marriage_years", kind: "count", title: "혼인한 지 몇 년 됐나요?", hint: "신혼부부 기준은 보통 7년 이내입니다. 1년 미만이면 0.",
+    id: "marriage_years", kind: "count", title: "혼인한 지 몇 년 됐나요?", hint: "신혼부부 기준은 보통 7년 이내예요. 1년 미만이면 0.",
     when: (p) => p.marriage === "married",
     apply: (p, v) => ({ ...p, marriage_years: Number(v) }), read: (p) => p.marriage_years ?? null,
   },
   {
-    id: "household_size", core: true, kind: "count", title: "함께 사는 가구원은 몇 명인가요?", hint: "본인을 포함한 세대구성원 수. 소득 기준이 가구원 수마다 다릅니다.",
+    id: "household_size", core: true, kind: "count", title: "함께 사는 가구원은 몇 명인가요?", hint: "본인을 포함한 세대구성원 수. 소득 기준이 가구원 수마다 달라요.",
     apply: (p, v) => ({ ...p, household_size: Number(v) }), read: (p) => p.household_size ?? null,
   },
   {
@@ -148,7 +148,7 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, children_ages: [Number(v)] }), read: (p) => p.children_ages?.[0] ?? null,
   },
   {
-    id: "income_type", kind: "select", title: "두 분 모두 소득이 있나요?", hint: "맞벌이는 소득 상한이 더 높습니다.",
+    id: "income_type", kind: "select", title: "두 분 모두 소득이 있나요?", hint: "맞벌이는 소득 상한이 더 높아요.",
     when: isCouple,
     options: [{ value: "dual", label: "맞벌이" }, { value: "single", label: "외벌이" }],
     apply: (p, v) => ({ ...p, income_type: v as UserProfile["income_type"] }), read: (p) => p.income_type ?? null,
@@ -157,7 +157,7 @@ export const STEPS: Step[] = [
     // 공고는 "월평균소득 100% 이하"처럼 월로 말하지만, 사람은 자기 소득을 연봉으로 기억한다.
     // 그래서 받기는 연봉으로 받고 월로 환산해 판정에 쓴다. 환산값은 화면에 같이 적어 둔다.
     id: "annual_income", core: true, kind: "manwon", title: "세전 연소득은 얼마인가요?", hint: "세금 떼기 전 1년 총액이에요. 맞벌이면 두 사람 소득을 더해 주세요.",
-    helper: "정확한 금액을 모르면 직장 건강보험료 납부액으로 역산해 드려요. 공고의 소득 기준은 월 환산액으로 판정됩니다.",
+    helper: "정확한 금액을 모르면 직장 건강보험료 납부액으로 역산해 드려요. 공고의 소득 기준은 월 환산액으로 판정해요.",
     apply: (p, v) => {
       const annual = Number(v);
       return { ...p, annual_income: annual, monthly_income: Math.round(annual / 12) };
@@ -170,15 +170,15 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, total_assets: Number(v) }), read: (p) => p.total_assets ?? null,
   },
   {
-    id: "car_value", kind: "manwon", title: "자동차가 있다면 가액은 얼마인가요?", hint: "없으면 0. 나중에 입력해도 됩니다.", optional: true,
+    id: "car_value", kind: "manwon", title: "자동차가 있다면 가액은 얼마인가요?", hint: "없으면 0. 나중에 입력해도 돼요.", optional: true,
     apply: (p, v) => ({ ...p, car_value: v === null ? undefined : Number(v) }), read: (p) => p.car_value ?? null,
   },
   {
-    id: "debt", kind: "manwon", title: "매달 갚는 대출이 있나요?", hint: "월 상환액. 없으면 0. 주거비 부담률 계산에 씁니다.", optional: true,
+    id: "debt", kind: "manwon", title: "매달 갚는 대출금은 얼마인가요?", hint: "월 상환액. 없으면 0. 주거비 부담률 계산에 써요.", optional: true,
     apply: (p, v) => ({ ...p, monthly_debt_payment: v === null ? undefined : Number(v) }), read: (p) => p.monthly_debt_payment ?? null,
   },
   {
-    id: "statuses", kind: "multi", title: "해당하는 것이 있나요?", hint: "공고의 계층(대학생·수급자 등) 자격을 판별하는 데 씁니다. 없으면 '해당 없음'.",
+    id: "statuses", kind: "multi", title: "해당하는 것이 있나요?", hint: "공고의 계층(대학생·수급자 등) 자격을 판별하는 데 써요. 없으면 '해당 없음'.",
     options: [
       { value: "student", label: "대학생·입복학 예정" }, { value: "job_seeker", label: "취업준비생", hint: "졸업·중퇴 2년 이내" },
       { value: "new_worker", label: "사회초년생", hint: "소득 있는 일 5년 이내" }, { value: "artist", label: "예술인" },
@@ -191,7 +191,7 @@ export const STEPS: Step[] = [
     read: (p) => (p.statuses === undefined ? null : p.statuses.join(",")),
   },
   {
-    id: "homeless", core: true, kind: "select", title: "세대구성원 모두 집이 없나요?", hint: "본인·배우자·같이 사는 부모 등 전원이 무주택이어야 하는 공고가 많습니다.",
+    id: "homeless", core: true, kind: "select", title: "세대구성원 모두 집이 없나요?", hint: "본인·배우자·같이 사는 부모 등 전원이 무주택이어야 하는 공고가 많아요.",
     options: [{ value: "yes", label: "네, 모두 무주택이에요" }, { value: "no", label: "아니요, 집이 있어요" }],
     apply: (p, v) => ({ ...p, is_homeless: v === "yes", homeless_months: v === "yes" ? p.homeless_months : undefined }),
     read: (p) => (p.is_homeless === undefined ? null : p.is_homeless ? "yes" : "no"),
@@ -239,17 +239,17 @@ export const STEPS: Step[] = [
     read: (p) => (p.subscription_active === undefined ? null : p.subscription_active ? "yes" : "no"),
   },
   {
-    id: "cash", kind: "manwon", title: "지금 바로 쓸 수 있는 현금은 얼마인가요?", hint: "보증금에 넣을 수 있는 돈. 부족액 계산에 씁니다.",
+    id: "cash", kind: "manwon", title: "지금 바로 쓸 수 있는 현금은 얼마인가요?", hint: "보증금에 넣을 수 있는 돈. 부족액 계산에 써요.",
     apply: (p, v) => ({ ...p, cash_on_hand: Number(v) }), read: (p) => p.cash_on_hand ?? null,
   },
   ...workplaceSteps("workplace", {
     core: true,
     title: "직장이 어디인가요?",
-    hint: "역·회사 이름을 검색하세요. 정확할수록 통근 시간이 맞습니다. 위치는 이 기기에만 저장돼요.",
+    hint: "역·회사 이름을 검색하세요. 정확할수록 통근 거리·시간이 실제와 가까워요. 위치는 이 기기에만 저장돼요.",
   }),
   ...workplaceSteps("workplace_partner", {
     title: (p) => (p.marriage === "pre_marriage" ? "예비 배우자 직장은 어디인가요?" : "배우자 직장은 어디인가요?"),
-    hint: "두 사람 통근을 같이 봐야 실제로 살 수 있는 집이 골라져요. 건너뛰어도 됩니다.",
+    hint: "두 사람 통근을 같이 봐야 실제로 살 수 있는 집이 골라져요. 건너뛰어도 돼요.",
     // 본인 직장을 넣은 신혼·예비신혼부부에게만 묻는다. 한 쪽도 안 넣었으면 물을 이유가 없다.
     when: (p) => isCouple(p) && !!p.workplace,
   }),

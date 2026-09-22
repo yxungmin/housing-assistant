@@ -129,7 +129,7 @@ export default function Home() {
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         <Chip on={myRegionOnly} count={chipCount.myRegionOnly} onPress={toggle(setMyRegionOnly)}>{regionLabel}만</Chip>
         <Chip on={rentalOnly} count={chipCount.rentalOnly} onPress={toggle(setRentalOnly)}>임대만</Chip>
-        {hasWorkplace ? <Chip on={nearWork} count={chipCount.nearWork} onPress={toggle(setNearWork)}>직장 {NEAR_WORK_KM}km 이내</Chip> : null}
+        {hasWorkplace ? <Chip on={nearWork} count={chipCount.nearWork} onPress={toggle(setNearWork)}>직장 직선 {NEAR_WORK_KM}km 이내</Chip> : null}
       </View>
 
 
@@ -148,12 +148,12 @@ export default function Home() {
             <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 조건에 맞는 공고가 없어요</T>
             <Sub style={{ textAlign: "center" }}>
               {outsideService
-                ? `지금은 ${SERVICE_REGION_LABEL} 공고만 모으고 있어요. ${regionLabel}까지 넓히면 알려드릴게요.`
-                : "새 공고가 올라오면 알려드릴게요. 내 정보에서 비어 있는 조건을 채우면 판별되는 공고가 늘어날 수 있어요."}
+                ? `지금은 ${SERVICE_REGION_LABEL} 공고만 모으고 있어요. 다른 지역은 아직 모으지 않아요.`
+                : "새 공고가 올라오면 알려드릴게요. 내 조건에서 비어 있는 항목을 채우면 판별되는 공고가 늘어날 수 있어요."}
             </Sub>
           </Card>
         ) : null}
-        {pending.length > 0 ? <Section title="조건 분석 중" items={pending} onOpen={open} /> : null}
+        {pending.length > 0 ? <Section title="조건을 아직 못 읽음" items={pending} onOpen={open} /> : null}
 
         {farAway.length > 0 ? (
           <View style={{ gap: 12 }}>
@@ -216,9 +216,9 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
   const unitLabel = units.length ? units.slice(0, 3).join(" · ") + (units.length > 3 ? ` 외 ${units.length - 3}` : "") : "";
   const status =
     !isReadable(a)
-      ? { tone: "warn" as const, icon: "alert" as const, text: "조건 분석 중" }
+      ? { tone: "warn" as const, icon: "alert" as const, text: "조건을 아직 못 읽음" }
       : m.match?.is_match && m.matched > 0
-        ? { tone: "primary" as const, icon: "check" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치${m.needsCheck ? ` · 확인 ${m.needsCheck}` : ""}` }
+        ? { tone: "primary" as const, icon: "check" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치${m.needsCheck ? ` · 확인 필요 ${m.needsCheck}개` : ""}` }
         : m.match?.is_match
           ? { tone: "warn" as const, icon: "alert" as const, text: `조건 ${m.needsCheck}개 확인 필요` }
           : m.match?.region_uncertain

@@ -168,7 +168,18 @@ export default function Onboarding() {
         />
       </View>
 
-      <IncomeHelperSheet visible={helper} dual={draft.income_type === "dual"} onClose={() => setHelper(false)} onApply={(v) => { setText(String(step.id === "annual_income" ? v * 12 : v)); setHelper(false); }} />
+      {/* 도우미는 월소득을 원으로 준다. 연소득 칸은 1년치를 만 원 단위로 받으므로 ×12 후 ÷10,000한다.
+          이 변환을 빼먹어 10,000배가 들어가던 버그가 있었다 (2026-09-22). */}
+      <IncomeHelperSheet
+        visible={helper}
+        dual={draft.income_type === "dual"}
+        onClose={() => setHelper(false)}
+        onApply={(v) => {
+          const won = step.id === "annual_income" ? v * 12 : v;
+          setText(String(step.kind === "manwon" ? Math.round(won / 10_000) : won));
+          setHelper(false);
+        }}
+      />
     </Screen>
   );
 }
@@ -268,7 +279,7 @@ function DurationField({ text, onChange }: { text: string; onChange: (t: string)
         </View>
       </View>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <T variant="bodyMedium" color={years ? colors.primary : colors.text3}>{years ? `총 ${total}개월` : "년 수만 적어도 돼요"}</T>
+        <T variant="bodyMedium" color={years ? colors.primary : colors.text3}>{years ? `총 ${total}개월` : "년만 적어도 돼요"}</T>
         <Sub tone="3">개월은 선택</Sub>
       </View>
     </View>
@@ -373,7 +384,7 @@ function PlaceField({
 
       {busy ? <Sub tone="3">찾는 중…</Sub> : null}
       {!busy && searched && hits.length === 0 ? (
-        <Sub tone="3">찾는 곳이 없어요. 역 이름이나 회사 이름으로 다시 쳐 보세요.</Sub>
+        <Sub tone="3">찾는 곳이 없어요. 역 이름이나 회사 이름으로 다시 검색해 보세요.</Sub>
       ) : null}
 
       {hits.map((h) => (

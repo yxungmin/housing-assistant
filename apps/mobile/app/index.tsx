@@ -16,10 +16,10 @@ export default function Start() {
         <Logo size={64} />
         <T variant="display">내 조건에 맞는{"\n"}공공주택 공고만{"\n"}보여드릴게요</T>
         <Sub variant="body" style={{ maxWidth: 320 }}>
-          나이·소득·자산을 입력하면 LH 공고 중 조건이 맞는 것과 예상 주거비를 바로 계산해요. 입력한 정보는 이 기기에만 저장됩니다.
+          나이·소득·자산을 입력하면 LH·SH 공고 중 조건이 맞는 것과 예상 주거비를 바로 계산해요. 입력한 정보는 이 기기에만 저장돼요.
         </Sub>
       </View>
-      <BottomCTA label="시작하기" onPress={() => router.push("/onboarding")} secondary secondaryLabel="로그인 없이 바로 시작합니다" onSecondary={() => router.push("/onboarding")} />
+      <BottomCTA label="시작하기" onPress={() => router.push("/onboarding")} secondary secondaryLabel="로그인 없이 시작해요" onSecondary={() => router.push("/onboarding")} />
     </Screen>
   );
 }

@@ -42,7 +42,7 @@ const STEP = 1_000_000; // 전환보증금은 100만 원 단위 (LH 공고 규�
 
 /** 비용 계산: 필요 현금·부족액·월 주거비를 분해해서 크게. 모든 숫자에 출처. */
 export default function Cost() {
-  const { id, auto } = useLocalSearchParams<{ id: string; auto?: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { colors } = useTheme();
   const { state, addReport, signIn } = useAppState();
@@ -204,7 +204,7 @@ export default function Cost() {
   if (!a || !profile || !chosen || !cost || !scenarioPricing) {
     return (
       <Screen>
-        <T variant="heading" style={{ paddingTop: 20 }}>{!profile ? "먼저 내 조건을 입력해 주세요" : "이 공고는 계산할 임대 조건이 없어요"}</T>
+        <T variant="heading" style={{ paddingTop: 20 }}>{!profile ? "먼저 내 조건을 입력해 주세요" : "이 공고는 계산할 임대조건이 없어요"}</T>
       </Screen>
     );
   }
@@ -230,11 +230,11 @@ export default function Cost() {
   return (
     <Screen
       padded={false}
-      header={<Header onBack={() => (auto ? router.replace("/(tabs)") : router.back())} title="예상 주거비" right={<IconButton name="more" label="더보기" color={colors.text2} />} />}
+      header={<Header onBack={() => router.back()} title="예상 주거비" right={<IconButton name="more" label="더보기" color={colors.text2} />} />}
       footer={
         <BottomCTA
           label={
-            signingIn ? "로그인 중" : needsSignIn ? "로그인하고 계산 보기" : locked ? "구독하고 계산 보기" : conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"
+            signingIn ? "로그인 중" : needsSignIn ? "로그인하고 주거비 보기" : locked ? "구독하고 주거비 보기" : conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"
           }
           disabled={signingIn}
           onPress={() => (locked ? unlock() : setScenario(true))}
@@ -243,7 +243,6 @@ export default function Cost() {
     >
       <View style={{ paddingHorizontal: space.screen, gap: space.section }}>
         <View style={{ gap: 16 }}>
-          {auto ? <Notice icon="check">조건이 가장 잘 맞는 공고의 주거비를 먼저 계산했어요. 이 공고는 계속 무료예요.</Notice> : null}
           <View style={{ gap: 4 }}>
             <T variant="heading" style={{ fontSize: 20, lineHeight: 28 }}>{a.title}</T>
             {bestTrackName ? <Sub tone="3">{bestTrackName}</Sub> : null}
@@ -284,13 +283,13 @@ export default function Cost() {
                     : "보증금에서 받을 수 있는 대출을 빼고 계산해요"
                   : cost.shortfall > 0
                     ? `보유 현금 ${manwon(profile.cash_on_hand)}으로는 ${manwon(cost.shortfall)} 부족해요`
-                    : `보유 현금 ${manwon(profile.cash_on_hand)}으로 감당돼요`
+                    : `보유 현금 ${manwon(profile.cash_on_hand)}으로 낼 수 있어요`
               }
             />
             <View style={{ gap: 14 }}>
               <KeyValue label="임대보증금" value={won(cost.deposit)} amount={cost.deposit} src={`공고문 ${base.source.page}쪽${deposit !== null ? " · 전환 적용" : ""}`} />
               {cost.loan ? (
-                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${hide(won(cost.loan.amount))}`} amount={locked ? undefined : -cost.loan.amount} note={locked ? `${cost.loan.product.provider} · ${needsSignIn ? "로그인하면" : "구독하면"} 한도와 금리를 봐요` : undefined} src={locked ? undefined : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
+                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${hide(won(cost.loan.amount))}`} amount={locked ? undefined : -cost.loan.amount} note={locked ? `${cost.loan.product.provider} · ${needsSignIn ? "로그인하면" : "구독하면"} 한도와 금리를 볼 수 있어요` : undefined} src={locked ? undefined : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
               ) : (
                 <KeyValue label="적용 가능한 대출" value="없음" note="입력 조건에 맞는 전세자금대출 상품이 없어요" />
               )}
@@ -312,14 +311,14 @@ export default function Cost() {
                   detail={`${state.profile?.workplace?.label ?? "직장"} 기준${commute.fare ? ` · 편도 ${won(commute.fare)}` : ""}`}
                 />
               ) : commuteLoading ? (
-                <NearRow icon="walk" title="직장까지 걸리는 시간을 재는 중이에요" detail="잠시만요" />
+                <NearRow icon="walk" title="직장까지 걸리는 시간을 알아보고 있어요" detail="몇 초쯤 걸려요" />
               ) : null}
               {nearbyLines(spot.nearby).map((n) => (
                 <NearRow key={n.kind} icon={n.icon as IconName} title={n.title} detail={n.detail} />
               ))}
               <Sub tone="3" variant="caption">
                 {chosen?.label} 기준이에요. 종류마다 가장 가까운 한 곳만 보여드리고, 역·시설까지는 직선거리예요.
-                {commute ? " 통근 시간은 직장이 있는 시군구 중심에서 출발한 대중교통 경로예요." : ""}
+                {commute ? " 통근 시간은 입력한 직장 위치에서 출발한 대중교통 경로예요." : ""}
               </Sub>
             </Card>
           </View>
@@ -397,11 +396,11 @@ export default function Cost() {
                 <BigNumber label="월임대료" value={won(scenarioPricing.monthly_rent ?? 0).replace("원", "")} unit="원" size={26} align="right" />
               </Row>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                <Stepper label="−100만" disabled={curDep - STEP < minDep} onPress={() => setDeposit(Math.max(minDep, curDep - STEP))} />
+                <Stepper label="−100만 원" disabled={curDep - STEP < minDep} onPress={() => setDeposit(Math.max(minDep, curDep - STEP))} />
                 <View style={{ flex: 1, height: 6, backgroundColor: colors.cardStrong, borderRadius: 3, overflow: "hidden" }}>
                   <View style={{ width: `${maxDep > minDep ? ((curDep - minDep) / (maxDep - minDep)) * 100 : 100}%`, height: "100%", backgroundColor: colors.primary }} />
                 </View>
-                <Stepper label="+100만" disabled={curDep + STEP > maxDep} onPress={() => setDeposit(Math.min(maxDep, curDep + STEP))} />
+                <Stepper label="+100만 원" disabled={curDep + STEP > maxDep} onPress={() => setDeposit(Math.min(maxDep, curDep + STEP))} />
               </View>
               <Row><Sub tone="3" variant="caption">최소 {manwon(minDep)}</Sub><Sub tone="3" variant="caption">최대 {manwon(maxDep)}</Sub></Row>
             </Card>
@@ -441,7 +440,7 @@ export default function Cost() {
                 ? `${UNIT_SORT_LABEL[houseSort]}으로 보고 있어요`
                 : state.profile?.workplace
                   ? "직장에서 가까운 순이에요"
-                  : "내 정보에 직장을 넣으면 가까운 순으로 보여드려요"
+                  : "내 조건에 직장을 넣으면 가까운 순으로 보여드려요"
               : bestTrackName
                 ? `조건이 가장 잘 맞는 ${bestTrackName} 기준`
                 : ""}

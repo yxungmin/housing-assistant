@@ -34,7 +34,7 @@ export default function Saved() {
 
   return (
     <Screen onRefresh={refresh} refreshing={refreshing}>
-      <PageTitle title={`관심 공고 ${items.length}개`} sub="접수 마감 3일 전에 알려드려요" />
+      <PageTitle title={`관심 공고 ${items.length}개`} sub="알림을 켜면 접수 마감 3일 전에 알려드려요" />
       {changed.length > 0 ? (
         <Notice tone="info" icon="bell">
           {changed.length === 1 ? `${changed[0]!.announcement.title} 정보가 바뀌었어요` : `관심 공고 ${changed.length}개의 정보가 바뀌었어요`}

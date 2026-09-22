@@ -66,7 +66,7 @@ export function ReportSheet({
         <View style={{ gap: 6 }}>
           <PrimaryButton
             tone="soft"
-            label={page ? `공고문 원문 ${page}쪽 열기` : "공고문 원문 열기"}
+            label={page ? `공고문 ${page}쪽 열기` : "공고문 열기"}
             onPress={() => void openSource(pdfUrl!, page).then((ok) => setOpenFailed(!ok))}
           />
           {openFailed ? (
@@ -86,7 +86,7 @@ export function ReportSheet({
           {existing.resolution ? <Sub>{existing.resolution}</Sub> : null}
           {existing.status === "OPEN" ? (
             <Sub tone="3" variant="caption">
-              {existing.sent ? "확인하고 결과를 알려드릴게요." : "아직 못 보냈어요. 연결되면 자동으로 보냅니다."}
+              {existing.sent ? "확인하고 결과를 알려드릴게요." : "아직 못 보냈어요. 연결되면 자동으로 보내요."}
             </Sub>
           ) : null}
         </View>

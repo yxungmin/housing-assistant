@@ -71,9 +71,9 @@ export function Gate({
 
       {!signIn ? (
         <Card style={{ gap: 4 }}>
-          <T variant="bodyMedium">공고문은 계속 볼 수 있어요</T>
+          <T variant="bodyMedium">저장한 공고는 계속 볼 수 있어요</T>
           <Sub tone="3" variant="caption">
-            저장해 둔 공고는 그대로 열리고, 마감 3일 전 알림도 계속 갑니다. 구독과 무관하게 마감을 놓치게 하지 않아요.
+            저장해 둔 공고는 그대로 열리고, 알림을 켜 두었다면 마감 3일 전 알림도 그대로 갑니다. 구독과 무관하게 마감을 놓치게 하지 않아요.
           </Sub>
         </Card>
       ) : null}

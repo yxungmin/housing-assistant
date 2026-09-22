@@ -129,7 +129,7 @@ function Page({ image, width, height, onClose }: { image: ViewerImage; width: nu
       {failed ? (
         <View style={{ position: "absolute", paddingHorizontal: 32, gap: 6 }}>
           <T variant="bodyMedium" color="#FFFFFF" style={{ textAlign: "center" }}>그림을 불러오지 못했어요</T>
-          <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>기관 서버에서 내려 간 그림일 수 있어요. 공고문 원문에서 확인해 주세요.</Sub>
+          <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>기관이 내린 그림일 수 있어요. 공고문에서 확인해 주세요.</Sub>
         </View>
       ) : null}
     </ScrollView>

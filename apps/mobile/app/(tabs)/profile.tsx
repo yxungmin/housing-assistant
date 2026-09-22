@@ -145,7 +145,7 @@ export default function Profile() {
       <BottomSheet visible={reports} onClose={() => setReports(false)}>
         <View style={{ gap: 8 }}>
           <T variant="title">내가 보낸 신고</T>
-          <Sub>확인하고 결과를 여기에 남겨 드려요. 고쳐진 값은 공고 화면에 바로 반영됩니다.</Sub>
+          <Sub>확인하고 결과를 여기에 남겨 드려요. 고쳐진 값은 공고 화면에 바로 반영돼요.</Sub>
         </View>
         <View style={{ gap: 18 }}>
           {state.reports.slice(0, 20).map((r) => (

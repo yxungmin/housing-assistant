@@ -27,15 +27,15 @@ export function SourceCard({ pdfUrl, detailUrl, what }: { pdfUrl?: string; detai
     <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
       <IconTile name="info" tone={canOpen ? "primary" : "gray"} />
       <View style={{ flex: 1, gap: 2 }}>
-        <T variant="bodyMedium">{canOpen ? "공고문 원문 보기" : canOpenDetail ? "기관 공고 페이지 열기" : "확실한 건 공고문이에요"}</T>
+        <T variant="bodyMedium">{canOpen ? "공고문 보기" : canOpenDetail ? "기관 공고 페이지 열기" : "확실한 건 공고문이에요"}</T>
         <Sub tone="3" variant="caption">
           {failed
             ? "공고문을 열지 못했어요. 기관 사이트에서 직접 확인해 주세요."
             : canOpen
-              ? `${what} 공고문에서 옮긴 것이에요. 신청 전에 원본을 꼭 확인하세요.${opensInPlace(pdfUrl) ? "" : " 기관 서버 파일이라 내려받아질 수 있어요."}`
+              ? `${what} 공고문에서 옮긴 것이에요. 신청 전에 공고문을 꼭 확인해 주세요.${opensInPlace(pdfUrl) ? "" : " 기관 서버 파일이라 내려받아질 수 있어요."}`
               : canOpenDetail
                 ? `${what} 공고문에서 옮긴 것이에요. 공고문 파일이 없어 기관 공고 페이지로 열어 드려요.`
-                : `${what} 공고문에서 옮긴 것이에요. 원문 주소가 아직 없어 기관 사이트에서 확인해 주세요.`}
+                : `${what} 공고문에서 옮긴 것이에요. 공고문 주소가 아직 없어 기관 사이트에서 확인해 주세요.`}
         </Sub>
       </View>
       {canOpen || canOpenDetail ? <Icon name="right" size={18} color={colors.text4} /> : null}

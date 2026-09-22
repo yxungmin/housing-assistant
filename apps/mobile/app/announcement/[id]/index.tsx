@@ -155,17 +155,17 @@ export default function AnnouncementDetail() {
         ) : null}
 
         {!isReadable(a) ? (
-          <Notice tone="warn" icon="alert">공고 조건을 분석하고 있어요. 다 읽으면 조건 일치와 비용 계산이 열립니다.</Notice>
+          <Notice tone="warn" icon="alert">공고문에서 조건을 읽지 못했어요. 이 공고는 조건 일치와 비용 계산을 하지 않아요 — 공고문을 직접 봐 주세요.</Notice>
         ) : a.checks?.length ? (
           // 자동 검증에서 걸린 것은 숨기지 않는다. "가격 정보 없음" 같은 것이 여기 뜬다.
-          <Notice tone="warn" icon="alert">자동 검증에서 확인할 점 — {a.checks.join(" · ")}. 원문 공고문을 함께 봐 주세요.</Notice>
+          <Notice tone="warn" icon="alert">자동 검증에서 확인할 점 — {a.checks.join(" · ")}. 공고문을 함께 봐 주세요.</Notice>
         ) : a.status === "AUTO" ? (
           <Notice tone="info" icon="info">공고문에서 자동으로 옮긴 조건이에요. 사람이 아직 확인하지 않았어요.</Notice>
         ) : null}
 
         {track ? (
           <View style={{ gap: 12 }}>
-            <SectionTitle right="근거는 공고문 쪽수">{track.track.name}</SectionTitle>
+            <SectionTitle right="쪽수는 공고문 기준">{track.track.name}</SectionTitle>
             <Card style={{ gap: 4, paddingVertical: 12, paddingHorizontal: 16 }}>
               <View style={{ paddingHorizontal: 4, paddingVertical: 8 }}>
                 <T variant="heading">
@@ -209,7 +209,7 @@ export default function AnnouncementDetail() {
         */}
         {scattered ? (
           <View style={{ gap: 12 }}>
-            <SectionTitle>{a.units?.length ? `고를 수 있는 집 ${a.units.length}곳` : "집이 흩어져 있어요"}</SectionTitle>
+            <SectionTitle>{a.units?.length ? `고를 수 있는 집 ${a.units.length}곳` : "집이 여러 곳에 흩어져 있어요"}</SectionTitle>
             {nearby3.length > 0 ? (
               <Card style={{ gap: 14 }}>
                 {nearby3.map(({ unit, km }) => (
@@ -224,14 +224,14 @@ export default function AnnouncementDetail() {
                 <Sub tone="3" variant="caption">
                   {state.profile?.workplace
                     ? "직장에서 가까운 순으로 세 곳만 보여드려요. 예상 주거비에서 집마다 보증금·월세를 볼 수 있어요."
-                    : "내 정보에 직장을 넣으면 가까운 집부터 보여드려요. 예상 주거비에서 집마다 보증금·월세를 볼 수 있어요."}
+                    : "내 조건에 직장을 넣으면 가까운 집부터 보여드려요. 예상 주거비에서 집마다 보증금·월세를 볼 수 있어요."}
                 </Sub>
               </Card>
             ) : (
               <Card style={{ gap: 8 }}>
-                <T variant="bodyMedium">주택이 여러 곳에 흩어져 있어요</T>
+                <T variant="bodyMedium">집이 여러 곳에 흩어져 있어요</T>
                 <Sub tone="3">
-                  이 공고는 단지가 아니라 개별 주택을 모집해요. 주택별 소재지와 임대조건은 공고문에 함께 붙은
+                  이 공고는 한 단지가 아니라 흩어져 있는 집을 한 채씩 공급해요. 주택별 소재지와 임대조건은 공고문에 함께 붙은
                   공급주택목록에서 확인해 주세요.
                 </Sub>
               </Card>
@@ -265,7 +265,7 @@ export default function AnnouncementDetail() {
               {/* 있는 것만 말한다. 통근 시간이 있으면 그렇게 말하고, 없으면 직선거리까지만 말한다 */}
               <Sub tone="3" variant="caption">
                 {hasCommuteTime
-                  ? "통근 시간은 시군구 중심에서 출발한 대중교통 경로 기준이고, 역·정류장까지 걷는 시간은 4km/h로 환산한 값이에요."
+                  ? "통근 시간은 입력한 직장 위치에서 출발한 대중교통 경로 기준이고, 역·정류장까지 걷는 시간은 4km/h로 환산한 값이에요."
                   : "모두 직선거리예요. 걷는 시간은 4km/h로 환산한 값이고, 실제 통근 시간(환승·배차)은 아직 계산하지 않아요."}
                 {state.profile?.workplace ? "" : " 직장 위치를 넣으면 거리가 보여요."}
               </Sub>
@@ -298,7 +298,7 @@ export default function AnnouncementDetail() {
               {a.waiting.rows.slice(0, 4).map((r, i) => (
                 <KeyValue
                   key={`${r.unit_type ?? i}`}
-                  label={r.unit_type ? `${r.unit_type}형` : "주택형 미상"}
+                  label={r.unit_type ? `${r.unit_type}형` : "주택형을 못 읽음"}
                   value={`${r.waiting.toLocaleString("ko-KR")}명`}
                   src={r.terminated ? `최근 해지 ${r.terminated}건` : undefined}
                 />
@@ -336,14 +336,14 @@ export default function AnnouncementDetail() {
                   <Icon name={applied ? "check-circle" : "bell"} size={20} color={applied ? colors.primary : colors.text2} />
                   <View style={{ flex: 1, gap: 1 }}>
                     <T variant="bodyMedium" style={{ fontSize: 15 }}>
-                      {applied ? "발표일에 알려드릴게요" : "신청했다면 발표일에 알려드릴게요"}
+                      {applied ? "발표일에 알려드릴게요" : "신청했다면 발표일에 알려드려요"}
                     </T>
                     <Sub tone="3" variant="caption">
                       {applied
                         ? announceDate
                           ? "3일 전 · 1일 전 · 당일 오전 9시"
                           : "발표일이 날짜로 적혀 있지 않아 알림을 걸지 못했어요"
-                        : "눌러서 신청한 공고로 표시하세요"}
+                        : "눌러서 표시해 두세요. 알림을 켜 두면 발표일에 알려드려요"}
                     </Sub>
                   </View>
                 </Pressable>
@@ -364,7 +364,7 @@ export default function AnnouncementDetail() {
           </View>
         ) : null}
         <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
-          조건 일치는 공고문과 입력값을 비교한 결과예요. 실제 자격은 서류 심사로 확정됩니다.
+          조건 일치는 공고문과 입력값을 비교한 결과예요. 실제 자격은 서류 심사로 확정돼요.
           {a.status === "VERIFIED" ? " 이 공고의 조건은 사람이 공고문과 대조했어요." : ""} 숫자가 이상하면 그 줄을 눌러 알려 주세요.
         </Sub>
       </View>

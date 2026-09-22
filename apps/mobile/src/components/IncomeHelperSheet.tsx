@@ -35,9 +35,9 @@ export function IncomeHelperSheet({ visible, dual, onClose, onApply }: { visible
           <Sub tone="3" variant="caption">건강보험료 ÷ (보험료율 {(result.rate * 100).toFixed(2)}% ÷ 2) · {HEALTH_INSURANCE.year}년 요율 기준</Sub>
         </View>
       ) : (
-        <Notice tone="info" icon="info">지역가입자는 소득 외 요소로 보험료가 정해져 역산할 수 없어요. 소득금액증명의 금액을 12로 나눠 적어 주세요.</Notice>
+        <Notice tone="info" icon="info">지역가입자는 소득 외 요소로 보험료가 정해져 역산할 수 없어요. 소득금액증명에 적힌 1년 금액을 그대로 적어 주세요.</Notice>
       )}
-      <PrimaryButton label={ok ? `${manwon(result.monthly_income)}으로 입력` : "금액을 입력해 주세요"} disabled={!ok} onPress={() => onApply(result.monthly_income)} />
+      <PrimaryButton label={ok ? `연 ${manwon(result.monthly_income * 12)}으로 입력` : "금액을 입력해 주세요"} disabled={!ok} onPress={() => onApply(result.monthly_income)} />
     </BottomSheet>
   );
 }

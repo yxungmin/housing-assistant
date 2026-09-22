@@ -55,7 +55,7 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
         </T>
       </View>
       <View style={{ gap: 12 }}>
-        {["모든 공고의 필요 현금·월 주거비 계산", "보증금·월세 시나리오와 대출 상품 비교", "수정 공고가 나오면 자동 재계산"].map((b) => (
+        {["모든 공고의 필요 현금·월 주거비 계산", "보증금·월세 시나리오와 대출 상품 비교", "공고 값이 바뀌면 알림 · 바뀐 값으로 다시 계산"].map((b) => (
           <View key={b} style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
             <Icon name="check" size={18} color={colors.primary} />
             <T variant="body">{b}</T>
