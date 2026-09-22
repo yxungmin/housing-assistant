@@ -26,7 +26,10 @@ const keyOf = (lat: number, lng: number) => `${lat.toFixed(3)},${lng.toFixed(3)}
 interface Body {
   announcement_id?: string;
   unit_id?: string;
-  /** 출발 좌표 (시군구 대표점). 앱이 packages/schema의 표에서 꺼내 보낸다 */
+  /**
+   * 출발 좌표. 앱이 직장 위치를 소수 3자리(약 100m)로 뭉개서 보낸다 (data/transit.ts).
+   * 전체 정밀도를 받지 않는다 — 쓰지도 않을뿐더러 직장 건물을 특정할 수 있는 값이다.
+   */
   from?: { lat: number; lng: number };
 }
 

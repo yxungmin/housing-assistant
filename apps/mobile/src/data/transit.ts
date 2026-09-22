@@ -32,9 +32,20 @@ const KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
  *
  * 옛 프로필은 좌표가 시군구 대표점이라 그대로 쓰면 예전과 같은 값이 나온다 — 따로 마이그레이션하지 않는다.
  */
+/**
+ * 출발 좌표를 소수 3자리(약 100m)로 뭉갠다.
+ *
+ * 서버는 어차피 이 단위로 캐시한다. 그런데 전송은 전체 정밀도로 하고 있었다 —
+ * 쓰지도 않을 정밀도를 받고 있던 셈이고, 그건 직장 건물을 특정할 수 있는 값이다.
+ * 직장이 시군구였을 때는 문제가 아니었지만 장소 검색으로 바꾸면서 의미가 달라졌다.
+ *
+ * 100m면 도보 1~2분이라 통근 시간 계산에는 영향이 없다.
+ */
+const COARSE = 1000;
+
 export function originFor(profile: UserProfile | null | undefined): { lat: number; lng: number } | null {
   const w = profile?.workplace;
-  return w ? { lat: w.lat, lng: w.lng } : null;
+  return w ? { lat: Math.round(w.lat * COARSE) / COARSE, lng: Math.round(w.lng * COARSE) / COARSE } : null;
 }
 
 export const transitConfigured = remoteConfigured;
