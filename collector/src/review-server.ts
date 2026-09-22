@@ -86,7 +86,7 @@ pre{white-space:pre-wrap;font:12px/1.5 ui-monospace,Consolas,monospace;backgroun
 .acts button:hover{background:#f3f4f6}
 .acts input{font:inherit;flex:1;min-width:200px;padding:6px 10px;border:1px solid var(--border);border-radius:8px}
 </style></head><body>
-<header><h1>공고 검수</h1><select id="pick"></select><button id="reload">새로고침</button><button id="tabReports">신고 큐</button><span id="meta" class="src"></span></header>
+<header><h1>공고 검수</h1><select id="pick"></select><button id="reload">새로고침</button><button id="tabHealth">상태</button><button id="tabReports">신고 큐</button><span id="meta" class="src"></span></header>
 <main><section id="content"><div class="empty">초안을 고르세요</div></section><aside><div class="card"><h2 id="srcTitle">원문 페이지</h2><div class="src" id="srcHint">표의 쪽수를 누르면 그 페이지 원문이 여기 나옵니다 (npm run inspect -- &lt;pdf&gt; --text 로 저장된 경우)</div><pre id="srcText" hidden></pre></div></aside></main>
 <script>
 const won=n=>n==null?"":Number(n).toLocaleString("ko-KR");
@@ -174,6 +174,48 @@ async function showReports(){
   }));
 }
 
+/**
+ * 상태판. "신뢰가 깨지고 있는가"를 먼저 보여 준다 — 방치하면 서비스의 전제가 무너지는 것들이다.
+ * 좋은 숫자는 회색, 손대야 하는 숫자만 색을 쓴다. 전부 색이면 아무것도 눈에 안 띈다.
+ */
+async function showHealth(){
+  const h=await (await fetch("/api/health")).json();
+  const c=document.getElementById("content");
+  if(!h.configured){c.innerHTML='<div class="empty">Supabase가 설정되지 않아 상태를 볼 수 없어요<br><span class="src">.env에 SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY</span></div>';return;}
+  if(h.error){c.innerHTML='<div class="card"><h2>상태</h2><div class="src">'+esc(h.error)+'</div></div>';return;}
+
+  const tone=(v,warnAt)=>v===0?"":v>=warnAt?"bad":"warn";
+  const days=h.oldestOpenDays;
+  const st=h.byStatus||{};
+  const total=Object.values(st).reduce((a,b)=>a+b,0);
+  const unread=st.UNVERIFIED||0;
+  const pct=total?Math.round(unread/total*100):0;
+  const ago=h.lastExtractedAt?Math.floor((Date.now()-Date.parse(h.lastExtractedAt))/86400000):null;
+  const cost=h.extractedThisMonth*1079;
+
+  const row=(label,value,badge,hint)=>'<tr><td>'+label+'</td><td class="num">'+value+
+    (badge?' <span class="badge '+badge+'">손대야 함</span>':'')+'</td><td class="src">'+(hint||"")+'</td></tr>';
+
+  c.innerHTML=
+   '<div class="card"><h2>신뢰</h2><table>'+
+      row("확인 중인 신고", h.reportsOpen+"건", tone(h.reportsOpen,1), h.reportsOpen?"신고 큐에서 처리":"쌓인 것 없음")+
+      row("가장 오래 묵은 신고", days===null?"—":days+"일", days===null?"":(days>=3?"bad":days>=1?"warn":""), "사용자는 그동안 답을 못 받고 있다")+
+      row("게시 보류 (CONFLICT)", h.conflicts+"건", tone(h.conflicts,1), "숫자를 믿을 수 없어 막힌 공고. 앱에 안 보인다")+
+      row("지적 달린 채 게시", h.withChecks+"건", h.withChecks?"warn":"", "checks가 앱에 그대로 노출된다")+
+      row("조건을 못 읽은 공고", unread+"건 / "+total+"건 ("+pct+"%)", pct>=30?"bad":pct>=15?"warn":"", "매칭·계산을 못 하는 공고")+
+   '</table></div>'+
+   '<div class="card"><h2>수집</h2><table>'+
+      row("마지막 추출", ago===null?"없음":(ago===0?"오늘":ago+"일 전"), ago===null?"warn":(ago>=7?"warn":""), "며칠째 조용하면 파이프라인을 본다")+
+      row("이번 달 추출", h.extractedThisMonth+"건", "", "번들에서 옮긴 것은 제외")+
+      row("이번 달 추출비(추정)", cost.toLocaleString("ko-KR")+"원", "", "1건 1,079원 기준 · 실제 청구액은 콘솔에서")+
+   '</table></div>'+
+   '<div class="card"><h2>게시 상태</h2><table>'+
+      row("사람이 대조함 (VERIFIED)", (st.VERIFIED||0)+"건","","")+
+      row("자동 검증만 (AUTO)", (st.AUTO||0)+"건","","")+
+      row("못 읽음 (UNVERIFIED)", unread+"건","","")+
+   '</table></div>';
+}
+
 async function refreshCount(){
   try{
     const r=await (await fetch("/api/reports")).json();
@@ -183,15 +225,21 @@ async function refreshCount(){
   }catch(e){/* 무시 */}
 }
 
-document.getElementById("tabReports").addEventListener("click",()=>{
-  view=view==="reports"?"drafts":"reports";
-  const tab=document.getElementById("tabReports");
-  document.getElementById("pick").style.display=view==="reports"?"none":"";
-  if(view==="reports"){tab.textContent="추출 검수로";showReports()}
-  else{tab.textContent="신고 큐";show();refreshCount()}
-});
+// 화면 셋을 한 자리에서 오간다. 탭 프레임워크를 쓸 만한 규모가 아니다.
+function goto(next){
+  view=next;
+  document.getElementById("pick").style.display=view==="drafts"?"":"none";
+  document.getElementById("tabReports").textContent=view==="reports"?"추출 검수로":"신고 큐";
+  document.getElementById("tabHealth").textContent=view==="health"?"추출 검수로":"상태";
+  if(view==="reports")showReports();
+  else if(view==="health")showHealth();
+  else show();
+  refreshCount();
+}
+document.getElementById("tabReports").addEventListener("click",()=>goto(view==="reports"?"drafts":"reports"));
+document.getElementById("tabHealth").addEventListener("click",()=>goto(view==="health"?"drafts":"health"));
 document.getElementById("pick").addEventListener("change",show);
-document.getElementById("reload").addEventListener("click",()=>{view==="reports"?showReports():load();refreshCount()});
+document.getElementById("reload").addEventListener("click",()=>{if(view==="reports")showReports();else if(view==="health")showHealth();else load();refreshCount()});
 load();refreshCount();
 </script></body></html>`;
 
@@ -244,6 +292,15 @@ const server = createServer(async (req, res) => {
       const m = new RegExp(`=== p\\.${page} ===\\n([\\s\\S]*?)(?=\\n\\n=== p\\.\\d+ ===|$)`).exec(all);
       res.writeHead(m ? 200 : 404, { "content-type": "text/plain; charset=utf-8" });
       return res.end(m ? m[1] : "");
+    }
+    // ── 상태판 ───────────────────────────────────────────────────────
+    if (url.pathname === "/api/health") {
+      if (!repo) return json(res, { configured: false });
+      try {
+        return json(res, { configured: true, ...(await repo.health()) });
+      } catch (err) {
+        return json(res, { configured: true, error: err instanceof Error ? err.message : String(err) });
+      }
     }
     // ── 신고 큐 ───────────────────────────────────────────────────────
     if (url.pathname === "/api/reports") {

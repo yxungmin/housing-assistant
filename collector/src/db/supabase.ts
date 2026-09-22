@@ -204,6 +204,66 @@ export class Repo {
     if (error) throw error;
   }
 
+  /**
+   * 신뢰가 깨지고 있는지 한눈에 보는 값들.
+   *
+   * 이 넷은 우리만 볼 수 있고, 방치하면 서비스의 전제가 무너진다 —
+   * 신고가 쌓이는데 아무도 안 보거나, CONFLICT로 게시가 막힌 공고를 모르거나,
+   * 조건을 못 읽은 공고가 늘어나는 것을 모르면 "정확하다"는 약속이 조용히 거짓이 된다.
+   *
+   * 전부 우리 DB의 사실이라 여기서 센다. 분석 도구로 보내면 같은 숫자의 출처가 둘이 되고,
+   * 둘이 어긋날 때 어느 쪽을 믿을지가 문제가 된다.
+   */
+  async health(): Promise<{
+    reportsOpen: number;
+    oldestOpenDays: number | null;
+    conflicts: number;
+    withChecks: number;
+    byStatus: Record<string, number>;
+    lastExtractedAt: string | null;
+    extractedThisMonth: number;
+  }> {
+    const count = async (table: string, apply: (q: any) => any): Promise<number> => {
+      const { count: c, error } = await apply(this.sb.from(table).select("*", { count: "exact", head: true }));
+      if (error) throw error;
+      return c ?? 0;
+    };
+
+    const reportsOpen = await count("issue_reports", (q) => q.eq("status", "OPEN"));
+    const conflicts = await count("announcement_versions", (q) => q.eq("status", "CONFLICT"));
+
+    // 가장 오래된 "확인 중" 신고. 며칠 묵었는지가 곧 우리가 얼마나 방치했는지다.
+    const { data: oldest } = await this.sb
+      .from("issue_reports").select("created_at").eq("status", "OPEN")
+      .order("created_at", { ascending: true }).limit(1).maybeSingle();
+    const oldestOpenDays = oldest
+      ? Math.floor((Date.now() - Date.parse((oldest as { created_at: string }).created_at)) / 86_400_000)
+      : null;
+
+    // 게시된 공고의 상태 분포 + 지적이 달린 채 나간 것
+    const { data: feed, error: feedErr } = await this.sb.from("app_announcements").select("status, checks");
+    if (feedErr) throw feedErr;
+    const rows = (feed ?? []) as { status: string; checks: unknown[] | null }[];
+    const byStatus: Record<string, number> = {};
+    for (const r of rows) byStatus[r.status] = (byStatus[r.status] ?? 0) + 1;
+    const withChecks = rows.filter((r) => Array.isArray(r.checks) && r.checks.length > 0).length;
+
+    const { data: last } = await this.sb
+      .from("announcement_versions").select("extracted_at")
+      .not("extracted_at", "is", null).order("extracted_at", { ascending: false }).limit(1).maybeSingle();
+    const lastExtractedAt = (last as { extracted_at: string } | null)?.extracted_at ?? null;
+
+    // 이번 달 추출 건수. 번들에서 옮긴 것(prompt_version=bundle-import)은 돈이 안 들었으므로 뺀다.
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+    const extractedThisMonth = await count("announcement_versions", (q) =>
+      q.gte("extracted_at", monthStart.toISOString()).neq("prompt_version", "bundle-import"),
+    );
+
+    return { reportsOpen, oldestOpenDays, conflicts, withChecks, byStatus, lastExtractedAt, extractedThisMonth };
+  }
+
   /** 검수 큐: "이 숫자 이상해요" 신고. 확인 중인 것을 먼저, 그 안에서는 오래된 것부터 본다. */
   async listReports(opts: { open?: boolean; limit?: number } = {}): Promise<ReportRow[]> {
     let q = this.sb
