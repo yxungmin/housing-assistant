@@ -31,7 +31,8 @@
     "app:enrich": "npm run app:enrich -w @housing/collector --",
     "simulate": "npm run simulate -w @housing/collector --",
     "pdf:rehost": "npm run pdf:rehost -w @housing/collector --",
-    "output:size": "npm run output:size -w @housing/collector"
+    "output:size": "npm run output:size -w @housing/collector",
+    "bundle:push": "npm run bundle:push -w @housing/collector --"
   },
   "engines": {
     "node": ">=20"

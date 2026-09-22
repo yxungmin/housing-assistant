@@ -22,7 +22,8 @@
     "output:size": "tsx src/output-size.ts",
     "app:enrich": "tsx src/enrich.ts",
     "simulate": "tsx src/simulate.ts",
-    "pdf:rehost": "tsx src/rehost-pdfs.ts"
+    "pdf:rehost": "tsx src/rehost-pdfs.ts",
+    "bundle:push": "tsx src/push-bundle.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.127.0",

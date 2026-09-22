@@ -281,10 +281,8 @@ const STEP_LABEL: Record<string, string> = {
   subscription_months: "청약통장 기간",
   subscription_active: "청약통장 납입 중",
   cash: "보유 현금",
-  workplace_region: "직장 지역",
-  workplace_sigungu: "직장 시군구",
-  workplace_partner_region: "배우자 직장 지역",
-  workplace_partner_sigungu: "배우자 직장 시군구",
+  workplace_place: "직장",
+  workplace_partner_place: "배우자 직장",
 };
 
 export const stepLabel = (s: Step): string => STEP_LABEL[s.id] ?? s.id;
@@ -331,6 +329,8 @@ export function stepDisplay(s: Step, p: Partial<UserProfile>): string | null {
   if (v === null || v === "") return null;
 
   if (s.kind === "select") return stepOptions(s, p).find((o) => o.value === String(v))?.label ?? String(v);
+  // 직장은 "이름|위도|경도"로 저장된다. 목록에는 이름만 보여 준다.
+  if (s.kind === "place") return v === NO_WORKPLACE ? "직장 없음" : String(v).split("|")[0] || null;
   if (s.kind === "multi") {
     const picked = String(v).split(",").filter(Boolean);
     if (picked.length === 0) return "해당 없음";
