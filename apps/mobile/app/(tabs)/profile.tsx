@@ -166,6 +166,14 @@ export default function Profile() {
         </Card>
       </View>
 
+      <View style={{ gap: 8 }}>
+        <SectionTitle>약관</SectionTitle>
+        <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
+          <ListRow icon="info" label="이용약관" onPress={() => router.push("/legal/terms")} />
+          <ListRow icon="info" label="개인정보처리방침" onPress={() => router.push("/legal/privacy")} />
+        </Card>
+      </View>
+
       <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>입력한 조건은 이 기기에만 저장되고 서버로 보내지 않아요.</Sub>
       <Pressable onPress={reset} accessibilityRole="button" style={{ paddingVertical: 12, paddingHorizontal: 4 }}>
         <T variant="small" color={colors.text3}>모든 데이터 지우고 처음부터</T>

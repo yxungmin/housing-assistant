@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useRouter } from "expo-router";
 import { Linking, Platform, Pressable, View } from "react-native";
 import { CoffeeMark } from "./CoffeeMark";
 import { Icon } from "./icon";
@@ -19,6 +20,7 @@ const price = `월 ${PRICE_KRW.toLocaleString("ko-KR")}원`;
  */
 export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: boolean; onClose: () => void; onStarted?: () => void }) {
   const { colors } = useTheme();
+  const router = useRouter();
   const { state, setSubscription } = useAppState();
   const [busy, setBusy] = useState(false);
   const expired = state.subscription.status === "expired";
@@ -72,12 +74,36 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
           <Tag tone="gray">언제든 해지</Tag>
         </Row>
       </Card>
+      {/* 전자상거래법 제17조 제6항: 청약철회 제한 사유는 **구매 화면에** 표시해야 효력이 있다.
+          아래에 작게 깔거나 약관 안에만 두면 제한이 아예 적용되지 않는다.
+          동시에 App Store 3.1.2는 구매 버튼 바로 위에 가격·주기·갱신을 요구한다 — 같은 자리다. */}
+      <Card tone="white" style={{ gap: 6 }}>
+        <T variant="bodyMedium" style={{ fontSize: 14 }}>결제 전에 확인해 주세요</T>
+        <Sub tone="3" variant="caption">
+          {freeMonth
+            ? `첫 ${TRIAL_DAYS}일은 0원이고, 그 뒤 ${price}이 매월 자동으로 결제돼요. 무료 기간에 해지하면 결제되지 않아요.`
+            : `${price}이 매월 자동으로 결제돼요.`}
+        </Sub>
+        <Sub tone="3" variant="caption">
+          결제일부터 7일 이내에 청약철회할 수 있어요. 다만 결제한 기간에 주거비 계산을 한 번이라도 사용하면 그 기간에 대해서는 청약철회가 제한돼요.
+        </Sub>
+        <Sub tone="3" variant="caption">해지는 스토어의 구독 관리 화면에서 할 수 있어요.</Sub>
+      </Card>
       <PrimaryButton label={busy ? "처리 중" : freeMonth ? "첫 달 0원으로 시작" : "구독 시작"} disabled={busy} onPress={() => void run(() => (freeMonth ? billing.startTrial() : billing.purchase()))} />
       <Pressable onPress={() => void run(() => billing.restore())} accessibilityRole="button" style={{ alignItems: "center", paddingVertical: 4 }}>
         <T variant="small" color={colors.text3}>이미 구독했다면 구매 복원</T>
       </Pressable>
+      {/* App Store 3.1.2는 구매 화면에 이용약관과 개인정보처리방침 링크를 함께 요구한다 */}
+      <View style={{ flexDirection: "row", justifyContent: "center", gap: 16 }}>
+        <Pressable onPress={() => { onClose(); router.push("/legal/terms"); }} accessibilityRole="button" hitSlop={8}>
+          <T variant="small" color={colors.text3} style={{ textDecorationLine: "underline" }}>이용약관</T>
+        </Pressable>
+        <Pressable onPress={() => { onClose(); router.push("/legal/privacy"); }} accessibilityRole="button" hitSlop={8}>
+          <T variant="small" color={colors.text3} style={{ textDecorationLine: "underline" }}>개인정보처리방침</T>
+        </Pressable>
+      </View>
       <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>
-        {billing.isMock ? "개발 빌드: 결제 없이 기기 상태만 바뀝니다" : "스토어 결제로 진행되며 스토어 계정 설정에서 해지할 수 있어요"}
+        {billing.isMock ? "개발 빌드: 결제 없이 기기 상태만 바뀝니다" : "스토어 결제로 진행돼요"}
       </Sub>
     </BottomSheet>
   );

@@ -38,7 +38,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "icon:preview": "tsx scripts/icon-preview.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "legal:md": "tsx scripts/legal-md.ts"
   },
   "private": true
 }
