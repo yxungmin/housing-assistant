@@ -21,6 +21,14 @@ export interface Step {
   helper?: string;
   options?: Option[] | ((p: Partial<UserProfile>) => Option[]);
   optional?: boolean;
+  /**
+   * 첫 온보딩에서 물을 것인가.
+   *
+   * 여기 없는 항목은 나중에 공고를 보다가 필요해질 때 그 자리에서 묻는다 —
+   * 엔진이 값이 없으면 그 조건을 NEEDS_CHECK로 돌려주므로, 화면이 "입력하면 판별돼요"로 이어 준다.
+   * 처음에 스무 개를 물으면 목록을 보기도 전에 지친다. 목록이 쓸모 있어지는 최소치만 받는다.
+   */
+  core?: boolean;
   /** 이 단계를 보여줄 조건 */
   when?: (p: Partial<UserProfile>) => boolean;
   /** 입력값을 프로필에 반영 */
@@ -45,6 +53,9 @@ const todayIso = () => {
  * 직장 위치 두 단계(시도 → 시군구). 본인과 배우자가 같은 모양이라 한 곳에서 만든다.
  * 주소 검색 대신 시군구 선택으로 받는다 — 정확한 주소는 통근 계산에 필요한 만큼보다 많이 알게 된다.
  */
+/** "직장이 없어요" 선택값. 지역 코드와 섞이지 않게 숫자가 아닌 값을 쓴다 */
+export const NO_WORKPLACE = "none";
+
 type WorkplaceKey = "workplace" | "workplace_partner";
 
 function workplaceSteps(key: WorkplaceKey, copy: { title: Step["title"]; hint: string; when?: (p: Partial<UserProfile>) => boolean }): Step[] {
@@ -53,13 +64,16 @@ function workplaceSteps(key: WorkplaceKey, copy: { title: Step["title"]; hint: s
     {
       id: `${key}_region`, kind: "select", title: copy.title, hint: copy.hint, optional: true,
       when: copy.when,
-      options: REGIONS,
+      // 모두가 직장에 다니는 건 아니다. 학생·구직 중·은퇴·육아 전담이면 통근을 물을 이유가 없고,
+      // 건너뛰기와도 다르다 — "없다"는 답이고 건너뛰기는 "아직 모르겠다"다.
+      options: [{ value: NO_WORKPLACE, label: "직장이 없어요", hint: "학생·구직 중·은퇴 등" }, ...REGIONS],
       apply: (p, v) => {
-        if (v === null) return { ...p, [key]: undefined };
+        if (v === null) return { ...p, [key]: undefined, [`${key}_none`]: undefined };
+        if (v === NO_WORKPLACE) return { ...p, [key]: undefined, [`${key}_none`]: true };
         const c = cur(p);
-        return { ...p, [key]: placeFor(String(v), c?.regionCode === String(v) ? c.sigungu : undefined) ?? undefined };
+        return { ...p, [key]: placeFor(String(v), c?.regionCode === String(v) ? c.sigungu : undefined) ?? undefined, [`${key}_none`]: undefined };
       },
-      read: (p) => cur(p)?.regionCode ?? null,
+      read: (p) => (p[`${key}_none` as keyof UserProfile] ? NO_WORKPLACE : (cur(p)?.regionCode ?? null)),
     },
     {
       id: `${key}_sigungu`, kind: "select",
@@ -67,6 +81,7 @@ function workplaceSteps(key: WorkplaceKey, copy: { title: Step["title"]; hint: s
       hint: "구청·시청 부근을 기준으로 직선거리를 계산해요.",
       when: (p) => {
         if (copy.when && !copy.when(p)) return false;
+        if (p[`${key}_none` as keyof UserProfile]) return false; // 직장이 없으면 시군구를 물을 이유가 없다
         const code = cur(p)?.regionCode;
         return !!code && (regionByCode(code)?.sigungu.length ?? 0) > 1;
       },
@@ -83,7 +98,7 @@ function workplaceSteps(key: WorkplaceKey, copy: { title: Step["title"]; hint: s
 
 export const STEPS: Step[] = [
   {
-    id: "region", kind: "select", title: "지금 어디에 살고 있나요?",
+    id: "region", core: true, kind: "select", title: "지금 어디에 살고 있나요?",
     // 수집 범위 밖을 고르면 그 자리에서 알린다. 스무 질문을 다 답하고 빈 목록을 보는 것보다 낫다.
     hint: (p) =>
       isServiceRegion(p.region_code)
@@ -103,7 +118,7 @@ export const STEPS: Step[] = [
     read: (p) => (p.region_sigungu ? p.region_sigungu.split(" ").slice(1).join(" ") : null),
   },
   {
-    id: "birth_date", kind: "date", title: "생년월일을 알려주세요", hint: "공고는 출생일 기준으로 청년·고령자 계층을 나눕니다. 만 나이는 자동으로 계산해요.",
+    id: "birth_date", core: true, kind: "date", title: "생년월일을 알려주세요", hint: "공고는 출생일 기준으로 청년·고령자 계층을 나눕니다. 만 나이는 자동으로 계산해요.",
     apply: (p, v) => {
       const s = String(v ?? "").replace(/[^0-9]/g, "");
       if (s.length !== 8) return p;
@@ -113,7 +128,7 @@ export const STEPS: Step[] = [
     read: (p) => (p.birth_date ? p.birth_date.replace(/-/g, "") : null),
   },
   {
-    id: "marriage", kind: "select", title: "혼인 상태를 알려주세요",
+    id: "marriage", core: true, kind: "select", title: "혼인 상태를 알려주세요",
     options: [
       { value: "single", label: "미혼" }, { value: "married", label: "기혼" },
       { value: "pre_marriage", label: "예비 신혼부부", hint: "입주 전까지 혼인 예정" }, { value: "single_parent", label: "한부모" },
@@ -127,7 +142,7 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, marriage_years: Number(v) }), read: (p) => p.marriage_years ?? null,
   },
   {
-    id: "household_size", kind: "count", title: "함께 사는 가구원은 몇 명인가요?", hint: "본인을 포함한 세대구성원 수. 소득 기준이 가구원 수마다 다릅니다.",
+    id: "household_size", core: true, kind: "count", title: "함께 사는 가구원은 몇 명인가요?", hint: "본인을 포함한 세대구성원 수. 소득 기준이 가구원 수마다 다릅니다.",
     apply: (p, v) => ({ ...p, household_size: Number(v) }), read: (p) => p.household_size ?? null,
   },
   {
@@ -148,7 +163,7 @@ export const STEPS: Step[] = [
   {
     // 공고는 "월평균소득 100% 이하"처럼 월로 말하지만, 사람은 자기 소득을 연봉으로 기억한다.
     // 그래서 받기는 연봉으로 받고 월로 환산해 판정에 쓴다. 환산값은 화면에 같이 적어 둔다.
-    id: "annual_income", kind: "won", title: "세전 연소득은 얼마인가요?", hint: "세금 떼기 전 1년 총액이에요. 맞벌이면 두 사람 소득을 더해 주세요.",
+    id: "annual_income", core: true, kind: "won", title: "세전 연소득은 얼마인가요?", hint: "세금 떼기 전 1년 총액이에요. 맞벌이면 두 사람 소득을 더해 주세요.",
     helper: "정확한 금액을 모르면 직장 건강보험료 납부액으로 역산해 드려요. 공고의 소득 기준은 월 환산액으로 판정됩니다.",
     apply: (p, v) => {
       const annual = Number(v);
@@ -158,7 +173,7 @@ export const STEPS: Step[] = [
     read: (p) => p.annual_income ?? (p.monthly_income !== undefined ? p.monthly_income * 12 : null),
   },
   {
-    id: "total_assets", kind: "won", title: "가구 총자산은 얼마쯤인가요?", hint: "부동산·자동차·금융자산을 더하고 부채를 뺀 금액. 대략이어도 괜찮아요.",
+    id: "total_assets", core: true, kind: "won", title: "가구 총자산은 얼마쯤인가요?", hint: "부동산·자동차·금융자산을 더하고 부채를 뺀 금액. 대략이어도 괜찮아요.",
     apply: (p, v) => ({ ...p, total_assets: Number(v) }), read: (p) => p.total_assets ?? null,
   },
   {
@@ -183,7 +198,7 @@ export const STEPS: Step[] = [
     read: (p) => (p.statuses === undefined ? null : p.statuses.join(",")),
   },
   {
-    id: "homeless", kind: "select", title: "세대구성원 모두 집이 없나요?", hint: "본인·배우자·같이 사는 부모 등 전원이 무주택이어야 하는 공고가 많습니다.",
+    id: "homeless", core: true, kind: "select", title: "세대구성원 모두 집이 없나요?", hint: "본인·배우자·같이 사는 부모 등 전원이 무주택이어야 하는 공고가 많습니다.",
     options: [{ value: "yes", label: "네, 모두 무주택이에요" }, { value: "no", label: "아니요, 집이 있어요" }],
     apply: (p, v) => ({ ...p, is_homeless: v === "yes", homeless_months: v === "yes" ? p.homeless_months : undefined }),
     read: (p) => (p.is_homeless === undefined ? null : p.is_homeless ? "yes" : "no"),
@@ -246,9 +261,13 @@ export const STEPS: Step[] = [
   }),
 ];
 
-export function visibleSteps(p: Partial<UserProfile>): Step[] {
-  return STEPS.filter((s) => !s.when || s.when(p));
+export function visibleSteps(p: Partial<UserProfile>, opts: { coreOnly?: boolean } = {}): Step[] {
+  return STEPS.filter((s) => (!opts.coreOnly || s.core) && (!s.when || s.when(p)));
 }
+
+/** 아직 안 채운 항목 (나중에 공고에서 유도할 때 쓴다) */
+export const pendingSteps = (p: Partial<UserProfile>): Step[] =>
+  visibleSteps(p).filter((s) => !s.core && s.read(p) === null);
 
 /**
  * 목록에 쓰는 짧은 이름. 단계의 title은 질문이라("세전 연소득은 얼마인가요?") 목록에 못 쓴다.
@@ -349,6 +368,10 @@ export function stepDisplay(s: Step, p: Partial<UserProfile>): string | null {
 export const stepById = (p: Partial<UserProfile>, id: string): Step | undefined => visibleSteps(p).find((s) => s.id === id);
 
 
+/**
+ * 목록을 보여 줄 만큼 채워졌는가. core 단계와 같은 집합이다.
+ * 현금(cash_on_hand)은 빠졌다 — 비용 계산에만 쓰이고, 없으면 그 자리에서 물으면 된다.
+ */
 export function isComplete(p: Partial<UserProfile>): p is UserProfile {
-  return p.region_code !== undefined && (p.birth_date !== undefined || p.age !== undefined) && p.marriage !== undefined && p.household_size !== undefined && p.monthly_income !== undefined && p.total_assets !== undefined && p.is_homeless !== undefined && p.cash_on_hand !== undefined;
+  return p.region_code !== undefined && (p.birth_date !== undefined || p.age !== undefined) && p.marriage !== undefined && p.household_size !== undefined && p.monthly_income !== undefined && p.total_assets !== undefined && p.is_homeless !== undefined;
 }

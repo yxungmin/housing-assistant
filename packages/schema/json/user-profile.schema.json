@@ -59,8 +59,14 @@
         "dual"
       ]
     },
+    "annual_income": {
+      "description": "세전 연소득 (원). 사람이 적은 원본",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
     "monthly_income": {
-      "description": "가구 월평균소득 (원, 세전)",
+      "description": "가구 월평균소득 (원, 세전). annual_income에서 계산",
       "type": "integer",
       "minimum": 0,
       "maximum": 9007199254740991
@@ -175,6 +181,12 @@
         "lat",
         "lng"
       ]
+    },
+    "workplace_none": {
+      "type": "boolean"
+    },
+    "workplace_partner_none": {
+      "type": "boolean"
     },
     "commute_limit_min": {
       "description": "허용 통근 시간 상한 (분)",

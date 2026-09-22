@@ -27,7 +27,8 @@ export default function Onboarding() {
   const { step: only } = useLocalSearchParams<{ step?: string }>();
   const [draft, setDraft] = useState<Partial<UserProfile>>(state.profile ?? {});
   const [index, setIndex] = useState(0);
-  const all = useMemo(() => visibleSteps(draft), [draft]);
+  // 첫 온보딩은 핵심만 묻는다. 나머지는 공고를 보다가 필요해질 때 ?step=<id>로 그 자리에서 묻는다.
+  const all = useMemo(() => visibleSteps(draft, { coreOnly: !only }), [draft, only]);
   // 한 항목만 고치는 중이면 그 단계만 남긴다. 없는 id를 받으면 평소대로 전부 보여 준다.
   const steps = useMemo(() => (only ? all.filter((x) => x.id === only) : all), [all, only]);
   const step = steps[Math.min(index, steps.length - 1)]!;
@@ -39,7 +40,7 @@ export default function Onboarding() {
     const merged = patch ?? draft;
     // 한 항목만 고치는 중이면 저장하고 바로 돌아간다. 다음 질문으로 넘어가지 않는다.
     if (only) return saveOne(merged);
-    const nextSteps = visibleSteps(merged);
+    const nextSteps = visibleSteps(merged, { coreOnly: !only });
     if (next >= nextSteps.length) return finish(merged);
     setDraft(merged);
     setIndex(next);

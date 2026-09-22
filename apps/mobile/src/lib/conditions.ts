@@ -113,6 +113,19 @@ export function missingStepFor(rule: EligibilityRule, p: UserProfile | null): st
   if (rule.applies_to?.household_size !== undefined && p.household_size === undefined) return "household_size";
   if (rule.applies_to?.income_type !== undefined && p.income_type === undefined) return "income_type";
 
+  // 같은 분류라도 무엇이 빠졌느냐에 따라 물을 것이 다르다.
+  // 예: 혼인 "상태"는 있는데 혼인 "기간"이 없으면, marriage가 아니라 marriage_years를 물어야 한다.
+  // 첫 온보딩에서 기간·세부 항목을 미루기로 했으므로(onboarding.ts의 core) 여기가 그 값들을 받는 자리가 된다.
+  const period = rule.unit === "years" || rule.unit === "months";
+  if (rule.category === "marriage" && p.marriage !== undefined && period && p.marriage_years === undefined) return "marriage_years";
+  if (rule.category === "housing" && p.is_homeless === true && period && p.homeless_months === undefined) return "homeless_months_manual";
+  if (rule.category === "children" && p.children_count !== undefined && rule.unit === "child_age" && p.children_ages === undefined) return "youngest";
+  // 시군구 단위 거주 요건 (값이 시도 코드보다 긴 문자열이면 시군구를 본다)
+  if (rule.category === "residence" && p.region_code !== undefined && p.region_sigungu === undefined) {
+    const vals = Array.isArray(rule.value) ? rule.value : [rule.value];
+    if (vals.some((v) => typeof v === "string" && v.length > 2)) return "sigungu";
+  }
+
   const missing: Partial<Record<RuleCategory, boolean>> = {
     income: p.monthly_income === undefined,
     asset: p.total_assets === undefined,

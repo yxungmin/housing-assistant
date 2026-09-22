@@ -42,6 +42,9 @@ export const UserProfile = z.object({
    * 한 쪽만 가까운 곳은 실제로는 후보가 아니다. 입력은 선택이고 기기에만 남는다.
    */
   workplace_partner: z.object({ label: z.string().optional(), lat: z.number(), lng: z.number() }).optional(),
+  /** 직장이 없다고 답했는가. undefined(아직 안 물음)와 구분해야 다시 묻지 않는다 */
+  workplace_none: z.boolean().optional(),
+  workplace_partner_none: z.boolean().optional(),
   commute_limit_min: z.number().int().min(0).optional().describe("허용 통근 시간 상한 (분)"),
 });
 export type UserProfile = z.infer<typeof UserProfile>;

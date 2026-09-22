@@ -50,6 +50,188 @@
       "type": "string",
       "format": "uri"
     },
+    "detail_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "units": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "address": {
+            "type": "string",
+            "minLength": 1
+          },
+          "dong": {
+            "type": "string"
+          },
+          "ho": {
+            "type": "string"
+          },
+          "complex": {
+            "type": "string"
+          },
+          "housing_form": {
+            "type": "string"
+          },
+          "exclusive_area_m2": {
+            "type": "number"
+          },
+          "total_area_m2": {
+            "type": "number"
+          },
+          "rooms": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "floor": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "elevator": {
+            "type": "boolean"
+          },
+          "viewing": {
+            "type": "string"
+          },
+          "rent_options": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tier": {
+                  "type": "string"
+                },
+                "max_conversion": {
+                  "type": "boolean"
+                },
+                "deposit": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "monthly_rent": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "tier",
+                "max_conversion",
+                "deposit",
+                "monthly_rent"
+              ]
+            }
+          },
+          "deposit": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "monthly_rent": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          },
+          "transit": {
+            "type": "object",
+            "properties": {
+              "nearest_station": {
+                "description": "가장 가까운 지하철역. Kakao는 \"망원역 6호선\"처럼 호선을 붙여 준다",
+                "type": "string"
+              },
+              "station_walk_min": {
+                "type": "number"
+              },
+              "station_distance_m": {
+                "type": "number"
+              },
+              "nearest_bus_stop": {
+                "type": "string"
+              },
+              "bus_walk_min": {
+                "type": "number"
+              },
+              "bus_distance_m": {
+                "type": "number"
+              }
+            }
+          },
+          "nearby": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "daycare",
+                    "school",
+                    "mart",
+                    "convenience",
+                    "hospital",
+                    "park"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "distance_m": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "kind",
+                "name",
+                "distance_m"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "address"
+        ]
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "description": "기관이 붙인 구분 (\"위치도\", \"단지조감도\")"
+          },
+          "name": {
+            "description": "원본 파일명",
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "kind",
+          "url"
+        ]
+      }
+    },
     "lat": {
       "type": "number"
     },
@@ -108,6 +290,117 @@
           "kind",
           "name",
           "distance_m"
+        ]
+      }
+    },
+    "market": {
+      "type": "object",
+      "properties": {
+        "lawd_cd": {
+          "type": "string"
+        },
+        "area_from": {
+          "type": "number"
+        },
+        "area_to": {
+          "type": "number"
+        },
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "deals": {
+          "type": "number"
+        },
+        "jeonse_median": {
+          "type": "number"
+        },
+        "monthly_deposit_median": {
+          "type": "number"
+        },
+        "monthly_rent_median": {
+          "type": "number"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "lawd_cd",
+        "area_from",
+        "area_to",
+        "from",
+        "to",
+        "deals",
+        "source"
+      ]
+    },
+    "waiting": {
+      "type": "object",
+      "properties": {
+        "complex": {
+          "type": "string"
+        },
+        "households": {
+          "type": "number"
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "unit_type": {
+                "type": "string"
+              },
+              "waiting": {
+                "type": "number"
+              },
+              "terminated": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "waiting"
+            ]
+          }
+        },
+        "total_waiting": {
+          "type": "number"
+        },
+        "as_of": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "complex",
+        "rows",
+        "total_waiting",
+        "source"
+      ]
+    },
+    "commute": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "minutes": {
+            "type": "number"
+          },
+          "transfers": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "minutes",
+          "transfers"
         ]
       }
     },
