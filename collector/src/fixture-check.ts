@@ -95,7 +95,7 @@ function reconstruction(quote: string, pageText: string): Reconstruction {
 export type Severity = "ok" | "warn" | "bad";
 
 export interface Finding {
-  kind: "rule" | "pricing";
+  kind: "rule" | "pricing" | "omission";
   track: string;
   /** 사람이 찾아갈 수 있게: 트랙 안에서의 위치 */
   index: number;
@@ -118,6 +118,8 @@ const CODE_TEXT: Record<string, string> = {
   value_unsupported: "값을 그 쪽 어디에서도 찾지 못했다",
   value_off_quote: "값이 인용문 밖(같은 쪽)에 있다",
   low_confidence: "추출 신뢰도가 낮다",
+  category_missing: "형제 트랙 대부분이 가진 조건이 이 트랙에만 없다 (누락 의심)",
+  category_lonely: "이 조건이 트랙 하나에만 있다 (다른 트랙에도 해당하는지 확인)",
 };
 
 /** 인용문이 어느 쪽에 있는가. 없으면 앞 20자라도 걸리는 쪽을 찾는다. */
@@ -217,11 +219,78 @@ const localDate = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6
 const LOW_CONFIDENCE = 0.7;
 
 /** 사람이 꼭 봐야 하는 것(bad)과 표본만 봐도 되는 것(warn)을 가른다. */
-const BAD = new Set(["quote_missing", "quote_partial", "quote_scattered", "value_unsupported", "page_out_of_range", "page_mismatch"]);
+const BAD = new Set(["quote_missing", "quote_partial", "quote_scattered", "value_unsupported", "page_out_of_range", "page_mismatch", "category_missing"]);
 const severityOf = (codes: string[]): Severity => (codes.some((c) => BAD.has(c)) ? "bad" : codes.length > 0 ? "warn" : "ok");
 
+/**
+ * 빠진 조건을 찾는다.
+ *
+ * 나머지 검사는 전부 **있는 것**의 근거만 본다 — 인용이 원문에 있나, 값이 인용과 맞나.
+ * 그래서 아예 안 뽑힌 조건은 원리적으로 안 걸린다. 그런데 자격 판정에서 더 위험한 쪽은
+ * 그쪽이다. 틀린 값은 화면에서 눈에 띄지만, 빠진 조건은 "맞음"으로 조용히 넘어간다 —
+ * 청약통장이 없는 사람에게 "조건 맞음"이라고 말하는 식이다.
+ *
+ * 모든 누락을 찾을 수는 없다(그러려면 정답을 이미 알아야 한다). 대신 값싸고 잘 맞는
+ * 신호 하나를 쓴다: **같은 공고의 형제 트랙 대부분이 가진 조건이 한 트랙에만 없으면**
+ * 그건 그 트랙이 예외인 것이거나 빠뜨린 것이다. 둘 다 사람이 봐야 한다.
+ *
+ * 2026-09-22에 018을 이걸로 다시 보니 청약통장 요건이 7개 트랙 중 1개에만 있었다.
+ * 공고문 p.10은 면적 구간마다 그 요건을 적고 있다.
+ */
+const OMISSION_RATIO = 0.6;
+
+function checkOmissions(gold: ExtractionOutput): Finding[] {
+  const tracks = gold.tracks;
+  if (tracks.length < 3) return []; // 비교할 형제가 없으면 판단 근거도 없다
+  const has = tracks.map((t) => new Set(t.rules.map((r) => r.category)));
+  const all = new Set(has.flatMap((s) => [...s]));
+  const out: Finding[] = [];
+  for (const cat of [...all].sort()) {
+    const withIt = has.filter((s) => s.has(cat)).length;
+
+    /**
+     * 반대 신호도 본다. 한 트랙에만 있는 조건은 "그 트랙만의 특칙"일 수도 있지만
+     * "거기서만 뽑히고 나머지는 빠뜨린 것"일 수도 있다. 018이 정확히 후자였다 —
+     * 청약통장 요건이 7개 중 1개에만 있었고, 공고문은 면적 구간마다 그걸 요구한다.
+     * 어느 쪽인지는 기계가 못 가린다. 그래서 문제로 세지 않고 눈에만 띄게 한다.
+     */
+    if (withIt === 1) {
+      const owner = tracks[has.findIndex((s) => s.has(cat))]!;
+      out.push({
+        kind: "omission",
+        track: owner.name,
+        index: -1,
+        label: `${cat} 조건이 이 트랙에만 있다 (나머지 ${tracks.length - 1}개에는 없다)`,
+        page: 0,
+        severity: "warn",
+        codes: ["category_lonely"],
+        detail: "그 트랙만의 특칙인지, 다른 트랙에서 빠진 것인지 공고문으로 확인한다",
+        quote: "",
+      });
+      continue;
+    }
+
+    if (withIt / tracks.length < OMISSION_RATIO) continue;
+    tracks.forEach((t, i) => {
+      if (has[i]!.has(cat)) return;
+      out.push({
+        kind: "omission",
+        track: t.name,
+        index: -1,
+        label: `${cat} 조건이 없다 (형제 트랙 ${withIt}/${tracks.length}개는 갖고 있다)`,
+        page: 0,
+        severity: "bad",
+        codes: ["category_missing"],
+        detail: "이 트랙만 예외인지, 추출에서 빠진 것인지 공고문으로 확인한다",
+        quote: "",
+      });
+    });
+  }
+  return out;
+}
+
 export function checkCase(gold: ExtractionOutput, pages: PdfPage[]): Finding[] {
-  const findings: Finding[] = [];
+  const findings: Finding[] = checkOmissions(gold);
   for (const track of gold.tracks) {
     track.rules.forEach((rule, i) => {
       const pageText = pages[rule.source.page - 1]?.text ?? "";
@@ -350,7 +419,8 @@ async function main(): Promise<void> {
         const [page, kind] = key.split("|");
         const nBad = fs.filter((f) => f.severity === "bad").length;
         const codes = [...new Set(fs.flatMap((f) => f.codes))].map((c) => CODE_TEXT[c] ?? c);
-        console.log(`   ${nBad > 0 ? "✗" : "△"} p.${page} ${kind === "rule" ? "조건" : "가격"} ${fs.length}건${nBad > 0 ? ` (문제 ${nBad})` : ""} — ${codes.join(" / ")}`);
+        const where = kind === "omission" ? "트랙 전체" : `p.${page} ${kind === "rule" ? "조건" : "가격"}`;
+        console.log(`   ${nBad > 0 ? "✗" : "△"} ${where} ${fs.length}건${nBad > 0 ? ` (문제 ${nBad})` : ""} — ${codes.join(" / ")}`);
         console.log(`      예: ${fs[0]!.label}`);
         console.log(`      「${fs[0]!.quote.slice(0, 70)}${fs[0]!.quote.length > 70 ? "…" : ""}」`);
       }
