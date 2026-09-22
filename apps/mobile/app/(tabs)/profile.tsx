@@ -33,6 +33,7 @@ export default function Profile() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [notiMsg, setNotiMsg] = useState<string | null>(null);
   const [reports, setReports] = useState(false);
   const openReports = state.reports.filter(isOpen).length;
@@ -79,7 +80,7 @@ export default function Profile() {
       <Card onPress={() => router.push("/conditions")} style={{ gap: 14 }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
           <T variant="subheading">내 조건</T>
-          <Tag tone="gray">수정</Tag>
+          <Tag tone={p ? "gray" : "primary"}>{p ? "수정" : "입력하기"}</Tag>
         </View>
         {p ? (
           <View style={{ gap: 6 }}>
@@ -124,7 +125,13 @@ export default function Profile() {
       <View style={{ gap: 8 }}>
         <SectionTitle>구독</SectionTitle>
         <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
-          <ListRow icon="check" iconTone={sub.status === "trial" || sub.status === "active" ? "primary" : sub.status === "expired" ? "warn" : "gray"} label={subLabel} sub={subSub} />
+          {/* 미구독에 체크 표시가 붙어 있었다 — 모양이 "됐다"는 말이라 상태와 어긋난다 */}
+          <ListRow
+            icon={sub.status === "trial" || sub.status === "active" ? "check" : sub.status === "expired" ? "alert" : "info"}
+            iconTone={sub.status === "trial" || sub.status === "active" ? "primary" : sub.status === "expired" ? "warn" : "gray"}
+            label={subLabel}
+            sub={subSub}
+          />
           <ListRow icon="more" label="구독 관리" sub="구매 복원 · 갱신 해지" onPress={() => setManage(true)} />
         </Card>
       </View>
@@ -175,11 +182,30 @@ export default function Profile() {
       </View>
 
       <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>입력한 조건은 이 기기에만 저장되고 서버로 보내지 않아요.</Sub>
-      <Pressable onPress={reset} accessibilityRole="button" style={{ paddingVertical: 12, paddingHorizontal: 4 }}>
+      {/* 한 번 물어본다. 바로 위 계정 삭제는 두 번 확인하는데 이건 한 번에 실행되고 있었다 —
+          잃는 것은 거의 같다(조건·저장한 공고·알림). 되돌릴 수 없는 일은 같은 격으로 다룬다. */}
+      <Pressable onPress={() => setConfirmReset(true)} accessibilityRole="button" style={{ paddingVertical: 12, paddingHorizontal: 4 }}>
         <T variant="small" color={colors.text3}>모든 데이터 지우고 처음부터</T>
       </Pressable>
       <SubscriptionManageSheet visible={manage} onClose={() => setManage(false)} />
       <SignInSheet visible={signInSheet} onClose={() => setSignInSheet(false)} />
+      <BottomSheet visible={confirmReset} onClose={() => setConfirmReset(false)}>
+        <View style={{ gap: 16 }}>
+          <View style={{ gap: 6 }}>
+            <T variant="title">모두 지우고 처음부터 할까요?</T>
+            <Sub variant="body">
+              이 기기의 조건·소득·자산, 저장한 공고, 알림 설정이 지워지고 처음 화면으로 돌아가요. 되돌릴 수 없어요.
+            </Sub>
+          </View>
+          <Card style={{ gap: 4 }}>
+            <T variant="bodyMedium">계정은 그대로예요</T>
+            <Sub tone="3" variant="caption">
+              로그인과 구독은 유지돼요. 계정까지 지우시려면 위의 “계정 삭제”를 눌러 주세요.
+            </Sub>
+          </Card>
+          <ListRow icon="trash" label="지우고 처음부터" danger onPress={() => { setConfirmReset(false); reset(); }} />
+        </View>
+      </BottomSheet>
       {/* 되돌릴 수 없는 일이라 무엇이 사라지는지 먼저 다 적는다. 누른 뒤에 알게 되면 늦다. */}
       <BottomSheet visible={confirmDelete} onClose={() => (deleting ? undefined : setConfirmDelete(false))}>
         <View style={{ gap: 16 }}>
