@@ -7,6 +7,8 @@
  * 이미 채워진 공고는 건너뛰므로 여러 번 돌려도 API 호출이 늘지 않는다 (--force로 다시 채운다).
  */
 import { readFileSync, writeFileSync } from "node:fs";
+import { matchPastResults, toughest, type PastResult } from "@housing/engine";
+import { buildResultPool } from "./lh/result-pool";
 import { loadEnv } from "./config";
 import { geocodeAddress } from "./geo/kakao";
 import { isUsable, RentClient } from "./market/rent";
@@ -44,11 +46,23 @@ interface Row {
   nearby?: unknown;
   market?: unknown;
   waiting?: unknown;
+  /** 공급기관이 부르는 단지 이름. 지난 회차 결과를 이을 때 쓴다 */
+  complex?: string;
+  past_results?: unknown;
   commute?: unknown;
   extraction: { address?: string; tracks: { unit_types: { exclusive_area_m2?: number }[] }[] };
 }
 
 const rows = JSON.parse(readFileSync(TARGET, "utf8")) as Row[];
+
+/**
+ * 지난 회차 결과 풀. 공고마다 부르면 같은 목록을 수십 번 받게 된다.
+ * 실패해도 나머지 보강은 그대로 돈다 — 이건 있으면 좋은 값이지 필수가 아니다.
+ */
+const resultPool: PastResult[] = await buildResultPool({ pages: 2, limit: 40, log: (m) => console.log(m) }).catch((e) => {
+  console.log(`지난 회차 결과 건너뜀: ${e instanceof Error ? e.message : String(e)}`);
+  return [];
+});
 const regions = env.COLLECT_REGIONS.split(",").map((r) => r.trim()).filter(Boolean);
 
 /**
@@ -230,7 +244,20 @@ for (const row of rows) {
     } else console.log(`  대기현황 단지 못 맞춤`);
   }
 
-  // 4) 통근 (시군구 × 이 단지)
+  // 4) 지난 회차 결과 (같은 단지가 지난번에 몇 순위에서 마감됐나)
+  //
+  // 풀은 바깥에서 한 번만 만든다 — 공고마다 당첨자 발표 목록을 다시 받을 이유가 없다.
+  // 못 맞추면 비워 둔다. 잘못 이은 경쟁률은 없는 것보다 나쁘다 (engine/results.ts).
+  if ((force || row.past_results === undefined) && resultPool.length > 0) {
+    const hits = matchPastResults(row, resultPool);
+    if (hits.length > 0) {
+      row.past_results = hits;
+      const t = toughest(hits);
+      console.log(`  지난 회차 ${hits[0]!.complex} · ${t?.closed_rank ?? "?"}순위 마감 · ${t?.competition ?? "?"}대 1`);
+    } else console.log(`  지난 회차 결과 못 맞춤`);
+  }
+
+  // 5) 통근 (시군구 × 이 단지)
   if ((force || row.commute === undefined) && row.lat !== undefined) {
     const t = await commuteTable({ lat: row.lat, lng: row.lng! }, regions, { kakao: env.KAKAO_REST_API_KEY, seoul: env.TRANSIT_API_KEY }).catch(() => undefined);
     if (t) {

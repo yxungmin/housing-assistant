@@ -48,7 +48,7 @@ export function normalizeComplex(name: string): string {
  * 공고가 가리키는 단지 이름들.
  * 제목 꼬리표("…-전북혁신 A10블럭")와 `units[].complex`를 모은다.
  */
-export function complexNames(input: { title?: string; units?: SupplyUnit[] }): string[] {
+export function complexNames(input: { title?: string; complex?: string; units?: SupplyUnit[] }): string[] {
   const out = new Set<string>();
   /*
    * LH 결과 쪽 공고명은 "<모집공고명>-<단지명>" 꼴이다. 그런데 하이픈이 단지명 앞에만
@@ -61,6 +61,9 @@ export function complexNames(input: { title?: string; units?: SupplyUnit[] }): s
    * 가르는 자리는 **모집공고명이 끝나는 곳**이다. 모집공고명은 "공고"나 "모집"으로 끝나므로,
    * 앞쪽에 그 말이 들어간 **첫 번째** 하이픈에서 자른다. 그 뒤는 통째로 단지명이다.
    */
+  // LH 상세 API가 주는 단지명(dsSbd.LCC_NT_NM)이 있으면 그게 제일 정확하다.
+  // 제목에서 뽑는 건 그게 없을 때의 차선책이다.
+  if (input.complex) out.add(input.complex);
   const title = input.title ?? "";
   for (let i = title.indexOf("-"); i >= 0; i = title.indexOf("-", i + 1)) {
     if (!/공고|모집/.test(title.slice(0, i))) continue;
@@ -80,7 +83,7 @@ export function complexNames(input: { title?: string; units?: SupplyUnit[] }): s
  * 비교가 안 되고, 여러 줄을 보여 주면 사용자가 어느 것을 믿을지 스스로 정해야 한다.
  */
 export function matchPastResults(
-  announcement: { lh_id?: string; title?: string; units?: SupplyUnit[] },
+  announcement: { lh_id?: string; title?: string; complex?: string; units?: SupplyUnit[] },
   pool: PastResult[],
 ): PastResult[] {
   // 같은 공고의 결과가 있으면 이름을 맞출 이유가 없다. PAN_ID는 정확하다.

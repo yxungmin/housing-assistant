@@ -36,6 +36,8 @@ export interface WaitStatus {
 /** 공급기관. 같은 조건이라도 신청처·절차가 달라서 목록에서부터 구분이 되어야 한다. */
 export type Provider = "LH" | "SH" | "GH" | "HUG" | "기타";
 
+import type { PastResult } from "@housing/engine";
+
 export interface Announcement {
   id: string;
   lh_id: string;
@@ -66,6 +68,10 @@ export interface Announcement {
   market?: MarketRent;
   /** 같은 단지 예비입주자 대기현황. 단지를 못 맞추면 없다 */
   waiting?: WaitStatus;
+  /** 공급기관이 부르는 단지 이름 */
+  complex?: string;
+  /** 같은 단지의 지난 회차 결과 (경쟁률·마감 순위) */
+  past_results?: PastResult[];
   /** 시군구 대표 좌표에서 여기까지 대중교통 소요. 키는 "서울 마포구" */
   commute?: Record<string, { minutes: number; transfers: number }>;
   /** 기관 사이트의 원문 공고문. 근거로 적은 쪽수를 실제로 열 수 있게 한다 */

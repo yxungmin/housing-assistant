@@ -366,6 +366,11 @@ export const Announcement = z.object({
     })
     .optional(),
   /**
+   * 공급기관이 부르는 단지 이름 (LH 상세의 `dsSbd.LCC_NT_NM`).
+   * 지난 회차 결과를 이을 때 쓴다 — 공고 제목에는 단지 꼬리표가 없는 일이 흔하다.
+   */
+  complex: z.string().optional(),
+  /**
    * 같은 단지의 **지난 회차** 결과. "붙을까"에 답하는 값 중 제일 직접적이다.
    *
    * LH 청약플러스 당첨자 발표의 커트라인 파일에서 나온다 (collector/src/lh/cutline.ts).

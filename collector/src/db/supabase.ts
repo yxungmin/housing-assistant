@@ -66,6 +66,8 @@ export class Repo {
     apply_end?: string;
     pdf_url?: string;
     detail_url?: string;
+    /** 공급기관이 부르는 단지 이름. 지난 회차 결과를 이을 때 쓴다 */
+    complex?: string;
     images?: object[];
     /** 흩어진 집 목록 (매입임대·전세임대). 단지형 공고에는 없다 */
     units?: object[];

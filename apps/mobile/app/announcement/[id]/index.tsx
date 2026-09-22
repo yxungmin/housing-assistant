@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Constants from "expo-constants";
 import { Pressable, View } from "react-native";
-import { haversineKm, matchAnnouncement, type RuleResult } from "@housing/engine";
+import { haversineKm, matchAnnouncement, type RuleResult, pastResultText, toughest } from "@housing/engine";
 import { Icon, type IconName } from "@/components/icon";
 import { ReportSheet } from "@/components/ReportSheet";
 import { NoticeImages } from "@/components/NoticeImages";
@@ -282,6 +282,44 @@ export default function AnnouncementDetail() {
           </View>
         ) : null}
 
+
+        {/* 지난 회차 결과. "붙을까"에 제일 직접 답하는 값이다.
+            **순위를 앞세우고 경쟁률은 괄호에 둔다** — 공공임대는 순위제라
+            "7.2대 1"보다 "1순위에서 마감"이 내 순위와 바로 견줘진다.
+            커트라인의 점수("9점")는 담지 않는다. 공고마다 배점이 달라 비교할 수 없다.
+
+            단지명으로 이은 값이라 틀릴 수 있다. 그래서 어느 단지의 언제 결과인지 그대로 적는다 —
+            사용자가 틀린 것을 알아볼 수 있어야 한다. */}
+        {a.past_results?.length ? (
+          <View style={{ gap: 12 }}>
+            <SectionTitle>지난 회차 결과</SectionTitle>
+            <Card style={{ gap: 14 }}>
+              {(() => {
+                const t = toughest(a.past_results!);
+                const text = t ? pastResultText(t) : null;
+                return text ? <T variant="bodyMedium" style={{ fontSize: 15 }}>{text}</T> : null;
+              })()}
+              {/* 공급·신청 수는 여기서 본문이다. src로 주면 (i) 뒤에 접혀 눌러야 보인다 */}
+              {a.past_results.slice(0, 4).map((r, i) => (
+                <KeyValue
+                  key={`${r.draw_type ?? i}`}
+                  label={r.draw_type ? `${r.draw_type}형` : "주택형을 못 읽음"}
+                  value={r.closed_rank ? `${r.closed_rank}순위 마감` : "마감 순위 미상"}
+                  note={
+                    r.households !== undefined && r.applicants !== undefined
+                      ? `${r.households}호 공급 · ${r.applicants.toLocaleString("ko-KR")}명 신청${r.competition ? ` · ${r.competition}대 1` : ""}`
+                      : undefined
+                  }
+                />
+              ))}
+              <Sub tone="3" variant="caption">
+                {a.past_results[0]!.complex}
+                {a.past_results[0]!.announced_at ? ` · ${dateText(a.past_results[0]!.announced_at)} 발표` : ""}
+                . LH 당첨자 발표의 커트라인이에요. 이번 회차 결과는 아니고, 기준이 달라질 수 있어요.
+              </Sub>
+            </Card>
+          </View>
+        ) : null}
 
         {/* 조건이 맞고 돈이 되면 마지막 질문이 "그래서 순번이 오나"다.
             단정하지 않는다 — 지금 몇 명이 기다리는지라는 사실만 적고 기준일과 출처를 단다. */}

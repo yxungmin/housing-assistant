@@ -33,6 +33,10 @@ export interface ResultNotice {
   has_winners: boolean;
   /** 예비자 명단이 있는가 */
   has_reserves: boolean;
+  /** 추첨단위 번호. 커트라인을 받을 때와 같은 단지의 다른 회차를 찾을 때 쓴다 */
+  unit_no?: string;
+  /** 추첨회수 */
+  draw_no?: string;
 }
 
 /**
@@ -116,6 +120,8 @@ export class LhResultClient {
         type_code: e.aisTpCd,
         has_winners: !!e.pzwrBtn1,
         has_reserves: !!e.pzwrBtn2,
+        unit_no: e.ltrUntNo || undefined,
+        draw_no: e.ltrToyNo || e.ltrNot || undefined,
       }));
   }
 
@@ -126,9 +132,11 @@ export class LhResultClient {
       const rows = await this.page(p);
       if (rows.length === 0) break;
       for (const r of rows) {
-        const prev = seen.get(r.pan_id);
         // 한 공고에 단지가 여럿이면 명단 유무를 합친다 — 하나라도 있으면 있는 것이다
-        seen.set(r.pan_id, prev ? { ...prev, has_winners: prev.has_winners || r.has_winners, has_reserves: prev.has_reserves || r.has_reserves } : r);
+        // 같은 공고라도 단지(추첨단위)가 다르면 별개 결과다. 단지별로 남긴다.
+        const key = `${r.pan_id}:${r.unit_no ?? ""}`;
+        const cur = seen.get(key);
+        seen.set(key, cur ? { ...cur, has_winners: cur.has_winners || r.has_winners, has_reserves: cur.has_reserves || r.has_reserves } : r);
       }
     }
     return [...seen.values()];

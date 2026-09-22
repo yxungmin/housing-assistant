@@ -64,6 +64,7 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
     apply_start: detail.apply_start,
     apply_end: detail.apply_end ?? notice.apply_end,
     detail_url: notice.detail_url,
+    complex: detail.complex,
     source_modified_at: detail.modified_key,
   });
   const version = (existing?.latest_version ?? 0) + 1;

@@ -32,6 +32,12 @@ export interface ResolvedNotice {
   /** 상세까지 반영한 수정 탐지 키. 저장된 값과 같으면 건너뛴다. */
   modified_key: string;
   address?: string;
+  /**
+   * 공급기관이 부르는 단지 이름 (LH 상세의 `dsSbd.LCC_NT_NM`).
+   * 지난 회차 결과를 이을 때 쓴다 — 공고 제목에는 단지 꼬리표가 없는 일이 흔하다.
+   * SH는 게시판 HTML이라 이 값이 없다.
+   */
+  complex?: string;
   apply_start?: string;
   apply_end?: string;
   correction_reason?: string;
@@ -88,6 +94,7 @@ function toLhNotice(client: LhClient, n: LhNoticeSummary): CollectedNotice {
       const resolved: ResolvedNotice = {
         modified_key: `${list_key}|${detail.correction_reason ?? ""}`,
         address: detail.address,
+        complex: detail.complex_name,
         apply_start: detail.apply_start,
         apply_end: detail.apply_end ?? n.apply_end,
         correction_reason: detail.correction_reason,
