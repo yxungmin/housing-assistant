@@ -73,3 +73,51 @@ describe("함께 걸 때", () => {
     expect(new Set(out.map((r) => r.id)).size).toBe(out.length);
   });
 });
+
+/**
+ * 첫 결제 고지. 공정위 다크패턴 가이드라인이 "숨은 갱신"을 지목한다 —
+ * 무료 체험을 걸어 두고 결제일에 말없이 긁는 방식이다. 안 하겠다는 약속을 여기서 고정한다.
+ */
+describe("첫 결제 3일 전 고지", () => {
+  const now = new Date(2026, 8, 22, 12, 0, 0); // 2026-09-22 12:00
+  const plan = (chargeAt: string | null | undefined, priceText?: string) =>
+    plannedReminders([], now, { chargeAt, priceText }).filter((r) => r.kind === "charge");
+
+  it("결제 3일 전 09:00에 건다", () => {
+    const [r] = plan(new Date(2026, 9, 5, 3, 0, 0).toISOString());
+    expect(r?.at).toEqual(new Date(2026, 9, 2, 9, 0, 0));
+  });
+
+  it("금액과 날짜를 말한다 — 금액 없는 고지는 고지가 아니다", () => {
+    const [r] = plan(new Date(2026, 9, 5).toISOString(), "월 1,900원");
+    expect(r?.body).toContain("월 1,900원");
+    expect(r?.body).toContain("10월 5일");
+    expect(r?.body).toContain("해지");
+  });
+
+  it("체험 중이 아니면 걸지 않는다 — chargeDate가 null을 준다", () => {
+    expect(plan(null)).toEqual([]);
+    expect(plan(undefined)).toEqual([]);
+  });
+
+  it("이미 3일 안쪽이면 걸지 않는다 — 지난 시각으로 예약할 수 없다", () => {
+    expect(plan(new Date(2026, 8, 24).toISOString())).toEqual([]);
+  });
+
+  it("망가진 날짜로 알림을 지어내지 않는다", () => {
+    expect(plan("나중에")).toEqual([]);
+  });
+
+  it("공고 알림과 같은 목록에 실린다 — 따로 걸면 cancelAll에 지워진다", () => {
+    const all = plannedReminders(
+      [{ id: "a1", title: "행복주택", apply_end: "2026-10-01", saved: true }],
+      now,
+      { chargeAt: new Date(2026, 9, 5).toISOString() },
+    );
+    expect(all.map((r) => r.kind).sort()).toEqual(["charge", "deadline"]);
+  });
+
+  it("공고와 무관하므로 announcementId가 비어 있다 — 눌러도 엉뚱한 공고로 가지 않는다", () => {
+    expect(plan(new Date(2026, 9, 5).toISOString())[0]?.announcementId).toBe("");
+  });
+});

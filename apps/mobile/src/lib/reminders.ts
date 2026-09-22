@@ -2,9 +2,10 @@
  * 기기에 걸 알림을 정하는 규칙. 실제 예약은 `notifications.ts`가 한다 —
  * 여기는 순수 함수라 테스트로 고정할 수 있다.
  *
- * 두 가지를 건다.
+ * 세 가지를 건다.
  *  - **접수 마감 3일 전**: 관심 공고. 놓치면 다음 기회까지 몇 달이다.
  *  - **당첨자 발표 3일 전·1일 전·당일**: "신청함"으로 표시한 공고.
+ *  - **첫 결제 3일 전**: 첫 달 0원이 끝나기 전에 미리 알린다.
  *
  * 둘 다 무료다. 알림을 잠그면 돈을 안 낸 사람이 마감을 놓치게 되고, 그건 해를 끼치는 것이다.
  * 게다가 알림은 기기에서 예약해 원가가 0이면서 사람을 앱으로 되돌리는 장치다 — 잠글 이유가 없다.
@@ -12,6 +13,18 @@
  * 예약은 한 번에 다시 건다(`cancelAll` 후 재예약). 그래서 두 종류를 한 곳에서 만들어야 한다.
  * 따로 걸면 나중에 거는 쪽이 앞의 것을 지운다.
  */
+
+/**
+ * 첫 결제 며칠 전에 알릴 것인가.
+ *
+ * 공정위 다크패턴 가이드라인이 "숨은 갱신"을 지목한다 — 무료 체험을 걸어 두고 결제일에
+ * 말없이 긁는 방식이다. 그걸 안 하겠다는 약속을 코드로 지키는 자리다.
+ * 사용자가 잊고 있다가 결제되는 것과, 알고도 그냥 두는 것은 전혀 다른 일이다.
+ *
+ * 알림을 꺼 둔 사람에게는 이것도 가지 않는다 (끈 것을 무시하지 않는다).
+ * 대신 첫 결제일은 내 정보 화면에 늘 적혀 있어, 알림이 유일한 통로가 되지는 않는다.
+ */
+export const CHARGE_DAYS_BEFORE = 3;
 
 /** 알림을 띄울 시각 (현지 시간 기준 시) */
 const HOUR = 9;
@@ -34,8 +47,9 @@ export interface ReminderItem {
 
 export interface PlannedReminder {
   id: string;
+  /** 결제 고지는 공고와 무관하다 — 그때는 빈 문자열이고 화면 이동도 하지 않는다 */
   announcementId: string;
-  kind: "deadline" | "announce";
+  kind: "deadline" | "announce" | "charge";
   at: Date;
   title: string;
   body: string;
@@ -58,9 +72,51 @@ const md = (date: string) => {
   return m ? `${Number(m[2])}월 ${Number(m[3])}일` : date;
 };
 
-/** 지금 걸어야 할 알림 전부. 이미 지난 시각은 뺀다. */
-export function plannedReminders(items: ReminderItem[], now: Date = new Date()): PlannedReminder[] {
+/**
+ * 지금 걸어야 할 알림 전부. 이미 지난 시각은 뺀다.
+ *
+ * 결제 고지까지 여기서 같이 만든다. 예약은 전부 지우고 다시 거는 방식이라
+ * 종류마다 따로 부르면 나중에 부른 쪽이 앞의 것을 지운다.
+ */
+export function plannedReminders(
+  items: ReminderItem[],
+  now: Date = new Date(),
+  opts: {
+    /** 첫 결제 예정 시각 (ISO). 체험 중이 아니거나 해지했으면 넘기지 않는다 (`chargeDate`) */
+    chargeAt?: string | null;
+    /** 화면에 적히는 가격. 고지에 금액이 없으면 고지가 아니다 */
+    priceText?: string;
+  } = {},
+): PlannedReminder[] {
   const out: PlannedReminder[] = [];
+
+  if (opts.chargeAt) {
+    const charge = new Date(opts.chargeAt);
+    if (!Number.isNaN(charge.getTime())) {
+      const when = new Date(
+        charge.getFullYear(),
+        charge.getMonth(),
+        charge.getDate() - CHARGE_DAYS_BEFORE,
+        HOUR,
+        0,
+        0,
+      );
+      if (when.getTime() > now.getTime()) {
+        const day = `${charge.getMonth() + 1}월 ${charge.getDate()}일`;
+        out.push({
+          id: "charge:first",
+          announcementId: "",
+          kind: "charge",
+          at: when,
+          title: `${CHARGE_DAYS_BEFORE}일 뒤 첫 결제예요`,
+          body: opts.priceText
+            ? `무료 이용이 ${day}에 끝나고 ${opts.priceText}이 결제돼요. 계속 안 쓰실 거면 그전에 해지해 주세요.`
+            : `무료 이용이 ${day}에 끝나요. 계속 안 쓰실 거면 그전에 해지해 주세요.`,
+          channel: "billing",
+        });
+      }
+    }
+  }
 
   for (const it of items) {
     if (it.saved && it.apply_end) {

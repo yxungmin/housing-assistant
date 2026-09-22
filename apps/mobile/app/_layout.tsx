@@ -7,6 +7,7 @@ import { useAnnouncements } from "@/data/announcements";
 import { registerPushSubscription } from "@/data/remote";
 import { useAnnouncementSync } from "@/data/sync";
 import { changeSummary } from "@/lib/changes";
+import { chargeDate, PRICE_TEXT } from "@/lib/billing";
 import { notifyChange, setupNotificationHandler, syncReminders } from "@/lib/notifications";
 import { AppStateProvider, useAppState } from "@/store/appState";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
@@ -58,7 +59,9 @@ function Root() {
 function useReminderSync() {
   const { state } = useAppState();
   const { list } = useAnnouncements();
-  const { saved, applied, notifications, pushToken, loaded } = state;
+  const { saved, applied, notifications, pushToken, loaded, subscription } = state;
+  // 첫 결제 3일 전 고지. 체험 중이고 해지하지 않았을 때만 값이 나온다 (chargeDate)
+  const chargeAt = chargeDate(subscription);
   const region = state.profile?.region_code;
   useEffect(() => {
     if (!loaded) return;
@@ -73,8 +76,8 @@ function useReminderSync() {
         saved: saved.includes(a.id),
         applied: applied.includes(a.id),
       }));
-    void syncReminders(items, notifications);
-  }, [loaded, list, saved, applied, notifications]);
+    void syncReminders(items, notifications, { chargeAt, priceText: PRICE_TEXT });
+  }, [loaded, list, saved, applied, notifications, chargeAt]);
   useEffect(() => {
     if (!loaded || !notifications || !pushToken || !region) return;
     void registerPushSubscription(pushToken, [region], ["happy", "national_rental", "purchased_rental", "long_term_rental", "newlywed_hope", "public_sale", "other"]).catch(() => false);

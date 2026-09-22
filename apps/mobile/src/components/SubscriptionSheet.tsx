@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Linking, Platform, Pressable, View } from "react-native";
 import { CoffeeMark } from "./CoffeeMark";
 import { Icon } from "./icon";
 import { BottomSheet, Card, PrimaryButton, Row, Sub, T, Tag } from "./ui";
-import { billing, canUseFirstMonthFree, daysLeft, PRICE_KRW, TRIAL_DAYS } from "@/lib/billing";
+import { billing, canUseFirstMonthFree, daysLeft, manageSubscriptionUrl, PRICE_KRW, TRIAL_DAYS } from "@/lib/billing";
+import Constants from "expo-constants";
 import { longDate } from "@/lib/format";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -98,9 +99,23 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
       setMsg("구독을 복원했어요.");
     } else setMsg("복원할 구매 내역이 없어요.");
   };
-  const cancel = async () => {
-    setSubscription(await billing.cancel(sub));
-    setMsg("갱신을 해지했어요. 만료일까지는 그대로 이용할 수 있어요.");
+  /**
+   * 해지는 스토어에서만 된다 (애플·구글 정책). 앱 상태만 바꾸고 "해지했어요"라고 하면
+   * 사용자는 껐다고 믿고 다음 달에 또 결제된다 — 그때 우리가 할 해명이 없다.
+   * 개발 빌드에서는 스토어가 없으니 목 어댑터로 흐름만 확인한다.
+   */
+  const openStore = async () => {
+    if (billing.isMock) {
+      setSubscription(await billing.cancel(sub));
+      setMsg("개발 빌드라 기기 상태만 바꿨어요. 실제로는 스토어 화면이 열려요.");
+      return;
+    }
+    const pkg = Constants.expoConfig?.android?.package;
+    const ok = await Linking.openURL(manageSubscriptionUrl(Platform.OS, pkg)).then(
+      () => true,
+      () => false,
+    );
+    if (!ok) setMsg(Platform.OS === "ios" ? "설정 → Apple 계정 → 구독에서 해지할 수 있어요." : "Play 스토어 → 결제 및 구독 → 구독에서 해지할 수 있어요.");
   };
 
   return (
@@ -118,11 +133,19 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
       </Card>
       {msg ? <Sub style={{ textAlign: "center" }}>{msg}</Sub> : null}
       <View style={{ gap: 10 }}>
-        {(sub.status === "trial" || sub.status === "active") && !sub.cancelled ? <PrimaryButton tone="soft" label="갱신 해지" onPress={() => void cancel()} /> : null}
+        {(sub.status === "trial" || sub.status === "active") && !sub.cancelled ? (
+          <PrimaryButton tone="soft" label={billing.isMock ? "갱신 해지" : "스토어에서 해지하기"} onPress={() => void openStore()} />
+        ) : null}
         <PrimaryButton tone="soft" label="구매 복원" onPress={() => void restore()} />
       </View>
+      {/* 해지는 앱 안에서 못 한다. 그러니 그 경로만큼은 어느 상태에서나 1탭 거리에 둔다 */}
+      {!billing.isMock ? (
+        <Pressable onPress={() => void openStore()} accessibilityRole="button" style={{ alignItems: "center", paddingVertical: 4 }}>
+          <T variant="small" color={colors.text3}>스토어 구독 관리 화면 열기</T>
+        </Pressable>
+      ) : null}
       <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>
-        {billing.isMock ? "개발 빌드: 결제 없이 기기 상태만 바뀝니다" : "결제·환불은 스토어 정책을 따르며 스토어 계정 설정에서도 관리할 수 있어요"}
+        {billing.isMock ? "개발 빌드: 결제 없이 기기 상태만 바뀝니다" : "해지는 스토어에서만 할 수 있어요. 결제·환불도 스토어 정책을 따라요."}
       </Sub>
     </BottomSheet>
   );

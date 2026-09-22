@@ -22,6 +22,9 @@ export const PRODUCT_ID = "housing_assistant_monthly_1900";
 /** 첫 결제 며칠 전에 미리 알릴 것인가 */
 export const NOTICE_DAYS_BEFORE_CHARGE = 3;
 
+/** "월 1,900원". 가격을 각 화면에서 따로 만들면 하나를 고칠 때 나머지가 남는다 */
+export const PRICE_TEXT = `월 ${PRICE_KRW.toLocaleString("ko-KR")}원`;
+
 /** 구매 버튼 위에 그대로 붙는 한 줄. 문구를 여러 화면에 흩어 두면 하나만 고치게 된다. */
 export const BILLING_DISCLOSURE = `첫 달 0원, 이후 월 ${PRICE_KRW.toLocaleString("ko-KR")}원이 자동으로 결제돼요. 언제든 취소할 수 있어요.`;
 
@@ -103,3 +106,18 @@ export const mockBilling: BillingAdapter = {
 
 // TODO(M8): 스토어 빌드에서는 여기서 RevenueCat 어댑터를 고른다.
 export const billing: BillingAdapter = mockBilling;
+
+/**
+ * 스토어의 구독 관리 화면.
+ *
+ * **앱 안에서는 자동갱신을 끊을 수 없다** — 애플·구글 정책이고, 우회할 방법이 없다.
+ * 그래서 "갱신 해지" 버튼이 앱 상태만 바꾸면 그건 거짓말이 된다. 사용자는 껐다고 믿고
+ * 다음 달에 또 결제되며, 그 시점에 우리가 할 수 있는 해명이 없다.
+ *
+ * 우리가 지킬 수 있는 약속은 "해지가 1탭 거리에 있다"까지다. 여기로 보낸다.
+ */
+export function manageSubscriptionUrl(platform: string, packageName?: string): string {
+  if (platform === "ios") return "itms-apps://apps.apple.com/account/subscriptions";
+  const q = packageName ? `?sku=${PRODUCT_ID}&package=${packageName}` : "";
+  return `https://play.google.com/store/account/subscriptions${q}`;
+}

@@ -1,6 +1,6 @@
 /**
  * 알림 (M7).
- *  - 관심 공고 마감 3일 전, 신청한 공고의 당첨자 발표 3일 전·1일 전·당일 09:00 기기 예약 알림.
+ *  - 관심 공고 마감 3일 전, 신청한 공고의 당첨자 발표 3일 전·1일 전·당일, 첫 결제 3일 전 09:00 기기 예약 알림.
  *    무엇을 언제 걸지는 `reminders.ts`가 정하고(순수 함수·테스트 있음) 여기서는 예약만 한다.
  *  - 관심 공고의 값이 바뀌면 즉시 알림: 조용히 바꾸지 않기 위한 것이다 (changes.ts).
  *  - 신규 공고 푸시: Expo 푸시 토큰을 받아 Supabase push_subscriptions에 지역·유형과 함께 등록한다 (remote.ts).
@@ -29,6 +29,8 @@ export async function setupNotificationHandler(): Promise<void> {
     void Notifications.setNotificationChannelAsync("announce", { name: "당첨자 발표 알림", importance: Notifications.AndroidImportance.HIGH });
     void Notifications.setNotificationChannelAsync("new", { name: "새 공고 알림", importance: Notifications.AndroidImportance.DEFAULT });
     void Notifications.setNotificationChannelAsync("change", { name: "관심 공고 변경 알림", importance: Notifications.AndroidImportance.HIGH });
+    // 결제 고지는 끄기 어렵게 만들 이유가 없다. 다만 채널이 없으면 안드로이드가 예약을 조용히 버린다
+    void Notifications.setNotificationChannelAsync("billing", { name: "결제 예정 알림", importance: Notifications.AndroidImportance.HIGH });
   }
 }
 
@@ -51,13 +53,18 @@ export async function requestNotificationPermission(): Promise<boolean> {
  * 마감과 발표를 한 번에 거는 이유: 예약을 `cancelAll`로 지우고 다시 걸기 때문에
  * 종류별로 나눠 부르면 나중에 부른 쪽이 앞의 것을 지운다.
  */
-export async function syncReminders(items: ReminderItem[], enabled: boolean): Promise<number> {
+export async function syncReminders(
+  items: ReminderItem[],
+  enabled: boolean,
+  /** 첫 결제 고지도 같은 예약에 실어야 한다. 따로 걸면 cancelAll에 지워진다 */
+  billing: { chargeAt?: string | null; priceText?: string } = {},
+): Promise<number> {
   if (!native) return 0;
   try {
     const Notifications = await mod();
     await Notifications.cancelAllScheduledNotificationsAsync();
     if (!enabled) return 0;
-    const planned = plannedReminders(items);
+    const planned = plannedReminders(items, new Date(), billing);
     for (const r of planned) {
       await Notifications.scheduleNotificationAsync({
         content: {
