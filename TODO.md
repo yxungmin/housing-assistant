@@ -456,8 +456,27 @@ LH·SH·GH·HUG 공고를 지도로 보여 주는 앱 하나를 화면 녹화로
       초안인 동안에는 `noindex`다. 확정 전에 검색에 잡히면 우리가 지킬 수 없는 약속이 퍼진다.
       - https://yxungmin.github.io/housing-assistant/privacy.html
       - https://yxungmin.github.io/housing-assistant/terms.html
-      - [ ] **저장소 설정에서 Pages 켜기** (사용자 작업) — Settings → Pages →
-            Source: Deploy from a branch → Branch: main / 폴더: /docs → Save
+      - [ ] **Pages 켜기는 문구 확정 후에** (사용자 작업) — Settings → Pages →
+            Source: Deploy from a branch → Branch: main / 폴더: /docs → Save.
+            **지금 켜지 않는다.** noindex는 검색만 막고 사람은 못 막는다. 확정 전 문서를
+            우리가 게시했다는 사실이 남는다. App Store 제출 직전에 켜면 된다.
+
+## 공개 노출 점검 (2026-09-22 실측)
+
+저장소가 공개라 anon 키도 사실상 공개다 — 앱 바이너리에서 누구나 뽑는다.
+키를 숨기는 것은 방어가 아니고, **RLS가 유일한 방어선**이다. 라이브 서버에 직접 쏴서 확인했다.
+
+- 읽기: 공고·버전·룰·가격 등 공개 데이터만 열린다. `issue_reports`·`push_subscriptions`·
+  `subscriptions`·`receipts`는 0행 (SELECT 정책 없음)
+- 쓰기: INSERT는 401. UPDATE·DELETE는 **실제 행에 같은 값을 다시 쓰는 방식으로** 확인했다 —
+  `[]`가 돌아오므로 RLS가 막고 있다. (없는 id로 시험하면 204가 나오는데, RLS는 막을 때
+  에러가 아니라 행을 안 보이게 하므로 그것만으로는 판정이 안 된다.)
+- 저장소 히스토리에 비밀값 없음 (`.env.example`만 추적)
+
+- [ ] **`push_subscriptions` 쓰기 정책이 넓다** — `insert with check (true)`,
+      `update using (true)`. 앱의 upsert(on_conflict) 때문에 둘 다 필요했는데, 그 결과
+      누구나 임의의 행을 넣을 수 있다. SELECT는 막혀 있어 토큰을 긁어 가지는 못하지만
+      쓰레기 행으로 채울 수는 있다. 급하지 않으나, 푸시 등록을 Edge Function 뒤로 옮기면 깔끔하다.
 - [ ] **개인정보처리방침 URL** (5.1.1) — 없으면 App Store Connect 제출 자체가 막힌다.
       앱 안에도 링크가 있어야 한다.
 - [ ] **이용약관(EULA) + 개인정보처리방침 링크를 구독 구매 화면에** (3.1.2).
