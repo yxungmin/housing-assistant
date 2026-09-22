@@ -5,7 +5,7 @@ import { parsePlaceLabel, placeFor } from "./places";
 import { REGION_LIST, regionByCode, sigunguValue } from "./regions";
 
 /** duration: 년 + 개월(선택) 두 칸으로 받아 개월 수로 저장 */
-export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "duration" | "date" | "skip-info";
+export type StepKind = "select" | "multi" | "won" | "count" | "age" | "months" | "duration" | "date" | "skip-info" | "place";
 
 export interface Option {
   value: string;
@@ -59,39 +59,26 @@ export const NO_WORKPLACE = "none";
 type WorkplaceKey = "workplace" | "workplace_partner";
 
 function workplaceSteps(key: WorkplaceKey, copy: { title: Step["title"]; hint: string; when?: (p: Partial<UserProfile>) => boolean }): Step[] {
-  const cur = (p: Partial<UserProfile>) => parsePlaceLabel(p[key]?.label);
   return [
     {
-      id: `${key}_region`, kind: "select", title: copy.title, hint: copy.hint, optional: true,
+      id: `${key}_place`, kind: "place", title: copy.title, hint: copy.hint, optional: true,
       when: copy.when,
       // 모두가 직장에 다니는 건 아니다. 학생·구직 중·은퇴·육아 전담이면 통근을 물을 이유가 없고,
       // 건너뛰기와도 다르다 — "없다"는 답이고 건너뛰기는 "아직 모르겠다"다.
-      options: [{ value: NO_WORKPLACE, label: "직장이 없어요", hint: "학생·구직 중·은퇴 등" }, ...REGIONS],
+      options: [{ value: NO_WORKPLACE, label: "직장이 없어요", hint: "학생·구직 중·은퇴 등" }],
       apply: (p, v) => {
         if (v === null) return { ...p, [key]: undefined, [`${key}_none`]: undefined };
         if (v === NO_WORKPLACE) return { ...p, [key]: undefined, [`${key}_none`]: true };
-        const c = cur(p);
-        return { ...p, [key]: placeFor(String(v), c?.regionCode === String(v) ? c.sigungu : undefined) ?? undefined, [`${key}_none`]: undefined };
+        // "이름|위도|경도" 꼴로 받는다. 화면이 고른 장소를 그대로 넘긴다.
+        const [label, lat, lng] = String(v).split("|");
+        if (!label || !lat || !lng) return p;
+        return { ...p, [key]: { label, lat: Number(lat), lng: Number(lng) }, [`${key}_none`]: undefined };
       },
-      read: (p) => (p[`${key}_none` as keyof UserProfile] ? NO_WORKPLACE : (cur(p)?.regionCode ?? null)),
-    },
-    {
-      id: `${key}_sigungu`, kind: "select",
-      title: (p) => `${regionByCode(cur(p)?.regionCode)?.label ?? ""} 어느 시·군·구인가요?`,
-      hint: "구청·시청 부근을 기준으로 직선거리를 계산해요.",
-      when: (p) => {
-        if (copy.when && !copy.when(p)) return false;
-        if (p[`${key}_none` as keyof UserProfile]) return false; // 직장이 없으면 시군구를 물을 이유가 없다
-        const code = cur(p)?.regionCode;
-        return !!code && (regionByCode(code)?.sigungu.length ?? 0) > 1;
+      read: (p) => {
+        if (p[`${key}_none` as keyof UserProfile]) return NO_WORKPLACE;
+        const w = p[key];
+        return w ? `${w.label ?? ""}|${w.lat}|${w.lng}` : null;
       },
-      options: (p) => (regionByCode(cur(p)?.regionCode)?.sigungu ?? []).map((s) => ({ value: s, label: s })),
-      apply: (p, v) => {
-        const code = cur(p)?.regionCode;
-        if (!code || v === null) return p;
-        return { ...p, [key]: placeFor(code, String(v)) ?? p[key] };
-      },
-      read: (p) => cur(p)?.sigungu ?? null,
     },
   ];
 }
@@ -250,11 +237,11 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, cash_on_hand: Number(v) }), read: (p) => p.cash_on_hand ?? null,
   },
   ...workplaceSteps("workplace", {
-    title: "직장은 어느 지역인가요?",
-    hint: "직장과 가까운 공고를 먼저 보여드려요. 위치는 기기에만 저장되고, 통근 시간 계산은 지도 연결 후 열립니다.",
+    title: "직장이 어디인가요?",
+    hint: "역·회사 이름을 검색하세요. 정확할수록 통근 시간이 맞습니다. 위치는 이 기기에만 저장돼요.",
   }),
   ...workplaceSteps("workplace_partner", {
-    title: (p) => (p.marriage === "pre_marriage" ? "예비 배우자 직장은 어느 지역인가요?" : "배우자 직장은 어느 지역인가요?"),
+    title: (p) => (p.marriage === "pre_marriage" ? "예비 배우자 직장은 어디인가요?" : "배우자 직장은 어디인가요?"),
     hint: "두 사람 통근을 같이 봐야 실제로 살 수 있는 집이 골라져요. 건너뛰어도 됩니다.",
     // 본인 직장을 넣은 신혼·예비신혼부부에게만 묻는다. 한 쪽도 안 넣었으면 물을 이유가 없다.
     when: (p) => isCouple(p) && !!p.workplace,

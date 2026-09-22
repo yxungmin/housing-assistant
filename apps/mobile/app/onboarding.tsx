@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import type { UserProfile } from "@housing/schema";
@@ -7,7 +7,8 @@ import { Icon } from "@/components/icon";
 import { IncomeHelperSheet } from "@/components/IncomeHelperSheet";
 import { BottomCTA, FadeIn, Header, IconButton, Screen, Sub, T } from "@/components/ui";
 import { currentAnnouncements, matchAll, pickBest } from "@/data/announcements";
-import { isComplete, stepHint, stepLabel, stepOptions, stepTitle, visibleSteps, type Step } from "@/lib/onboarding";
+import { isComplete, NO_WORKPLACE, stepHint, stepLabel, stepOptions, stepTitle, visibleSteps, type Step } from "@/lib/onboarding";
+import { searchPlaces, type PlaceHit } from "@/data/places-search";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius, space } from "@/theme/tokens";
@@ -74,11 +75,11 @@ export default function Onboarding() {
   const duration = parseDuration(text);
   const parsed = isDuration ? duration.total : numeric ? Number(digits) : NaN;
   const dateOk = step.kind === "date" && isValidBirthDate(digits);
-  const canNext = step.kind === "select" ? value !== null : step.kind === "skip-info" || step.kind === "multi" ? true : step.kind === "date" ? dateOk : isDuration ? duration.years !== "" : text !== "" && Number.isFinite(parsed);
+  const canNext = step.kind === "select" || step.kind === "place" ? value !== null : step.kind === "skip-info" || step.kind === "multi" ? true : step.kind === "date" ? dateOk : isDuration ? duration.years !== "" : text !== "" && Number.isFinite(parsed);
   const selected = step.kind === "multi" ? String(value ?? "").split(",").filter(Boolean) : [];
 
   const onNext = () => {
-    if (step.kind === "select" || step.kind === "skip-info") return go(index + 1);
+    if (step.kind === "select" || step.kind === "skip-info" || step.kind === "place") return go(index + 1);
     if (step.kind === "multi") return go(index + 1, step.apply(draft, selected.length ? selected.join(",") : null));
     if (step.kind === "date") return go(index + 1, step.apply(draft, digits));
     go(index + 1, step.apply(draft, parsed));
@@ -126,6 +127,16 @@ export default function Onboarding() {
                 );
               })}
             </View>
+          )}
+
+          {step.kind === "place" && (
+            <PlaceField
+              value={value}
+              onPick={(name, lat, lng) => setDraft((d) => step.apply(d, `${name}|${lat}|${lng}`))}
+              noneLabel={options[0]?.label ?? "직장이 없어요"}
+              noneHint={options[0]?.hint}
+              onNone={() => setDraft((d) => step.apply(d, NO_WORKPLACE))}
+            />
           )}
 
           {numeric && <NumberField step={step} text={text} onChange={setText} />}
@@ -283,4 +294,109 @@ function isValidBirthDate(d: string): boolean {
   const dim = new Date(y, m, 0).getDate();
   if (day < 1 || day > dim) return false;
   return new Date(y, m - 1, day).getTime() <= Date.now();
+}
+
+/**
+ * 직장 위치 검색. 역·회사·건물 이름을 치면 좌표가 나온다.
+ *
+ * 시군구 선택을 대신한다 — 구청 좌표로는 통근 시간이 실제와 몇 십 분씩 어긋났다.
+ * 검색은 Edge Function을 거친다 (`data/places-search.ts`). 검색어는 어디에도 저장되지 않는다.
+ */
+function PlaceField({
+  value,
+  onPick,
+  noneLabel,
+  noneHint,
+  onNone,
+}: {
+  value: string | number | null;
+  onPick: (name: string, lat: number, lng: number) => void;
+  noneLabel: string;
+  noneHint?: string;
+  onNone: () => void;
+}) {
+  const { colors } = useTheme();
+  const [q, setQ] = useState("");
+  const [hits, setHits] = useState<PlaceHit[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const none = value === NO_WORKPLACE;
+  // 이미 고른 장소가 있으면 "이름|위도|경도"로 들어온다
+  const picked = typeof value === "string" && value !== NO_WORKPLACE ? value.split("|")[0] : null;
+
+  // 한 글자씩 부르면 호출만 쓴다. 타자가 멎고 300ms 뒤에 한 번 부른다.
+  useEffect(() => {
+    const term = q.trim();
+    if (term.length < 2) {
+      setHits([]);
+      setSearched(false);
+      return;
+    }
+    let alive = true;
+    setBusy(true);
+    const t = setTimeout(() => {
+      void searchPlaces(term).then((r) => {
+        if (!alive) return;
+        setHits(r);
+        setBusy(false);
+        setSearched(true);
+      });
+    }, 300);
+    return () => {
+      alive = false;
+      clearTimeout(t);
+    };
+  }, [q]);
+
+  return (
+    <View style={{ gap: 10, marginTop: 12 }}>
+      {picked ? (
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 16, paddingVertical: 12, borderRadius: radius.md, backgroundColor: colors.primarySoft }}>
+          <Icon name="check" size={18} color={colors.primary} />
+          <T variant="bodyMedium" color={colors.primary} style={{ flex: 1 }}>{picked}</T>
+        </View>
+      ) : null}
+
+      <TextInput
+        value={q}
+        onChangeText={setQ}
+        placeholder="예: 강남역, 판교 카카오, 삼성전자 수원"
+        placeholderTextColor={colors.text4}
+        autoCorrect={false}
+        style={{ fontFamily: fonts.medium, fontSize: 17, color: colors.text, backgroundColor: colors.card, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 16 }}
+      />
+
+      {busy ? <Sub tone="3">찾는 중…</Sub> : null}
+      {!busy && searched && hits.length === 0 ? (
+        <Sub tone="3">찾는 곳이 없어요. 역 이름이나 회사 이름으로 다시 쳐 보세요.</Sub>
+      ) : null}
+
+      {hits.map((h) => (
+        <Pressable
+          key={`${h.name}|${h.lat}|${h.lng}`}
+          onPress={() => onPick(h.name, h.lat, h.lng)}
+          accessibilityRole="button"
+          accessibilityLabel={h.name}
+          style={({ pressed }) => ({ paddingHorizontal: 16, paddingVertical: 14, borderRadius: radius.md, backgroundColor: pressed ? colors.cardStrong : colors.card, gap: 2 })}
+        >
+          <T variant="bodyMedium">{h.name}</T>
+          {h.address ? <Sub tone="3">{h.address}</Sub> : null}
+        </Pressable>
+      ))}
+
+      {/* 직장이 없는 사람도 있다. 건너뛰기와 다른 답이라 따로 둔다. */}
+      <Pressable
+        onPress={onNone}
+        accessibilityRole="button"
+        accessibilityState={{ selected: none }}
+        style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 16, paddingVertical: 16, borderRadius: radius.md, backgroundColor: none ? colors.primarySoft : pressed ? colors.cardStrong : colors.cardSoft })}
+      >
+        <View style={{ gap: 2 }}>
+          <T variant="bodyMedium" color={none ? colors.primary : colors.text}>{noneLabel}</T>
+          {noneHint ? <Sub tone="3">{noneHint}</Sub> : null}
+        </View>
+        <Icon name="check" size={20} color={none ? colors.primary : colors.line} />
+      </Pressable>
+    </View>
+  );
 }

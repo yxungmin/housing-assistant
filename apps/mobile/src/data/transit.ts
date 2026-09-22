@@ -1,4 +1,4 @@
-import { parsePlaceLabel, placeFor, type SupplyUnit, type UserProfile } from "@housing/schema";
+import type { SupplyUnit, UserProfile } from "@housing/schema";
 import { remoteConfigured } from "./remote";
 
 /**
@@ -23,11 +23,18 @@ export interface UnitCommute {
 const URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-/** 직장의 시군구 대표 좌표. 프로필에 직장이 없으면 부를 수 없다. */
+/**
+ * 출발 좌표. 직장을 검색으로 받으면서 실제 좌표를 그대로 쓴다.
+ *
+ * 전에는 라벨에서 시군구를 되짚어 구청 좌표를 썼다. 같은 구 사람이 캐시를 같이 쓰는 이점이 있었지만
+ * 통근 시간이 실제와 몇 십 분씩 어긋났다 — 강남구청과 강남역은 다른 곳이다.
+ * 정확한 좌표를 쓰면 캐시가 덜 겹치므로, 호출 한도는 Edge Function 쪽 일일 예산이 지킨다.
+ *
+ * 옛 프로필은 좌표가 시군구 대표점이라 그대로 쓰면 예전과 같은 값이 나온다 — 따로 마이그레이션하지 않는다.
+ */
 export function originFor(profile: UserProfile | null | undefined): { lat: number; lng: number } | null {
-  const at = parsePlaceLabel(profile?.workplace?.label);
-  const place = at ? placeFor(at.regionCode, at.sigungu) : null;
-  return place ? { lat: place.lat, lng: place.lng } : null;
+  const w = profile?.workplace;
+  return w ? { lat: w.lat, lng: w.lng } : null;
 }
 
 export const transitConfigured = remoteConfigured;
