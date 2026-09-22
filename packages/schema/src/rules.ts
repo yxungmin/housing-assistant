@@ -366,6 +366,39 @@ export const Announcement = z.object({
     })
     .optional(),
   /**
+   * 같은 단지의 **지난 회차** 결과. "붙을까"에 답하는 값 중 제일 직접적이다.
+   *
+   * LH 청약플러스 당첨자 발표의 커트라인 파일에서 나온다 (collector/src/lh/cutline.ts).
+   * 이번 회차 결과는 접수가 끝난 뒤에나 나오므로, 신청 판단에 쓰려면 지난 회차를 봐야 한다.
+   *
+   * **화면은 경쟁률보다 순위를 앞세운다.** 공공임대는 순위제라 "7.2대 1"보다
+   * "지난번엔 1순위에서 마감됐어요"가 내 순위와 직접 비교된다.
+   * 점수(커트라인의 "9점")는 공고마다 배점이 달라 담지 않는다 — 비교할 수 없는 숫자다.
+   *
+   * 단지명으로 잇기 때문에 틀릴 수 있다. 그래서 `complex`와 `announced_at`을 같이 담아
+   * 화면이 "어느 단지의 언제 결과인지"를 밝히게 한다 — 사용자가 틀린 것을 알아볼 수 있어야 한다.
+   */
+  past_results: z
+    .array(
+      z.object({
+        /** 추첨단위 번호. 회차가 달라도 같은 단지면 같다 */
+        unit_no: z.string().optional(),
+        /** 단지명 (커트라인 파일의 추첨단위 표기에서) */
+        complex: z.string(),
+        /** 당첨자 발표일 (YYYY-MM-DD) */
+        announced_at: z.string().optional(),
+        /** 주택형 */
+        draw_type: z.string().optional(),
+        households: z.number().optional(),
+        applicants: z.number().optional(),
+        /** 신청자 ÷ 공급. 공급이 0이면 담지 않는다 */
+        competition: z.number().optional(),
+        /** 몇 순위에서 마감됐는가 */
+        closed_rank: z.number().int().optional(),
+      }),
+    )
+    .optional(),
+  /**
    * 시군구 대표 좌표에서 이 단지까지의 대중교통 통근 시간. 키는 "서울 마포구" 형식.
    *
    * 사용자마다 부르지 않고 수집할 때 미리 계산한다. 그래야 두 가지가 된다:
