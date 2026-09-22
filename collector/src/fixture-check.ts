@@ -18,6 +18,7 @@ import { existsSync, readFileSync, writeFileSync, readdirSync, mkdirSync } from 
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { ExtractionOutput, type EligibilityRule, type Pricing } from "@housing/schema";
+import { missingCategories } from "@housing/engine";
 import { extractPdfText, type PdfPage } from "./pdf/extract";
 import { fromRoot } from "./paths";
 
@@ -237,28 +238,44 @@ const severityOf = (codes: string[]): Severity => (codes.some((c) => BAD.has(c))
  * 2026-09-22에 018을 이걸로 다시 보니 청약통장 요건이 7개 트랙 중 1개에만 있었다.
  * 공고문 p.10은 면적 구간마다 그 요건을 적고 있다.
  */
-const OMISSION_RATIO = 0.6;
-
 function checkOmissions(gold: ExtractionOutput): Finding[] {
-  const tracks = gold.tracks;
-  if (tracks.length < 3) return []; // 비교할 형제가 없으면 판단 근거도 없다
-  const has = tracks.map((t) => new Set(t.rules.map((r) => r.category)));
-  const all = new Set(has.flatMap((s) => [...s]));
   const out: Finding[] = [];
-  for (const cat of [...all].sort()) {
-    const withIt = has.filter((s) => s.has(cat)).length;
+  const tracks = gold.tracks;
 
-    /**
-     * 반대 신호도 본다. 한 트랙에만 있는 조건은 "그 트랙만의 특칙"일 수도 있지만
-     * "거기서만 뽑히고 나머지는 빠뜨린 것"일 수도 있다. 018이 정확히 후자였다 —
-     * 청약통장 요건이 7개 중 1개에만 있었고, 공고문은 면적 구간마다 그걸 요구한다.
-     * 어느 쪽인지는 기계가 못 가린다. 그래서 문제로 세지 않고 눈에만 띄게 한다.
-     */
-    if (withIt === 1) {
-      const owner = tracks[has.findIndex((s) => s.has(cat))]!;
+  // 형제 대부분이 가졌는데 여기만 없는 조건 — 판정 로직은 엔진과 같은 것을 쓴다.
+  // 검수 도구와 앱이 서로 다른 기준으로 "빠졌다"고 하면 검수의 의미가 없다.
+  missingCategories(gold).forEach((cats, i) => {
+    for (const cat of cats) {
       out.push({
         kind: "omission",
-        track: owner.name,
+        track: tracks[i]!.name,
+        index: -1,
+        label: `${cat} 조건이 없다 (다른 공급 유형에는 있다)`,
+        page: 0,
+        severity: "bad",
+        codes: ["category_missing"],
+        detail: "이 트랙만 예외인지, 추출에서 빠진 것인지 공고문으로 확인한다",
+        quote: "",
+      });
+    }
+  });
+
+  /**
+   * 반대 신호. 한 트랙에만 있는 조건은 그 트랙의 특칙일 수도, 거기서만 뽑히고
+   * 나머지는 빠뜨린 것일 수도 있다. 018이 정확히 후자였다 — 청약통장 요건이
+   * 7개 중 1개에만 있었고 공고문은 면적 구간마다 그걸 요구한다.
+   * 기계가 가릴 수 없어 문제로 세지 않고, 검수하는 사람 눈에만 띄게 한다.
+   * (그래서 엔진에는 넣지 않았다. 앱이 이걸로 "확인 필요"를 띄우면 특칙마다 오경보가 난다.)
+   */
+  if (tracks.length >= 3) {
+    const has = tracks.map((t) => new Set(t.rules.map((r) => r.category)));
+    const all = new Set(has.flatMap((x) => [...x]));
+    for (const cat of [...all].sort()) {
+      const owners = has.map((x, i) => (x.has(cat) ? i : -1)).filter((i) => i >= 0);
+      if (owners.length !== 1) continue;
+      out.push({
+        kind: "omission",
+        track: tracks[owners[0]!]!.name,
         index: -1,
         label: `${cat} 조건이 이 트랙에만 있다 (나머지 ${tracks.length - 1}개에는 없다)`,
         page: 0,
@@ -267,24 +284,7 @@ function checkOmissions(gold: ExtractionOutput): Finding[] {
         detail: "그 트랙만의 특칙인지, 다른 트랙에서 빠진 것인지 공고문으로 확인한다",
         quote: "",
       });
-      continue;
     }
-
-    if (withIt / tracks.length < OMISSION_RATIO) continue;
-    tracks.forEach((t, i) => {
-      if (has[i]!.has(cat)) return;
-      out.push({
-        kind: "omission",
-        track: t.name,
-        index: -1,
-        label: `${cat} 조건이 없다 (형제 트랙 ${withIt}/${tracks.length}개는 갖고 있다)`,
-        page: 0,
-        severity: "bad",
-        codes: ["category_missing"],
-        detail: "이 트랙만 예외인지, 추출에서 빠진 것인지 공고문으로 확인한다",
-        quote: "",
-      });
-    });
   }
   return out;
 }

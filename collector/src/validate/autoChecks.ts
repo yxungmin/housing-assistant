@@ -1,4 +1,5 @@
 import type { ExtractionOutput } from "@housing/schema";
+import { categoryLabel, missingCategories } from "@housing/engine";
 
 /**
  * 결정론적 자동 검증.
@@ -65,6 +66,21 @@ export function autoChecks(x: ExtractionOutput): AutoCheck[] {
     // 가격이 없으면 계산 화면만 닫히고 조건 매칭은 그대로 쓸 수 있다 → 알리기만 한다
     if (track.pricing.length === 0) note(`${label}: 가격 정보 없음`);
   });
+  /**
+   * 빠진 조건. 위의 검사는 전부 **있는 값**을 본다 — 일정이 말이 되나, 세대수 합이 맞나.
+   * 아예 안 뽑힌 조건은 그래서 안 걸리는데, 자격 판정에서 더 위험한 쪽은 그쪽이다.
+   * 틀린 값은 화면에서 눈에 띄지만 빠진 조건은 "맞음"으로 조용히 넘어간다.
+   *
+   * blocking으로 두지 않는다. 그 트랙만의 특칙일 수도 있고, 이것 하나로 공고를 통째로
+   * 감추면 우리가 못 읽었다는 사실조차 아무도 못 보게 된다. 대신 앱에 그대로 알린다 —
+   * 앱은 같은 판단을 엔진의 siblingGuard로 한 번 더 하고, 이건 그 이유를 글로 보여 주는 쪽이다.
+   */
+  missingCategories(x).forEach((cats, ti) => {
+    if (cats.length === 0) return;
+    const name = x.tracks[ti]?.name ?? `tracks[${ti}]`;
+    note(`${name}: ${cats.map(categoryLabel).join("·")}을 읽지 못했어요 (다른 공급 유형에는 있어요)`);
+  });
+
   return issues;
 }
 

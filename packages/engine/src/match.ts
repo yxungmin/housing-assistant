@@ -8,6 +8,7 @@ import type {
   SupplyTrack,
   UserProfile,
 } from "@housing/schema";
+import { categoryLabel, missingCategories } from "./omission";
 
 /** 생년월일(YYYY-MM-DD) → 기준일의 만 나이 */
 export function ageFromBirthDate(birthDate: string, today = new Date()): number {
@@ -384,15 +385,57 @@ export function incomeGuard(track: TrackResult): TrackResult {
   };
 }
 
+/**
+ * 형제 트랙이 가진 조건이 이 트랙에만 없을 때 "확인 필요"를 얹는다.
+ *
+ * `incomeGuard`와 같은 자리에 서지만 근거가 다르다 — 저쪽은 우리가 미리 적어 둔 도메인 지식이고,
+ * 이쪽은 **그 공고문 안의 다른 트랙**이라는 증거다. 그래서 우리가 예상하지 못한 조건도 잡는다.
+ *
+ * 후보에서 빼지는 않는다. 그 트랙만의 특칙일 수도 있고, 우리가 모른다는 이유로 공고를 감추면
+ * 그 오류는 아무도 신고하지 못한다. 대신 완벽해 보이지 않게 만든다 —
+ * 조건을 못 읽은 트랙에 "8개 중 8개 일치"가 붙지 않게.
+ */
+export function siblingGuard(track: TrackResult, missing: RuleCategory[]): TrackResult {
+  if (missing.length === 0) return track;
+  const groups = [...track.groups];
+  for (const category of missing) {
+    const label = categoryLabel(category);
+    const guard: RuleResult = {
+      rule: {
+        group_id: `__sibling_guard__${category}`,
+        category,
+        applies_to: {},
+        operator: "in",
+        value: [],
+        source: { page: 0, text: `공고문에서 이 공급 유형의 ${label}을 읽지 못했어요.` },
+        confidence: 0,
+        verified: false,
+      },
+      status: "NEEDS_CHECK",
+      reason: `같은 공고의 다른 공급 유형에는 ${label}이 있는데 여기서는 읽지 못했어요. 공고문을 확인해 주세요.`,
+      skipped: false,
+    };
+    groups.push({
+      group: { id: `__sibling_guard__${category}`, mode: "all_of" as const, label },
+      status: "NEEDS_CHECK" as const,
+      rules: [guard],
+    });
+  }
+  return { ...track, groups, summary: { ...track.summary, needs_check: track.summary.needs_check + missing.length } };
+}
+
 export function matchAnnouncement(
   extraction: Pick<ExtractionOutput, "tracks">,
   profile: UserProfile,
   options: MatchOptions = {},
 ): AnnouncementMatch {
+  // 빠진 조건은 트랙끼리 비교해야 보인다 — 트랙 하나만 들여다봐서는 없는 것을 알 수 없다
+  const missing = missingCategories(extraction);
   const tracks = extraction.tracks
     .map((t) => matchTrack(t, profile))
     .map((t) => regionGuard(t, profile, options.announcement_region))
-    .map(incomeGuard);
+    .map(incomeGuard)
+    .map((t, i) => siblingGuard(t, missing[i] ?? []));
   const byFit = (a: TrackResult, b: TrackResult) => b.summary.matched - a.summary.matched || a.summary.needs_check - b.summary.needs_check;
   const clean = tracks.filter((t) => t.summary.mismatched === 0).sort(byFit);
   // 거주 요건을 확인 못 한 트랙은 후보에서 뺀다.
