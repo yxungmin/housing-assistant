@@ -167,7 +167,7 @@ export default function Home() {
             {showFar ? (
               <>
                 <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
-                  다른 조건은 어긋나지 않지만, 공고문에서 거주 요건을 읽지 못했어요. 사는 지역이 달라 신청 가능한지는 공고문을 확인해 주세요.
+                  다른 조건은 어긋나지 않지만, 공고문에서 거주 요건을 읽지 못했어요. 사는 지역이 달라 신청할 수 있는지는 공고문을 확인해 주세요.
                 </Sub>
                 <Section items={farAway} onOpen={open} />
               </>

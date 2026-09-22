@@ -101,7 +101,7 @@ export default function AnnouncementDetail() {
   const trackIndex = track ? a.extraction.tracks.indexOf(track.track) : -1;
   /**
    * 값이 없어 판별을 못 한 줄에 "지금 입력하기"를 단다.
-   * 그 줄이 할 수 있는 말은 "입력하면 판별 가능"뿐인데, 그러려면 내 정보로 나가서 항목을 찾아야 했다.
+   * 그 줄이 할 수 있는 말은 "입력하면 판별할 수 있어요"뿐인데, 그러려면 내 정보로 나가서 항목을 찾아야 했다.
    * 여기서 바로 넣고 돌아오면 그 자리에서 판정이 끝난다.
    */
   const fillProps = (r: RuleResult) => {

@@ -181,14 +181,14 @@ export interface AnnouncementMatch {
  */
 function evaluateRule(rule: EligibilityRule, profile: UserProfile): RuleResult {
   const app = applies(rule.applies_to, profile);
-  if (app === false) return { rule, status: "MATCH", skipped: true, reason: "이 조건은 내 가구 유형에 해당하지 않음" };
-  if (app === null) return { rule, status: "NEEDS_CHECK", skipped: false, reason: "가구원 수·맞벌이 여부를 입력하면 판별 가능" };
+  if (app === false) return { rule, status: "MATCH", skipped: true, reason: "내 가구 유형에는 해당하지 않는 조건이에요" };
+  if (app === null) return { rule, status: "NEEDS_CHECK", skipped: false, reason: "가구원 수·맞벌이 여부를 입력하면 판별할 수 있어요" };
   const actual = profileValueFor(rule.category, profile, rule.unit);
   if (actual === undefined || actual === null) {
-    return { rule, status: "NEEDS_CHECK", skipped: false, reason: "입력하면 판별 가능" };
+    return { rule, status: "NEEDS_CHECK", skipped: false, reason: "입력하면 판별할 수 있어요" };
   }
   const ok = compare(actual, rule.operator, rule.value);
-  return { rule, status: ok ? "MATCH" : "MISMATCH", skipped: false, reason: ok ? "조건 일치" : "조건 불일치" };
+  return { rule, status: ok ? "MATCH" : "MISMATCH", skipped: false, reason: ok ? "조건이 맞아요" : "조건이 어긋나요" };
 }
 
 function combine(mode: RuleGroup["mode"], statuses: MatchStatus[]): MatchStatus {
@@ -324,7 +324,7 @@ export function regionGuard(
       verified: false,
     },
     status: "NEEDS_CHECK",
-    reason: "공고문에서 거주 요건을 읽지 못했어요. 지역이 달라 신청 가능한지 공고문을 확인해 주세요.",
+    reason: "공고문에서 거주 요건을 읽지 못했어요. 지역이 달라 신청할 수 있는지 공고문을 확인해 주세요.",
     skipped: false,
   };
   const groups = [
