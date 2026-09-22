@@ -472,7 +472,16 @@ LH·SH·GH·HUG 공고를 지도로 보여 주는 앱 하나를 화면 녹화로
         빼는 방법이 없다. `scopes` 파라미터는 **더하기만 되고 빼기가 안 된다** (실측).
         이메일 동의항목은 비즈 앱(사업자등록번호)이라야 켤 수 있으므로 지금은 못 켠다.
         카카오가 미설정 선택 동의항목을 오류로 보는지 그냥 미동의로 넘기는지는 눌러 봐야 안다.
-        후자라면 "Allow users without an email"이 받아 준다 — 그래서 그게 켜져 있어야 한다.
+        → **KOE205가 났다** (2026-09-22 기기 확인). 카카오가 동의 화면을 그리기 전에 거절한다.
+      - **KOE205는 카카오가 내는 오류다.** Supabase 쪽 토글을 껐다 켰다 해도 바뀌지 않는다.
+      - 길이 셋이다.
+        1. **비즈 앱 전환** (사업자등록번호 필요, 무료) — 정공법. 이메일도 같이 얻는다.
+        2. **id_token 우회** — 우리가 카카오 OAuth를 직접 하고 `openid`로 id_token을 받아
+           `/auth/v1/token?grant_type=id_token`에 넘긴다. **가능하다** (실측: 없는 제공자는
+           "Custom OIDC provider not allowed"인데 kakao는 "Bad ID token"까지 간다 = 제공자는 인정된다).
+           Client Secret을 앱에 둘 수 없어 교환용 Edge Function이 하나 더 필요하다.
+           비즈 앱이 되면 버릴 코드라, 1번이 가능하면 굳이 만들지 않는다.
+        3. **카카오를 미룬다** — 구글 + Apple로 출시하고 나중에 붙인다. 지금 가장 싸다.
 - [ ] 첫 결제 3일 전 사전 고지 알림 (`NOTICE_DAYS_BEFORE_CHARGE`를 `lib/reminders.ts`에 건다)
 - [ ] RevenueCat (네이티브 재빌드 필요). 붙일 때 Supabase user id를 `logIn`에 넘긴다
 
