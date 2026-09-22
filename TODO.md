@@ -462,7 +462,17 @@ LH·SH·GH·HUG 공고를 지도로 보여 주는 앱 하나를 화면 녹화로
         (Biz App 등록 전에는 이메일을 안 준다)
 - [ ] Apple Developer 등록 ($99/년) — 없으면 iOS 심사 자체가 막힌다
 - [ ] Sign in with Apple (4.8 충족) — 버튼과 흐름은 이미 있다. 제공자만 켜면 된다
-- [ ] 카카오 로그인 (developers.kakao.com 앱 등록 + 심사)
+- [~] **카카오 로그인** (2026-09-22) — 설정 완료. 서버 쪽은 확인했고 마지막 한 번은 사람이 눌러야 한다.
+      - 확인된 것: 제공자 활성화, 앱 키 유효, Redirect URI 등록됨, 카카오 로그인 ON
+        (authorize를 따라가면 카카오 **로그인 페이지**까지 간다. KOE006이면 거기서 막힌다)
+      - **확인 못 한 것 1 — 리디렉트 허용목록.** authorize 단계는 `redirect_to`를 검사하지 않는다.
+        대조군으로 `https://evil.example.com/steal`을 넣어도 똑같이 카카오로 넘어갔다.
+        검사는 돌아오는 쪽에서 한다 — 그러니 이 단계가 통과했다고 허용목록이 맞다는 뜻이 아니다.
+      - **확인 못 한 것 2 — `account_email`.** Supabase가 카카오 scope에 이걸 기본으로 넣는데
+        빼는 방법이 없다. `scopes` 파라미터는 **더하기만 되고 빼기가 안 된다** (실측).
+        이메일 동의항목은 비즈 앱(사업자등록번호)이라야 켤 수 있으므로 지금은 못 켠다.
+        카카오가 미설정 선택 동의항목을 오류로 보는지 그냥 미동의로 넘기는지는 눌러 봐야 안다.
+        후자라면 "Allow users without an email"이 받아 준다 — 그래서 그게 켜져 있어야 한다.
 - [ ] 첫 결제 3일 전 사전 고지 알림 (`NOTICE_DAYS_BEFORE_CHARGE`를 `lib/reminders.ts`에 건다)
 - [ ] RevenueCat (네이티브 재빌드 필요). 붙일 때 Supabase user id를 `logIn`에 넘긴다
 
