@@ -10,6 +10,8 @@
  *
  * 토큰은 SecureStore에 둔다 (iOS Keychain / Android Keystore). AsyncStorage는 평문이다.
  */
+import * as AppleAuthentication from "expo-apple-authentication";
+import { Platform } from "react-native";
 import * as Crypto from "expo-crypto";
 import * as Linking from "expo-linking";
 import * as SecureStore from "expo-secure-store";
@@ -72,9 +74,54 @@ async function saveSession(s: AuthSession | null): Promise<void> {
   }
 }
 
+/**
+ * Apple은 브라우저를 열지 않는다.
+ *
+ * iOS에는 시스템이 제공하는 로그인 시트가 있다 — Face ID로 끝나고 앱을 떠나지 않는다.
+ * 웹 OAuth로도 붙일 수는 있지만, "Apple로 로그인"을 눌렀는데 사파리가 뜨는 것은
+ * 아이폰 사용자가 아는 그 동작이 아니다. 그리고 그 경우 Services ID를 따로 만들어야 하는데
+ * 네이티브 방식은 App ID(번들 id)만 Supabase에 등록하면 된다.
+ *
+ * 받은 id_token을 Supabase가 Apple의 공개키로 검증해 세션을 만든다 (grant_type=id_token).
+ * 그래서 우리 서버에 Apple 비밀키를 둘 필요가 없다.
+ *
+ * 이름은 **첫 로그인에만** 온다. 그 뒤로는 Apple이 주지 않으므로, 필요하면 그때 저장해야 한다.
+ * 지금은 저장하지 않는다 — 계정에 담는 것은 구독 상태뿐이라는 선을 지킨다.
+ */
+async function signInWithAppleNative(): Promise<AuthSession> {
+  if (!(await AppleAuthentication.isAvailableAsync())) throw new Error("이 기기에서는 Apple 로그인을 쓸 수 없어요");
+  let credential: AppleAuthentication.AppleAuthenticationCredential;
+  try {
+    credential = await AppleAuthentication.signInAsync({
+      requestedScopes: [AppleAuthentication.AppleAuthenticationScope.EMAIL],
+    });
+  } catch (e) {
+    // 사용자가 시트를 닫은 것은 실패가 아니다
+    if ((e as { code?: string })?.code === "ERR_REQUEST_CANCELED") throw new Error(CANCELLED);
+    throw e;
+  }
+  if (!credential.identityToken) throw new Error("Apple이 토큰을 주지 않았어요");
+
+  const res = await fetch(`${URL}/auth/v1/token?grant_type=id_token`, {
+    method: "POST",
+    headers: headers(),
+    body: JSON.stringify({ provider: "apple", id_token: credential.identityToken }),
+  });
+  const body = await res.json().catch(() => null);
+  if (!res.ok) {
+    const b = body as { error_description?: string; msg?: string } | null;
+    throw new Error(b?.error_description ?? b?.msg ?? `HTTP ${res.status}`);
+  }
+  const session = toSession(body, "apple");
+  if (!session) throw new Error("로그인 응답에 토큰이 없어요");
+  await saveSession(session);
+  return session;
+}
+
 /** 제공자 로그인. 사용자가 창을 닫으면 CANCELLED를 던진다 (실패로 세지 않는다) */
 export async function signInWith(provider: AuthProvider): Promise<AuthSession> {
   if (!authConfigured) throw new Error("Supabase 미설정");
+  if (provider === "apple" && Platform.OS === "ios") return signInWithAppleNative();
   const verifier = await makeVerifier();
   await SecureStore.setItemAsync(VERIFIER_KEY, verifier);
   const redirect = redirectUri();

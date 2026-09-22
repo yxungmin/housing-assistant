@@ -19,7 +19,8 @@
           "kakaomap",
           "nmap"
         ]
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
@@ -51,6 +52,7 @@
         }
       ],
       "expo-web-browser",
+      "expo-apple-authentication",
       "./plugins/with-optional-push"
     ],
     "scheme": "housingassistant"

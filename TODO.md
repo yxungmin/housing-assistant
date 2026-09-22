@@ -461,7 +461,16 @@ LH·SH·GH·HUG 공고를 지도로 보여 주는 앱 하나를 화면 녹화로
       - Providers에서 쓸 제공자를 켠다. 카카오는 "Allow users without an email"도 같이 켠다
         (Biz App 등록 전에는 이메일을 안 준다)
 - [ ] Apple Developer 등록 ($99/년) — 없으면 iOS 심사 자체가 막힌다
-- [ ] Sign in with Apple (4.8 충족) — 버튼과 흐름은 이미 있다. 제공자만 켜면 된다
+- [~] **Sign in with Apple** (2026-09-22) — **네이티브**로 붙였다 (`expo-apple-authentication`).
+      브라우저를 열지 않는다. "Apple로 로그인"을 눌렀는데 사파리가 뜨는 것은 아이폰 사용자가
+      아는 그 동작이 아니고, 네이티브는 Services ID도 필요 없다 (App ID만 등록하면 된다).
+      id_token을 Supabase가 Apple 공개키로 검증하므로 **우리 서버에 Apple 비밀키를 두지 않는다.**
+      이름은 첫 로그인에만 오는데 저장하지 않는다 — 계정에 담는 건 구독 상태뿐이라는 선을 지킨다.
+      - [ ] Apple Developer → Identifiers → App ID `com.yxungmin.housingassistant`에
+            **Sign In with Apple** 체크
+      - [ ] Supabase → Providers → Apple → Enable, **Client IDs**에 번들 id 입력
+            (네이티브 전용이면 Secret Key는 필요 없다)
+      - [ ] 멤버십 활성화 후 재빌드 — 이때 `EXPO_IOS_PUSH=1`로 푸시도 같이 켠다
 - [~] **카카오 로그인** (2026-09-22) — 설정 완료. 서버 쪽은 확인했고 마지막 한 번은 사람이 눌러야 한다.
       - 확인된 것: 제공자 활성화, 앱 키 유효, Redirect URI 등록됨, 카카오 로그인 ON
         (authorize를 따라가면 카카오 **로그인 페이지**까지 간다. KOE006이면 거기서 막힌다)
