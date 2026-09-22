@@ -5,6 +5,7 @@ import type { Pricing } from "@housing/schema";
 import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchAnnouncement, shortfallPlans } from "@housing/engine";
 import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
+import { SignInSheet } from "@/components/SignIn";
 import { SourceCard } from "@/components/SourceCard";
 import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
@@ -45,7 +46,7 @@ export default function Cost() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { colors } = useTheme();
-  const { state, addReport, signIn } = useAppState();
+  const { state, addReport } = useAppState();
   const { list } = useAnnouncements();
   const a = getAnnouncement(id ?? "", list);
   const profile = state.profile;
@@ -113,7 +114,7 @@ export default function Cost() {
   const [picker, setPicker] = useState(false);
   const [subSheet, setSubSheet] = useState(false);
   const [report, setReport] = useState(false);
-  const [signingIn, setSigningIn] = useState(false);
+  const [signInSheet, setSignInSheet] = useState(false);
 
   // 확정된 선: 조건 매칭은 무료, 자금 계산은 유료.
   // 잠겼어도 화면은 그대로 보여 준다 — 보증금·월임대료는 공고문에 적힌 공개 사실이라 가리지 않고,
@@ -126,11 +127,8 @@ export default function Cost() {
   const needsSignIn = level === "gate";
   const hide = (text: string) => (locked ? maskDigits(text) : text);
 
-  const unlock = () => {
-    if (!needsSignIn) return setSubSheet(true);
-    setSigningIn(true);
-    void signIn("kakao").finally(() => setSigningIn(false));
-  };
+  // 로그인 시트는 화면을 갈아치우지 않는다 — 보던 공고를 잃지 않고 돌아온다
+  const unlock = () => (needsSignIn ? setSignInSheet(true) : setSubSheet(true));
 
   // 흩어진 공고에서 고르는 것은 주택형이 아니라 집 한 채다. 말이 다르면 화면의 말도 달라야 한다.
   const picksHouse = !!a?.units?.length;
@@ -246,9 +244,8 @@ export default function Cost() {
       footer={
         <BottomCTA
           label={
-            signingIn ? "로그인 중" : needsSignIn ? "로그인하고 주거비 보기" : locked ? "구독하고 주거비 보기" : conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"
+            needsSignIn ? "로그인하고 주거비 보기" : locked ? "구독하고 주거비 보기" : conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"
           }
-          disabled={signingIn}
           onPress={() => (locked ? unlock() : setScenario(true))}
         />
       }
@@ -561,6 +558,7 @@ export default function Cost() {
       </BottomSheet>
 
       <SubscriptionSheet visible={subSheet} onClose={() => setSubSheet(false)} onStarted={() => setSubSheet(false)} />
+      <SignInSheet visible={signInSheet} onClose={() => setSignInSheet(false)} reason="이 공고의 예상 주거비는 입력하신 소득·자산으로 계산해요. 로그인하면 첫 달은 0원이에요." />
       <ReportSheet
         visible={report}
         onClose={() => setReport(false)}

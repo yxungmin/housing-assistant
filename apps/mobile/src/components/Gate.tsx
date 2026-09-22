@@ -1,6 +1,7 @@
 import { View } from "react-native";
 import { BILLING_DISCLOSURE, PRICE_KRW } from "@/lib/billing";
 import { BlurredCard } from "./BlurredCard";
+import { SignInButtons } from "./SignIn";
 import { Card, PrimaryButton, Screen, SectionTitle, Sub, T } from "./ui";
 import { useTheme } from "@/theme/ThemeProvider";
 import { space } from "@/theme/tokens";
@@ -19,6 +20,7 @@ export function Gate({
   samples,
   busy,
   onPrimary,
+  onSignedIn,
 }: {
   mode: "signIn" | "expired";
   /** 조건에 맞는 공고 수. 가려진 것이 비어 있지 않다는 증거다 */
@@ -28,7 +30,10 @@ export function Gate({
   /** 가려서 보여 줄 카드들의 실제 상태 문구 ("조건 8개 중 7개 일치") */
   samples: { status: string; dday?: string }[];
   busy?: boolean;
-  onPrimary: () => void;
+  /** 만료 화면에서만 쓴다 — 로그인 화면은 제공자 버튼이 직접 처리한다 */
+  onPrimary?: () => void;
+  /** 로그인이 끝났을 때. 게이트를 닫는 쪽이 붙인다 */
+  onSignedIn?: () => void;
 }) {
   const { colors } = useTheme();
   const signIn = mode === "signIn";
@@ -57,11 +62,15 @@ export function Gate({
       </View>
 
       <View style={{ gap: 10, paddingTop: space.sm }}>
-        <PrimaryButton
-          label={busy ? "처리 중" : signIn ? "카카오로 로그인" : `다시 구독하기 · 월 ${PRICE_KRW.toLocaleString("ko-KR")}원`}
-          disabled={busy}
-          onPress={onPrimary}
-        />
+        {signIn ? (
+          <SignInButtons onDone={onSignedIn} />
+        ) : (
+          <PrimaryButton
+            label={busy ? "처리 중" : `다시 구독하기 · 월 ${PRICE_KRW.toLocaleString("ko-KR")}원`}
+            disabled={busy}
+            onPress={() => onPrimary?.()}
+          />
+        )}
         {/* 고지는 구매 버튼 바로 위·아래에 둔다. 아래에 작게 깔면 App Store 심사에서 걸린다 */}
         <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>{BILLING_DISCLOSURE}</Sub>
         <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>

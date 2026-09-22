@@ -393,12 +393,24 @@ LH·SH·GH·HUG 공고를 지도로 보여 주는 앱 하나를 화면 녹화로
 
 ### 순서
 
-- [ ] UI 먼저 (인증·결제 없이, 지금 가능) — 온보딩 끝 게이트, 만료 화면, 첫 달 0원 문구(`TRIAL_DAYS` 30),
-      구매 고지 블록, 구독 관리 1탭, 결제 3일 전 알림
+- [x] **인증 계층** (2026-09-22) — Supabase Auth PKCE를 fetch로 직접 붙였다. supabase-js는 넣지 않았다.
+      - `src/lib/auth.ts` 순수 규칙(주소 만들기·리디렉트 읽기·만료·base64url·실패 문구) + 테스트 17건
+      - `src/data/auth.ts` 어댑터: 브라우저 열기, 토큰 교환, 갱신, 로그아웃. 토큰은 SecureStore(키체인)
+      - `btoa`를 쓰지 않는다 — Hermes에 있다는 보장이 없고, 테스트는 node에서 돌아 그 실패를 못 잡는다
+      - 배포 빌드에서 Supabase 설정이 없으면 로그인이 **실패한다**. 모의 계정은 `__DEV__`에서만 —
+        조용히 모의 계정을 내주면 유료선이 통째로 뚫린다
+- [x] **게이트 연결** — 홈 목록이 로그인 뒤로 갔다. 개수·가장 빠른 마감·조건 일치 수는 보여 주고
+      제목만 가린다. 맞는 공고가 0개면 띄우지 않는다. 비용 화면은 화면을 갈아치우지 않고 시트로 받는다.
+- [x] **계정 칸** — 내 정보에 로그인/로그아웃. 로그아웃은 한 번 묻고, 조건·저장 목록·알림은 남긴다.
+- [ ] **대시보드 설정** (사용자 작업) — Supabase → Authentication
+      - URL Configuration → Redirect URLs에 `housingassistant://auth` 추가. **없으면 리디렉트가 막힌다**
+      - Providers에서 쓸 제공자를 켠다. 카카오는 "Allow users without an email"도 같이 켠다
+        (Biz App 등록 전에는 이메일을 안 준다)
 - [ ] Apple Developer 등록 ($99/년) — 없으면 iOS 심사 자체가 막힌다
-- [ ] Sign in with Apple (4.8 충족)
+- [ ] Sign in with Apple (4.8 충족) — 버튼과 흐름은 이미 있다. 제공자만 켜면 된다
 - [ ] 카카오 로그인 (developers.kakao.com 앱 등록 + 심사)
-- [ ] RevenueCat (네이티브 재빌드 필요)
+- [ ] 첫 결제 3일 전 사전 고지 알림 (`NOTICE_DAYS_BEFORE_CHARGE`를 `lib/reminders.ts`에 건다)
+- [ ] RevenueCat (네이티브 재빌드 필요). 붙일 때 Supabase user id를 `logIn`에 넘긴다
 
 ## 대출 — 부족액 (2026-09-22)
 

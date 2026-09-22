@@ -15,12 +15,18 @@
  *  2. **빈 걸 가리고 로그인을 받지 않는다.** 맞는 공고가 0개면 게이트를 띄우지 않는다.
  */
 import { hasAccess, type Subscription } from "./billing";
+import type { AuthProvider } from "./auth";
 
-/** 모의 계정. 실제 인증(Supabase Auth 카카오·Apple)은 아직 붙이지 않았다 */
+/**
+ * 로그인한 계정. **구독을 묶는 열쇠일 뿐이고, 프로필은 여기 담지 않는다.**
+ * id는 Supabase user id다 — 나중에 RevenueCat에 그대로 넘겨야 기기를 바꿔도 구독이 따라온다.
+ */
 export interface Account {
   id: string;
-  provider: "kakao" | "apple" | "google";
+  provider: AuthProvider;
   signedInAt: string;
+  /** 카카오는 Biz App 등록 전에는 이메일을 주지 않는다. 없을 수 있다 */
+  email?: string;
 }
 
 export type AccessLevel =

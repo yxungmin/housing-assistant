@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/icon";
+import { Gate } from "@/components/Gate";
+import { accessLevel, shouldGate } from "@/lib/access";
+import { ruleCounts } from "@housing/engine";
 import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { commuteKm, getAnnouncement, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
@@ -112,6 +115,35 @@ export default function Home() {
     animateLayout();
     setter((v) => !v);
   };
+
+  /**
+   * 로그인 게이트. 맞춤 공고가 제품 자체라 목록이 로그인 뒤에 있다 —
+   * 조건을 뺀 목록은 우리가 파는 물건이 아니다.
+   *
+   * 다만 가린 것이 비어 있지 않다는 증거를 먼저 준다: 개수·가장 빠른 마감·조건 일치 수는
+   * 그대로 보여 주고 제목만 가린다. 맞는 공고가 0개면 아예 띄우지 않는다 (`shouldGate`) —
+   * 빈 걸 가리고 가입을 받는 건 사기다.
+   *
+   * 하이드레이션 전에는 띄우지 않는다. 저장된 계정을 읽기 전이라 로그인한 사람에게도 잠깐 뜬다.
+   */
+  const level = accessLevel(state);
+  if (state.loaded && shouldGate(level, matched.length)) {
+    const soonest = soon[0]?.announcement.apply_end ?? matched[0]?.announcement.apply_end;
+    return (
+      <Gate
+        mode="signIn"
+        count={matched.length}
+        soonestDday={soonest ? dday(soonest) : undefined}
+        samples={matched.slice(0, 3).map((m) => {
+          const c = m.match?.best_track ? ruleCounts(m.match.best_track) : null;
+          return {
+            status: c ? `조건 ${c.total}개 중 ${c.matched}개 일치` : "조건 일치",
+            dday: m.announcement.apply_end ? dday(m.announcement.apply_end) : undefined,
+          };
+        })}
+      />
+    );
+  }
 
   return (
     <Screen onRefresh={refresh} refreshing={refreshing}>

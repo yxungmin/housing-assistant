@@ -14,6 +14,8 @@ import { SERVICE_REGION_LABEL } from "@housing/schema";
 import { REGIONS } from "@/lib/onboarding";
 import { isOpen, REPORT_STATUS_LABEL } from "@/lib/reports";
 import { useAppState, type ThemePref } from "@/store/appState";
+import { PROVIDER_LABEL } from "@/lib/auth";
+import { SignInSheet } from "@/components/SignIn";
 import { useTheme } from "@/theme/ThemeProvider";
 
 const MARRIAGE: Record<string, string> = { single: "미혼", married: "기혼", pre_marriage: "예비 신혼부부", single_parent: "한부모" };
@@ -21,11 +23,13 @@ const price = `월 ${PRICE_KRW.toLocaleString("ko-KR")}원`;
 
 /** 내 정보: 조건 수정(항상 무료), 구독 상태, 알림, 데이터 기준일, 화면 모드 */
 export default function Profile() {
-  const { state, setTheme, setNotifications, reset } = useAppState();
+  const { state, setTheme, setNotifications, reset, signOut } = useAppState();
   const { colors } = useTheme();
   const router = useRouter();
   const feed = useAnnouncements();
   const [manage, setManage] = useState(false);
+  const [signInSheet, setSignInSheet] = useState(false);
+  const [confirmOut, setConfirmOut] = useState(false);
   const [notiMsg, setNotiMsg] = useState<string | null>(null);
   const [reports, setReports] = useState(false);
   const openReports = state.reports.filter(isOpen).length;
@@ -93,6 +97,25 @@ export default function Profile() {
       </Card>
 
       <View style={{ gap: 8 }}>
+        <SectionTitle>계정</SectionTitle>
+        <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
+          {state.account ? (
+            <>
+              <ListRow
+                icon="user"
+                iconTone="primary"
+                label={`${PROVIDER_LABEL[state.account.provider]} 계정으로 로그인됨`}
+                sub={state.account.email ?? "계정에는 구독 상태만 저장돼요"}
+              />
+              <ListRow icon="left" label="로그아웃" sub="조건과 저장한 공고는 이 기기에 그대로 남아요" onPress={() => setConfirmOut(true)} />
+            </>
+          ) : (
+            <ListRow icon="user" label="로그인" sub="로그인하면 첫 달은 0원이에요" onPress={() => setSignInSheet(true)} />
+          )}
+        </Card>
+      </View>
+
+      <View style={{ gap: 8 }}>
         <SectionTitle>구독</SectionTitle>
         <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
           <ListRow icon="check" iconTone={sub.status === "trial" || sub.status === "active" ? "primary" : sub.status === "expired" ? "warn" : "gray"} label={subLabel} sub={subSub} />
@@ -142,6 +165,19 @@ export default function Profile() {
         <T variant="small" color={colors.text3}>모든 데이터 지우고 처음부터</T>
       </Pressable>
       <SubscriptionManageSheet visible={manage} onClose={() => setManage(false)} />
+      <SignInSheet visible={signInSheet} onClose={() => setSignInSheet(false)} />
+      {/* 로그아웃은 한 번 묻는다. 눌러서 바로 나가면 되돌릴 방법이 로그인뿐이다 */}
+      <BottomSheet visible={confirmOut} onClose={() => setConfirmOut(false)}>
+        <View style={{ gap: 16 }}>
+          <View style={{ gap: 6 }}>
+            <T variant="title">로그아웃할까요?</T>
+            <Sub variant="body">
+              입력한 조건, 저장한 공고, 마감 알림은 이 기기에 그대로 남아요. 다시 로그인하면 구독도 그대로 이어져요.
+            </Sub>
+          </View>
+          <ListRow icon="left" label="로그아웃" danger onPress={() => { setConfirmOut(false); void signOut(); }} />
+        </View>
+      </BottomSheet>
       <BottomSheet visible={reports} onClose={() => setReports(false)}>
         <View style={{ gap: 8 }}>
           <T variant="title">내가 보낸 신고</T>

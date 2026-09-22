@@ -20,6 +20,8 @@ import {
 } from "@/lib/inbox";
 import { emptySeen, markOpened, noteSeen, type SeenState } from "@/lib/unseen";
 import { canOpenCost as canOpenCostRule, type Account } from "@/lib/access";
+import { CANCELLED, type AuthProvider } from "@/lib/auth";
+import { authConfigured, loadSession, refreshIfNeeded, signInWith, signOutRemote } from "@/data/auth";
 import { canSend, type LocalReport } from "@/lib/reports";
 import { fetchReportStatuses, remoteConfigured, sendIssueReport } from "@/data/remote";
 
@@ -210,9 +212,13 @@ async function write(key: string, value: string | null): Promise<void> {
 interface Ctx {
   state: AppState;
   setProfile: (profile: UserProfile, onboarded?: boolean) => void;
-  /** 지금은 모의 로그인이다. 계정을 만들고 첫 달 0원을 시작한다 */
-  signIn: (provider: Account["provider"]) => Promise<void>;
-  signOut: () => void;
+  /**
+   * 제공자 로그인 → 계정 + 첫 달 0원 시작.
+   * 사용자가 창을 닫으면 조용히 false를 준다 (실패 문구를 띄우지 않는다).
+   * 실제로 실패하면 던진다 — 호출부가 `signInErrorText`로 옮겨 보여 준다.
+   */
+  signIn: (provider: AuthProvider) => Promise<boolean>;
+  signOut: () => Promise<void>;
   toggleSaved: (id: string) => void;
   toggleApplied: (id: string) => void;
   setSubscription: (subscription: Subscription) => void;
@@ -264,6 +270,18 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     if (subscription.firstMonthUsedAt) void write(KEYS.firstMonth, subscription.firstMonthUsedAt);
   }, [state]);
 
+  // 켤 때 토큰이 아직 살아 있는지 본다. 저장된 계정만 믿으면 서버에서 지워진 계정으로도
+  // 계속 로그인 상태가 된다. 갱신이 안 되면 로그아웃시킨다 — 조용히 401만 나는 것보다 낫다.
+  const checkedSession = useRef(false);
+  useEffect(() => {
+    if (!state.loaded || !state.account || !authConfigured || checkedSession.current) return;
+    checkedSession.current = true;
+    void (async () => {
+      const stored = await loadSession();
+      if (!stored || !(await refreshIfNeeded(stored))) dispatch({ type: "signOut" });
+    })();
+  }, [state.loaded, state.account]);
+
   // 신고 동기화: 못 보낸 건 보내고, 보낸 건의 처리 결과를 받아 "확인 중"을 끝맺는다.
   // Supabase가 없으면 기기에 그대로 둔다 — 버튼은 동작하고, 연결되면 그때 올라간다.
   const syncing = useRef(false);
@@ -307,16 +325,37 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     () => ({
       state,
       setProfile: (profile, onboarded) => dispatch({ type: "setProfile", profile, onboarded }),
-      // 모의 로그인: 계정을 만들고, 첫 달 무료를 아직 안 썼을 때만 시작한다.
-      // 첫 달만 무료다 — 로그아웃 후 다시 들어와도 또 주지 않는다. 실제 인증은 M8에서 이 자리에 들어간다.
+      // 로그인하면 첫 달 무료를 아직 안 썼을 때만 시작한다.
+      // 첫 달만 무료다 — 로그아웃 후 다시 들어와도 또 주지 않는다 (setSubscription이 지킨다).
+      //
+      // Supabase 설정이 없으면 개발 빌드에서만 모의 계정으로 넘어간다. 배포 빌드에서
+      // 조용히 모의 계정을 내주면 유료선이 통째로 뚫린다 — 그래서 __DEV__로 못을 박는다.
       signIn: async (provider) => {
-        const account: Account = { id: `mock-${provider}-${Date.now()}`, provider, signedInAt: new Date().toISOString() };
+        let account: Account;
+        if (authConfigured) {
+          try {
+            const session = await signInWith(provider);
+            account = { id: session.userId, provider, signedInAt: new Date().toISOString(), ...(session.email ? { email: session.email } : {}) };
+          } catch (e) {
+            if (e instanceof Error && e.message === CANCELLED) return false;
+            throw e;
+          }
+        } else if (__DEV__) {
+          account = { id: `mock-${provider}-${Date.now()}`, provider, signedInAt: new Date().toISOString() };
+        } else {
+          throw new Error("로그인 설정이 없어요");
+        }
         dispatch({ type: "signIn", account });
         if (canUseFirstMonthFree(state.subscription)) {
           dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
         }
+        return true;
       },
-      signOut: () => dispatch({ type: "signOut" }),
+      // 토큰부터 지우고 상태를 바꾼다. 순서가 뒤집히면 화면은 로그아웃인데 키체인에 토큰이 남는다.
+      signOut: async () => {
+        await signOutRemote(await loadSession());
+        dispatch({ type: "signOut" });
+      },
       toggleSaved: (id) => dispatch({ type: "toggleSaved", id }),
       toggleApplied: (id) => dispatch({ type: "toggleApplied", id }),
       setSubscription: (subscription) => dispatch({ type: "setSubscription", subscription }),
