@@ -482,6 +482,12 @@ LH·SH·GH·HUG 공고를 지도로 보여 주는 앱 하나를 화면 녹화로
            Client Secret을 앱에 둘 수 없어 교환용 Edge Function이 하나 더 필요하다.
            비즈 앱이 되면 버릴 코드라, 1번이 가능하면 굳이 만들지 않는다.
         3. **카카오를 미룬다** — 구글 + Apple로 출시하고 나중에 붙인다. 지금 가장 싸다.
+      → **3번으로 간다** (2026-09-22 결정). 화면에서 카카오를 뺐다.
+        되돌리는 건 `lib/auth.ts`의 `shownProviders`에 `"kakao"`를 다시 넣는 것뿐이다 —
+        나머지 코드는 제공자에 무관하다. 그 전에 비즈 앱 전환이 선행돼야 한다.
+      - 지금 화면 구성: iOS는 Apple + 구글, 안드로이드는 구글.
+        **iOS에 제3자가 있으면 Apple이 반드시 같이 있어야 한다** (App Store 4.8).
+        이 규칙은 제공자를 추가하다 조용히 깨지므로 테스트로 고정했다.
 - [ ] 첫 결제 3일 전 사전 고지 알림 (`NOTICE_DAYS_BEFORE_CHARGE`를 `lib/reminders.ts`에 건다)
 - [ ] RevenueCat (네이티브 재빌드 필요). 붙일 때 Supabase user id를 `logIn`에 넘긴다
 

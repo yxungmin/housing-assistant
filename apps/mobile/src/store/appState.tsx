@@ -363,7 +363,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       },
       devSignIn: async () => {
         if (!__DEV__) return;
-        dispatch({ type: "signIn", account: { id: `dev-${Date.now()}`, provider: "kakao", signedInAt: new Date().toISOString() } });
+        dispatch({ type: "signIn", account: { id: `dev-${Date.now()}`, provider: "google", signedInAt: new Date().toISOString() } });
         if (canUseFirstMonthFree(state.subscription)) {
           dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
         }

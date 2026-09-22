@@ -21,6 +21,21 @@ export const PROVIDER_LABEL: Record<AuthProvider, string> = {
   google: "구글",
 };
 
+/**
+ * 로그인 화면에 띄울 제공자.
+ *
+ * **카카오는 지금 없다** (2026-09-22). 코드가 아니라 계정 문제다 — Supabase가 카카오 scope에
+ * `account_email`을 기본으로 넣는데 그 동의항목은 비즈 앱(사업자등록번호)이라야 켤 수 있어,
+ * 누르면 카카오가 KOE205로 거절한다. `scopes`로 빼려 해도 그건 더하기만 된다(실측).
+ * 비즈 앱이 되면 "kakao"를 맨 앞에 다시 넣으면 끝이다 — 나머지 코드는 제공자에 무관하다.
+ *
+ * iOS에 Apple이 있는 것은 App Store 4.8 때문이다. 제3자 로그인을 쓰면 **동등한** 수단을
+ * 반드시 함께 제공해야 한다. 그래서 iOS에 제3자가 하나라도 있으면 apple이 같이 있어야 한다.
+ */
+export function shownProviders(platform: string): AuthProvider[] {
+  return platform === "ios" ? ["apple", "google"] : ["google"];
+}
+
 export interface AuthSession {
   userId: string;
   provider: AuthProvider;

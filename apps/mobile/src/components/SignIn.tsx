@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ActivityIndicator, Platform, Pressable, View } from "react-native";
-import { PROVIDER_LABEL, signInErrorText, type AuthProvider } from "@/lib/auth";
+import { PROVIDER_LABEL, shownProviders, signInErrorText, type AuthProvider } from "@/lib/auth";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { fonts, radius } from "@/theme/tokens";
@@ -21,11 +21,7 @@ export function SignInButtons({ onDone }: { onDone?: () => void }) {
   const [busy, setBusy] = useState<AuthProvider | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // iOS는 카카오 + Apple이 배포 구성이다. 구글은 안드로이드 쪽.
-  // 다만 개발 빌드에서는 iOS에도 구글을 띄운다 — 카카오는 심사가, Apple은 유료 계정이 필요해서
-  // 구글이 아이폰에서 로그인 흐름을 실제로 확인할 수 있는 유일한 제공자다.
-  const providers: AuthProvider[] =
-    Platform.OS === "ios" ? (__DEV__ ? ["kakao", "apple", "google"] : ["kakao", "apple"]) : ["kakao", "google"];
+  const providers = shownProviders(Platform.OS);
 
   const press = (provider: AuthProvider) => {
     if (busy) return;

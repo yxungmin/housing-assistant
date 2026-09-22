@@ -6,6 +6,8 @@ import {
   isValidVerifier,
   needsRefresh,
   parseRedirect,
+  PROVIDER_LABEL,
+  shownProviders,
   signInErrorText,
   toSession,
   type AuthSession,
@@ -133,5 +135,36 @@ describe("base64url", () => {
     const v = base64url(new Uint8Array(32).map((_, i) => (i * 7 + 3) % 256));
     expect(v).toHaveLength(43);
     expect(isValidVerifier(v)).toBe(true);
+  });
+});
+
+/**
+ * App Store 4.8: 제3자 로그인을 쓰면 **동등한** 수단을 함께 제공해야 한다.
+ * 이 조항은 조용히 깨진다 — 제공자 하나를 추가하면서 Apple을 빼먹어도 앱은 잘 돌고,
+ * 심사에서야 알게 된다. 그래서 규칙 자체를 고정한다.
+ */
+describe("로그인 화면에 띄우는 제공자", () => {
+  it("iOS에 제3자 로그인이 있으면 Apple이 반드시 같이 있다 (4.8)", () => {
+    const ios = shownProviders("ios");
+    const thirdParty = ios.filter((p) => p !== "apple");
+    if (thirdParty.length > 0) expect(ios).toContain("apple");
+  });
+
+  it("안드로이드는 Apple을 띄우지 않는다 — 거기선 의무가 아니고 쓸 수도 없다", () => {
+    expect(shownProviders("android")).not.toContain("apple");
+  });
+
+  it("빈 목록을 내지 않는다 — 로그인할 방법이 없으면 앱을 쓸 수 없다", () => {
+    for (const p of ["ios", "android", "web"]) expect(shownProviders(p).length).toBeGreaterThan(0);
+  });
+
+  it("카카오는 지금 빠져 있다 — 비즈 앱 전환 전에는 KOE205로 거절당한다", () => {
+    for (const p of ["ios", "android"]) expect(shownProviders(p)).not.toContain("kakao");
+  });
+
+  it("띄우는 제공자는 모두 이름을 갖고 있다 — 없으면 버튼에 원시 id가 나온다", () => {
+    for (const p of [...shownProviders("ios"), ...shownProviders("android")]) {
+      expect(PROVIDER_LABEL[p]).toBeTruthy();
+    }
   });
 });
