@@ -68,6 +68,7 @@ npm run db:check                     # 빈 Postgres에 마이그레이션 전체
 npm run fixture:check -- 018         # 초안 ↔ 공고문 PDF 1차 대조 (사람 검수 전)
 npm run review                       # 검수 뷰어 4310 — 추출 검수 + 신고 큐
 npm run output:size                  # 추출 출력이 어디서 커지는지 (비용의 70%가 출력 토큰)
+npm run pdf:rehost [-- --apply]      # 기관 서버를 가리키는 공고문을 우리 Storage로 옮긴다 (내려받기 방지)
 ```
 
 ## 규칙

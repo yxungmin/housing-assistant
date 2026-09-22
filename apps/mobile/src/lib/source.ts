@@ -25,6 +25,14 @@ const webBrowser = () => import("expo-web-browser");
 
 export const hasSource = (pdfUrl?: string): boolean => !!pdfUrl && /^https?:\/\//.test(pdfUrl);
 
+/**
+ * 우리 Storage에 올려 둔 주소인가. 여기 있으면 application/pdf라 눌렀을 때 그 자리에서 펼쳐진다.
+ * 기관 서버 주소는 octet-stream + attachment로 오는 경우가 많아 파일로 내려받아진다 (2026-09-22 확인).
+ * 무엇으로 열지는 서버가 정하므로 앱에서 못 바꾼다 — 그래서 화면이 미리 말해 준다.
+ * 수집기를 거친 공고는 이미 우리 Storage를 가리키고, 그러지 않은 행은 `npm run pdf:rehost`로 옮긴다.
+ */
+export const opensInPlace = (pdfUrl?: string): boolean => !!pdfUrl && pdfUrl.includes("/storage/v1/object/public/");
+
 export function sourceUrl(pdfUrl: string, page?: number): string {
   return page && page > 0 ? `${pdfUrl}#page=${page}` : pdfUrl;
 }
