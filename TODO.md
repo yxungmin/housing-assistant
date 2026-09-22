@@ -450,7 +450,14 @@ LH·SH·GH·HUG 공고를 지도로 보여 주는 앱 하나를 화면 녹화로
       위법 사실의 증거다. 테스트가 가격·무료 기간·좌표 정밀도를 코드와 대조한다.
 - [x] **청약철회 제한 사유를 구매 화면에 표시** — 전자상거래법 제17조 제6항.
       약관 안에만 두거나 아래에 작게 깔면 **제한이 아예 적용되지 않는다**.
-- [ ] **호스팅** — App Store Connect가 개인정보처리방침 **URL**을 요구한다. 파일로는 안 된다.
+- [x] **호스팅** (2026-09-22) — GitHub Pages, main 브랜치 `/docs`.
+      `npm run legal:site`가 `src/legal` 하나에서 md와 HTML을 같이 만든다.
+      외부 폰트·스크립트를 쓰지 않는다 — 약관을 읽는 데 네트워크가 더 필요할 이유가 없다.
+      초안인 동안에는 `noindex`다. 확정 전에 검색에 잡히면 우리가 지킬 수 없는 약속이 퍼진다.
+      - https://yxungmin.github.io/housing-assistant/privacy.html
+      - https://yxungmin.github.io/housing-assistant/terms.html
+      - [ ] **저장소 설정에서 Pages 켜기** (사용자 작업) — Settings → Pages →
+            Source: Deploy from a branch → Branch: main / 폴더: /docs → Save
 - [ ] **개인정보처리방침 URL** (5.1.1) — 없으면 App Store Connect 제출 자체가 막힌다.
       앱 안에도 링크가 있어야 한다.
 - [ ] **이용약관(EULA) + 개인정보처리방침 링크를 구독 구매 화면에** (3.1.2).

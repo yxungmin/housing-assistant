@@ -39,7 +39,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "icon:preview": "tsx scripts/icon-preview.ts",
     "test": "vitest run",
-    "legal:md": "tsx scripts/legal-md.ts"
+    "legal:site": "tsx scripts/legal-site.ts"
   },
   "private": true
 }

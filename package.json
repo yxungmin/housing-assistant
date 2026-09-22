@@ -33,7 +33,7 @@
     "pdf:rehost": "npm run pdf:rehost -w @housing/collector --",
     "output:size": "npm run output:size -w @housing/collector",
     "bundle:push": "npm run bundle:push -w @housing/collector --",
-    "legal:md": "npm run legal:md -w @housing/mobile"
+    "legal:site": "npm run legal:site -w @housing/mobile"
   },
   "engines": {
     "node": ">=20"
