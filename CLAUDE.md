@@ -68,7 +68,11 @@
   종류는 셋(신규·마감임박·조건주의). 공고 사실은 충분히 주고 개인별 판단만 앱으로 넘긴다 — 정보를 숨겨 궁금하게 만들지 않는다.
   대상은 제목이 먼저다(청년 공고의 "수급자·한부모 가구" 순위를 한부모 공급으로 부르지 않는다). 세대 수는 모든 트랙에 있을 때만 쓴다.
   다운로드 링크는 출시 후 `SOCIAL_APP_LINK`. 영상(Remotion)·게시(Instagram Graph API)는 이 JSON을 받는 다음 단계다.
-  이미 만든 대본은 올린 게시물로 보고 덮어쓰지 않는다. 공고가 정정돼 게시물에 나온 사실이 바뀌면 고정 댓글 문안(`correction.ts`, `<id>.<type>.correction.json`)을 만든다 — 게시물은 고치지 않는다.
+  초안(`social/output`, 커밋 안 함)은 매번 새로 만든다. 올린 게시물은 `npm run social:posted -- 012.new`로 `social/posted/`(커밋)에 기록하고,
+  그 기록과 비교해 공고 정정 시 고정 댓글 문안(`correction.ts`)을 만든다 — 게시물은 고치지 않는다. 초안을 게시물로 보면 옛 오류 초안이 굳는다(실제로 "모집 4세대"가 영상까지 갔다).
+- `apps/video` Remotion 릴스 템플릿(1080×1920). 대본 JSON을 props로 받아 장면 종류마다 정해진 틀에 글자만 채운다 — 색은 앱 토큰(`apps/mobile/src/theme/tokens.ts`)을 그대로, 폰트는 Pretendard.
+  `npm run render -w @housing/video`가 재대조를 통과한 초안만 `social/video/*.mp4`로 렌더한다. 로고·폰트는 앱에서 복사해 온다(`public/`, 커밋 안 함).
+  인스타 UI가 덮는 곳(위 250px, 아래 470px, 오른쪽 150px)에는 내용을 두지 않는다. 프로필 사진은 `npm run profile -w @housing/video`(원형 크롭 여백 포함).
 
 ## 명령
 ```bash
@@ -82,6 +86,8 @@ npm run app:enrich [-- --links]      # 번들에 원문 링크·그림·좌표·
 npm run simulate [-- --full]         # 프로필 10종 × 지금 공고로 매칭 점검 (LLM 없음)
 npm run audit:match [-- --matrix]    # 프로필 6,480개 × 공고로 오추천·놓친 추천 감사 (LLM 없음)
 npm run social:script [-- --id 012] [--llm]   # 인스타 릴스 대본·캡션 JSON (--llm은 SOCIAL_COPY_ENABLED=true 필요)
+npm run social:posted -- 012.new      # 직접 올린 게시물 표시 (정정 댓글의 기준)
+npm run render -w @housing/video       # 대본 → 릴스 MP4 (social/video)
 npm run db:check                     # 빈 Postgres에 마이그레이션 전체 적용 + 동작 확인 (Docker 필요)
 npm run fixture:check -- 018         # 초안 ↔ 공고문 PDF 1차 대조 (사람 검수 전)
 npm run review                       # 검수 뷰어 4310 — 추출 검수 + 신고 큐

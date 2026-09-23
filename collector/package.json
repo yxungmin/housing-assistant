@@ -24,6 +24,7 @@
     "simulate": "tsx src/simulate.ts",
     "audit:match": "tsx src/audit-match.ts",
     "social:script": "tsx src/social-script.ts",
+    "social:posted": "tsx src/social-posted.ts",
     "pdf:rehost": "tsx src/rehost-pdfs.ts",
     "bundle:push": "tsx src/push-bundle.ts",
     "benchmark:restore": "tsx src/restore-benchmark.ts",

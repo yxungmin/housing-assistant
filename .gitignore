@@ -21,3 +21,8 @@ supabase/.temp/
 supabase/.branches/
 # 인스타 대본 생성물 (npm run social:script)
 social/output/
+# 올린 게시물 기록은 커밋한다 — 정정 댓글의 기준이다 (social/posted/)
+# 영상: 앱에서 복사해 오는 자산과 렌더 결과 (npm run render -w @housing/video)
+apps/video/public/
+apps/video/out/
+social/video/

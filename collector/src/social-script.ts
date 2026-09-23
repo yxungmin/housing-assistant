@@ -10,8 +10,12 @@
  *
  * 다운로드 링크는 앱 출시 후에 SOCIAL_APP_LINK로 넣는다. 없으면 캡션의 링크 문장과 첫 댓글을 만들지 않는다.
  *
- * 이미 만든 대본은 **올린 게시물**로 보고 덮어쓰지 않는다. 공고가 정정돼 게시물에 나온 사실이 바뀌었으면
- * <id>.<type>.correction.json에 고정 댓글 문안을 만든다(social/correction.ts). 대본을 새로 뽑으려면 --force.
+ * 초안(social/output)은 매번 새로 만든다. **올린 게시물**은 social/posted/에 따로 둔다 —
+ *   npm run social:posted -- 012.new      (직접 올린 뒤 표시. 게시 자동화가 붙으면 게시 단계가 대신한다)
+ * 공고가 정정돼 올린 게시물에 나온 사실이 바뀌었으면 social/output/<id>.<type>.correction.json에 고정 댓글 문안을 만든다.
+ *
+ * 전에는 "이미 만든 초안 = 올린 게시물"로 봤다. 그랬더니 올리지도 않은 옛 초안("모집 4세대" 오류가 있던 것)이
+ * 덮어쓰이지 않고 굳어서 영상까지 렌더됐다(2026-09-23). 초안과 게시물은 다른 것이다.
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -25,7 +29,6 @@ import { fromRoot } from "./paths";
 const args = process.argv.slice(2);
 const only = args.includes("--id") ? args[args.indexOf("--id") + 1] : undefined;
 const useLlm = args.includes("--llm");
-const force = args.includes("--force");
 const appLink = process.env.SOCIAL_APP_LINK || null;
 const today = new Date();
 
@@ -35,6 +38,7 @@ const rows = (JSON.parse(readFileSync(fromRoot("apps", "mobile", "data", "announ
   .filter((r) => !only || r.id === only);
 
 const outDir = fromRoot("social", "output");
+const postedDir = fromRoot("social", "posted");
 mkdirSync(outDir, { recursive: true });
 
 let ok = 0;
@@ -46,9 +50,10 @@ for (const row of rows) {
   if (facts.apply.end && facts.apply.end < today.toISOString().slice(0, 10)) continue;
   for (const type of typesFor(facts, today)) {
     const file = join(outDir, `${row.id}.${type}.json`);
-    // 이미 만든 대본 = 올린 게시물. 바꾸지 않고, 정정이 있으면 고정 댓글만 만든다
-    if (existsSync(file) && !force) {
-      const posted = JSON.parse(readFileSync(file, "utf8")) as { facts: typeof facts };
+    const postedFile = join(postedDir, `${row.id}.${type}.json`);
+    // 올린 게시물이 있으면 대본을 다시 만들지 않는다 — 올린 것은 못 고친다. 정정이 있으면 고정 댓글만 만든다
+    if (existsSync(postedFile)) {
+      const posted = JSON.parse(readFileSync(postedFile, "utf8")) as { facts: typeof facts };
       const fix = detectCorrection(posted.facts, facts);
       if (fix) {
         corrections++;
@@ -80,5 +85,5 @@ for (const row of rows) {
     console.log(`${mark} ${row.id} ${type.padEnd(8)} ${mode.padEnd(8)} ${facts.title.slice(0, 30)}${verdict.errors.length ? `\n      ✗ ${verdict.errors.join("\n      ✗ ")}` : ""}${verdict.warnings.length ? `\n      ! ${verdict.warnings.join("\n      ! ")}` : ""}${llmNote ? `\n      (Claude 결과 버림: ${llmNote})` : ""}`);
   }
 }
-console.log(`\n새 대본 ${ok}편 통과, ${rejected}편 보류, 정정 댓글 ${corrections}건 → ${outDir}${force ? "" : "\n(이미 만든 대본은 올린 게시물로 보고 그대로 둔다. 새로 뽑으려면 --force)"}`);
+console.log(`\n새 대본 ${ok}편 통과, ${rejected}편 보류, 정정 댓글 ${corrections}건 → ${outDir}\n올린 것은 npm run social:posted -- <id>.<type> 로 표시해 두세요 (정정 댓글의 기준이 된다)`);
 if (rejected > 0) process.exitCode = 1;

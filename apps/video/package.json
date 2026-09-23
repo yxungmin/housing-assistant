@@ -1,0 +1,25 @@
+{
+  "name": "@housing/video",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "assets": "node scripts/copy-assets.mjs",
+    "studio": "npm run assets && remotion studio src/index.ts",
+    "render": "npm run assets && tsx scripts/render.ts",
+    "profile": "npm run assets && remotion still src/index.ts Profile out/profile.png && remotion still src/index.ts ProfileDark out/profile-dark.png",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.527",
+    "@remotion/cli": "4.0.527",
+    "@remotion/fonts": "4.0.527",
+    "@remotion/renderer": "4.0.527",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.527"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0"
+  }
+}
