@@ -17,6 +17,8 @@ import { userFacingNotes } from "@/lib/notes";
 import { isScattered, unitLabel, unitSpec, unitsWithDistance, priceRange, rangeText } from "@/lib/units";
 import { dateRange, dateText, daysUntil, housingLabel, longDate, looseDate, manwon } from "@/lib/format";
 import { applyPhase, phaseLabel, phaseTone } from "@/lib/phase";
+import { applyLink } from "@/lib/apply";
+import { openSource } from "@/lib/source";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { commuteDetail, commuteFor, commuteLines, mapPlace, nearbyLines, openMapTarget, transitLines } from "@/lib/commute";
@@ -187,12 +189,29 @@ export default function AnnouncementDetail() {
    * 비용 화면에 만들어 둔 미리보기는 아무도 닿을 수 없는 화면이었다(2026-09-23).
    */
   const openCost = () => router.push(`/announcement/${a.id}/cost`);
+  // 신청하러 가는 길 (lib/apply.ts). 조건을 못 읽은 공고에는 판단할 거리가 없으니 이게 주 버튼이 된다.
+  const apply = applyLink(a);
+  const openApply = () => apply && void openSource(apply.url);
 
   return (
     <Screen
       padded={false}
       header={<Header onBack={() => router.back()} right={<IconButton pop name={saved ? "bookmark-filled" : "bookmark"} label={saved ? "관심 해제" : "관심 등록"} onPress={() => save()} color={saved ? colors.primary : colors.text} />} />}
-      footer={isReadable(a) ? <BottomCTA label={hasRental ? "예상 주거비 보기" : hasAnyPricing ? "분양 공고는 계산을 아직 지원하지 않아요" : "임대조건을 아직 못 읽어 계산할 수 없어요"} onPress={openCost} disabled={!hasRental} /> : undefined}
+      footer={
+        isReadable(a) ? (
+          <BottomCTA
+            label={hasRental ? "예상 주거비 보기" : hasAnyPricing ? "분양 공고는 계산을 아직 지원하지 않아요" : "임대조건을 아직 못 읽어 계산할 수 없어요"}
+            onPress={openCost}
+            disabled={!hasRental}
+            secondary={!!apply}
+            secondaryLabel={apply?.label}
+            secondaryIcon="right"
+            onSecondary={openApply}
+          />
+        ) : apply ? (
+          <BottomCTA label={apply.label} onPress={openApply} />
+        ) : undefined
+      }
     >
       <View style={{ paddingHorizontal: space.screen, gap: space.section }}>
         <View style={{ gap: 12, paddingTop: 4 }}>

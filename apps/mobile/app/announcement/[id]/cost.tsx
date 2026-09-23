@@ -7,6 +7,8 @@ import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SignInSheet } from "@/components/SignIn";
 import { SourceCard } from "@/components/SourceCard";
+import { applyLink } from "@/lib/apply";
+import { openSource } from "@/lib/source";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
 import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconButton, IconTile, KeyValue, LockNote, Notice, Redacted, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
@@ -248,6 +250,7 @@ export default function Cost() {
   const curDep = scenarioPricing.deposit ?? 0;
   const incomeRatio = cost.income_ratio;
   const cashLabel = manwon(cost.required_cash).replace(/ ?원$/, "");
+  const apply = applyLink(a);
 
   return (
     <Screen
@@ -259,6 +262,11 @@ export default function Cost() {
             needsSignIn ? "로그인하고 주거비 보기" : locked ? "구독하고 주거비 보기" : conv ? "보증금·월세 조정해 보기" : "대출 상품 바꿔 보기"
           }
           onPress={() => (locked ? unlock() : setScenario(true))}
+          // 숫자를 다 본 사람이 "해 볼 만하다"고 판단하는 자리다. 다음 할 일(신청)로 가는 길을 여기 둔다 (lib/apply.ts)
+          secondary={!!apply}
+          secondaryLabel={apply?.label}
+          secondaryIcon="right"
+          onSecondary={() => apply && void openSource(apply.url)}
         />
       }
     >

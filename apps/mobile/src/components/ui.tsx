@@ -651,7 +651,12 @@ export function useKeyboardHeight(): number {
  * disabled 대신 `appear`를 주면 할 수 있을 때 버튼이 올라온다 — 흐린 버튼을 계속 보여 주는 대신
  * 버튼이 나타나는 것 자체를 "다 됐다"는 신호로 쓴다. 건너뛰기(secondary)는 그동안에도 남는다.
  */
-export function BottomCTA({ label, onPress, disabled, appear, secondary, secondaryLabel, onSecondary }: { label: string; onPress: () => void; disabled?: boolean; appear?: boolean; secondary?: boolean; secondaryLabel?: string; onSecondary?: () => void }) {
+/**
+ * 하단 고정 버튼. 보조 동작이 하나 붙을 수 있다.
+ * secondaryIcon이 있으면 밖으로 나가는 길이다(기관 사이트) — 글자를 한 단계 진하게 하고 화살표를 붙여
+ * "나중에 입력할게요" 같은 물러서는 동작과 구별한다.
+ */
+export function BottomCTA({ label, onPress, disabled, appear, secondary, secondaryLabel, onSecondary, secondaryIcon }: { label: string; onPress: () => void; disabled?: boolean; appear?: boolean; secondary?: boolean; secondaryLabel?: string; onSecondary?: () => void; secondaryIcon?: IconName }) {
   const { colors } = useTheme();
   // 키보드가 올라오면 그 위로 붙는다. 홈 인디케이터 여백(28)은 키보드가 대신하므로 줄인다.
   const keyboard = useKeyboardHeight();
@@ -665,8 +670,9 @@ export function BottomCTA({ label, onPress, disabled, appear, secondary, seconda
         <PrimaryButton label={label} onPress={onPress} disabled={disabled} />
       )}
       {secondary && secondaryLabel ? (
-        <Pressable onPress={onSecondary} style={{ paddingVertical: 12, alignItems: "center" }} accessibilityRole="button">
-          <Text {...wordWrap} style={[{ fontFamily: fonts.medium, fontSize: 15, color: colors.text3 }]}>{secondaryLabel}</Text>
+        <Pressable onPress={onSecondary} style={({ pressed }) => ({ paddingVertical: 12, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, opacity: pressed ? 0.6 : 1 })} accessibilityRole={secondaryIcon ? "link" : "button"}>
+          <Text {...wordWrap} style={[{ fontFamily: fonts.medium, fontSize: 15, color: secondaryIcon ? colors.text2 : colors.text3 }]}>{secondaryLabel}</Text>
+          {secondaryIcon ? <Icon name={secondaryIcon} size={16} color={colors.text3} /> : null}
         </Pressable>
       ) : null}
     </View>
