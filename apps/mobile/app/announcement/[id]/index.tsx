@@ -16,7 +16,8 @@ import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby 
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
 import { userFacingNotes } from "@/lib/notes";
 import { isScattered, unitLabel, unitSpec, unitsWithDistance, priceRange, rangeText } from "@/lib/units";
-import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate, manwon } from "@/lib/format";
+import { dateRange, dateText, HOUSING_LABEL, longDate, looseDate, manwon } from "@/lib/format";
+import { applyPhase, phaseLabel, phaseTone } from "@/lib/phase";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { commuteDetail, commuteFor, commuteLines, mapPlace, nearbyLines, openMapTarget, transitLines } from "@/lib/commute";
@@ -126,7 +127,7 @@ export default function AnnouncementDetail() {
         <View style={{ gap: 10, paddingTop: 12 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
             <Tag tone="gray">{HOUSING_LABEL[a.housing_type]}</Tag>
-            {a.apply_end ? <Tag tone="gray">{dday(a.apply_end)}</Tag> : null}
+            {phaseLabel(applyPhase(a)) ? <Tag tone={phaseTone(applyPhase(a))}>{phaseLabel(applyPhase(a))}</Tag> : null}
           </View>
           <T variant="title" style={{ fontSize: 24, lineHeight: 32 }}>{a.title}</T>
           <Sub variant="body">{a.address ?? a.region_name}</Sub>
@@ -178,7 +179,7 @@ export default function AnnouncementDetail() {
   const shown = lastReport.current;
   const households = a.extraction.tracks.reduce((s, t) => s + (t.households ?? 0), 0);
   const range = priceRange(a.units, state.profile);
-  const days = daysUntil(a.apply_end);
+  const phase = applyPhase(a);
   const openCost = () => {
     if (canOpenCost(state)) router.push(`/announcement/${a.id}/cost`);
     else setSheet(true);
@@ -196,7 +197,7 @@ export default function AnnouncementDetail() {
             {/* 기관이 먼저다 — 신청처와 절차가 기관마다 다르다 */}
             {a.provider ? <Tag tone="info">{a.provider}</Tag> : null}
             <Tag tone="gray">{HOUSING_LABEL[a.housing_type]}</Tag>
-            {days !== null ? <Tag tone={days <= 14 ? "danger" : "gray"}>{dday(a.apply_end)}</Tag> : null}
+            {phaseLabel(phase) ? <Tag tone={phaseTone(phase)}>{phaseLabel(phase)}</Tag> : null}
           </View>
           <T variant="title" style={{ fontSize: 26, lineHeight: 34 }}>{a.title}</T>
           <Sub variant="body">{a.address ?? a.region_name}{households ? ` · 총 ${households.toLocaleString("ko-KR")}세대` : ""}</Sub>

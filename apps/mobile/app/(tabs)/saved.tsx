@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { Card, IconTile, Notice, PageTitle, Screen, Sub, T } from "@/components/ui";
 import { matchAll, useAnnouncements } from "@/data/announcements";
 import { daysUntil, longDate } from "@/lib/format";
+import { applyPhase, closesWithin, phaseRank } from "@/lib/phase";
 import { unseenChange } from "@/lib/changes";
 import { useAppState } from "@/store/appState";
 import { syncAnnouncementsOnce } from "@/data/sync";
@@ -23,14 +24,17 @@ export default function Saved() {
     () =>
       matchAll(state.profile, list)
         .filter((m) => state.saved.includes(m.announcement.id))
-        .sort((a, b) => (daysUntil(a.announcement.apply_end) ?? 999) - (daysUntil(b.announcement.apply_end) ?? 999)),
+        // 접수 중 → 접수 전 → 마감, 같은 단계 안에서는 마감이 가까운 순
+        .sort(
+          (a, b) =>
+            phaseRank(applyPhase(a.announcement)) - phaseRank(applyPhase(b.announcement)) ||
+            (daysUntil(a.announcement.apply_end) ?? 999) - (daysUntil(b.announcement.apply_end) ?? 999),
+        ),
     [state.profile, state.saved, list],
   );
   const changed = items.filter((m) => unseenChange(state.changes, m.announcement.id));
-  const nearest = items.find((m) => {
-    const d = daysUntil(m.announcement.apply_end);
-    return d !== null && d >= 0 && d <= 3;
-  });
+  // 아직 시작 안 한 공고에 "곧 끝나요"를 띄우지 않는다
+  const nearest = items.find((m) => closesWithin(applyPhase(m.announcement), 3));
 
   return (
     <Screen onRefresh={refresh} refreshing={refreshing}>

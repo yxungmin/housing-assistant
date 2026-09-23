@@ -54,13 +54,7 @@ export function daysUntil(dateIso: string | undefined, now = new Date()): number
   return Math.round((end - today) / 86_400_000);
 }
 
-export function dday(dateIso: string | undefined): string {
-  const d = daysUntil(dateIso);
-  if (d === null) return "";
-  if (d < 0) return "마감";
-  if (d === 0) return "오늘 마감";
-  return `D-${d}`;
-}
+// D-n 표시는 lib/phase.ts의 phaseLabel이 한다 — 마감일만 보면 접수 전 공고에도 D-n이 붙는다.
 
 /** "2026-09-30" → "9.30" */
 export function shortDate(iso: string | undefined): string {

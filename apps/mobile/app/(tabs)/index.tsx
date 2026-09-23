@@ -4,7 +4,8 @@ import { Pressable, View } from "react-native";
 import { Icon } from "@/components/icon";
 import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { commuteKm, getAnnouncement, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
-import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
+import { HOUSING_LABEL } from "@/lib/format";
+import { applyPhase, closesWithin, phaseLabel, phaseRank, phaseTone } from "@/lib/phase";
 import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
 import { REGIONS } from "@/lib/onboarding";
 import { commuteFor, commuteShort, nearestHouseShort, splitStation } from "@/lib/commute";
@@ -32,6 +33,7 @@ export default function Home() {
   const [showOthers, setShowOthers] = useState(false);
   const [showFar, setShowFar] = useState(false);
   const [showTarget, setShowTarget] = useState(false);
+  const [showClosed, setShowClosed] = useState(false);
   const [nearWork, setNearWork] = useState(false);
   const [closingSoon, setClosingSoon] = useState(false);
   const feed = useAnnouncements();
@@ -67,15 +69,14 @@ export default function Home() {
         if (f.rentalOnly && m.announcement.housing_type === "public_sale") return false;
         // 부부는 더 먼 쪽이 그 집의 통근 부담이다 (commuteKm). 한 사람만 가까운 집은 후보가 아니다.
         if (f.nearWork && hasWorkplace) { const km = commuteKm(m); if (km === null || km > NEAR_WORK_KM) return false; }
-        // 이미 끝난 것은 "곧 마감"이 아니다. 음수를 빼지 않으면 지난 공고가 급한 척한다.
-        if (f.closingSoon) { const d = daysUntil(m.announcement.apply_end); if (d === null || d < 0 || d > CLOSING_SOON_DAYS) return false; }
+        // "곧 마감"은 지금 접수 중인 것만. 끝난 공고나 아직 시작도 안 한 공고가 급한 척하면 안 된다 (lib/phase.ts)
+        if (f.closingSoon && !closesWithin(applyPhase(m.announcement), CLOSING_SOON_DAYS)) return false;
         return true;
       })
       .sort((x, y) => {
         if (f.nearWork && hasWorkplace) return (commuteKm(x) ?? 1e9) - (commuteKm(y) ?? 1e9);
-        // 접수가 끝난 것은 무조건 뒤로. 아직 넣을 수 있는 공고가 위에 있어야 한다.
-        const closed = (m: Matched) => ((daysUntil(m.announcement.apply_end) ?? 99) < 0 ? 1 : 0);
-        const c = closed(x) - closed(y);
+        // 접수 중 → 접수 전 → 마감. 지금 넣을 수 있는 공고가 위에 있어야 한다.
+        const c = phaseRank(applyPhase(x.announcement)) - phaseRank(applyPhase(y.announcement));
         if (c !== 0) return c;
         // 그다음은 가까운 곳이 먼저다. 마감만 보고 세우면 서울 사람 맨 위에 제주 공고가 온다.
         const region = state.profile?.region_code;
@@ -84,7 +85,15 @@ export default function Home() {
       });
 
   const filtered = useMemo(() => apply(filters), [all, myRegionOnly, rentalOnly, nearWork, closingSoon, hasWorkplace, state.profile?.region_code]);
-  const matched = matching(filtered);
+  /**
+   * 접수가 끝난 공고는 목록에서 내려가기 전 일주일 동안 남아 있다(서버 뷰 기준). 그동안
+   * "내 조건에 맞는 공고" 수에 세면 지금 넣을 수 없는 공고를 추천하는 셈이 된다.
+   * 큰 숫자·칩 숫자·섹션 모두 접수 중이거나 접수 전인 것만 세고, 끝난 것은 맨 아래에 따로 둔다.
+   */
+  const live = (list: Matched[]) => list.filter((m) => applyPhase(m.announcement).kind !== "closed");
+  const active = live(filtered);
+  const closedList = filtered.filter((m) => applyPhase(m.announcement).kind === "closed");
+  const matched = matching(active);
   const newCount = unseenCount(state.seen, feedIds);
 
   /**
@@ -94,27 +103,27 @@ export default function Home() {
    */
   const chipCount = useMemo(
     () => ({
-      myRegionOnly: matching(apply({ ...filters, myRegionOnly: true })).length,
-      rentalOnly: matching(apply({ ...filters, rentalOnly: true })).length,
-      nearWork: matching(apply({ ...filters, nearWork: true })).length,
-      closingSoon: matching(apply({ ...filters, closingSoon: true })).length,
+      myRegionOnly: matching(live(apply({ ...filters, myRegionOnly: true }))).length,
+      rentalOnly: matching(live(apply({ ...filters, rentalOnly: true }))).length,
+      nearWork: matching(live(apply({ ...filters, nearWork: true }))).length,
+      closingSoon: matching(live(apply({ ...filters, closingSoon: true }))).length,
     }),
     [all, myRegionOnly, rentalOnly, nearWork, closingSoon, hasWorkplace, state.profile?.region_code],
   );
-  const pending = filtered.filter((m) => !isReadable(m.announcement));
+  const pending = active.filter((m) => !isReadable(m.announcement));
   // 거주 요건을 못 읽었고 공고 지역도 다른 것들. "맞지 않는다"와는 다른 말이라 따로 세운다 —
   // 우리는 맞는지 아닌지를 모르는 것이고, 모르는 것을 아는 척하면 그 자리에서 신뢰가 깎인다.
-  const farAway = filtered.filter((m) => isReadable(m.announcement) && m.match?.region_uncertain);
+  const farAway = active.filter((m) => isReadable(m.announcement) && m.match?.region_uncertain);
   // 대상 계층(수급자·국가유공자 등)만 신청할 수 있는 공고인데 해당 계층을 모르는 것들.
   // "맞지 않는다"로 세면 실제 대상인 사람이 못 보고, "맞는다"로 세면 대상이 아닌 사람에게 추천이 된다.
-  const needsTarget = filtered.filter((m) => isReadable(m.announcement) && m.match?.status_uncertain);
-  const others = filtered.filter((m) => isReadable(m.announcement) && !m.match?.is_match && !m.match?.region_uncertain && !m.match?.status_uncertain);
-  // 접수가 끝난 공고는 임박이 아니다. d가 음수인 것까지 넣으면 "마감"이 접수 임박 맨 위에 온다.
-  const soon = matched.filter((m) => {
-    const d = daysUntil(m.announcement.apply_end);
-    return d !== null && d >= 0 && d <= 14;
-  });
-  const rest = matched.filter((m) => !soon.includes(m));
+  const needsTarget = active.filter((m) => isReadable(m.announcement) && m.match?.status_uncertain);
+  const others = active.filter((m) => isReadable(m.announcement) && !m.match?.is_match && !m.match?.region_uncertain && !m.match?.status_uncertain);
+  // "접수 임박"은 지금 접수 중인 것만. 아직 시작 안 한 공고는 "곧 접수 시작"으로 따로 세운다.
+  const soon = matched.filter((m) => closesWithin(applyPhase(m.announcement), 14));
+  const upcoming = matched
+    .filter((m) => applyPhase(m.announcement).kind === "upcoming")
+    .sort((x, y) => (x.announcement.apply_start ?? "").localeCompare(y.announcement.apply_start ?? ""));
+  const rest = matched.filter((m) => !soon.includes(m) && !upcoming.includes(m));
   const today = new Date();
   const regionLabel = REGIONS.find((r) => r.value === state.profile?.region_code)?.label ?? "내 지역";
   // 수집 범위 밖에 사는 사람에게는 목록이 거의 비어 보인다. 왜 비었는지 말하지 않으면
@@ -148,7 +157,8 @@ export default function Home() {
           그리고 **고를 수 없는 칩은 띄우지 않는다.** 분양이 한 건도 없으면 "임대"를 눌러도
           결과가 그대로다 — 아무 일도 일어나지 않는 버튼은 신뢰를 깎는다.
         */}
-        <Chip on={closingSoon} count={chipCount.closingSoon} onPress={toggle(setClosingSoon)}>곧 마감</Chip>
+        {/* 곧 마감이 한 건도 없으면 누를 이유가 없다. 켜 둔 채로 0이 된 경우만 끌 수 있게 남긴다 */}
+        {closingSoon || chipCount.closingSoon > 0 ? <Chip on={closingSoon} count={chipCount.closingSoon} onPress={toggle(setClosingSoon)}>곧 마감</Chip> : null}
         <Chip on={myRegionOnly} count={chipCount.myRegionOnly} onPress={toggle(setMyRegionOnly)}>{regionLabel}</Chip>
         {hasSale ? <Chip on={rentalOnly} count={chipCount.rentalOnly} onPress={toggle(setRentalOnly)}>임대</Chip> : null}
         {hasWorkplace ? <Chip on={nearWork} count={chipCount.nearWork} onPress={toggle(setNearWork)}>출퇴근 가까운 곳</Chip> : null}
@@ -163,7 +173,8 @@ export default function Home() {
 
       <FadeIn delay={120} style={{ gap: 20 }}>
         {soon.length > 0 ? <Section title="접수 임박" items={soon} onOpen={open} /> : null}
-        {rest.length > 0 ? <Section title={soon.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} /> : null}
+        {upcoming.length > 0 ? <Section title="곧 접수 시작" items={upcoming} onOpen={open} /> : null}
+        {rest.length > 0 ? <Section title={soon.length || upcoming.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} /> : null}
         {/*
           맞는 공고가 없을 때가 중요하다. 억지로 채우면 추천이 아니라 목록이 된다.
           없다고 말하고, 생기면 알려 주겠다고 하고, 그동안 볼 것을 준다 — 이 셋이 다 있어야
@@ -186,12 +197,13 @@ export default function Home() {
             {!outsideService && !state.notifications ? (
               <PrimaryButton tone="soft" label="알림 켜기" onPress={() => router.push("/profile")} />
             ) : null}
-            {others.length + farAway.length + pending.length > 0 ? (
+            {others.length + farAway.length + needsTarget.length + pending.length > 0 ? (
               <Pressable
                 onPress={() => {
                   animateLayout();
                   setShowOthers(true);
                   setShowFar(true);
+                  setShowTarget(true);
                 }}
                 accessibilityRole="button"
                 style={({ pressed }) => ({ paddingVertical: 10, paddingHorizontal: 8, opacity: pressed ? 0.6 : 1 })}
@@ -255,6 +267,26 @@ export default function Home() {
           </Pressable>
         ) : null}
         {showOthers && others.length > 0 ? <Section items={others} onOpen={open} /> : null}
+
+        {closedList.length > 0 ? (
+          <View style={{ gap: 12 }}>
+            <Pressable onPress={toggle(setShowClosed)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
+              <T variant="bodyMedium" color={colors.text2}>접수가 끝난 공고 {closedList.length}개</T>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
+                <T variant="small" color={colors.text3}>{showClosed ? "숨기기" : "보기"}</T>
+                <Icon name="right" size={16} color={colors.text4} />
+              </View>
+            </Pressable>
+            {showClosed ? (
+              <>
+                <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
+                  접수가 끝나고 일주일 동안 보여드려요. 신청했다면 당첨자 발표 일정을 확인해 보세요.
+                </Sub>
+                <Section items={closedList} onOpen={open} />
+              </>
+            ) : null}
+          </View>
+        ) : null}
       </FadeIn>
 
       <View style={{ flexDirection: "row", gap: 8, paddingTop: 8, paddingHorizontal: 4 }}>
@@ -281,7 +313,9 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
   const { state } = useAppState();
   const a = m.announcement;
   const fresh = isUnseen(state.seen, a.id);
-  const days = daysUntil(a.apply_end);
+  const phase = applyPhase(a);
+  const phaseText = phaseLabel(phase);
+  const phaseColor = { danger: colors.danger, info: colors.info, gray: colors.text3 }[phaseTone(phase)];
   const units = [...new Set(a.extraction.tracks.flatMap((t) => t.unit_types.map((u) => u.name)))];
   const unitLabel = units.length ? units.slice(0, 3).join(" · ") + (units.length > 3 ? ` 외 ${units.length - 3}` : "") : "";
   const status =
@@ -326,7 +360,7 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
           {a.provider ? <Tag tone="gray">{a.provider}</Tag> : null}
           <Sub tone="3" variant="caption" lines={1} style={{ flex: 1 }}>{HOUSING_LABEL[a.housing_type]}{unitLabel ? ` · ${unitLabel}` : ""}</Sub>
         </View>
-        {days !== null ? <T variant="label" color={days <= 14 ? colors.danger : colors.text3} style={{ fontFamily: fonts.bold, flexShrink: 0 }}>{dday(a.apply_end)}</T> : null}
+        {phaseText ? <T variant="label" color={phaseColor} style={{ fontFamily: fonts.bold, flexShrink: 0 }}>{phaseText}</T> : null}
       </View>
       <View style={{ gap: 4 }}>
         <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 7 }}>
