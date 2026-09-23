@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/icon";
-import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Notice, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { commuteKm, getAnnouncement, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
@@ -142,15 +142,43 @@ export default function Home() {
       <FadeIn delay={120} style={{ gap: 20 }}>
         {soon.length > 0 ? <Section title="접수 임박" items={soon} onOpen={open} /> : null}
         {rest.length > 0 ? <Section title={soon.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} /> : null}
+        {/*
+          맞는 공고가 없을 때가 중요하다. 억지로 채우면 추천이 아니라 목록이 된다.
+          없다고 말하고, 생기면 알려 주겠다고 하고, 그동안 볼 것을 준다 — 이 셋이 다 있어야
+          빈 화면이 막다른 길이 되지 않는다.
+          알림이 꺼져 있으면 "알려드릴게요"라고 하지 않는다. 실제로 안 가기 때문이다.
+        */}
         {matched.length === 0 ? (
-          <Card style={{ alignItems: "center", paddingVertical: 32, gap: 8 }}>
+          <Card style={{ alignItems: "center", paddingVertical: 28, gap: 10 }}>
             <IconTile name="bookmark" size={48} />
-            <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 조건에 맞는 공고가 없어요</T>
+            <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>
+              {outsideService ? `아직 ${regionLabel} 공고는 모으지 않아요` : "지금은 딱 맞는 공고가 없어요"}
+            </T>
             <Sub style={{ textAlign: "center" }}>
               {outsideService
-                ? `지금은 ${SERVICE_REGION_LABEL} 공고만 모으고 있어요. 다른 지역은 아직 모으지 않아요.`
-                : "새 공고가 올라오면 알려드릴게요. 내 조건에서 비어 있는 항목을 채우면 판별되는 공고가 늘어날 수 있어요."}
+                ? `지금은 ${SERVICE_REGION_LABEL} 공고만 모으고 있어요.`
+                : state.notifications
+                  ? "조건에 맞는 공고가 새로 올라오면 알려드릴게요."
+                  : "새 공고 알림을 켜 두면 조건에 맞는 공고가 올라올 때 알려드려요."}
             </Sub>
+            {!outsideService && !state.notifications ? (
+              <PrimaryButton tone="soft" label="알림 켜기" onPress={() => router.push("/profile")} />
+            ) : null}
+            {others.length + farAway.length + pending.length > 0 ? (
+              <Pressable
+                onPress={() => {
+                  animateLayout();
+                  setShowOthers(true);
+                  setShowFar(true);
+                }}
+                accessibilityRole="button"
+                style={({ pressed }) => ({ paddingVertical: 10, paddingHorizontal: 8, opacity: pressed ? 0.6 : 1 })}
+              >
+                <T variant="small" color={colors.text3}>
+                  그동안 다른 공고 {others.length + farAway.length + pending.length}개 보기
+                </T>
+              </Pressable>
+            ) : null}
           </Card>
         ) : null}
         {pending.length > 0 ? <Section title="조건을 아직 못 읽음" items={pending} onOpen={open} /> : null}

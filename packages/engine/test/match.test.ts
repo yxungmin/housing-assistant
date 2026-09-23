@@ -289,3 +289,70 @@ describe("incomeGuard", () => {
     expect(m.tracks[0]!.groups.map((g) => g.group.id)).not.toContain("__income_guard__");
   });
 });
+
+/**
+ * 서른 살에게 "만 65세 이상" 공고가 추천되던 문제.
+ *
+ * "고령자 또는 장애인 또는 한부모"는 any_of다. 생년월일로 65세가 아닌 걸 아는데
+ * 장애인 여부를 모르면 그룹은 NEEDS_CHECK가 된다 — 논리적으로는 맞다. 정말 장애인이면 맞으니까.
+ * 그런데 그 트랙을 "조건에 맞는 공고"로 세면, 확실히 아닌 사람에게 추천이 나간다.
+ */
+describe("확실히 아닌 갈래가 있는 any_of는 추천하지 않는다", () => {
+  const rule = (over: Partial<EligibilityRule>): EligibilityRule => ({
+    group_id: "g1", category: "age", applies_to: {}, operator: "gte", value: 65, unit: "years",
+    source: { page: 1, text: "만 65세 이상" }, confidence: 1, verified: false, ...over,
+  });
+  const track = (rules: EligibilityRule[], groups: { id: string; mode: "any_of" | "all_of"; label: string }[]) => ({
+    name: "주거약자", unit_types: [], rule_groups: groups, rules, pricing: [],
+  });
+  const profile = { region_code: "11", birth_date: "1996-03-15", is_homeless: true } as UserProfile;
+
+  it("나이는 확실히 아니고 계층은 모르면 추천하지 않는다", () => {
+    const x = {
+      tracks: [
+        track(
+          [rule({}), rule({ category: "status", operator: "in", value: ["disabled"], unit: undefined })],
+          [{ id: "g1", mode: "any_of", label: "주거약자" }],
+        ),
+      ],
+    } as unknown as ExtractionOutput;
+    const m = matchAnnouncement(x, profile);
+    expect(m.tracks[0]!.groups[0]!.contradicted).toBe(true);
+    expect(m.is_match).toBe(false);
+  });
+
+  it("같은 그룹에 확실히 맞는 갈래가 있으면 추천한다 — any_of는 하나만 맞으면 된다", () => {
+    const x = {
+      tracks: [
+        track(
+          [rule({}), rule({ category: "age", operator: "between", value: [19, 39] })],
+          [{ id: "g1", mode: "any_of", label: "주거약자" }],
+        ),
+      ],
+    } as unknown as ExtractionOutput;
+    const m = matchAnnouncement(x, profile);
+    expect(m.tracks[0]!.groups[0]!.contradicted).toBeFalsy();
+    expect(m.is_match).toBe(true);
+  });
+
+  it("all_of에서는 쓰지 않는다 — 거기선 MISMATCH가 이미 그룹을 떨어뜨린다", () => {
+    const x = {
+      tracks: [track([rule({})], [{ id: "g1", mode: "all_of", label: "나이" }])],
+    } as unknown as ExtractionOutput;
+    const m = matchAnnouncement(x, profile);
+    expect(m.tracks[0]!.groups[0]!.contradicted).toBeFalsy();
+    expect(m.is_match).toBe(false);
+  });
+
+  it("상세 화면은 그대로 보여 준다 — 후보에서 뺄 뿐 감추지 않는다", () => {
+    const x = {
+      tracks: [
+        track(
+          [rule({}), rule({ category: "status", operator: "in", value: ["disabled"], unit: undefined })],
+          [{ id: "g1", mode: "any_of", label: "주거약자" }],
+        ),
+      ],
+    } as unknown as ExtractionOutput;
+    expect(matchAnnouncement(x, profile).best_track).not.toBeNull();
+  });
+});

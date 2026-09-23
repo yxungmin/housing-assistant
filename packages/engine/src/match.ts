@@ -141,6 +141,17 @@ export interface RuleResult {
 }
 
 export interface GroupResult {
+  /**
+   * any_of인데 **확실히 아닌 갈래가 있고 확실히 맞는 갈래는 없다.**
+   *
+   * 예: "고령자(만 65세 이상) 또는 장애인 또는 한부모". 생년월일로 65세가 아닌 걸 아는데
+   * 장애인 여부는 모르면, 그룹 전체는 NEEDS_CHECK가 된다 — 논리적으로는 맞다(정말 장애인이면 맞으니까).
+   * 그런데 그 상태의 트랙을 "조건에 맞는 공고"로 세면, 서른 살에게 65세 공고가 추천된다.
+   *
+   * 그래서 판정은 그대로 두고 **표시만 따로 한다.** 이런 그룹이 있는 트랙은 추천에서 뺀다.
+   * 후보에서 빼는 것이지 감추는 것이 아니다 — 상세 화면은 조건을 다 보여 준다.
+   */
+  contradicted?: boolean;
   group: RuleGroup;
   status: MatchStatus;
   rules: RuleResult[];
@@ -217,7 +228,10 @@ export function matchTrack(track: SupplyTrack, profile: UserProfile): TrackResul
     // applies_to로 건너뛴 룰은 집계에서 제외한다. 그룹 전체가 건너뛰어졌으면 그룹도 제외.
     const counted = rules.filter((r) => !r.skipped);
     if (counted.length === 0 && rules.length > 0) continue;
-    groups.push({ group, status: combine(group.mode, counted.map((r) => r.status)), rules });
+    const status = combine(group.mode, counted.map((r) => r.status));
+    const contradicted =
+      group.mode === "any_of" && counted.some((r) => r.status === "MISMATCH") && !counted.some((r) => r.status === "MATCH");
+    groups.push({ group, status, rules, ...(contradicted ? { contradicted: true } : {}) });
   }
   // 정의되지 않은 그룹을 가리키는 룰은 스키마 검증에서 걸러지지만, 방어적으로 all_of로 취급한다.
   for (const [groupId, rules] of byGroup) {
@@ -446,7 +460,12 @@ export function matchAnnouncement(
   //
   // 그래도 MISMATCH로 자르지는 않는다. 전국 모집도 있고, 자격이 되는 사람에게서 공고를 감추면
   // 그 오류는 아무도 신고하지 못한다. best_track은 그대로 둬서 상세 화면이 조건을 다 보여 준다.
-  const candidates = clean.filter((t) => !t.region_guarded);
+  /*
+   * 모순된 any_of 그룹이 있는 트랙은 추천하지 않는다.
+   * "어긋난 게 없다"와 "맞는다"는 다른 말이다 — 지역 안전망에서 이미 같은 판단을 했다.
+   * 여기서 빼지 않으면 서른 살에게 "만 65세 이상" 공고가 "조건에 맞는 공고"로 나간다.
+   */
+  const candidates = clean.filter((t) => !t.region_guarded && !t.groups.some((g) => g.contradicted));
   const best = candidates[0] ?? clean[0] ?? null;
   return {
     tracks,
