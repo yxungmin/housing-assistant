@@ -291,7 +291,11 @@ export default function Cost() {
                     ? "로그인하면 보증금에서 받을 수 있는 대출을 빼고 계산해 드려요"
                     : "보증금에서 받을 수 있는 대출을 빼고 계산해요"
                   : cost.shortfall > 0
-                    ? `보유 현금 ${manwon(profile.cash_on_hand)}으로는 ${manwon(cost.shortfall)} 부족해요`
+                    /* 현금을 입력하지 않았으면 "보유 현금 -으로는"이 된다.
+                       모르는 값을 문장에 끼워 넣지 말고, 모른다고 말한다. */
+                    ? profile.cash_on_hand === undefined
+                      ? `${manwon(cost.shortfall)}이 필요해요. 보유 현금을 입력하면 얼마가 모자라는지 알려드려요`
+                      : `보유 현금 ${manwon(profile.cash_on_hand)}으로는 ${manwon(cost.shortfall)} 부족해요`
                     : `보유 현금 ${manwon(profile.cash_on_hand)}으로 낼 수 있어요`
               }
             />
@@ -321,7 +325,9 @@ export default function Cost() {
                     <View style={{ flex: 1, gap: 1 }}>
                       <T variant="bodyMedium" style={{ fontSize: 15 }}>
                         월 {manwon(p.monthly_total)}
-                        <T variant="caption" color={colors.text3}>{"  "}(+{manwon(p.monthly_payment)})</T>
+                        {/* 상환액은 원 단위로 적는다. 만 원으로 뭉개면 부족액이 작을 때
+                            연 5%와 연 8%가 같은 값으로 보여서, 금리를 나눠 보여 주는 뜻이 없어진다. */}
+                        <T variant="caption" color={colors.text3}>{"  "}(+{won(p.monthly_payment)})</T>
                       </T>
                       {p.income_ratio !== null ? (
                         <Sub tone="3" variant="caption">소득의 {Math.round(p.income_ratio * 100)}%</Sub>
