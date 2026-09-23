@@ -46,7 +46,7 @@ export function Gate({
         </T>
         <Sub variant="body">
           {signIn
-            ? "로그인하면 바로 볼 수 있어요."
+            ? "로그인하면 바로 볼 수 있어요. 공고를 보고 조건이 맞는지 확인하는 건 무료예요."
             : `조건에 맞는 새 공고가 ${count}개 올라왔어요.${soonestDday ? ` 가장 빠른 마감은 ${soonestDday}이에요.` : ""}`}
         </Sub>
       </View>
@@ -71,8 +71,12 @@ export function Gate({
             onPress={() => onPrimary?.()}
           />
         )}
-        {/* 고지는 구매 버튼 바로 위·아래에 둔다. 아래에 작게 깔면 App Store 심사에서 걸린다 */}
-        <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>{BILLING_DISCLOSURE}</Sub>
+        {/* 결제 고지는 **구매 버튼이 있는 화면에만** 둔다.
+            로그인은 결제를 시작하지 않는다 — 조건 매칭은 무료다.
+            로그인 화면에 결제 문구가 있으면 "로그인 = 결제"로 읽히고, 그건 사실이 아니다. */}
+        {!signIn ? (
+          <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>{BILLING_DISCLOSURE}</Sub>
+        ) : null}
         <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>
           {signIn ? "입력하신 조건은 이 기기에만 저장돼요." : "저장한 공고와 마감 알림은 그대로 쓸 수 있어요."}
         </Sub>

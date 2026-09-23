@@ -137,7 +137,11 @@ export default function Home() {
         samples={matched.slice(0, 3).map((m) => {
           const c = m.match?.best_track ? ruleCounts(m.match.best_track) : null;
           return {
-            status: c ? `조건 ${c.total}개 중 ${c.matched}개 일치` : "조건 일치",
+            // 실제 카드와 **같은 문구**를 쓴다. "확인 필요"를 빼면 미리보기가 실제보다
+            // 낙관적으로 보이고, 로그인한 뒤에 기대가 꺾인다.
+            status: c
+              ? `조건 ${c.total}개 중 ${c.matched}개 일치${c.needsCheck > 0 ? ` · 확인 필요 ${c.needsCheck}개` : ""}`
+              : "조건 일치",
             dday: m.announcement.apply_end ? dday(m.announcement.apply_end) : undefined,
           };
         })}

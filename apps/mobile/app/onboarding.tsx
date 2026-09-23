@@ -123,7 +123,9 @@ export default function Onboarding() {
                       <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{o.label}</T>
                       {o.hint ? <Sub tone="3">{o.hint}</Sub> : null}
                     </View>
-                    {!grid ? <Icon name="check" size={20} color={on ? colors.primary : colors.line} /> : null}
+                    {/* 고른 것에만 체크를 붙인다. 안 고른 것에 흐린 체크가 있으면
+                        "이미 선택됨"으로 읽힌다 — 체크는 "됐다"는 뜻이다. */}
+                    {!grid && on ? <Icon name="check" size={20} color={colors.primary} /> : null}
                   </Pressable>
                 );
               })}
@@ -411,7 +413,7 @@ function PlaceField({
           <T variant="bodyMedium" color={none ? colors.primary : colors.text}>{noneLabel}</T>
           {noneHint ? <Sub tone="3">{noneHint}</Sub> : null}
         </View>
-        <Icon name="check" size={20} color={none ? colors.primary : colors.line} />
+        {none ? <Icon name="check" size={20} color={colors.primary} /> : null}
       </Pressable>
     </View>
   );

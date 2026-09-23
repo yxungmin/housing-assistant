@@ -367,9 +367,16 @@ export function AppStateProvider({ children }: PropsWithChildren) {
         // 구독을 계정에 묶는다. 안 하면 기기마다 익명 id가 생겨 아이폰에서 산 구독이
         // 안드로이드에서 안 보인다.
         void linkStoreAccount(account.id);
-        if (canUseFirstMonthFree(state.subscription)) {
-          dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
-        }
+        /*
+         * **로그인이 결제를 시작하지 않는다.**
+         *
+         * 전에는 여기서 바로 `billing.startTrial()`을 불렀다. 목 어댑터로는 화면에 아무 일도
+         * 일어나지 않아 괜찮아 보였는데, RevenueCat을 끼우는 순간 그게 **실제 구매 시트**가 된다.
+         * 공고를 보려고 로그인했는데 결제창이 뜨는 앱이 된다.
+         *
+         * 그리고 그건 우리가 정한 선과도 어긋난다 — 조건 매칭은 무료다.
+         * 체험은 유료 기능(주거비 계산)을 처음 열 때 구독 시트에서 시작한다.
+         */
         return true;
       },
       devSignIn: async () => {

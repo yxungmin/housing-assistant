@@ -19,7 +19,9 @@ export default function Start() {
           나이·소득·자산을 입력하면 LH·SH 공고 중 조건이 맞는 것과 예상 주거비를 바로 계산해요. 입력한 정보는 이 기기에만 저장돼요.
         </Sub>
       </View>
-      <BottomCTA label="시작하기" onPress={() => router.push("/onboarding")} secondary secondaryLabel="로그인 없이 시작해요" onSecondary={() => router.push("/onboarding")} />
+      {/* "로그인 없이 시작해요"가 있었는데 사실이 아니다 — 맞춤 공고는 로그인 뒤에 있다.
+          지킬 수 없는 말을 첫 화면에 두면 그 뒤의 말도 안 믿긴다. */}
+      <BottomCTA label="시작하기" onPress={() => router.push("/onboarding")} />
     </Screen>
   );
 }
