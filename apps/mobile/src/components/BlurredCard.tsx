@@ -13,7 +13,7 @@ import { fonts } from "@/theme/tokens";
  * 실제 블러(expo-blur) 대신 회색 막대를 쓴다. 블러는 가린 글자를 복원할 여지를 남기고,
  * 안드로이드에서 성능이 고르지 않다. 막대는 애초에 아무 정보도 담지 않는다.
  */
-export function BlurredCard({ status, dday }: { status: string; dday?: string }) {
+export function BlurredCard({ status, dday, settled }: { status: string; dday?: string; /** 확인 필요가 없어 초록 체크를 붙여도 되는가 */ settled?: boolean }) {
   const { colors } = useTheme();
   const bar = (w: number | string, h = 16) => (
     <View style={{ width: w as number, height: h, borderRadius: 6, backgroundColor: colors.cardStrong }} />
@@ -30,7 +30,8 @@ export function BlurredCard({ status, dday }: { status: string; dday?: string })
         {bar(140, 18)}
       </View>
       <View style={{ flexDirection: "row" }}>
-        <Tag tone="primary" icon="check">{status}</Tag>
+        {/* 목록 카드와 같은 규칙. 확인 필요가 남았으면 초록 체크를 붙이지 않는다 */}
+        <Tag tone={settled ? "primary" : "gray"} icon={settled ? "check" : "info"}>{status}</Tag>
       </View>
       <Sub tone="3" variant="caption">로그인하면 어떤 공고인지 볼 수 있어요</Sub>
     </Card>

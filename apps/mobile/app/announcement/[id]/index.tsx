@@ -37,6 +37,8 @@ export default function AnnouncementDetail() {
   const [change, setChange] = useState(incoming);
   const [report, setReport] = useState<{ target: ReportTarget; sourceText?: string } | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
+  /** 북마크를 **방금** 눌렀을 때만 뜬다. 늘 띄우면 소음이 된다 */
+  const [justSaved, setJustSaved] = useState(false);
   // 네이버 지도는 호출한 앱의 식별자를 요구한다 (없으면 앱만 열리고 아무 일도 안 한다)
   const APP_ID = Constants.expoConfig?.ios?.bundleIdentifier ?? "com.yxungmin.housingassistant";
   const place = a ? mapPlace(a) : null;
@@ -59,6 +61,28 @@ export default function AnnouncementDetail() {
   // 가격이 아예 없는 공고를 "분양"이라고 하면 사실이 아니다. 두 경우를 나눠 말한다.
   const hasAnyPricing = !!a?.extraction.tracks.some((t) => t.pricing.length > 0);
   const saved = !!a && state.saved.includes(a.id);
+
+  /**
+   * 북마크가 알림과 이어져 있다는 걸 **누르는 자리에서** 알린다.
+   *
+   * 전에는 아이콘만 채워지고 아무 말이 없었다. "마감 3일 전에 알려드려요"는 관심 탭에
+   * 가야 나오는데, 그 탭을 열기 전에는 북마크가 무엇을 하는지 알 수가 없다.
+   * 바로 아래 "신청함" 표시에는 설명이 붙어 있어 일관성도 없었다.
+   *
+   * 알림이 꺼져 있으면 "알려드려요"라고 하지 않는다 — 실제로 안 가기 때문이다.
+   * 대신 켜는 길을 준다.
+   */
+  const save = () => {
+    if (!a) return;
+    const adding = !saved;
+    toggleSaved(a.id);
+    setJustSaved(adding);
+  };
+  useEffect(() => {
+    if (!justSaved) return;
+    const t = setTimeout(() => setJustSaved(false), 4000);
+    return () => clearTimeout(t);
+  }, [justSaved]);
   const applied = !!a && state.applied.includes(a.id);
   // 발표일이 날짜로 적힌 공고만 알림을 걸 수 있다 ("2027년 2월"처럼 월까지만 있는 경우가 있다)
   const announceDate = /^\d{4}-\d{2}-\d{2}$/.test(a?.extraction.schedule.winner_announce?.trim() ?? "");
@@ -133,7 +157,7 @@ export default function AnnouncementDetail() {
   return (
     <Screen
       padded={false}
-      header={<Header onBack={() => router.back()} right={<IconButton pop name={saved ? "heart-filled" : "heart"} label={saved ? "관심 해제" : "관심 등록"} onPress={() => toggleSaved(a.id)} color={saved ? colors.danger : colors.text} />} />}
+      header={<Header onBack={() => router.back()} right={<IconButton pop name={saved ? "bookmark-filled" : "bookmark"} label={saved ? "관심 해제" : "관심 등록"} onPress={() => save()} color={saved ? colors.primary : colors.text} />} />}
       footer={isReadable(a) ? <BottomCTA label={hasRental ? "예상 주거비 보기" : hasAnyPricing ? "분양 공고는 계산을 아직 지원하지 않아요" : "임대조건을 아직 못 읽어 계산할 수 없어요"} onPress={openCost} disabled={!hasRental} /> : undefined}
     >
       <View style={{ paddingHorizontal: space.screen, gap: space.section }}>
@@ -147,6 +171,14 @@ export default function AnnouncementDetail() {
           <T variant="title" style={{ fontSize: 26, lineHeight: 34 }}>{a.title}</T>
           <Sub variant="body">{a.address ?? a.region_name}{households ? ` · 총 ${households.toLocaleString("ko-KR")}세대` : ""}</Sub>
         </View>
+
+        {justSaved ? (
+          <Notice tone={state.notifications ? "info" : "warn"} icon="bell">
+            {state.notifications
+              ? "관심 공고에 담았어요. 접수 마감 3일 전에 알려드릴게요."
+              : "관심 공고에 담았어요. 알림이 꺼져 있어서 마감 알림은 못 보내요 — 내 정보에서 켜 주세요."}
+          </Notice>
+        ) : null}
 
         {change ? (
           <Notice tone="info" icon="bell">

@@ -143,6 +143,7 @@ export default function Home() {
               ? `조건 ${c.total}개 중 ${c.matched}개 일치${c.needsCheck > 0 ? ` · 확인 필요 ${c.needsCheck}개` : ""}`
               : "조건 일치",
             dday: m.announcement.apply_end ? dday(m.announcement.apply_end) : undefined,
+            settled: !!c && c.needsCheck === 0,
           };
         })}
       />
@@ -253,8 +254,15 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
   const status =
     !isReadable(a)
       ? { tone: "warn" as const, icon: "alert" as const, text: "조건을 아직 못 읽음" }
+      /*
+       * 확인 필요가 남았으면 초록 체크를 붙이지 않는다.
+       * 체크는 "다 됐다"는 신호인데, 8개 중 4개만 확인된 자리에 붙으면 색이 내용보다
+       * 낙관적이다. 사용자는 글보다 색을 먼저 읽는다.
+       */
+      : m.match?.is_match && m.matched > 0 && !m.needsCheck
+        ? { tone: "primary" as const, icon: "check" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` }
       : m.match?.is_match && m.matched > 0
-        ? { tone: "primary" as const, icon: "check" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치${m.needsCheck ? ` · 확인 필요 ${m.needsCheck}개` : ""}` }
+        ? { tone: "gray" as const, icon: "info" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치 · 확인 필요 ${m.needsCheck}개` }
         : m.match?.is_match
           ? { tone: "warn" as const, icon: "alert" as const, text: `조건 ${m.needsCheck}개 확인 필요` }
           : m.match?.region_uncertain

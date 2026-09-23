@@ -28,7 +28,7 @@ export function Gate({
   /** "D-9" 같은 문구. 없으면 생략 */
   soonestDday?: string;
   /** 가려서 보여 줄 카드들의 실제 상태 문구 ("조건 8개 중 7개 일치") */
-  samples: { status: string; dday?: string }[];
+  samples: { status: string; dday?: string; settled?: boolean }[];
   busy?: boolean;
   /** 만료 화면에서만 쓴다 — 로그인 화면은 제공자 버튼이 직접 처리한다 */
   onPrimary?: () => void;
@@ -54,7 +54,7 @@ export function Gate({
       <View style={{ gap: 12 }}>
         <SectionTitle>{signIn ? "내 조건에 맞는 공고" : "새로 올라온 공고"}</SectionTitle>
         {samples.map((s, i) => (
-          <BlurredCard key={i} status={s.status} dday={s.dday} />
+          <BlurredCard key={i} status={s.status} dday={s.dday} settled={s.settled} />
         ))}
         {count > samples.length ? (
           <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>외 {count - samples.length}개</Sub>

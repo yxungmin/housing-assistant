@@ -43,9 +43,9 @@ export default function Saved() {
       {nearest ? <Notice tone="warn" icon="bell">{nearest.announcement.title} 접수가 {longDate(nearest.announcement.apply_end)}에 끝나요</Notice> : null}
       {items.length === 0 ? (
         <Card style={{ alignItems: "center", paddingVertical: 36, gap: 10 }}>
-          <IconTile name="heart" size={48} tone="danger" />
+          <IconTile name="bookmark" size={48} tone="primary" />
           <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 관심 공고가 없어요</T>
-          <Sub style={{ textAlign: "center" }}>공고 상세에서 하트를 누르면 여기에 모이고,{"\n"}접수 마감 3일 전에 알려드려요.</Sub>
+          <Sub style={{ textAlign: "center" }}>공고 상세에서 북마크를 누르면 여기에 모이고,{"\n"}접수 마감 3일 전에 알려드려요.</Sub>
         </Card>
       ) : (
         items.map((m) => <AnnouncementCard key={m.announcement.id} m={m} onPress={() => router.push(`/announcement/${m.announcement.id}`)} />)
