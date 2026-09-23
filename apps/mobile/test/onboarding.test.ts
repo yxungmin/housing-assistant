@@ -34,7 +34,7 @@ describe("단계 표들이 최신인가", () => {
 });
 
 describe("첫 온보딩은 핵심만 묻는다", () => {
-  it("core는 여덟 개다 — 목록이 쓸모 있어지는 최소치 + 내 직장", () => {
+  it("core는 아홉 개다 — 목록이 쓸모 있어지는 최소치 + 해당 계층 + 내 직장", () => {
     expect(STEPS.filter((s) => s.core).map((s) => s.id)).toEqual([
       "region",
       "birth_date",
@@ -42,9 +42,17 @@ describe("첫 온보딩은 핵심만 묻는다", () => {
       "household_size",
       "annual_income",
       "total_assets",
+      "statuses",
       "homeless",
       "workplace_place",
     ]);
+  });
+
+  it("해당 계층 선택지가 엔진이 아는 계층을 전부 담는다 — 빠지면 그 계층인 사람이 영영 대상이 못 된다", async () => {
+    const { SpecialStatus } = await import("@housing/schema");
+    const step = STEPS.find((s) => s.id === "statuses")!;
+    const values = (typeof step.options === "function" ? step.options({}) : step.options ?? []).map((o) => o.value);
+    expect([...values].sort()).toEqual([...SpecialStatus.options].sort());
   });
 
   it("배우자 직장은 core가 아니다 — 혼인 상태와 내 직장을 채운 뒤에만 묻는다", () => {

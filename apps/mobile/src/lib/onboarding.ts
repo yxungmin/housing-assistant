@@ -180,14 +180,20 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, monthly_debt_payment: v === null ? undefined : Number(v) }), read: (p) => p.monthly_debt_payment ?? null,
   },
   {
-    id: "statuses", kind: "multi", title: "해당하는 것이 있나요?", hint: "공고마다 따로 뽑는 계층(대학생·수급자 등)에 드는지 볼 때 써요. 없으면 '해당 없음'을 눌러 주세요.",
+    /*
+     * 첫 온보딩에서 묻는다 (2026-09-23). 안 물었더니 대부분의 사용자가 비어 있어서, 대학생·수급자 전용 공급이
+     * 추천이 아니라 "신청 대상을 확인할 공고"로만 모였다 — 엔진은 모르는 계층을 맞다고 치지 않는다(pendingStatus).
+     * 여러 개 고를 수 있고, 아무것도 안 고르면 버튼이 "해당 없음"이 된다.
+     */
+    id: "statuses", core: true, kind: "multi", title: "해당하는 것이 있나요?", hint: "대학생·수급자·장애인처럼 정해진 사람만 신청할 수 있는 공고가 있어요. 여러 개 골라도 되고, 없으면 '해당 없음'을 눌러 주세요.",
     options: [
       { value: "student", label: "대학생·입복학 예정" }, { value: "job_seeker", label: "취업준비생", hint: "졸업·중퇴 2년 이내" },
       { value: "new_worker", label: "사회초년생", hint: "소득 있는 일 5년 이내" }, { value: "artist", label: "예술인" },
       { value: "welfare_recipient", label: "주거급여 수급자" }, { value: "basic_livelihood", label: "생계·의료급여 수급자" },
       { value: "national_merit", label: "국가유공자" }, { value: "disabled", label: "장애인 등록" },
       { value: "nk_defector", label: "북한이탈주민" }, { value: "single_parent_support", label: "한부모가족 지원대상" },
-      { value: "elderly_care", label: "65세 이상 부모 부양" }, { value: "creator", label: "창작자" },
+      { value: "elderly_care", label: "65세 이상 부모 부양" }, { value: "care_leaver", label: "아동복지시설 퇴소자" },
+      { value: "creator", label: "창작자" },
     ],
     apply: (p, v) => ({ ...p, statuses: v === null ? [] : String(v).split(",").filter(Boolean) as UserProfile["statuses"] }),
     read: (p) => (p.statuses === undefined ? null : p.statuses.join(",")),

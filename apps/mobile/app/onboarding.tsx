@@ -93,7 +93,9 @@ export default function Onboarding() {
   const options = stepOptions(step, draft);
   const grid = options.length > 6;
   // 칸 최소 폭(22% · 30%)과 간격 10px로 한 줄에 들어가는 개수. 아래 빈 칸 채우기에 쓴다
-  const gridCols = options.length > 20 ? 3 : 4;
+  // 이름이 긴 복수 선택(해당 계층)은 2열. 4열에 넣으면 "생계·의료급여 수급자"와 "예술인"이 섞여 칸 폭이 들쭉날쭉해진다
+  const gridCols = step.kind === "multi" ? 2 : options.length > 20 ? 3 : 4;
+  const cellMin = gridCols === 2 ? "45%" : gridCols === 3 ? "30%" : "22%";
 
   return (
     <Screen scroll={false} padded={false}>
@@ -120,7 +122,7 @@ export default function Onboarding() {
                   <Pressable key={o.value} onPress={() => (step.kind === "multi" ? toggleMulti(o.value) : setDraft((d) => step.apply(d, o.value)))} accessibilityRole="button" accessibilityLabel={o.label} accessibilityState={{ selected: on }}
                     style={({ pressed }) => ({
                       paddingHorizontal: 18, paddingVertical: grid ? 14 : 18, borderRadius: radius.md, backgroundColor: on ? colors.primarySoft : colors.card, opacity: pressed ? 0.85 : 1,
-                      flexDirection: "row", alignItems: "center", justifyContent: grid ? "center" : "space-between", minWidth: grid ? (options.length > 20 ? "30%" : "22%") : undefined, flexGrow: grid ? 1 : 0,
+                      flexDirection: "row", alignItems: "center", justifyContent: grid ? "center" : "space-between", minWidth: grid ? cellMin : undefined, flexBasis: grid ? cellMin : undefined, flexGrow: grid ? 1 : 0,
                     })}>
                     <View style={{ gap: 2, alignItems: grid ? "center" : "flex-start" }}>
                       <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{o.label}</T>
@@ -136,7 +138,7 @@ export default function Onboarding() {
                   마지막 한 칸('제주')이 한 줄을 통째로 차지한다 */}
               {grid
                 ? Array.from({ length: (gridCols - (options.length % gridCols)) % gridCols }, (_, i) => (
-                    <View key={`fill-${i}`} style={{ minWidth: options.length > 20 ? "30%" : "22%", flexGrow: 1, height: 0 }} />
+                    <View key={`fill-${i}`} style={{ minWidth: cellMin, flexBasis: cellMin, flexGrow: 1, height: 0 }} />
                   ))
                 : null}
             </View>
