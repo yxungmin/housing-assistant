@@ -82,6 +82,11 @@ export function commuteShort(
   return `배우자 직장까지 직선거리 ${km(distancePartnerKm)}`;
 }
 
+/** 거리 표시. 1km가 넘으면 km로 — "1213m"는 한눈에 읽히지 않는다 */
+export function meters(m: number): string {
+  return m < 1000 ? `${Math.round(m)}m` : `${(m / 1000).toFixed(1)}km`;
+}
+
 /**
  * 흩어진 공고의 목록 한 줄. 거리가 공고가 아니라 **가장 가까운 집**까지라는 걸 밝혀 적는다.
  * 부부는 두 사람 모두에게 가까운 집 하나를 골라 그 집 기준으로 둘 다 적는다 (lib/units.ts distancesTo).
@@ -119,7 +124,7 @@ export function transitLines(transit: Transit | undefined): TransitLine[] {
   const out: TransitLine[] = [];
   const walk = (min?: number, m?: number) => {
     const dist = m ?? (min !== undefined ? Math.round(min * WALK_M_PER_MIN) : undefined);
-    return dist !== undefined && min !== undefined ? `도보 약 ${min}분 (${dist}m)` : min !== undefined ? `도보 약 ${min}분` : "거리 정보 없음";
+    return dist !== undefined && min !== undefined ? `도보 약 ${min}분 (${meters(dist)})` : min !== undefined ? `도보 약 ${min}분` : "거리 정보 없음";
   };
   if (transit.nearest_station) {
     const { station, line } = splitStation(transit.nearest_station);
@@ -160,7 +165,7 @@ export function nearbyLines(nearby: Nearby[] | undefined): { kind: string; icon:
     kind: n.kind,
     icon: NEARBY_ICON[n.kind],
     title: `${NEARBY_LABEL[n.kind]} · ${n.name}`,
-    detail: `약 ${n.distance_m}m`,
+    detail: `약 ${meters(n.distance_m)}`,
   }));
 }
 

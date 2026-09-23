@@ -17,6 +17,7 @@ import { manwon, maskDigits, pct, won, dateText } from "@/lib/format";
 import { compareUnits, UNIT_SORT_LABEL, unitLabel, unitRent, unitsWithDistance, type UnitSort } from "@/lib/units";
 import { nearbyLines, transitLines } from "@/lib/commute";
 import { depositAt, fillRatio } from "@/lib/slider";
+import { isIncomeBracket, preferredRow } from "@/lib/tiers";
 import type { IconName } from "@/components/icon";
 import type { SupplyUnit } from "@housing/schema";
 import type { UnitRent } from "@/lib/units";
@@ -142,10 +143,17 @@ export default function Cost() {
    * 그 값이 "새 첫 번째 집"으로 덮여 되찾을 대상이 사라진다 — 효과 순서에 기대는 코드가 된다.
    */
   const chosenId = useRef<string | undefined>(undefined);
+  /** 사람이 목록에서 직접 골랐는가. 고른 뒤에는 기본 행 규칙이 덮어쓰지 않는다 */
+  const pickedByHand = useRef(false);
   const pickHouse = (at: number) => {
     chosenId.current = rentals[at]?.unit?.id;
+    pickedByHand.current = true;
     setSel(at);
   };
+  // 기본 행은 첫 행이 아니라 이 사람의 소득·계층 구간 (lib/tiers.ts). 첫 행은 대개 수급자 요율이다.
+  useEffect(() => {
+    if (!picksHouse && !pickedByHand.current) setSel(preferredRow(rentals, profile));
+  }, [rentals, picksHouse, profile]);
   useEffect(() => {
     if (!picksHouse || !chosenId.current) return;
     const at = rentals.findIndex((r) => r.unit?.id === chosenId.current);
@@ -207,6 +215,8 @@ export default function Cost() {
         : [],
     [cost, locked, profile?.monthly_income],
   );
+  // 금리별 월 합계가 만 원 단위로 모두 같으면 표를 접는다 (아래 부족액 카드)
+  const flatPlans = plans.length > 1 && Math.round(plans[0]!.monthly_total / 10_000) === Math.round(plans[plans.length - 1]!.monthly_total / 10_000);
   const loans = useMemo(() => (profile && scenarioPricing ? eligibleLoans(LOANS, profile).map((l) => loanLimit(l, scenarioPricing.deposit ?? 0, profile)) : []), [profile, scenarioPricing]);
 
   useEffect(() => {
@@ -264,6 +274,9 @@ export default function Cost() {
               <Sub tone="3" variant="caption">{picksHouse ? "집" : "주택형"}</Sub>
               {/* 주소는 잘리면 어느 집인지 알 수 없다. 줄바꿈해서 다 보여 준다. */}
               <T variant="bodyMedium">{chosen.label}</T>
+              {!picksHouse && !pickedByHand.current && isIncomeBracket(chosen.pricing.tier) ? (
+                <Sub tone="3" variant="caption">소득 구간을 알 수 없어 가장 높은 구간으로 계산했어요. 눌러서 바꿀 수 있어요.</Sub>
+              ) : null}
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4, flexShrink: 0 }}>
               <Sub tone="3">{rentals.length + otherCount}개 중</Sub>
@@ -315,7 +328,18 @@ export default function Cost() {
           {/* 부족액을 더 빌리면 월에 얼마가 되는지. 상품을 권하지 않고 계산만 보여 준다 —
               공공임대 대상은 소득·자산 기준에 걸린 사람들이라, 권하는 순간 감당 못 할 위험이
               가장 큰 쪽에 가장 비싼 돈을 밀어 넣는 일이 된다. 판단은 사람이 한다. */}
-          {!locked && plans.length > 0 ? (
+          {/* 부족액이 작으면 금리를 나눠 보여 줄 뜻이 없다. 55만 원이면 연 5%·8%·12%가 전부 "월 17만 원"으로 같다 —
+              세 줄이 같은 숫자면 표가 아니라 소음이다. 그때는 한 줄로 말한다. */}
+          {!locked && plans.length > 0 && flatPlans ? (
+            <Card style={{ gap: 6 }}>
+              <T variant="bodyMedium">{manwon(cost.shortfall)}을 더 빌리면 월 {won(plans[0]!.monthly_payment)}~{won(plans[plans.length - 1]!.monthly_payment)} 더 들어요</T>
+              <Sub tone="3" variant="caption">
+                연 {Math.round(plans[0]!.annual_rate * 100)}~{Math.round(plans[plans.length - 1]!.annual_rate * 100)}% 어느 금리여도 비슷해요. 5년 원리금균등 기준이에요.
+                {plans[plans.length - 1]!.income_ratio !== null ? ` 그러면 월 주거비가 소득의 ${Math.round(plans[plans.length - 1]!.income_ratio! * 100)}%가 돼요.` : ""}
+              </Sub>
+            </Card>
+          ) : null}
+          {!locked && plans.length > 0 && !flatPlans ? (
             <Card style={{ gap: 12 }}>
               <View style={{ gap: 4 }}>
                 <T variant="bodyMedium">{manwon(cost.shortfall)}을 더 빌리면</T>

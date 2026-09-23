@@ -16,7 +16,7 @@ import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby 
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
 import { userFacingNotes } from "@/lib/notes";
 import { isScattered, unitLabel, unitSpec, unitsWithDistance, priceRange, rangeText } from "@/lib/units";
-import { dateRange, dateText, HOUSING_LABEL, longDate, looseDate, manwon } from "@/lib/format";
+import { dateRange, dateText, daysUntil, housingLabel, longDate, looseDate, manwon } from "@/lib/format";
 import { applyPhase, phaseLabel, phaseTone } from "@/lib/phase";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
@@ -90,6 +90,8 @@ export default function AnnouncementDetail() {
   const applied = !!a && state.applied.includes(a.id);
   // 발표일이 날짜로 적힌 공고만 알림을 걸 수 있다 ("2027년 2월"처럼 월까지만 있는 경우가 있다)
   const announceDate = /^\d{4}-\d{2}-\d{2}$/.test(a?.extraction.schedule.winner_announce?.trim() ?? "");
+  // 날짜로 적힌 발표일이 이미 지났는가. "4월 예정"처럼 날짜가 아니면 모르므로 지나지 않은 것으로 둔다
+  const announced = announceDate && (daysUntil(a?.extraction.schedule.winner_announce?.trim()) ?? 0) < 0;
 
   // seeChange는 상태가 바뀔 때마다 새로 만들어진다. 막지 않으면
   // 표시 → 상태 변경 → 새 함수 → 다시 표시로 무한히 돈다. 한 번만 부른다.
@@ -126,7 +128,7 @@ export default function AnnouncementDetail() {
       <Screen header={<Header onBack={() => router.back()} />}>
         <View style={{ gap: 10, paddingTop: 12 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Tag tone="gray">{HOUSING_LABEL[a.housing_type]}</Tag>
+            <Tag tone="gray">{housingLabel(a)}</Tag>
             {phaseLabel(applyPhase(a)) ? <Tag tone={phaseTone(applyPhase(a))}>{phaseLabel(applyPhase(a))}</Tag> : null}
           </View>
           <T variant="title" style={{ fontSize: 24, lineHeight: 32 }}>{a.title}</T>
@@ -135,7 +137,7 @@ export default function AnnouncementDetail() {
         <Card style={{ gap: 6 }}>
           <T variant="bodyMedium">내 조건과 맞는지 보려면 로그인해 주세요</T>
           <Sub tone="3" variant="caption">
-            입력하신 조건과 공고문을 한 줄씩 비교해서 보여드려요. 소득·자산 같은 입력값은 이 기기에만 저장돼요.
+            입력하신 조건과 공고문을 한 줄씩 비교해서 보여드려요. 소득·자산처럼 적어 두신 값은 이 기기에만 저장돼요.
           </Sub>
         </Card>
         <SignInButtons />
@@ -151,6 +153,8 @@ export default function AnnouncementDetail() {
    * 그래서 위치 섹션을 통째로 끄고, 대신 고를 수 있는 집 목록을 보여 준다.
    */
   const scattered = isScattered(a);
+  // 흩어진 집을 한 채씩 주는 유형인가 (매입임대·전세임대). 아니면 여러 단지를 한 번에 모집하는 공고다
+  const houses = a.housing_type === "purchased_rental" || /전세임대/.test(a.title);
   const nearby3 = a.units?.length ? unitsWithDistance(a.units, state.profile).slice(0, 3) : [];
   const trackIndex = track ? a.extraction.tracks.indexOf(track.track) : -1;
   /**
@@ -196,7 +200,7 @@ export default function AnnouncementDetail() {
           <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
             {/* 기관이 먼저다 — 신청처와 절차가 기관마다 다르다 */}
             {a.provider ? <Tag tone="info">{a.provider}</Tag> : null}
-            <Tag tone="gray">{HOUSING_LABEL[a.housing_type]}</Tag>
+            <Tag tone="gray">{housingLabel(a)}</Tag>
             {phaseLabel(phase) ? <Tag tone={phaseTone(phase)}>{phaseLabel(phase)}</Tag> : null}
           </View>
           <T variant="title" style={{ fontSize: 26, lineHeight: 34 }}>{a.title}</T>
@@ -264,7 +268,10 @@ export default function AnnouncementDetail() {
         */}
         {scattered ? (
           <View style={{ gap: 12 }}>
-            <SectionTitle>{a.units?.length ? `고를 수 있는 집 ${a.units.length}곳` : "집이 여러 곳에 흩어져 있어요"}</SectionTitle>
+            {/* 집 목록이 없을 때 두 경우가 있다. 매입임대는 정말 흩어진 집이고, 영구임대·국민임대처럼
+                주소가 "서울특별시"뿐인 공고는 여러 단지를 한 번에 모집하는 것이다. 매입임대용 설명을
+                영구임대에 붙이면("공급주택목록에서 확인") 없는 첨부를 찾게 만든다. */}
+            <SectionTitle>{a.units?.length ? `고를 수 있는 집 ${a.units.length}곳` : houses ? "집이 여러 곳에 흩어져 있어요" : "여러 단지에서 모집해요"}</SectionTitle>
             {nearby3.length > 0 ? (
               <Card style={{ gap: 14 }}>
                 {nearby3.map(({ unit, km }) => (
@@ -292,11 +299,12 @@ export default function AnnouncementDetail() {
                 </Sub>
               </Card>
             ) : (
-              <Card style={{ gap: 8 }}>
-                <T variant="bodyMedium">집이 여러 곳에 흩어져 있어요</T>
-                <Sub tone="3">
-                  이 공고는 한 단지가 아니라 흩어져 있는 집을 한 채씩 공급해요. 주택별 소재지와 임대조건은 공고문에 함께 붙은
-                  공급주택목록에서 확인해 주세요.
+              <Card>
+                {/* 제목은 바로 위 섹션 제목이 이미 말했다. 카드에서 같은 말을 또 하지 않는다 */}
+                <Sub>
+                  {houses
+                    ? "한 단지가 아니라 흩어져 있는 집을 한 채씩 공급해요. 집마다 주소와 임대조건은 공고문에 함께 붙은 공급주택목록에서 확인해 주세요."
+                    : "한 공고로 여러 단지의 입주자를 함께 모집해요. 단지별 위치와 임대조건은 공고문에서 확인해 주세요."}
                 </Sub>
               </Card>
             )}
@@ -445,7 +453,7 @@ export default function AnnouncementDetail() {
             {/* 누르기 **전에도** 북마크가 무엇을 하는지 알 수 있어야 한다.
                 누른 뒤에만 알려 주면, 그 기능이 있는 줄 모르는 사람은 영영 안 누른다.
                 이미 담았으면 같은 말을 또 하지 않는다. */}
-            {!saved && a.apply_end ? (
+            {!saved && a.apply_end && phase.kind !== "closed" ? (
               <Sub tone="3" variant="caption">
                 오른쪽 위 관심 버튼을 누르면 접수 마감 3일 전에 알려드려요.
               </Sub>
@@ -454,7 +462,11 @@ export default function AnnouncementDetail() {
               <>
                 <KeyValue label="당첨자 발표" value={looseDate(a.extraction.schedule.winner_announce)} />
                 {/* 날짜를 본 그 자리에 둔다. 카드 밖 아래쪽에 두었더니 있는 줄도 몰랐다.
-                    구독과 무관하게 무료다 — 알림을 잠그면 일정을 놓치게 된다. */}
+                    구독과 무관하게 무료다 — 알림을 잠그면 일정을 놓치게 된다.
+                    발표일이 지났으면 걸 알림이 없다. 누를 수 있게 두면 없는 알림을 약속하는 버튼이 된다. */}
+                {announced ? (
+                  <Sub tone="3" variant="caption">발표가 끝났어요. 결과는 기관 사이트에서 확인해 주세요.</Sub>
+                ) : (
                 <Pressable
                   onPress={() => toggleApplied(a.id)}
                   accessibilityRole="switch"
@@ -480,6 +492,7 @@ export default function AnnouncementDetail() {
                     </Sub>
                   </View>
                 </Pressable>
+                )}
               </>
             ) : null}
             {a.extraction.schedule.move_in ? <KeyValue label="입주 예정" value={looseDate(a.extraction.schedule.move_in)} /> : null}
@@ -497,7 +510,7 @@ export default function AnnouncementDetail() {
           </View>
         ) : null}
         <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
-          조건 일치는 공고문과 입력값을 비교한 결과예요. 실제 자격은 서류 심사로 확정돼요.
+          조건 일치는 공고문과 적어 두신 값을 맞춰 본 결과예요. 실제 자격은 서류 심사로 확정돼요.
           {a.status === "VERIFIED" ? " 이 공고의 조건은 사람이 공고문과 대조했어요." : ""} 숫자가 이상하면 그 줄을 눌러 알려 주세요.
         </Sub>
       </View>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { UserProfile } from "@housing/schema";
-import { commuteLines, commuteShort, mapUrl, splitStation, transitLines } from "../src/lib/commute";
+import { commuteLines, commuteShort, mapUrl, meters, splitStation, transitLines } from "../src/lib/commute";
 
 const profile = (over: Partial<UserProfile> = {}): UserProfile =>
   ({
@@ -108,5 +108,13 @@ describe("mapUrl", () => {
   it("좌표가 있으면 좌표를 그대로 넘긴다", () => {
     const url = mapUrl({ title: "테스트 공고", lat: 37.5586, lng: 126.9095, address: "서울 마포구 망원동" });
     expect(url).toContain("37.5586,126.9095");
+  });
+});
+
+describe("meters", () => {
+  it("1km가 넘으면 km로 — '1213m'는 한눈에 읽히지 않는다", () => {
+    expect(meters(351)).toBe("351m");
+    expect(meters(999)).toBe("999m");
+    expect(meters(1213)).toBe("1.2km");
   });
 });

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { manwon } from "../src/lib/format";
 import type { SupplyUnit, UserProfile } from "@housing/schema";
-import { compareUnits, isScattered, unitLabel, unitRent, unitSpec, unitsWithDistance, priceRange, rangeText } from "../src/lib/units";
+import { compareUnits, isScattered, unitLabel, unitRent, unitSpec, unitsWithDistance, priceRange, rangeText, sizeText } from "../src/lib/units";
 
 /** 2026-09-22 실제 행 (강동구 구천면로 317 403호) */
 const unit: SupplyUnit = {
@@ -170,5 +170,22 @@ describe("가격 범위", () => {
     expect(priceRange([u(undefined, undefined)], null)).toBeNull();
     expect(priceRange([], null)).toBeNull();
     expect(priceRange(undefined, null)).toBeNull();
+  });
+});
+
+describe("sizeText", () => {
+  const ex = (types: { name: string; exclusive_area_m2?: number }[]) => ({ tracks: [{ unit_types: types }] });
+  it("주택형 코드 대신 전용면적 범위", () => {
+    expect(sizeText({ extraction: ex([{ name: "일도 16A", exclusive_area_m2: 16.64 }, { name: "삼도1 26A", exclusive_area_m2: 26.94 }]) })).toBe("전용 17~27㎡");
+  });
+  it("면적이 하나면 범위로 쓰지 않는다", () => {
+    expect(sizeText({ extraction: ex([{ name: "59A", exclusive_area_m2: 59.95 }, { name: "59A", exclusive_area_m2: 59.95 }]) })).toBe("전용 60㎡");
+  });
+  it("면적이 없으면 예전처럼 코드로", () => {
+    expect(sizeText({ extraction: ex([{ name: "A" }, { name: "B" }, { name: "C" }, { name: "D" }]) })).toBe("A · B · C 외 1");
+  });
+  it("흩어진 집은 집마다의 면적으로", () => {
+    const units = [{ exclusive_area_m2: 19.2 }, { exclusive_area_m2: 44.8 }] as unknown as SupplyUnit[];
+    expect(sizeText({ units, extraction: ex([]) })).toBe("전용 19~45㎡");
   });
 });

@@ -41,6 +41,8 @@ export default function Profile() {
   const missing: string[] = [];
   if (p?.car_value === undefined) missing.push("자동차 가액");
   if (p?.monthly_debt_payment === undefined) missing.push("월 부채 상환액");
+  // 보유 현금이 없으면 예상 주거비가 "얼마가 모자라는지"를 말하지 못한다
+  if (p?.cash_on_hand === undefined) missing.push("보유 현금");
   if (!p?.workplace) missing.push("직장 위치");
   // 부부는 두 사람 통근을 같이 봐야 후보가 제대로 걸러진다
   else if ((p.marriage === "married" || p.marriage === "pre_marriage") && !p.workplace_partner) missing.push("배우자 직장 위치");
@@ -85,7 +87,16 @@ export default function Profile() {
         {p ? (
           <View style={{ gap: 6 }}>
             <T variant="bodyMedium">{age} · {p.household_size}인 가구 · {MARRIAGE[p.marriage ?? ""]}{p.income_type === "dual" ? " 맞벌이" : ""} · {p.region_sigungu ?? REGIONS.find((r) => r.value === p.region_code)?.label}</T>
-            <Sub>월 소득 {manwon(p.monthly_income)} · 자산 {manwon(p.total_assets)} · 현금 {manwon(p.cash_on_hand)}</Sub>
+            {/* 안 넣은 값은 "현금 -"처럼 기호로 두지 않고 빼 둔다. 무엇이 빠졌는지는 아래 "아직 입력하지 않은 항목"이 말한다 */}
+            <Sub>
+              {[
+                p.monthly_income !== undefined ? `월 소득 ${manwon(p.monthly_income)}` : null,
+                p.total_assets !== undefined ? `자산 ${manwon(p.total_assets)}` : null,
+                p.cash_on_hand !== undefined ? `현금 ${manwon(p.cash_on_hand)}` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </Sub>
             <Sub>{p.is_homeless ? `무주택 ${yearsMonths(p.homeless_months)}` : "유주택"} · 청약통장 {(p.subscription_months ?? 0) + (p.subscription_active && p.subscription_as_of ? monthsBetween(p.subscription_as_of) : 0)}개월{p.subscription_active ? " (납입 중)" : ""}</Sub>
             {p.workplace ? (
               <Sub>
@@ -117,7 +128,13 @@ export default function Profile() {
               <ListRow icon="trash" label="계정 삭제" sub="계정과 이 기기의 입력을 모두 지워요" danger onPress={() => { setDeleteError(null); setConfirmDelete(true); }} />
             </>
           ) : (
-            <ListRow icon="user" label="로그인" sub="로그인하면 첫 달은 0원이에요" onPress={() => setSignInSheet(true)} />
+            // 이미 구독(체험) 중인데 "로그인하면 첫 달 0원"이라고 하면 앞뒤가 안 맞는다 (구매 복원 뒤에 생기는 상태)
+            <ListRow
+              icon="user"
+              label="로그인"
+              sub={sub.status === "trial" || sub.status === "active" ? "로그인하면 다른 기기에서도 구독을 이어서 써요" : "로그인하면 첫 달은 0원이에요"}
+              onPress={() => setSignInSheet(true)}
+            />
           )}
         </Card>
       </View>

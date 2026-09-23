@@ -163,7 +163,7 @@ export function compareUnits(by: UnitSort, a: { unit: SupplyUnit; km: number | n
  */
 const LOW_TIER_STATUSES = ["basic_livelihood", "welfare_recipient", "single_parent_support"] as const;
 
-const isLowTier = (profile: UserProfile | null | undefined): boolean =>
+export const isLowTier = (profile: UserProfile | null | undefined): boolean =>
   (profile?.statuses ?? []).some((s) => (LOW_TIER_STATUSES as readonly string[]).includes(s));
 
 export interface UnitRent {
@@ -226,4 +226,27 @@ export function priceRange(units: SupplyUnit[] | undefined, profile: UserProfile
 export function rangeText(r: [number, number] | null, fmt: (n: number) => string): string | null {
   if (!r) return null;
   return r[0] === r[1] ? fmt(r[0]) : `${fmt(r[0])} ~ ${fmt(r[1])}`;
+}
+
+/**
+ * 목록 카드에 적는 크기. "H1 17A · H1 17C · H2 17A …" 같은 주택형 코드는 공고문 안에서만 뜻이 있다 —
+ * 사람이 카드에서 알고 싶은 건 "얼마나 넓은가"다. 전용면적이 있으면 범위로, 없으면 예전처럼 코드로 적는다.
+ * 흩어진 집은 주택형이 없고 집마다 면적이 있어서 그 범위를 쓴다.
+ */
+export function sizeText(a: {
+  units?: SupplyUnit[];
+  extraction: { tracks: { unit_types: { name: string; exclusive_area_m2?: number }[] }[] };
+}): string {
+  const types = a.extraction.tracks.flatMap((t) => t.unit_types);
+  const areas = [
+    ...types.map((u) => u.exclusive_area_m2),
+    ...(a.units ?? []).map((u) => u.exclusive_area_m2),
+  ].filter((x): x is number => typeof x === "number" && x > 0);
+  if (areas.length) {
+    const lo = Math.round(Math.min(...areas));
+    const hi = Math.round(Math.max(...areas));
+    return lo === hi ? `전용 ${lo}㎡` : `전용 ${lo}~${hi}㎡`;
+  }
+  const names = [...new Set(types.map((u) => u.name))];
+  return names.length ? names.slice(0, 3).join(" · ") + (names.length > 3 ? ` 외 ${names.length - 3}` : "") : "";
 }

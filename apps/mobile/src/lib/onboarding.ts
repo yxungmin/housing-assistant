@@ -135,7 +135,7 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, marriage_years: Number(v) }), read: (p) => p.marriage_years ?? null,
   },
   {
-    id: "household_size", core: true, kind: "count", title: "함께 사는 가구원은 몇 명인가요?", hint: "본인을 포함한 세대구성원 수. 소득 기준이 가구원 수마다 달라요.",
+    id: "household_size", core: true, kind: "count", title: "함께 사는 가구원은 몇 명인가요?", hint: "본인을 포함해 주민등록등본에 함께 올라 있는 사람\u00A0수예요. 소득 기준이 가구원 수마다 달라요.",
     apply: (p, v) => ({ ...p, household_size: Number(v) }), read: (p) => p.household_size ?? null,
   },
   {
@@ -156,8 +156,10 @@ export const STEPS: Step[] = [
   {
     // 공고는 "월평균소득 100% 이하"처럼 월로 말하지만, 사람은 자기 소득을 연봉으로 기억한다.
     // 그래서 받기는 연봉으로 받고 월로 환산해 판정에 쓴다. 환산값은 화면에 같이 적어 둔다.
-    id: "annual_income", core: true, kind: "manwon", title: "세전 연소득은 얼마인가요?", hint: "세금 떼기 전 1년 총액이에요. 맞벌이면 두 사람 소득을 더해 주세요.",
-    helper: "정확한 금액을 모르면 직장 건강보험료 납부액으로 역산해 드려요. 공고의 소득 기준은 월 환산액으로 판정해요.",
+    id: "annual_income", core: true, kind: "manwon", title: "세전 연소득은 얼마인가요?",
+    // 배우자가 없는 사람에게 "맞벌이면…"은 읽을 필요가 없는 문장이다
+    hint: (p) => (p.marriage === "married" || p.marriage === "pre_marriage" ? "세금 떼기 전 1년 총액이에요. 맞벌이면 두 사람 소득을 더해 주세요." : "세금 떼기 전 1년 총액이에요."),
+    helper: "정확한 금액을 모르면 직장 건강보험료로 거꾸로 계산해 드려요.",
     apply: (p, v) => {
       const annual = Number(v);
       return { ...p, annual_income: annual, monthly_income: Math.round(annual / 12) };

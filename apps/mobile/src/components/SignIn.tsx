@@ -121,7 +121,7 @@ export function SignInSheet({ visible, onClose, reason }: { visible: boolean; on
         </View>
         <SignInButtons onDone={onClose} />
         <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>
-          소득·자산 같은 입력값은 로그인해도 서버로 보내지 않고 이 기기에만 둬요.
+          소득·자산처럼 적어 두신 값은 로그인해도 서버로 보내지 않고 이 기기에만 둬요.
         </Sub>
       </View>
     </BottomSheet>

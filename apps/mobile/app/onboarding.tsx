@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Platform, Pressable, ScrollView, TextInput, View } from "react-native";
+import { Keyboard, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/icon";
@@ -92,6 +92,8 @@ export default function Onboarding() {
   };
   const options = stepOptions(step, draft);
   const grid = options.length > 6;
+  // 칸 최소 폭(22% · 30%)과 간격 10px로 한 줄에 들어가는 개수. 아래 빈 칸 채우기에 쓴다
+  const gridCols = options.length > 20 ? 3 : 4;
 
   return (
     <Screen scroll={false} padded={false}>
@@ -106,7 +108,8 @@ export default function Onboarding() {
         <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         <FadeIn key={step.id} style={{ paddingHorizontal: space.screen, paddingTop: 32, gap: space.md }}>
           <Sub tone="3">{only ? stepLabel(step) : `${index + 1} / ${steps.length}`}</Sub>
-          <T variant="title">{stepTitle(step, draft)}</T>
+          {/* "몇 명", "몇 살"이 줄 끝에서 갈리면 "몇 / 명인가요?"가 된다. 둘을 붙들어 둔다 */}
+          <T variant="title">{stepTitle(step, draft).replace(/몇 /g, "몇\u00A0")}</T>
           {stepHint(step, draft) ? <T variant="body" color={colors.text2}>{stepHint(step, draft)}</T> : null}
 
           {(step.kind === "select" || step.kind === "multi") && (
@@ -129,6 +132,13 @@ export default function Onboarding() {
                   </Pressable>
                 );
               })}
+              {/* 마지막 줄이 덜 차면 남은 칸을 빈 칸으로 채운다. 안 그러면 flexGrow 때문에
+                  마지막 한 칸('제주')이 한 줄을 통째로 차지한다 */}
+              {grid
+                ? Array.from({ length: (gridCols - (options.length % gridCols)) % gridCols }, (_, i) => (
+                    <View key={`fill-${i}`} style={{ minWidth: options.length > 20 ? "30%" : "22%", flexGrow: 1, height: 0 }} />
+                  ))
+                : null}
             </View>
           )}
 
@@ -202,7 +212,7 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
   const won = step.kind === "manwon" ? Number(digits) * 10_000 : Number(digits);
   const manwon = isWon && digits ? summarizeWon(won) : "";
   // 연소득으로 받지만 공고의 소득 기준은 월이다. 판정에 쓰는 값을 그 자리에서 같이 보여 준다.
-  const monthlyNote = step.id === "annual_income" && digits ? `월 ${summarizeWon(Math.round(won / 12))} 기준으로 판정해요` : "";
+  const monthlyNote = step.id === "annual_income" && digits ? `월 ${summarizeWon(Math.round(won / 12))}으로 보고 맞춰 볼게요` : "";
   return (
     <View style={{ gap: 10, marginTop: 16 }}>
       <View style={{ flexDirection: "row", alignItems: "baseline", borderBottomWidth: 2, borderBottomColor: colors.primary, paddingBottom: 10, gap: 10 }}>
@@ -342,6 +352,17 @@ function PlaceField({
   // 이미 고른 장소가 있으면 "이름|위도|경도"로 들어온다
   const picked = typeof value === "string" && value !== NO_WORKPLACE ? value.split("|")[0] : null;
 
+  /**
+   * 고르면 검색어를 비운다 — 결과 목록도 같이 사라진다.
+   * 전에는 고른 뒤에도 검색어와 결과 여섯 줄이 그대로 남아, 무엇이 골라졌는지 한눈에 안 보였고
+   * "내 조건으로 공고 찾기" 버튼이 목록에 가려졌다.
+   */
+  const pick = (h: PlaceHit) => {
+    onPick(h.name, h.lat, h.lng);
+    setQ("");
+    Keyboard.dismiss();
+  };
+
   // 한 글자씩 부르면 호출만 쓴다. 타자가 멎고 300ms 뒤에 한 번 부른다.
   useEffect(() => {
     const term = q.trim();
@@ -380,7 +401,7 @@ function PlaceField({
         onChangeText={setQ}
         /* 예시를 셋이나 넣으니 17pt 입력칸 폭을 넘어 잘렸다.
            무엇을 넣어야 하는지는 위 설명이 이미 말한다 — 여기선 둘이면 충분하다. */
-        placeholder="예: 강남역, 판교 카카오"
+        placeholder={picked ? "다른 곳으로 바꾸려면 검색해 주세요" : "예: 강남역, 판교 카카오"}
         placeholderTextColor={colors.text4}
         autoCorrect={false}
         /* paddingVertical로 높이를 만들면 글자가 아래로 치우친다 — Pretendard는 ascent가 커서
@@ -397,7 +418,7 @@ function PlaceField({
       {hits.map((h) => (
         <Pressable
           key={`${h.name}|${h.lat}|${h.lng}`}
-          onPress={() => onPick(h.name, h.lat, h.lng)}
+          onPress={() => pick(h)}
           accessibilityRole="button"
           accessibilityLabel={h.name}
           style={({ pressed }) => ({ paddingHorizontal: 16, paddingVertical: 14, borderRadius: radius.md, backgroundColor: pressed ? colors.cardStrong : colors.card, gap: 2 })}

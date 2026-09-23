@@ -4,8 +4,9 @@ import { Pressable, View } from "react-native";
 import { Icon } from "@/components/icon";
 import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { commuteKm, getAnnouncement, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
-import { HOUSING_LABEL } from "@/lib/format";
+import { housingLabel } from "@/lib/format";
 import { applyPhase, closesWithin, phaseLabel, phaseRank, phaseTone } from "@/lib/phase";
+import { sizeText } from "@/lib/units";
 import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
 import { REGIONS } from "@/lib/onboarding";
 import { commuteFor, commuteShort, nearestHouseShort, splitStation } from "@/lib/commute";
@@ -316,8 +317,7 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
   const phase = applyPhase(a);
   const phaseText = phaseLabel(phase);
   const phaseColor = { danger: colors.danger, info: colors.info, gray: colors.text3 }[phaseTone(phase)];
-  const units = [...new Set(a.extraction.tracks.flatMap((t) => t.unit_types.map((u) => u.name)))];
-  const unitLabel = units.length ? units.slice(0, 3).join(" · ") + (units.length > 3 ? ` 외 ${units.length - 3}` : "") : "";
+  const unitLabel = sizeText(a);
   const status =
     !isReadable(a)
       ? { tone: "warn" as const, icon: "alert" as const, text: "조건을 아직 못 읽음" }
@@ -358,7 +358,7 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
         <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 6 }}>
           {/* 기관을 먼저 보여 준다 — 같은 조건이라도 신청처와 절차가 다르다 */}
           {a.provider ? <Tag tone="gray">{a.provider}</Tag> : null}
-          <Sub tone="3" variant="caption" lines={1} style={{ flex: 1 }}>{HOUSING_LABEL[a.housing_type]}{unitLabel ? ` · ${unitLabel}` : ""}</Sub>
+          <Sub tone="3" variant="caption" lines={1} style={{ flex: 1 }}>{housingLabel(a)}{unitLabel ? ` · ${unitLabel}` : ""}</Sub>
         </View>
         {phaseText ? <T variant="label" color={phaseColor} style={{ fontFamily: fonts.bold, flexShrink: 0 }}>{phaseText}</T> : null}
       </View>

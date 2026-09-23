@@ -30,7 +30,7 @@ export default function Conditions() {
   // 헤더에 제목을 또 넣지 않는다 — 바로 아래 PageTitle과 겹쳐 같은 말이 두 번 나온다
   return (
     <Screen header={<Header onBack={() => router.back()} />}>
-      <PageTitle title="내 조건" sub="항목을 눌러 그것만 고칠 수 있어요. 고치면 공고 판정에 바로 반영돼요." />
+      <PageTitle title="내 조건" sub="항목을 눌러 그것만 고칠 수 있어요. 고치면 공고마다 조건을 바로 다시 맞춰 봐요." />
 
       {[...CONDITION_GROUPS, ...(rest.length ? [{ title: "그 밖에", ids: rest.map((s) => s.id) }] : [])].map((group) => {
         const rows = group.ids.map((id) => byId.get(id)).filter((s): s is NonNullable<typeof s> => !!s && s.kind !== "skip-info");

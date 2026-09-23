@@ -147,7 +147,7 @@ export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: 
   if (result.status === "NEEDS_CHECK") return result.reason;
   switch (r.category) {
     case "income":
-      return p.monthly_income ? `내 소득 월 ${manwon(p.monthly_income)}` : "소득 미입력";
+      return p.monthly_income ? `내 소득 월 ${manwon(p.monthly_income)}` : "소득은 아직 안 넣었어요";
     case "asset":
       return `내 자산 ${manwon(p.total_assets)}`;
     case "car_value":
@@ -177,7 +177,7 @@ export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: 
       // yearsMonths는 undefined를 0으로 접는데, 여기서는 그게 단정이 된다.
       return p.is_homeless
         ? p.homeless_months === undefined
-          ? "무주택 (기간 미입력)"
+          ? "무주택 · 기간은 아직 안 넣었어요"
           : `무주택 ${yearsMonths(p.homeless_months)}째`
         : "집이 있어요";
     case "residence":
@@ -190,7 +190,7 @@ export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: 
       return `청약통장 ${months}개월 · ${deposits}회 납입${p.subscription_active ? " (매달 자동 반영)" : ""}`;
     }
     case "commute":
-      return p.commute_limit_min ? `통근 ${p.commute_limit_min}분까지 괜찮아요` : "통근 시간 미입력";
+      return p.commute_limit_min ? `통근 ${p.commute_limit_min}분까지 괜찮아요` : "통근 시간은 아직 안 넣었어요";
     case "status":
       return p.statuses?.length ? p.statuses.map((s) => STATUS_LABEL[s] ?? s).join(", ") : "해당하는 자격 없음";
   }
