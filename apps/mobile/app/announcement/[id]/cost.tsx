@@ -8,12 +8,12 @@ import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SignInSheet } from "@/components/SignIn";
 import { SourceCard } from "@/components/SourceCard";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
-import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconButton, IconTile, KeyValue, LockNote, Notice, Redacted, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { getAnnouncement, useAnnouncements } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
-import { manwon, maskDigits, pct, won, dateText } from "@/lib/format";
+import { manwon, pct, won, dateText } from "@/lib/format";
 import { compareUnits, UNIT_SORT_LABEL, unitLabel, unitRent, unitsWithDistance, type UnitSort } from "@/lib/units";
 import { nearbyLines, transitLines } from "@/lib/commute";
 import { depositAt, fillRatio } from "@/lib/slider";
@@ -128,7 +128,6 @@ export default function Cost() {
   const level = accessLevel({ account: state.account, subscription: state.subscription });
   const locked = !canOpenCost(state);
   const needsSignIn = level === "gate";
-  const hide = (text: string) => (locked ? maskDigits(text) : text);
 
   // 로그인 시트는 화면을 갈아치우지 않는다 — 보던 공고를 잃지 않고 돌아온다
   const unlock = () => (needsSignIn ? setSignInSheet(true) : setSubSheet(true));
@@ -285,12 +284,13 @@ export default function Cost() {
           </Pressable>
         </View>
 
+        {/* 미리보기는 구독 뒤 화면과 **같은 모양**이다 — 숫자 자리만 막대로 가린다(Redacted).
+            무엇이 잠겼는지는 공고 상세의 로그인 안내와 같은 카드로 한 번만 말한다. */}
         {locked ? (
-          <Notice icon="info">
-            {needsSignIn
-              ? "보증금과 월임대료는 공고문에 적힌 그대로예요. 가려진 계산 결과는 로그인하면 볼 수 있어요."
-              : "보증금과 월임대료는 공고문에 적힌 그대로예요. 가려진 것은 이 조건으로 우리가 계산한 값이에요."}
-          </Notice>
+          <LockNote
+            title={needsSignIn ? "로그인하면 이 집에 드는 돈을 계산해\u00A0드려요" : "구독하면 이 집에 드는 돈을 모두 볼\u00A0수\u00A0있어요"}
+            body="보증금과 월임대료는 공고문에 적힌 그대로예요. 가려진 곳에는 받을 수 있는 대출을 뺀 필요한 현금과, 이자까지 더한 매달 나가는 돈이 들어가요."
+          />
         ) : null}
 
         <FadeIn key={`${sel}-${deposit ?? "base"}-${loanId ?? "auto"}`} style={{ gap: space.section }}>
@@ -299,14 +299,13 @@ export default function Cost() {
           <Card style={{ gap: 20 }}>
             <Unmask locked={locked} onPress={unlock}>
             <BigNumber
-              value={hide(cashLabel)}
+              value={cashLabel}
+              redacted={locked}
               unit="원"
               size={40}
               sub={
                 locked
-                  ? needsSignIn
-                    ? "로그인하면 보증금에서 받을 수 있는 대출을 빼고 계산해 드려요"
-                    : "구독하면 보증금에서 받을 수 있는 대출을 빼고 계산해 드려요"
+                  ? undefined
                   : cost.shortfall > 0
                     /* 현금을 입력하지 않았으면 "보유 현금 -으로는"이 된다.
                        모르는 값을 문장에 끼워 넣지 말고, 모른다고 말한다. */
@@ -320,7 +319,7 @@ export default function Cost() {
             <View style={{ gap: 14 }}>
               <KeyValue label="임대보증금" value={won(cost.deposit)} amount={cost.deposit} src={`공고문 ${base.source.page}쪽${deposit !== null ? " · 전환 적용" : ""}`} />
               {cost.loan ? (
-                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${hide(won(cost.loan.amount))}`} amount={locked ? undefined : -cost.loan.amount} note={locked ? `${cost.loan.product.provider} · ${needsSignIn ? "로그인하면" : "구독하면"} 한도와 금리를 볼 수 있어요` : undefined} src={locked ? undefined : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
+                <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${won(cost.loan.amount)}`} redacted={locked} amount={locked ? undefined : -cost.loan.amount} src={locked ? undefined : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
               ) : (
                 <KeyValue label="적용 가능한 대출" value="없음" note="내 조건에 맞는 전세자금대출이 없어요" />
               )}
@@ -431,18 +430,22 @@ export default function Cost() {
           <Card style={{ gap: 20 }}>
             <Unmask locked={locked} onPress={unlock}>
             <Row center>
-              <BigNumber value={hide(won(cost.monthly_housing_cost).replace("원", ""))} unit="원" size={34} />
+              <BigNumber value={won(cost.monthly_housing_cost).replace("원", "")} redacted={locked} unit="원" size={34} />
               {incomeRatio !== null ? (
                 <View style={{ alignItems: "flex-end", gap: 2 }}>
                   <Sub tone="3" variant="caption">월 소득 대비</Sub>
-                  <T variant="heading" numeric color={locked ? colors.text3 : incomeRatio > 0.3 ? colors.warning : colors.text}>{hide(pct(incomeRatio))}</T>
+                  {locked ? (
+                    <Redacted width={64} height={24} />
+                  ) : (
+                    <T variant="heading" numeric color={incomeRatio > 0.3 ? colors.warning : colors.text}>{pct(incomeRatio)}</T>
+                  )}
                 </View>
               ) : null}
             </Row>
             </Unmask>
             <View style={{ gap: 14 }}>
               <KeyValue label="월임대료" value={won(cost.monthly_rent)} amount={cost.monthly_rent} />
-              {cost.loan ? <KeyValue label={cost.loan.interest_only ? "대출 이자" : "대출 원리금"} value={hide(won(cost.loan.monthly_payment))} /> : null}
+              {cost.loan ? <KeyValue label={cost.loan.interest_only ? "대출 이자" : "대출 원리금"} value={won(cost.loan.monthly_payment)} redacted={locked} /> : null}
               <KeyValue
                 label="관리비"
                 value={won(cost.maintenance_estimate)}
@@ -450,7 +453,7 @@ export default function Cost() {
                 note={base.maintenance_estimate === undefined ? "공고문에 없어 추정값을 썼어요" : undefined}
                 src={base.maintenance_estimate === undefined ? undefined : `공고문 ${base.source.page}쪽`}
               />
-              {cost.monthly_debt_payment > 0 ? <KeyValue label="기존 부채 상환" value={hide(won(cost.monthly_debt_payment))} note="부담률 계산에만 넣어요" /> : null}
+              {cost.monthly_debt_payment > 0 ? <KeyValue label="기존 부채 상환" value={won(cost.monthly_debt_payment)} note="부담률 계산에만 넣어요" /> : null}
             </View>
           </Card>
         </View>

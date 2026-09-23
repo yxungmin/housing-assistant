@@ -239,13 +239,47 @@ export function IconTile({ name, tone = "gray", size = 40 }: { name: IconName; t
 }
 
 /** 큰 숫자 */
-export function BigNumber({ value, unit, label, sub, size = 40, align = "left" }: { value: string; unit?: string; label?: string; sub?: string; size?: number; align?: "left" | "right" }) {
+/**
+ * 구독 전 미리보기에서 숫자 자리를 가리는 막대.
+ *
+ * 전에는 숫자를 "•,•••만"처럼 점으로 바꿨다. 쉼표와 단위가 남아 고장 난 숫자처럼 보였고,
+ * 자리마다 점의 모양이 달라 한 화면 안에서도 제각각이었다. 가림은 한 모양이어야 한다 —
+ * BigNumber·KeyValue의 redacted가 모두 이걸 쓴다.
+ */
+export function Redacted({ width, height }: { width: number; height: number }) {
+  const { colors } = useTheme();
+  return <View accessibilityLabel="가려진 값" style={{ width, height, borderRadius: Math.min(10, height / 2.4), backgroundColor: colors.cardStrong }} />;
+}
+
+/**
+ * 잠긴 이유와 풀면 무엇을 보는지 알리는 카드. 공고 상세의 로그인 안내와 예상 주거비 미리보기가 같이 쓴다 —
+ * 같은 일을 하는 안내가 화면마다 다른 모양이면(초록 안내 상자, 회색 카드…) 같은 말로 읽히지 않는다.
+ */
+export function LockNote({ title, body }: { title: string; body: string }) {
+  const { colors } = useTheme();
+  return (
+    <Card style={{ gap: 6 }}>
+      {/* 제목이 두 줄이 되면 가운데 정렬은 아이콘을 두 줄 사이로 떨어뜨린다. 첫 줄에 붙인다 */}
+      <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 8 }}>
+        <View style={{ paddingTop: 2 }}><Icon name="lock" size={18} color={colors.text2} /></View>
+        <T variant="bodyMedium" style={{ flex: 1 }}>{title}</T>
+      </View>
+      <Sub tone="3" variant="caption">{body}</Sub>
+    </Card>
+  );
+}
+
+export function BigNumber({ value, unit, label, sub, size = 40, align = "left", redacted }: { value: string; unit?: string; label?: string; sub?: string; size?: number; align?: "left" | "right"; /** 구독 전 미리보기 — 숫자 자리를 막대로 가린다 (Redacted) */ redacted?: boolean }) {
   const { colors } = useTheme();
   return (
     <View style={{ gap: 4, alignItems: align === "right" ? "flex-end" : "flex-start" }}>
       {label ? <Sub>{label}</Sub> : null}
-      <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
-        <Text style={{ fontFamily: fonts.bold, fontSize: size, lineHeight: size * 1.2, color: colors.text, letterSpacing: -size * 0.035, fontVariant: ["tabular-nums"] }}>{value}</Text>
+      <View style={{ flexDirection: "row", alignItems: redacted ? "center" : "baseline", gap: 6 }}>
+        {redacted ? (
+          <Redacted width={size * 3.2} height={size * 0.9} />
+        ) : (
+          <Text style={{ fontFamily: fonts.bold, fontSize: size, lineHeight: size * 1.2, color: colors.text, letterSpacing: -size * 0.035, fontVariant: ["tabular-nums"] }}>{value}</Text>
+        )}
         {unit ? <Text style={{ fontFamily: fonts.bold, fontSize: Math.round(size * 0.5), color: colors.text2, letterSpacing: -0.5 }}>{unit}</Text> : null}
       </View>
       {sub ? <Sub tone="3">{sub}</Sub> : null}
@@ -467,6 +501,7 @@ export function KeyValue({
   note,
   strong,
   amount,
+  redacted,
 }: {
   label: string;
   value: string;
@@ -483,9 +518,11 @@ export function KeyValue({
    * 43,520,000과 4,352,000은 쉼표 하나 차이인데 열 배가 다르고, 사람은 그 자리에서 잘못 읽는다.
    */
   amount?: number | null;
+  /** 구독 전 미리보기 — 값 자리를 막대로 가린다 (Redacted) */
+  redacted?: boolean;
 }) {
   const { colors } = useTheme();
-  const reading = koreanWon(amount);
+  const reading = redacted ? null : koreanWon(amount);
   return (
     <View style={{ gap: 2 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
@@ -495,7 +532,11 @@ export function KeyValue({
         </View>
         {/* 긴 값은 잘리는 대신 줄바꿈한다. 금액은 짧아 이 설정에 영향받지 않는다. */}
         <View style={{ flexShrink: 1, alignItems: "flex-end", gap: 1 }}>
-          <T variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold, textAlign: "right" }}>{value}</T>
+          {redacted ? (
+            <View style={{ paddingVertical: 2 }}><Redacted width={strong ? 112 : 88} height={strong ? 22 : 18} /></View>
+          ) : (
+            <T variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold, textAlign: "right" }}>{value}</T>
+          )}
           {reading ? <Sub tone="3" variant="caption">{reading}</Sub> : null}
         </View>
       </View>

@@ -10,7 +10,7 @@ import { SignInButtons } from "@/components/SignIn";
 import { canSeeAnnouncement } from "@/lib/access";
 import { SourceCard } from "@/components/SourceCard";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
-import { BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
+import { LockNote, BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
 import { userFacingNotes } from "@/lib/notes";
@@ -132,12 +132,10 @@ export default function AnnouncementDetail() {
           <T variant="title" style={{ fontSize: 24, lineHeight: 32 }}>{a.title}</T>
           <Sub variant="body">{a.address ?? a.region_name}</Sub>
         </View>
-        <Card style={{ gap: 6 }}>
-          <T variant="bodyMedium">내 조건과 맞는지 보려면 로그인해 주세요</T>
-          <Sub tone="3" variant="caption">
-            입력하신 조건과 공고문을 한 줄씩 비교해서 보여드려요. 소득·자산처럼 적어 두신 값은 이 기기에만 저장돼요.
-          </Sub>
-        </Card>
+        <LockNote
+          title="로그인하면 내 조건과 맞는지 알려 드려요"
+          body="입력하신 조건과 공고문을 한 줄씩 비교해서 보여드려요. 소득·자산처럼 적어 두신 값은 이 기기에만 저장돼요."
+        />
         <SignInButtons />
       </Screen>
     );
