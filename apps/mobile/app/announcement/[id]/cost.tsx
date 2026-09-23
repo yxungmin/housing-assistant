@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { PanResponder, Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
@@ -297,6 +297,7 @@ export default function Cost() {
         <View style={{ gap: 12 }}>
           <SectionTitle>지금 필요한 현금</SectionTitle>
           <Card style={{ gap: 20 }}>
+            <Unmask locked={locked} onPress={unlock}>
             <BigNumber
               value={hide(cashLabel)}
               unit="원"
@@ -305,7 +306,7 @@ export default function Cost() {
                 locked
                   ? needsSignIn
                     ? "로그인하면 보증금에서 받을 수 있는 대출을 빼고 계산해 드려요"
-                    : "보증금에서 받을 수 있는 대출을 빼고 계산해요"
+                    : "구독하면 보증금에서 받을 수 있는 대출을 빼고 계산해 드려요"
                   : cost.shortfall > 0
                     /* 현금을 입력하지 않았으면 "보유 현금 -으로는"이 된다.
                        모르는 값을 문장에 끼워 넣지 말고, 모른다고 말한다. */
@@ -315,6 +316,7 @@ export default function Cost() {
                     : `보유 현금 ${manwon(profile.cash_on_hand)}으로 낼 수 있어요`
               }
             />
+            </Unmask>
             <View style={{ gap: 14 }}>
               <KeyValue label="임대보증금" value={won(cost.deposit)} amount={cost.deposit} src={`공고문 ${base.source.page}쪽${deposit !== null ? " · 전환 적용" : ""}`} />
               {cost.loan ? (
@@ -427,6 +429,7 @@ export default function Cost() {
         <View style={{ gap: 12 }}>
           <SectionTitle>매달 나가는 돈</SectionTitle>
           <Card style={{ gap: 20 }}>
+            <Unmask locked={locked} onPress={unlock}>
             <Row center>
               <BigNumber value={hide(won(cost.monthly_housing_cost).replace("원", ""))} unit="원" size={34} />
               {incomeRatio !== null ? (
@@ -436,6 +439,7 @@ export default function Cost() {
                 </View>
               ) : null}
             </Row>
+            </Unmask>
             <View style={{ gap: 14 }}>
               <KeyValue label="월임대료" value={won(cost.monthly_rent)} amount={cost.monthly_rent} />
               {cost.loan ? <KeyValue label={cost.loan.interest_only ? "대출 이자" : "대출 원리금"} value={hide(won(cost.loan.monthly_payment))} /> : null}
@@ -606,6 +610,19 @@ export default function Cost() {
         onSubmit={(message, suggested) => addReport(draftReport({ announcementId: a.id, announcementTitle: a.title, target: priceTarget, message, suggested }))}
       />
     </Screen>
+  );
+}
+
+/**
+ * 미리보기에서 가려진 숫자를 눌러서 연다 — 궁금해진 그 자리가 결제를 판단하는 자리다.
+ * 카드 전체를 누르게 하면 안에 있는 근거(ⓘ) 버튼과 겹친다. 가려진 숫자 줄만 감싼다.
+ */
+function Unmask({ locked, onPress, children }: { locked: boolean; onPress: () => void; children: ReactNode }) {
+  if (!locked) return <>{children}</>;
+  return (
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel="가려진 계산 결과 보기" style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}>
+      {children}
+    </Pressable>
   );
 }
 

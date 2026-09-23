@@ -10,7 +10,6 @@ import { SignInButtons } from "@/components/SignIn";
 import { canSeeAnnouncement } from "@/lib/access";
 import { SourceCard } from "@/components/SourceCard";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
-import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
@@ -22,7 +21,7 @@ import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { commuteDetail, commuteFor, commuteLines, mapPlace, nearbyLines, openMapTarget, transitLines } from "@/lib/commute";
 import { mapTargets } from "@/lib/maps";
-import { canOpenCost, useAppState } from "@/store/appState";
+import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, space } from "@/theme/tokens";
 
@@ -34,7 +33,6 @@ export default function AnnouncementDetail() {
   const { state, toggleSaved, toggleApplied, addReport, seeChange, openAnnouncement } = useAppState();
   const { list } = useAnnouncements();
   const a = getAnnouncement(id ?? "", list);
-  const [sheet, setSheet] = useState(false);
   // 동기화가 화면을 연 뒤에 끝날 수도 있으니 계속 지켜보다가, 오면 그때 집어서 들고 있는다.
   // (본 것으로 표시하면 목록에서 사라지므로 이 화면에서는 따로 붙들어 둔다.)
   const incoming = unseenChange(state.changes, id ?? "");
@@ -184,10 +182,13 @@ export default function AnnouncementDetail() {
   const households = a.extraction.tracks.reduce((s, t) => s + (t.households ?? 0), 0);
   const range = priceRange(a.units, state.profile);
   const phase = applyPhase(a);
-  const openCost = () => {
-    if (canOpenCost(state)) router.push(`/announcement/${a.id}/cost`);
-    else setSheet(true);
-  };
+  /*
+   * 구독 여부와 상관없이 예상 주거비 화면으로 간다. 구독 전이면 그 화면이 미리보기다 —
+   * 공고문의 보증금·월세는 그대로, 우리가 계산한 숫자만 가려 둔다.
+   * 전에는 여기서 곧장 구독 시트를 띄웠다. 그러면 무엇을 사는지 보지도 못한 채 결제를 판단하게 되고,
+   * 비용 화면에 만들어 둔 미리보기는 아무도 닿을 수 없는 화면이었다(2026-09-23).
+   */
+  const openCost = () => router.push(`/announcement/${a.id}/cost`);
 
   return (
     <Screen
@@ -537,7 +538,6 @@ export default function AnnouncementDetail() {
         <Sub tone="3" variant="caption">앱이 없으면 웹 지도로 열려요.</Sub>
       </BottomSheet>
 
-      <SubscriptionSheet visible={sheet} onClose={() => setSheet(false)} onStarted={() => router.push(`/announcement/${a.id}/cost`)} />
       <ReportSheet
         visible={!!report}
         onClose={() => setReport(null)}
