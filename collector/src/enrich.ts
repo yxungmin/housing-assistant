@@ -193,6 +193,24 @@ function representativeArea(r: Row): number | undefined {
 for (const row of rows) {
   if (only && row.id !== only) continue;
   if (row.status !== "VERIFIED" && row.status !== "AUTO") continue;
+  /*
+   * 지난 회차 결과를 제일 먼저 한다.
+   *
+   * 아래 보강들은 주소 → 좌표 → 시세·통근으로 이어져 있어서, 앞이 막히면 뒤가 통째로 건너뛴다.
+   * 그런데 이 값은 주소도 좌표도 쓰지 않는다 — 단지 이름으로만 잇는다.
+   * 처음에 좌표 뒤에 뒀더니 "좌표 실패 — 나머지도 건너뜀"에 같이 쓸려 나갔다(2026-09-23).
+   */
+  if ((force || row.past_results === undefined) && resultPool.length > 0) {
+    const hits = matchPastResults(row, resultPool);
+    if (hits.length > 0) {
+      row.past_results = hits;
+      const t = toughest(hits);
+      console.log(`${row.id}: 지난 회차 ${hits[0]!.complex} · ${t?.closed_rank ?? "?"}순위 마감 · ${t?.competition ?? "?"}대 1`);
+      changed++;
+      save();
+    }
+  }
+
   const address = row.address ?? row.extraction.address;
   if (!address) {
     console.log(`${row.id}: 주소 없음 — 건너뜀`);
@@ -244,20 +262,7 @@ for (const row of rows) {
     } else console.log(`  대기현황 단지 못 맞춤`);
   }
 
-  // 4) 지난 회차 결과 (같은 단지가 지난번에 몇 순위에서 마감됐나)
-  //
-  // 풀은 바깥에서 한 번만 만든다 — 공고마다 당첨자 발표 목록을 다시 받을 이유가 없다.
-  // 못 맞추면 비워 둔다. 잘못 이은 경쟁률은 없는 것보다 나쁘다 (engine/results.ts).
-  if ((force || row.past_results === undefined) && resultPool.length > 0) {
-    const hits = matchPastResults(row, resultPool);
-    if (hits.length > 0) {
-      row.past_results = hits;
-      const t = toughest(hits);
-      console.log(`  지난 회차 ${hits[0]!.complex} · ${t?.closed_rank ?? "?"}순위 마감 · ${t?.competition ?? "?"}대 1`);
-    } else console.log(`  지난 회차 결과 못 맞춤`);
-  }
-
-  // 5) 통근 (시군구 × 이 단지)
+  // 4) 통근 (시군구 × 이 단지)
   if ((force || row.commute === undefined) && row.lat !== undefined) {
     const t = await commuteTable({ lat: row.lat, lng: row.lng! }, regions, { kakao: env.KAKAO_REST_API_KEY, seoul: env.TRANSIT_API_KEY }).catch(() => undefined);
     if (t) {
