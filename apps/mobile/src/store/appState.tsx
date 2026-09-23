@@ -7,7 +7,7 @@ import { AppState as AppLifecycle, Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { withDerived } from "@/lib/onboarding";
 import type { UserProfile } from "@housing/schema";
-import { billing, canUseFirstMonthFree, normalizeSubscription, type Subscription } from "@/lib/billing";
+import { normalizeSubscription, type Subscription } from "@/lib/billing";
 import type { ChangeRecord } from "@/lib/changes";
 import {
   addNotifications,
@@ -430,10 +430,9 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       },
       devSignIn: async () => {
         if (!__DEV__) return;
+        // 실제 로그인과 같게 구독을 시작하지 않는다. 전에는 여기서 체험을 시작해서
+        // 개발 빌드로는 "로그인했지만 구독 전" 화면을 볼 수 없었다 — 출시 후 대부분의 사람이 보는 화면이다.
         dispatch({ type: "signIn", account: { id: `dev-${Date.now()}`, provider: "google", signedInAt: new Date().toISOString(), consent: newConsent() } });
-        if (canUseFirstMonthFree(state.subscription)) {
-          dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
-        }
       },
       // 토큰부터 지우고 상태를 바꾼다. 순서가 뒤집히면 화면은 로그아웃인데 키체인에 토큰이 남는다.
       signOut: async () => {

@@ -122,7 +122,7 @@ export default function Profile() {
                 icon="user"
                 iconTone="primary"
                 label={`${PROVIDER_LABEL[state.account.provider]} 계정으로 로그인했어요`}
-                sub={state.account.email ?? "계정에는 구독 상태만 저장돼요"}
+                sub={state.account.email ?? "계정에는 구독 상태와 약관 동의만 저장돼요"}
               />
               <ListRow icon="logout" label="로그아웃" sub="조건과 저장한 공고는 이 기기에 그대로 남아요" onPress={() => setConfirmOut(true)} />
               {/* App Store 5.1.1(v): 계정을 만들 수 있으면 앱 안에서 삭제도 시작할 수 있어야 한다.
@@ -151,7 +151,8 @@ export default function Profile() {
             label={subLabel}
             sub={subSub}
           />
-          <ListRow icon="more" label="구독 관리" sub="구매 복원 · 갱신 해지" onPress={() => setManage(true)} />
+          {/* 구독 전인 사람에게 "갱신 해지"는 해당이 없다 */}
+          <ListRow icon="settings" label="구독 관리" sub={sub.status === "trial" || sub.status === "active" ? "결제 예정 · 해지 · 결제 내역" : "구매 복원 · 결제 내역"} onPress={() => setManage(true)} />
         </Card>
       </View>
 

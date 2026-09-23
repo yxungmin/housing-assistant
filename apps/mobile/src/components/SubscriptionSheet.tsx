@@ -56,7 +56,8 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
       <View style={{ alignItems: "center", gap: 6 }}>
         <CoffeeMark />
         <T variant="heading" style={{ textAlign: "center" }}>
-          {expired ? (freeMonth ? "구독이 끝났어요" : "첫 달 무료는 다 쓰셨어요") : "커피 한 잔이면 한 달이에요"}
+          {/* 만료된 사람은 첫 달 무료를 이미 썼다 — 전에는 그래서 늘 "첫 달 무료는 다 쓰셨어요"가 떴는데, 몇 달 낸 사람에게는 엉뚱한 말이다 */}
+          {expired ? "구독이 끝났어요" : freeMonth ? "커피 한 잔이면 한 달이에요" : "첫 달 무료는 다 쓰셨어요"}
         </T>
         <Sub variant="caption" tone="3" style={{ textAlign: "center" }}>
           필요한 현금과 월 주거비, 대출까지 계산해 드려요
