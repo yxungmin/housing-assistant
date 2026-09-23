@@ -167,6 +167,11 @@ export interface TrackResult {
    * 불일치라고 단정하지는 않지만 "조건에 맞는 공고"로 세지도 않는다.
    */
   region_guarded?: boolean;
+  /**
+   * 대상 계층 안전망이 붙었고, 입력한 계층으로는 대상인지 알 수 없는 트랙 (statusGuard 참고).
+   * 거주 안전망과 같이 후보에서 빼지만, 화면에는 "다른 지역"이 아니라 "대상 계층 확인"으로 알린다.
+   */
+  status_guarded?: boolean;
 }
 
 export interface AnnouncementMatch {
@@ -181,6 +186,11 @@ export interface AnnouncementMatch {
    * 맞다고도 아니라고도 말하지 않는 자리다.
    */
   region_uncertain: boolean;
+  /**
+   * 어긋난 조건은 없지만 대상 계층(수급자·국가유공자 등)인지 모른다 (statusGuard 참고).
+   * region_uncertain과 같은 자리에 서지만 사람에게 할 말이 다르다 — "사는 곳"이 아니라 "해당 계층"을 물어야 한다.
+   */
+  status_uncertain: boolean;
 }
 
 /**
@@ -286,6 +296,8 @@ export interface MatchOptions {
    * 추출된 거주지 룰이 하나도 없을 때 이 값으로 안전망을 친다 (regionGuard 참고).
    */
   announcement_region?: string;
+  /** 공고 제목. 공급 유형(영구임대 등)을 가리는 데 쓴다 — 유형 코드는 영구임대와 장기전세를 한데 묶는다 (statusGuard 참고). */
+  announcement_title?: string;
 }
 
 /**
@@ -438,6 +450,79 @@ export function siblingGuard(track: TrackResult, missing: RuleCategory[]): Track
   return { ...track, groups, summary: { ...track.summary, needs_check: track.summary.needs_check + missing.length } };
 }
 
+/**
+ * 영구임대 1순위에서 입주 대상이 될 수 있는 계층 (공고문 "입주자격(1순위)" 가~자목).
+ *
+ * 주거급여 수급자(welfare_recipient)는 넣지 않는다 — 1순위 가목은 **생계·의료급여** 수급자다.
+ * 일본군위안부 피해자, 65세 이상 차상위계층처럼 우리 입력 항목에 없는 계층도 있어서,
+ * "해당 없음"을 골랐다고 불일치로 자를 수는 없다.
+ */
+const PERMANENT_RENTAL_STATUSES = [
+  "basic_livelihood",
+  "national_merit",
+  "single_parent_support",
+  "nk_defector",
+  "disabled",
+  "elderly_care",
+  "care_leaver",
+] as const;
+
+/**
+ * 대상 계층 안전망 — 지금은 영구임대 1순위 하나.
+ *
+ * 영구임대는 수급자·국가유공자·한부모가족처럼 **대상이 법으로 정해진** 공급이다.
+ * 그런데 추출이 그 목록을 판정 규칙이 아니라 "그 밖의 조건" 글로 남기면, 엔진은 그걸 모른다.
+ * 실제로 나왔다(2026-09-23): 서울 영구임대 1순위가 월소득 300만 원인 서른 살 미혼에게
+ * "조건 6개 중 5개 일치"로 추천됐다. 남은 규칙이 나이·소득·자산·무주택뿐이라 다 맞았다.
+ *
+ * 규칙을 하나 얹고, 입력한 계층이 목록에 있으면 맞는 것으로, 아니면 "확인 필요"로 두고 후보에서 뺀다.
+ * 불일치로 자르지는 않는다 — 위 목록 밖의 계층(위안부 피해자, 65세 이상 차상위)도 1순위라서,
+ * "해당 없음"을 고른 사람이 실제로는 대상일 수 있다. 상세 화면은 조건을 그대로 보여 준다.
+ *
+ * "입주자격완화" 모집은 대상 계층을 풀어 일반 가구도 받는 공급이라 건드리지 않는다.
+ * 제목을 보는 이유: 공급 유형 코드(long_term_rental)가 영구임대와 장기전세를 한데 묶어서
+ * 코드만으로는 가를 수 없다.
+ */
+export function statusGuard(track: TrackResult, profile: UserProfile, title: string | undefined): TrackResult {
+  if (!title || !title.includes("영구임대")) return track;
+  if (/완화/.test(title) || /완화/.test(track.track.name)) return track;
+  const hasStatusRule = track.groups.some((g) => g.rules.some((r) => !r.skipped && r.rule.category === "status"));
+  if (hasStatusRule) return track;
+
+  const eligible: readonly string[] = PERMANENT_RENTAL_STATUSES;
+  const fits = profile.statuses?.some((s) => eligible.includes(s)) ?? false;
+  const guard: RuleResult = {
+    rule: {
+      group_id: "__status_guard__",
+      category: "status",
+      applies_to: {},
+      operator: "in",
+      value: [...PERMANENT_RENTAL_STATUSES],
+      source: { page: 0, text: "영구임대 1순위는 생계·의료급여 수급자, 국가유공자, 한부모가족, 북한이탈주민, 장애인 등 대상 계층만 신청할 수 있어요." },
+      confidence: 0,
+      verified: false,
+    },
+    status: fits ? "MATCH" : "NEEDS_CHECK",
+    reason: fits
+      ? "입력한 계층이 영구임대 1순위 대상이에요"
+      : profile.statuses === undefined
+        ? "영구임대 1순위는 수급자·국가유공자 등 대상 계층만 신청할 수 있어요. 해당 계층을 입력하면 판별할 수 있어요."
+        : "영구임대 1순위는 수급자·국가유공자 등 대상 계층만 신청할 수 있어요. 입력한 계층은 목록에 없어서, 공고문의 1순위 자격을 확인해 주세요.",
+    skipped: false,
+  };
+  return {
+    ...track,
+    groups: [
+      ...track.groups,
+      { group: { id: "__status_guard__", mode: "all_of" as const, label: "대상 계층" }, status: guard.status, rules: [guard] },
+    ],
+    summary: fits
+      ? { ...track.summary, matched: track.summary.matched + 1 }
+      : { ...track.summary, needs_check: track.summary.needs_check + 1 },
+    ...(fits ? {} : { status_guarded: true }),
+  };
+}
+
 export function matchAnnouncement(
   extraction: Pick<ExtractionOutput, "tracks">,
   profile: UserProfile,
@@ -449,7 +534,8 @@ export function matchAnnouncement(
     .map((t) => matchTrack(t, profile))
     .map((t) => regionGuard(t, profile, options.announcement_region))
     .map(incomeGuard)
-    .map((t, i) => siblingGuard(t, missing[i] ?? []));
+    .map((t, i) => siblingGuard(t, missing[i] ?? []))
+    .map((t) => statusGuard(t, profile, options.announcement_title));
   const byFit = (a: TrackResult, b: TrackResult) => b.summary.matched - a.summary.matched || a.summary.needs_check - b.summary.needs_check;
   const clean = tracks.filter((t) => t.summary.mismatched === 0).sort(byFit);
   // 거주 요건을 확인 못 한 트랙은 후보에서 뺀다.
@@ -465,13 +551,16 @@ export function matchAnnouncement(
    * "어긋난 게 없다"와 "맞는다"는 다른 말이다 — 지역 안전망에서 이미 같은 판단을 했다.
    * 여기서 빼지 않으면 서른 살에게 "만 65세 이상" 공고가 "조건에 맞는 공고"로 나간다.
    */
-  const candidates = clean.filter((t) => !t.region_guarded && !t.groups.some((g) => g.contradicted));
+  const candidates = clean.filter((t) => !t.region_guarded && !t.status_guarded && !t.groups.some((g) => g.contradicted));
   const best = candidates[0] ?? clean[0] ?? null;
+  // 후보가 없을 때 왜 없는지를 나눠 말한다. 사는 곳을 물을지, 해당 계층을 물을지가 다르다.
+  const undecided = candidates.length === 0;
   return {
     tracks,
     best_track: best,
     is_match: candidates.length > 0,
-    region_uncertain: candidates.length === 0 && clean.length > 0,
+    region_uncertain: undecided && clean.some((t) => t.region_guarded),
+    status_uncertain: undecided && !clean.some((t) => t.region_guarded) && clean.some((t) => t.status_guarded),
   };
 }
 

@@ -356,3 +356,65 @@ describe("확실히 아닌 갈래가 있는 any_of는 추천하지 않는다", (
     expect(matchAnnouncement(x, profile).best_track).not.toBeNull();
   });
 });
+
+/**
+ * 영구임대 1순위는 대상 계층(수급자·국가유공자 등)만 신청할 수 있다.
+ * 추출이 그 목록을 "그 밖의 조건" 글로만 남기면 엔진이 몰라서, 서른 살 직장인에게
+ * 서울 영구임대가 "조건 6개 중 5개 일치"로 추천됐다(2026-09-23).
+ */
+describe("영구임대 대상 계층 안전망", () => {
+  const rule = (over: Partial<EligibilityRule>): EligibilityRule => ({
+    group_id: "g1", category: "age", applies_to: {}, operator: "gte", value: 19, unit: "years",
+    source: { page: 5, text: "만 19세 이상" }, confidence: 1, verified: false, ...over,
+  });
+  const extraction = (rules: EligibilityRule[], name = "일반공급 1순위") =>
+    ({ tracks: [{ name, unit_types: [], rule_groups: [{ id: "g1", mode: "all_of", label: "자격" }], rules, pricing: [] }] }) as unknown as ExtractionOutput;
+  const base = { region_code: "11", birth_date: "1996-05-12", is_homeless: true } as UserProfile;
+  const title = "2024년 서울특별시 영구임대주택 예비입주자 모집";
+
+  it("계층을 모르면 추천하지 않고, 그 이유를 '대상 계층'으로 알린다", () => {
+    const m = matchAnnouncement(extraction([rule({})]), base, { announcement_region: "11", announcement_title: title });
+    expect(m.is_match).toBe(false);
+    expect(m.status_uncertain).toBe(true);
+    expect(m.region_uncertain).toBe(false);
+    const guard = m.tracks[0]!.groups.find((g) => g.group.id === "__status_guard__");
+    expect(guard?.status).toBe("NEEDS_CHECK");
+  });
+
+  it("대상 계층을 입력했으면 맞는 공고로 센다", () => {
+    const m = matchAnnouncement(extraction([rule({})]), { ...base, statuses: ["basic_livelihood"] }, { announcement_region: "11", announcement_title: title });
+    expect(m.is_match).toBe(true);
+    expect(m.tracks[0]!.groups.find((g) => g.group.id === "__status_guard__")?.status).toBe("MATCH");
+  });
+
+  it("주거급여 수급자만으로는 1순위가 아니다 — 1순위는 생계·의료급여 수급자다", () => {
+    const m = matchAnnouncement(extraction([rule({})]), { ...base, statuses: ["welfare_recipient"] }, { announcement_region: "11", announcement_title: title });
+    expect(m.is_match).toBe(false);
+  });
+
+  it("'해당 없음'이어도 불일치로 자르지 않는다 — 목록 밖 계층(65세 이상 차상위 등)도 1순위다", () => {
+    const m = matchAnnouncement(extraction([rule({})]), { ...base, statuses: [] }, { announcement_region: "11", announcement_title: title });
+    expect(m.tracks[0]!.summary.mismatched).toBe(0);
+    expect(m.status_uncertain).toBe(true);
+  });
+
+  it("입주자격완화 모집은 일반 가구도 받으니 건드리지 않는다", () => {
+    const m = matchAnnouncement(extraction([rule({})], "영구임대주택 입주자격완화 예비입주자(일반)"), base, {
+      announcement_region: "11",
+      announcement_title: "군산시 영구임대주택 입주자격완화 예비입주자 모집",
+    });
+    expect(m.tracks[0]!.groups.some((g) => g.group.id === "__status_guard__")).toBe(false);
+  });
+
+  it("추출이 계층 규칙을 읽었으면 그 규칙을 따른다", () => {
+    const withStatus = extraction([rule({}), rule({ category: "status", operator: "in", value: ["disabled"], unit: undefined })]);
+    const m = matchAnnouncement(withStatus, base, { announcement_region: "11", announcement_title: title });
+    expect(m.tracks[0]!.groups.some((g) => g.group.id === "__status_guard__")).toBe(false);
+  });
+
+  it("영구임대가 아니면 붙지 않는다 — 장기전세도 같은 유형 코드지만 대상 제한이 없다", () => {
+    const m = matchAnnouncement(extraction([rule({})]), base, { announcement_region: "11", announcement_title: "제51차 장기전세주택 입주자 모집공고" });
+    expect(m.is_match).toBe(true);
+    expect(m.status_uncertain).toBe(false);
+  });
+});

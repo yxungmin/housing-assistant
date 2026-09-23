@@ -33,16 +33,22 @@ interface Meta {
   commute?: Record<string, { minutes: number; transfers: number }>;
 }
 
-/** 초기 벤치마크 PDF(001~004)는 API 메타 없이 받았으므로 손으로 채운 값. 접수일은 시안 기준일(2026-09-20) 근처. */
+/**
+ * 초기 벤치마크 PDF(001~004)는 API 메타 없이 받았으므로 손으로 채운 값.
+ *
+ * 전에는 접수일도 여기서 시안 기준일(2026-09-20) 근처로 옮겨 적었다. 그 결과 2024년 공고가
+ * "공고일 2024.12 · 당첨자 발표 2025.04 · 접수 D-7"로 서버까지 올라가 실제 공고처럼 보였다(2026-09-23 발견).
+ * 날짜는 이제 공고문에서 읽은 값을 그대로 쓰고, 지난 공고는 아래에서 번들에 넣지 않는다.
+ */
 const MANUAL_META: Record<string, Meta> = {
-  "001": { lh_id: "MOCK-001", region_code: "41", region_name: "경기 과천시", apply_start: "2026-09-30", apply_end: "2026-10-02", lat: 37.4316, lng: 126.9982,
+  "001": { lh_id: "MOCK-001", region_code: "41", region_name: "경기 과천시", lat: 37.4316, lng: 126.9982,
     transit: { nearest_station: "인덕원역 4호선", station_walk_min: 22, station_distance_m: 1480, nearest_bus_stop: "과천지식정보타운", bus_walk_min: 3, bus_distance_m: 190 },
     nearby: [{ kind: "school", name: "과천문원초등학교", distance_m: 690 }, { kind: "mart", name: "이마트 과천점", distance_m: 1320 }, { kind: "convenience", name: "세븐일레븐 과천점", distance_m: 210 }] },
-  "002": { lh_id: "MOCK-002", region_code: "11", region_name: "서울 관악구", apply_start: "2026-09-25", apply_end: "2026-09-29", lat: 37.4784, lng: 126.9517,
+  "002": { lh_id: "MOCK-002", region_code: "11", region_name: "서울 관악구", lat: 37.4784, lng: 126.9517,
     transit: { nearest_station: "봉천역 2호선", station_walk_min: 9, station_distance_m: 620, nearest_bus_stop: "관악구청", bus_walk_min: 4, bus_distance_m: 250 },
     nearby: [{ kind: "school", name: "봉천중학교", distance_m: 540 }, { kind: "convenience", name: "CU 봉천역점", distance_m: 160 }, { kind: "hospital", name: "에이치플러스 양지병원", distance_m: 1100 }] },
-  "003": { lh_id: "MOCK-003", region_code: "11", region_name: "서울", apply_start: "2026-09-23", apply_end: "2026-09-30", lat: 37.5665, lng: 126.978, transit: {} },
-  "004": { lh_id: "MOCK-004", region_code: "11", region_name: "서울 마포구", apply_start: "2026-09-22", apply_end: "2026-10-06", lat: 37.5586, lng: 126.9095,
+  "003": { lh_id: "MOCK-003", region_code: "11", region_name: "서울", lat: 37.5665, lng: 126.978, transit: {} },
+  "004": { lh_id: "MOCK-004", region_code: "11", region_name: "서울 마포구", lat: 37.5586, lng: 126.9095,
     transit: { nearest_station: "망원역 6호선", station_walk_min: 7, station_distance_m: 470, nearest_bus_stop: "망원역2번출구", bus_walk_min: 2, bus_distance_m: 130 },
     nearby: [{ kind: "daycare", name: "망원어린이집", distance_m: 240 }, { kind: "school", name: "망원초등학교", distance_m: 320 }, { kind: "mart", name: "망원시장", distance_m: 410 }, { kind: "convenience", name: "GS25 망원점", distance_m: 90 }, { kind: "hospital", name: "마포구립서부노인전문병원", distance_m: 1480 }, { kind: "park", name: "망원한강공원", distance_m: 760 }] },
   "005": { lh_id: "2015122300020801", region_code: "45", region_name: "전북 군산시", apply_start: "2026-09-29", apply_end: "2026-09-29", lat: 35.9676, lng: 126.7106, transit: {} },
@@ -184,6 +190,20 @@ if (fromSources === 0) {
   process.exit(1);
 }
 
+/**
+ * 서버 뷰(app_announcements)와 같은 기준으로 지난 공고를 뺀다 — 마감 7일이 지나면 목록에서 내린다.
+ * 번들은 서버가 안 붙었을 때 보이는 데이터라, 서버와 다른 공고가 보이면 안 된다.
+ */
+const cutoff = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
+const expired = items.filter((i) => i.apply_end && i.apply_end < cutoff);
+if (expired.length) console.log(`마감 지난 공고 ${expired.length}건은 넣지 않습니다: ${expired.map((i) => `${i.id}(${i.apply_end})`).join(", ")}`);
+const live = items.filter((i) => !expired.includes(i));
+// 위의 "하나도 못 읽었으면 멈춘다"와 같은 이유 — 전부 지난 공고라 비었어도 덮어쓰지 않는다
+if (live.filter((i) => i.id !== "pending-001").length === 0) {
+  console.error(`남는 공고가 없습니다 (전부 마감 7일 경과). ${TARGET}를 덮어쓰지 않고 멈춥니다.`);
+  process.exit(1);
+}
+
 mkdirSync(join(TARGET, ".."), { recursive: true });
-writeFileSync(TARGET, JSON.stringify(items, null, 1));
-console.log(`wrote ${TARGET} (${items.length}건: ${items.map((i) => i.id).join(", ")})`);
+writeFileSync(TARGET, JSON.stringify(live, null, 1));
+console.log(`wrote ${TARGET} (${live.length}건: ${live.map((i) => i.id).join(", ")})`);

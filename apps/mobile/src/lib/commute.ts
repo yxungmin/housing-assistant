@@ -83,6 +83,19 @@ export function commuteShort(
 }
 
 /**
+ * 흩어진 공고의 목록 한 줄. 거리가 공고가 아니라 **가장 가까운 집**까지라는 걸 밝혀 적는다.
+ * 부부는 두 사람 모두에게 가까운 집 하나를 골라 그 집 기준으로 둘 다 적는다 (lib/units.ts distancesTo).
+ * 대중교통 소요는 적지 않는다 — 공고 단위로 미리 잰 값이 관할 대표점 기준이라 이 유형에서는 틀린 숫자다.
+ */
+export function nearestHouseShort(distanceKm: number | null, distancePartnerKm: number | null): string | null {
+  const km = (v: number) => `${v < 10 ? v.toFixed(1) : v.toFixed(0)}km`;
+  if (distanceKm !== null && distancePartnerKm !== null) return `가까운 집까지 직선 직장 ${km(distanceKm)} · 배우자 ${km(distancePartnerKm)}`;
+  if (distanceKm !== null) return `직장에서 가장 가까운 집 직선 ${km(distanceKm)}`;
+  if (distancePartnerKm !== null) return `배우자 직장에서 가장 가까운 집 직선 ${km(distancePartnerKm)}`;
+  return null;
+}
+
+/**
  * Kakao의 지하철역 이름은 "망원역 6호선"처럼 호선이 붙어 온다. 붙어 있으면 갈라 놓는다.
  * 여러 호선이 지나면 "왕십리역 2호선" 하나만 오므로, 없는 환승 정보를 만들어 내지는 않는다.
  */

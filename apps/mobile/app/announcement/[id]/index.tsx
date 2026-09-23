@@ -9,6 +9,7 @@ import { NoticeImages } from "@/components/NoticeImages";
 import { SignInButtons } from "@/components/SignIn";
 import { canSeeAnnouncement } from "@/lib/access";
 import { SourceCard } from "@/components/SourceCard";
+import { MissingAnnouncement } from "@/components/MissingAnnouncement";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
@@ -54,7 +55,7 @@ export default function AnnouncementDetail() {
   const distanceKm = to(state.profile?.workplace);
   const distancePartnerKm = to(state.profile?.workplace_partner);
 
-  const match = useMemo(() => (a && isReadable(a) && state.profile ? matchAnnouncement(a.extraction, state.profile, { announcement_region: a.region_code }) : null), [a, state.profile]);
+  const match = useMemo(() => (a && isReadable(a) && state.profile ? matchAnnouncement(a.extraction, state.profile, { announcement_region: a.region_code, announcement_title: a.title }) : null), [a, state.profile]);
   const track = match?.best_track ?? (match ? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0] ?? null : null);
   // 흩어진 공고는 임대조건이 공고문 본문이 아니라 주택 목록에 집마다 붙어 있다.
   // 목록을 읽었으면 계산할 수 있다 — 고르는 단위가 주택형이 아니라 집일 뿐이다.
@@ -107,13 +108,7 @@ export default function AnnouncementDetail() {
     openAnnouncement(id);
   }, [id, openAnnouncement]);
 
-  if (!a) {
-    return (
-      <Screen>
-        <T variant="heading" style={{ paddingTop: 20 }}>공고를 찾을 수 없어요</T>
-      </Screen>
-    );
-  }
+  if (!a) return <MissingAnnouncement />;
 
   /*
    * 로그인은 **여기서** 받는다. 목록은 그대로 보여 주고, 공고를 열려는 순간에 묻는다.

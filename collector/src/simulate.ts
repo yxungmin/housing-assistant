@@ -176,7 +176,7 @@ for (const { name, profile } of PROFILES) {
   const lines: string[] = [];
 
   for (const row of readable) {
-    const result = matchAnnouncement(row.extraction as never, profile, { announcement_region: row.region_code });
+    const result = matchAnnouncement(row.extraction as never, profile, { announcement_region: row.region_code, announcement_title: row.title });
     const best = result.best_track ?? [...result.tracks].sort((a, b) => b.summary.matched - a.summary.matched)[0];
     const counts = best ? ruleCounts(best) : { matched: 0, needsCheck: 0, total: 0 };
     const km = listKm(row, profile);

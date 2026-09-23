@@ -7,7 +7,7 @@ import { commuteKm, getAnnouncement, isReadable, listDistanceKm, matchAll, match
 import { daysUntil, dday, HOUSING_LABEL } from "@/lib/format";
 import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
 import { REGIONS } from "@/lib/onboarding";
-import { commuteFor, commuteShort, splitStation } from "@/lib/commute";
+import { commuteFor, commuteShort, nearestHouseShort, splitStation } from "@/lib/commute";
 import { isUnseen, unseenCount } from "@/lib/unseen";
 import { fundsFor, fundsNote } from "@/lib/funds";
 import { syncAnnouncementsOnce } from "@/data/sync";
@@ -31,6 +31,7 @@ export default function Home() {
   const [rentalOnly, setRentalOnly] = useState(false);
   const [showOthers, setShowOthers] = useState(false);
   const [showFar, setShowFar] = useState(false);
+  const [showTarget, setShowTarget] = useState(false);
   const [nearWork, setNearWork] = useState(false);
   const [closingSoon, setClosingSoon] = useState(false);
   const feed = useAnnouncements();
@@ -104,7 +105,10 @@ export default function Home() {
   // 거주 요건을 못 읽었고 공고 지역도 다른 것들. "맞지 않는다"와는 다른 말이라 따로 세운다 —
   // 우리는 맞는지 아닌지를 모르는 것이고, 모르는 것을 아는 척하면 그 자리에서 신뢰가 깎인다.
   const farAway = filtered.filter((m) => isReadable(m.announcement) && m.match?.region_uncertain);
-  const others = filtered.filter((m) => isReadable(m.announcement) && !m.match?.is_match && !m.match?.region_uncertain);
+  // 대상 계층(수급자·국가유공자 등)만 신청할 수 있는 공고인데 해당 계층을 모르는 것들.
+  // "맞지 않는다"로 세면 실제 대상인 사람이 못 보고, "맞는다"로 세면 대상이 아닌 사람에게 추천이 된다.
+  const needsTarget = filtered.filter((m) => isReadable(m.announcement) && m.match?.status_uncertain);
+  const others = filtered.filter((m) => isReadable(m.announcement) && !m.match?.is_match && !m.match?.region_uncertain && !m.match?.status_uncertain);
   // 접수가 끝난 공고는 임박이 아니다. d가 음수인 것까지 넣으면 "마감"이 접수 임박 맨 위에 온다.
   const soon = matched.filter((m) => {
     const d = daysUntil(m.announcement.apply_end);
@@ -193,7 +197,7 @@ export default function Home() {
                 style={({ pressed }) => ({ paddingVertical: 10, paddingHorizontal: 8, opacity: pressed ? 0.6 : 1 })}
               >
                 <T variant="small" color={colors.text3}>
-                  그동안 다른 공고 {others.length + farAway.length + pending.length}개 보기
+                  그동안 다른 공고 {others.length + farAway.length + needsTarget.length + pending.length}개 보기
                 </T>
               </Pressable>
             ) : null}
@@ -216,6 +220,26 @@ export default function Home() {
                   다른 조건은 어긋나지 않지만, 공고문에서 거주 요건을 읽지 못했어요. 사는 지역이 달라 신청할 수 있는지는 공고문을 확인해 주세요.
                 </Sub>
                 <Section items={farAway} onOpen={open} />
+              </>
+            ) : null}
+          </View>
+        ) : null}
+
+        {needsTarget.length > 0 ? (
+          <View style={{ gap: 12 }}>
+            <Pressable onPress={toggle(setShowTarget)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
+              <T variant="bodyMedium" color={colors.text2}>대상 계층을 확인할 공고 {needsTarget.length}개</T>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
+                <T variant="small" color={colors.text3}>{showTarget ? "숨기기" : "보기"}</T>
+                <Icon name="right" size={16} color={colors.text4} />
+              </View>
+            </Pressable>
+            {showTarget ? (
+              <>
+                <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
+                  수급자·국가유공자·한부모가족처럼 정해진 계층만 신청할 수 있는 공고예요. 내 조건에 해당 계층을 넣으면 맞는지 바로 알려드려요.
+                </Sub>
+                <Section items={needsTarget} onOpen={open} />
               </>
             ) : null}
           </View>
@@ -276,14 +300,17 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
           ? { tone: "warn" as const, icon: "alert" as const, text: `조건 ${m.needsCheck}개 확인 필요` }
           : m.match?.region_uncertain
             ? { tone: "warn" as const, icon: "alert" as const, text: "다른 지역 · 거주 요건 확인 필요" }
+          : m.match?.status_uncertain
+            ? { tone: "warn" as const, icon: "alert" as const, text: "대상 계층 확인 필요" }
             : { tone: "danger" as const, icon: "x" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` };
   // 직장을 넣었으면 통근이 먼저, 아니면 가장 가까운 역, 그것도 없으면 지역명
   // 조건이 맞아도 보증금을 못 대면 못 간다. 그 사실만 무료로 알리고 금액은 비용 화면(유료)에서 본다.
   const funds = useMemo(() => fundsFor(a, state.profile, LOANS), [a, state.profile]);
   const note = m.match?.is_match ? fundsNote(funds) : null;
 
-  const place =
-    commuteShort(
+  const place = m.nearestHouse
+    ? nearestHouseShort(m.distanceKm, m.distancePartnerKm) ?? a.region_name
+    : commuteShort(
       m.distanceKm,
       m.distancePartnerKm,
       commuteFor(a.commute, state.profile?.workplace?.label),

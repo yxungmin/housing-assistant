@@ -32,6 +32,56 @@ export function isScattered(a: { units?: SupplyUnit[]; address?: string; housing
   return !/(시|군|구)\s/.test(`${address} `) || address.split(/\s+/).length <= 1;
 }
 
+type Point = { lat: number; lng: number };
+
+/**
+ * 직장·배우자 직장·사는 곳에서 공고까지의 직선거리 (km).
+ *
+ * 흩어진 공고의 좌표는 한 집이 아니라 관할 구역의 대표점(대개 시청)이다. 그걸로 재면
+ * 서울 전역 모집 공고가 을지로 직장인에게 "직장까지 0.3km"가 된다 — 실제로 홈 목록에 그렇게 떴다(2026-09-23).
+ * 공고 상세는 이미 이 유형에서 위치 섹션을 끄는데, 목록과 "출퇴근 가까운 곳" 필터는 그 좌표를 그대로 쓰고 있었다.
+ *
+ * 그래서 흩어진 공고는 **집마다** 재서 가장 가까운 집을 쓴다. 부부는 두 사람 중 먼 쪽이 가장 짧은 집 하나를 골라
+ * 그 집 기준으로 두 거리를 같이 적는다 — 사람마다 다른 집을 고르면 둘 다 가까운 집이 있는 것처럼 보인다.
+ * 집 좌표가 하나도 없으면 거리를 말하지 않는다. 없는 값을 대표점으로 채우지 않는다.
+ */
+export function distancesTo(
+  a: { units?: SupplyUnit[]; address?: string; lat?: number; lng?: number },
+  work: Point | undefined | null,
+  partner: Point | undefined | null,
+  home: Point | undefined | null,
+): { work: number | null; partner: number | null; home: number | null; nearestHouse: boolean } {
+  const scattered = isScattered(a);
+  const points: Point[] = scattered
+    ? (a.units ?? []).flatMap((u) => (u.lat !== undefined && u.lng !== undefined ? [{ lat: u.lat, lng: u.lng }] : []))
+    : a.lat !== undefined && a.lng !== undefined
+      ? [{ lat: a.lat, lng: a.lng }]
+      : [];
+  if (points.length === 0) return { work: null, partner: null, home: null, nearestHouse: scattered };
+
+  const d = (from: Point | undefined | null, to: Point) => (from ? haversineKm(from, to) : null);
+  const minTo = (from: Point | undefined | null) => (from ? Math.min(...points.map((p) => haversineKm(from, p))) : null);
+
+  // 부부 기준으로 한 집을 고른다. 한 사람만 있으면 그 사람에게 가장 가까운 집
+  let pick: Point | undefined;
+  if (work || partner) {
+    let best = Infinity;
+    for (const p of points) {
+      const cost = Math.max(d(work, p) ?? 0, d(partner, p) ?? 0);
+      if (cost < best) {
+        best = cost;
+        pick = p;
+      }
+    }
+  }
+  return {
+    work: pick ? d(work, pick) : null,
+    partner: pick ? d(partner, pick) : null,
+    home: minTo(home),
+    nearestHouse: scattered,
+  };
+}
+
 /** 직장에서 가까운 순. 직장이 없으면 보증금이 싼 순 — 고를 기준이 없으면 돈이 기준이다. */
 export function unitsWithDistance(units: SupplyUnit[], profile: UserProfile | null | undefined): UnitWithDistance[] {
   const work = profile?.workplace;

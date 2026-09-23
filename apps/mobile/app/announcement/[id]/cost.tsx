@@ -7,6 +7,7 @@ import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SignInSheet } from "@/components/SignIn";
 import { SourceCard } from "@/components/SourceCard";
+import { MissingAnnouncement } from "@/components/MissingAnnouncement";
 import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
@@ -100,7 +101,7 @@ export default function Cost() {
       return { rentals: rows, bestTrackName: "", otherCount: 0 };
     }
 
-    const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code });
+    const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code, announcement_title: a.title });
     const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
     const ordered = [...(best ? [best] : []), ...match.tracks.filter((t) => t !== best)];
     const rows = ordered.flatMap((t) => t.track.pricing.filter((p) => p.kind === "rental").map((p) => ({ label: `${p.unit_type}${p.tier ? ` · ${p.tier}` : ""}`, pricing: p, trackName: t.track.name })));
@@ -212,9 +213,10 @@ export default function Cost() {
     setDeposit(null);
   }, [sel]);
 
-  if (!a || !profile || !chosen || !cost || !scenarioPricing) {
+  if (!a) return <MissingAnnouncement />;
+  if (!profile || !chosen || !cost || !scenarioPricing) {
     return (
-      <Screen>
+      <Screen header={<Header onBack={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)"))} />}>
         <T variant="heading" style={{ paddingTop: 20 }}>{!profile ? "먼저 내 조건을 입력해 주세요" : "이 공고는 계산할 임대조건이 없어요"}</T>
       </Screen>
     );
@@ -338,9 +340,11 @@ export default function Cost() {
                   </View>
                 ))}
               </View>
+              {/* "대출 비교는 준비 중"이라고 적었었다. 대출은 권하지 않기로 정했으니(engine/shortfall.ts) 올 기능이 아니고,
+                  "준비 중" 같은 자리 표시 문구는 앱 심사(2.1 완성도)에서 문제가 된다. 권하지 않는 이유를 그대로 적는다. */}
               <Sub tone="3" variant="caption">
                 월 주거비가 소득의 30%를 넘으면 부담이 크다고 봐요. 이자만 내면 월 부담은 줄지만 원금이 그대로 남아요.
-                대출 비교는 준비 중이에요 — 지금은 계산만 보여드려요.
+                금리는 사람마다 달라서 특정 상품을 권하지 않아요. 실제 금리는 은행에서 확인해 주세요.
               </Sub>
             </Card>
           ) : null}

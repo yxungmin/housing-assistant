@@ -1,8 +1,9 @@
 import { useSyncExternalStore } from "react";
 import type { ExtractionOutput, HousingType, SupplyUnit, UserProfile } from "@housing/schema";
-import { haversineKm, matchAnnouncement, ruleCounts, type AnnouncementMatch, type TrackResult } from "@housing/engine";
+import { matchAnnouncement, ruleCounts, type AnnouncementMatch, type TrackResult } from "@housing/engine";
 import { parsePlaceLabel, placeFor } from "@housing/schema";
 import raw from "../../data/announcements.json";
+import { distancesTo } from "@/lib/units";
 
 export { ruleCounts };
 
@@ -168,26 +169,29 @@ export interface Matched {
    * "가까운 것부터" 보여 주려면 기준이 하나는 있어야 한다.
    */
   residenceKm: number | null;
+  /** 흩어진 공고라 거리가 "가장 가까운 집" 기준이다. 화면은 그렇게 밝혀 적는다 */
+  nearestHouse: boolean;
 }
 
 export function matchAll(profile: UserProfile | null, list: Announcement[] = current): Matched[] {
   return list.map((a) => {
-    const to = (w: { lat: number; lng: number } | undefined) =>
-      w && a.lat !== undefined && a.lng !== undefined ? haversineKm(w, { lat: a.lat, lng: a.lng }) : null;
-    const distanceKm = to(profile?.workplace);
-    const distancePartnerKm = to(profile?.workplace_partner);
     const at = parsePlaceLabel(profile?.region_sigungu);
     const home = at ? placeFor(at.regionCode, at.sigungu) : profile?.region_code ? placeFor(profile.region_code) : null;
-    const residenceKm = to(home ?? undefined);
+    // 흩어진 공고는 공고 좌표(관할 대표점)가 아니라 가장 가까운 집으로 잰다 (lib/units.ts distancesTo)
+    const dist = distancesTo(a, profile?.workplace, profile?.workplace_partner, home);
+    const distanceKm = dist.work;
+    const distancePartnerKm = dist.partner;
+    const residenceKm = dist.home;
+    const nearestHouse = dist.nearestHouse;
     if (!isReadable(a) || !profile) {
-      return { announcement: a, match: null, matched: 0, needsCheck: 0, total: 0, distanceKm, distancePartnerKm, residenceKm };
+      return { announcement: a, match: null, matched: 0, needsCheck: 0, total: 0, distanceKm, distancePartnerKm, residenceKm, nearestHouse };
     }
-    const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code });
+    const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code, announcement_title: a.title });
     const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
     // 화면에는 규칙 단위로 센다 ("조건 8개 중 7개 일치"). 일치 판정 자체는 엔진의 그룹 단위 결과를 따른다.
     const counts = best ? ruleCounts(best) : { matched: 0, needsCheck: 0, total: 0 };
     const { matched, needsCheck, total } = counts;
-    return { announcement: a, match, matched, needsCheck, total, distanceKm, distancePartnerKm, residenceKm };
+    return { announcement: a, match, matched, needsCheck, total, distanceKm, distancePartnerKm, residenceKm, nearestHouse };
   });
 }
 
