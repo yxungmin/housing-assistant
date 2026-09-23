@@ -51,7 +51,7 @@ export default function Profile() {
     sub.status === "trial" ? `${longDate(sub.expiresAt?.slice(0, 10))}까지 무료 · 이후 ${price}`
     : sub.status === "active" ? `${price}${sub.cancelled ? ` · ${longDate(sub.expiresAt?.slice(0, 10))}에 종료` : ` · ${daysLeft(sub)}일 뒤 갱신`}`
     : sub.status === "expired" ? "다시 구독하면 모든 공고를 계산할 수 있어요"
-    : "조건 확인은 무료 · 자금 계산은 구독이 필요해요";
+    : "구독하면 필요한 현금과 월 주거비를 계산해 드려요";
 
   const toggleNotifications = async () => {
     if (!notificationsSupported) {

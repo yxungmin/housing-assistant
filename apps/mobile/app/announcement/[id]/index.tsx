@@ -6,6 +6,8 @@ import { haversineKm, matchAnnouncement, type RuleResult, pastResultText, toughe
 import { Icon, type IconName } from "@/components/icon";
 import { ReportSheet } from "@/components/ReportSheet";
 import { NoticeImages } from "@/components/NoticeImages";
+import { SignInButtons } from "@/components/SignIn";
+import { canSeeAnnouncement } from "@/lib/access";
 import { SourceCard } from "@/components/SourceCard";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
@@ -109,6 +111,38 @@ export default function AnnouncementDetail() {
     return (
       <Screen>
         <T variant="heading" style={{ paddingTop: 20 }}>공고를 찾을 수 없어요</T>
+      </Screen>
+    );
+  }
+
+  /*
+   * 로그인은 **여기서** 받는다. 목록은 그대로 보여 주고, 공고를 열려는 순간에 묻는다.
+   *
+   * 화면을 바꾸지 않고 이 자리에서 처리하는 이유는 히스토리 때문이다.
+   * 로그인 뒤 `router.push`로 되돌려 보내면 뒤로 가기에 그 공고가 두 번 쌓이거나,
+   * 잘못하면 로그인 화면으로 돌아간다. 같은 화면이 내용으로 바뀌면 뒤로 가기는 그냥 목록이다.
+   * 딥링크로 바로 들어온 경우도 이 한 갈래가 같이 처리한다.
+   *
+   * 제목과 마감은 가리지 않는다. 무엇을 보려고 로그인하는지 모르면 로그인할 이유도 없다.
+   */
+  if (!canSeeAnnouncement(state)) {
+    return (
+      <Screen header={<Header onBack={() => router.back()} />}>
+        <View style={{ gap: 10, paddingTop: 12 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <Tag tone="gray">{HOUSING_LABEL[a.housing_type]}</Tag>
+            {a.apply_end ? <Tag tone="gray">{dday(a.apply_end)}</Tag> : null}
+          </View>
+          <T variant="title" style={{ fontSize: 24, lineHeight: 32 }}>{a.title}</T>
+          <Sub variant="body">{a.address ?? a.region_name}</Sub>
+        </View>
+        <Card style={{ gap: 6 }}>
+          <T variant="bodyMedium">내 조건과 맞는지 보려면 로그인해 주세요</T>
+          <Sub tone="3" variant="caption">
+            입력하신 조건과 공고문을 한 줄씩 비교해서 보여드려요. 소득·자산 같은 입력값은 이 기기에만 저장돼요.
+          </Sub>
+        </Card>
+        <SignInButtons />
       </Screen>
     );
   }
@@ -387,6 +421,14 @@ export default function AnnouncementDetail() {
             {/* 표 안에서는 자릿수를 맞춘다. 문장 안(알림·고지)에서만 "2026년 9월 17일" 꼴을 쓴다 */}
             <KeyValue label="공고일" value={dateText(a.notice_date)} />
             <KeyValue label="접수" value={dateRange(a.apply_start, a.apply_end)} />
+            {/* 누르기 **전에도** 북마크가 무엇을 하는지 알 수 있어야 한다.
+                누른 뒤에만 알려 주면, 그 기능이 있는 줄 모르는 사람은 영영 안 누른다.
+                이미 담았으면 같은 말을 또 하지 않는다. */}
+            {!saved && a.apply_end ? (
+              <Sub tone="3" variant="caption">
+                오른쪽 위 북마크를 누르면 접수 마감 3일 전에 알려드려요.
+              </Sub>
+            ) : null}
             {a.extraction.schedule.winner_announce ? (
               <>
                 <KeyValue label="당첨자 발표" value={looseDate(a.extraction.schedule.winner_announce)} />

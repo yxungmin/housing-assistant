@@ -46,7 +46,7 @@ export function Gate({
         </T>
         <Sub variant="body">
           {signIn
-            ? "로그인하면 바로 볼 수 있어요. 공고를 보고 조건이 맞는지 확인하는 건 무료예요."
+            ? "로그인하면 바로 볼 수 있어요."
             : `조건에 맞는 새 공고가 ${count}개 올라왔어요.${soonestDday ? ` 가장 빠른 마감은 ${soonestDday}이에요.` : ""}`}
         </Sub>
       </View>
