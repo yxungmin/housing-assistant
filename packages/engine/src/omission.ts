@@ -33,6 +33,14 @@ export const MIN_TRACKS = 3;
  */
 const ALREADY_GUARDED: RuleCategory[] = ["income", "residence"];
 
+/**
+ * 트랙을 **가르는** 조건은 비교하지 않는다. 계층·나이·혼인·자녀는 트랙마다 다른 게 정상이다 —
+ * 대학생 계층에는 계층 자격이, 청년 계층에는 나이가, 신혼부부 계층에는 혼인이 붙는다.
+ * 행복주택처럼 계층 트랙이 여럿인 공고에서 이걸 비교하면, 신혼부부 트랙에 "계층 자격을 읽지 못했어요"가 붙었다
+ * (2026-09-23 감사). 형제 비교가 잡아야 하는 건 공통 뼈대 — 자산·자동차·무주택·청약통장이다.
+ */
+const TRACK_DEFINING: RuleCategory[] = ["status", "age", "marriage", "children", "commute"];
+
 export const CATEGORY_LABEL: Record<string, string> = {
   income: "소득 기준",
   asset: "자산 기준",
@@ -62,7 +70,7 @@ export function missingCategories(extraction: Pick<ExtractionOutput, "tracks">):
   const has = tracks.map((t) => new Set(t.rules.map((r) => r.category)));
   const all = new Set(has.flatMap((s) => [...s]));
   for (const cat of all) {
-    if (ALREADY_GUARDED.includes(cat)) continue;
+    if (ALREADY_GUARDED.includes(cat) || TRACK_DEFINING.includes(cat)) continue;
     const withIt = has.filter((s) => s.has(cat)).length;
     if (withIt / tracks.length < SIBLING_RATIO) continue;
     has.forEach((s, i) => {

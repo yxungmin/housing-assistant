@@ -418,3 +418,79 @@ describe("영구임대 대상 계층 안전망", () => {
     expect(m.status_uncertain).toBe(false);
   });
 });
+
+/**
+ * 추천 감사(npm run audit:match, 2026-09-23)에서 나온 오추천 원인들. 프로필 6,480개 × 공고 11건에서
+ * 추천의 41.8%가 공급 이름과 어긋났고, 아래를 고쳐 0%가 됐다. 각각을 작은 예로 고정한다.
+ */
+describe("추천 감사에서 나온 것들", () => {
+  const r = (over: Partial<EligibilityRule>): EligibilityRule => ({
+    group_id: "g1", category: "age", applies_to: {}, operator: "gte", value: 19, unit: "years",
+    source: { page: 1, text: "" }, confidence: 1, verified: false, ...over,
+  });
+  type G = { id: string; mode: "any_of" | "all_of"; label: string };
+  const track = (name: string, rules: EligibilityRule[], groups: G[] = [{ id: "g1", mode: "all_of", label: "자격" }]) =>
+    ({ name, unit_types: [], rule_groups: groups, rules, pricing: [] });
+  const ex = (...tracks: ReturnType<typeof track>[]) => ({ tracks }) as unknown as ExtractionOutput;
+  const single22 = { region_code: "11", birth_date: "2004-01-15", marriage: "single", household_size: 1, children_count: 0, children_ages: [], is_homeless: true, statuses: ["student"] } as UserProfile;
+
+  it("any_of의 갈래가 전부 다른 가구 유형 전용이면 그 사람이 지나갈 길이 없다", () => {
+    // 신혼·신생아 매입임대 2순위: "신혼부부면 혼인 7년 이내" 또는 "한부모면 6세 이하 자녀"
+    const x = ex(
+      track("2순위", [
+        r({ group_id: "g2", category: "children", operator: "lte", value: 6, unit: "child_age", applies_to: { marriage: ["single_parent"] } }),
+        r({ group_id: "g2", category: "status", operator: "in", value: ["creator"], unit: undefined, applies_to: { marriage: ["married"] } }),
+      ], [{ id: "g2", mode: "any_of", label: "2순위 자격" }]),
+    );
+    expect(matchAnnouncement(x, single22).is_match).toBe(false);
+  });
+
+  it("신혼 공급의 혼인 기간 규칙은 적용 대상이 붙어 있어도 미혼에게 불일치다", () => {
+    const rule = r({ group_id: "g2", category: "marriage", operator: "lte", value: 7, unit: "years", applies_to: { marriage: ["married", "pre_marriage"] } });
+    const kids0 = r({ group_id: "g2", category: "children", operator: "eq", value: 0, unit: "count" });
+    const groups: G[] = [{ id: "g2", mode: "all_of", label: "3순위" }];
+    expect(matchAnnouncement(ex(track("3순위 (미성년 자녀가 없는 신혼부부·예비신혼부부)", [rule, kids0], groups)), single22).is_match).toBe(false);
+    // 신혼 공급이 아니면 "기혼이면 7년 이내"로 읽고 미혼에게는 건너뛴다
+    expect(matchAnnouncement(ex(track("청년 계층", [rule, kids0], groups)), single22).is_match).toBe(true);
+  });
+
+  it("계층을 입력하지 않았으면 계층이 꼭 필요한 공급은 추천하지 않고 '대상 계층 확인'으로 둔다", () => {
+    const x = ex(track("주거급여 수급자 계층", [r({ category: "status", operator: "in", value: ["welfare_recipient"], unit: undefined })]));
+    const unset = { ...single22, statuses: undefined };
+    const m = matchAnnouncement(x, unset);
+    expect(m.is_match).toBe(false);
+    expect(m.status_uncertain).toBe(true);
+    expect(matchAnnouncement(x, { ...single22, statuses: ["welfare_recipient"] }).is_match).toBe(true);
+  });
+
+  it("청년 계층처럼 '나이 또는 계층'이면 나이만 맞아도 추천한다 — 계층을 비워 둔 청년을 막지 않는다", () => {
+    const x = ex(track("청년 계층", [
+      r({ group_id: "g2", category: "age", operator: "between", value: [19, 39] }),
+      r({ group_id: "g2", category: "status", operator: "in", value: ["new_worker"], unit: undefined }),
+    ], [{ id: "g2", mode: "any_of", label: "청년" }]));
+    expect(matchAnnouncement(x, { ...single22, statuses: undefined }).is_match).toBe(true);
+  });
+
+  it("철거민 우선공급은 규칙이 무주택 하나뿐이어도 추천하지 않는다 — 다른 트랙이 맞으면 그걸로 추천", () => {
+    const evict = track("우선공급(철거민 등)", [r({ category: "housing", operator: "gte", value: 0, unit: "months" })]);
+    const general = track("일반공급 - 일반", [r({ category: "age", operator: "gte", value: 50 })]);
+    const m = matchAnnouncement(ex(evict, general), single22);
+    expect(m.is_match).toBe(false);
+    expect(m.status_uncertain).toBe(true);
+    const older = { ...single22, birth_date: "1970-01-15" };
+    const m2 = matchAnnouncement(ex(evict, general), older);
+    expect(m2.is_match).toBe(true);
+    expect(m2.best_track?.track.name).toBe("일반공급 - 일반");
+  });
+
+  it("소득표에 내 가구원 수 줄이 없으면 소득을 건너뛰지 않고 '확인 필요'로 둔다", () => {
+    const rows = [1, 2, 3, 4, 5, 6].map((n) => r({ category: "income", operator: "lte", value: 5_000_000, unit: "KRW_monthly", applies_to: { household_size: n } }));
+    const m = matchAnnouncement(ex(track("일반공급", rows)), { ...single22, household_size: 7, monthly_income: 9_000_000 });
+    expect(m.tracks[0]!.summary.needs_check).toBeGreaterThan(0);
+  });
+
+  it("특별자치도의 새 코드(전북 52)로 추출된 거주 요건도 옛 코드(45) 사람에게 맞는다", () => {
+    const x = ex(track("일반", [r({ category: "residence", operator: "in", value: ["52"], unit: undefined })]));
+    expect(matchAnnouncement(x, { ...single22, region_code: "45" }, { announcement_region: "45" }).is_match).toBe(true);
+  });
+});

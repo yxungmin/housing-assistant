@@ -108,6 +108,8 @@ const STEP_FOR_CATEGORY: Partial<Record<RuleCategory, string>> = {
 /** 그 규칙의 판별에 빠진 값이 있으면, 그것을 받는 단계 id */
 export function missingStepFor(rule: EligibilityRule, p: UserProfile | null): string | undefined {
   if (!p) return undefined;
+  // 철거민 같은 대상(engine targetGuard)은 우리 입력 항목에 없다. 계층을 넣어도 결과가 안 바뀌므로 입력 버튼을 주지 않는다
+  if (rule.group_id === "__target_guard__") return undefined;
 
   // applies_to가 판별이 안 되는 경우다. 가구원 수나 맞벌이 여부가 없어서 어느 줄을 볼지 모른다.
   if (rule.applies_to?.household_size !== undefined && p.household_size === undefined) return "household_size";

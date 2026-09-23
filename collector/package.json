@@ -22,6 +22,7 @@
     "output:size": "tsx src/output-size.ts",
     "app:enrich": "tsx src/enrich.ts",
     "simulate": "tsx src/simulate.ts",
+    "audit:match": "tsx src/audit-match.ts",
     "pdf:rehost": "tsx src/rehost-pdfs.ts",
     "bundle:push": "tsx src/push-bundle.ts",
     "benchmark:restore": "tsx src/restore-benchmark.ts",

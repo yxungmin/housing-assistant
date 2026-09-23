@@ -21,6 +21,13 @@
   둘 다 MISMATCH로 자르지 않는다 — 자격이 되는 사람에게서 공고를 감추면 그 오류는 아무도 신고하지 못한다.
   `statusGuard`는 영구임대 1순위(제목으로 가린다 — 유형 코드가 장기전세와 같다)에 계층 규칙이 없으면 대상 계층 한 줄을 얹고,
   입력한 계층이 대상이 아니거나 모르면 추천에서 뺀다(`status_uncertain`). 역시 MISMATCH로 자르지 않는다 — 입력 항목에 없는 1순위 계층이 있다.
+  같은 자리(`status_guarded`)에 둘이 더 선다: `targetGuard`는 철거민·이주대책 대상처럼 입력 항목에 없는 대상의 트랙을 이름으로 가려 빼고,
+  `pendingStatus`는 계층을 입력하지 않아(온보딩 core가 아니다) 계층이 꼭 필요한 조건이 "확인 필요"인 트랙을 뺀다. "어긋난 게 없다"는 "맞는다"가 아니다.
+  any_of의 갈래가 전부 다른 가구 유형 전용(applies_to.marriage)이면 불일치, 신혼 트랙의 혼인 기간 규칙은 applies_to를 보지 않는다,
+  소득표에 내 가구원 수 줄이 없으면 건너뛰지 않고 확인 필요 — 셋 다 "조건이 빠지면 조용히 통과"를 막는 것이다.
+  형제 트랙 비교(`missingCategories`)는 트랙을 가르는 조건(계층·나이·혼인·자녀)은 보지 않는다.
+  **추천을 바꾸면 `npm run audit:match`를 돌린다** — 프로필 6,480개 × 공고로 추천이 공급 이름(대학생·고령자·철거민…)과 어긋나는지,
+  확실히 자격이 되는 사람을 놓치는지 본다(`--matrix`로 누구에게 무엇이 나가는지 표). 오추천이 있으면 종료 코드 1.
   무주택 기간은 `homeless.ts`가 청약 가점제 규칙으로 계산한다(만 30세부터, 그 전 혼인이면 혼인신고일부터). 사람이 적은 값보다 규칙이 이긴다.
   룰의 `verified`(사람 검수 여부)는 판정에 쓰지 않는다 — 검수 전이라고 숨기면 자격이 되는 사람에게 공고를 감추게 된다. 화면이 사실대로 알린다.
 - `collector` 기관 목록 → PDF → 텍스트/섹션 → Claude 구조화 추출(`llm/extract.ts`) → `autoChecks` → Supabase(`db/supabase.ts`, 버저닝). 기관 어댑터는 `sources.ts` 한 곳(LH는 공공데이터포털 API, SH는 게시판 HTML 파싱 `sh/api.ts`). 수집 범위는 `COLLECT_PROVIDERS`·`COLLECT_REGIONS`(기본 LH,SH / 서울·경기)로 줄여 비용을 통제한다.
@@ -66,6 +73,7 @@ npm run benchmark:fetch -- --count 10   # LH API에서 공고문 PDF 추가 수�
 npm run app:data                     # 초안/정답 → 앱 번들 데이터
 npm run app:enrich [-- --links]      # 번들에 원문 링크·그림·좌표·시세·대기·통근 (LLM 없음, --links는 링크·그림만)
 npm run simulate [-- --full]         # 프로필 10종 × 지금 공고로 매칭 점검 (LLM 없음)
+npm run audit:match [-- --matrix]    # 프로필 6,480개 × 공고로 오추천·놓친 추천 감사 (LLM 없음)
 npm run db:check                     # 빈 Postgres에 마이그레이션 전체 적용 + 동작 확인 (Docker 필요)
 npm run fixture:check -- 018         # 초안 ↔ 공고문 PDF 1차 대조 (사람 검수 전)
 npm run review                       # 검수 뷰어 4310 — 추출 검수 + 신고 큐

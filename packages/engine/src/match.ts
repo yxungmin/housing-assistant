@@ -8,6 +8,7 @@ import type {
   SupplyTrack,
   UserProfile,
 } from "@housing/schema";
+import { regionCodesOf } from "@housing/schema";
 import { categoryLabel, missingCategories } from "./omission";
 
 /** 생년월일(YYYY-MM-DD) → 기준일의 만 나이 */
@@ -45,7 +46,8 @@ export function profileValueFor(
       return profile.monthly_debt_payment;
     case "residence": {
       // 룰 값은 시도 코드("41") 또는 "경기 과천시" 형식. 둘 중 하나라도 목록에 있으면 일치.
-      const vals = [profile.region_code, profile.region_sigungu].filter((v): v is string => !!v);
+      // 특별자치도로 바뀐 코드(강원 51, 전북 52)로 추출된 룰도 맞춰 보도록 옛·새 코드를 같이 낸다
+      const vals = [...(profile.region_code ? regionCodesOf(profile.region_code) : []), profile.region_sigungu].filter((v): v is string => !!v);
       return vals.length ? vals : undefined;
     }
     case "housing":
@@ -225,7 +227,55 @@ function combine(mode: RuleGroup["mode"], statuses: MatchStatus[]): MatchStatus 
   return "MATCH";
 }
 
-export function matchTrack(track: SupplyTrack, profile: UserProfile): TrackResult {
+/**
+ * 소득표에 내 가구원 수 줄이 없으면 "확인 필요"로 남긴다.
+ *
+ * 소득 기준은 가구원 수마다 한 줄씩(applies_to.household_size) 추출된다. 공고문 표는 대개 1~6인까지만 적고
+ * "7인 이상은 1인당 얼마 추가"라고 덧붙이는데, 그 문장은 규칙이 되지 못한다. 그러면 7인 가구에게는 모든 줄이
+ * 건너뛰어져 **소득을 보지도 않고 통과**했다(2026-09-23 감사: 신혼·신생아 매입임대 2순위).
+ * 표를 못 읽은 것이지 그 사람이 소득 기준 밖에 있는 게 아니므로, 불일치가 아니라 확인 필요다.
+ */
+function markMissingIncomeRow(rules: RuleResult[], profile: UserProfile): RuleResult[] {
+  const income = rules.filter((r) => r.rule.category === "income");
+  if (income.length === 0 || income.some((r) => !r.skipped)) return rules;
+  const bySize = income.some((r) => r.rule.applies_to?.household_size !== undefined && profile.household_size !== undefined);
+  if (!bySize) return rules;
+  const first = income[0]!;
+  return rules.map((r) =>
+    r === first
+      ? { ...r, skipped: false, status: "NEEDS_CHECK" as const, reason: `공고문 소득표에서 ${profile.household_size}인 가구 기준을 찾지 못했어요. 공고문을 확인해 주세요.` }
+      : r,
+  );
+}
+
+/** 혼인 상태로 적용 대상에서 빠진 룰인가 (applies_to.marriage에 내 혼인 상태가 없다) */
+const excludedByMarriage = (rule: EligibilityRule, profile: UserProfile): boolean =>
+  !!rule.applies_to?.marriage?.length && profile.marriage !== undefined && !rule.applies_to.marriage.includes(profile.marriage);
+
+/**
+ * 신혼 공급에서는 혼인 기간 규칙의 applies_to.marriage를 보지 않는다.
+ *
+ * 추출은 "신혼부부: 혼인 7년 이내"를 적용 대상 {기혼, 예비신혼}이 붙은 규칙으로 옮기곤 한다.
+ * 그러면 미혼에게는 그 규칙이 건너뛰어지고, 신혼·신생아 매입임대 3순위("미성년 자녀가 없는 신혼부부")에
+ * "자녀 0명"만 남아 22세 미혼 대학생이 "조건 맞음"이 됐다(2026-09-23 감사, 432회).
+ * 신혼 공급에서 혼인은 곁가지 조건이 아니라 자격 그 자체다. 미혼·한부모의 혼인 기간은 이미 무한대로
+ * 계산되므로(profileValueFor) 적용 대상만 떼면 제대로 불일치가 된다.
+ *
+ * 공급 이름으로 한정한다. 청년 공급의 "기혼이면 혼인 7년 이내"처럼 미혼에게 건너뛰는 게 맞는 규칙은 그대로 둔다.
+ */
+const NEWLYWED_TRACK = /신혼|예비신혼|혼인가구/;
+function marriageIsTheTarget(track: SupplyTrack): SupplyTrack {
+  if (!NEWLYWED_TRACK.test(track.name)) return track;
+  const rules = track.rules.map((r) => {
+    if (r.category !== "marriage" || r.unit !== "years" || !r.applies_to?.marriage?.length) return r;
+    const { marriage: _marriage, ...rest } = r.applies_to;
+    return { ...r, applies_to: rest };
+  });
+  return { ...track, rules };
+}
+
+export function matchTrack(input: SupplyTrack, profile: UserProfile): TrackResult {
+  const track = marriageIsTheTarget(input);
   const byGroup = new Map<string, EligibilityRule[]>();
   for (const rule of track.rules) {
     const list = byGroup.get(rule.group_id) ?? [];
@@ -234,10 +284,26 @@ export function matchTrack(track: SupplyTrack, profile: UserProfile): TrackResul
   }
   const groups: GroupResult[] = [];
   for (const group of track.rule_groups) {
-    const rules = (byGroup.get(group.id) ?? []).map((r) => evaluateRule(r, profile));
+    const rules = markMissingIncomeRow((byGroup.get(group.id) ?? []).map((r) => evaluateRule(r, profile)), profile);
     // applies_to로 건너뛴 룰은 집계에서 제외한다. 그룹 전체가 건너뛰어졌으면 그룹도 제외.
     const counted = rules.filter((r) => !r.skipped);
-    if (counted.length === 0 && rules.length > 0) continue;
+    if (counted.length === 0 && rules.length > 0) {
+      /*
+       * 단, "하나만 맞으면 되는(any_of)" 그룹의 갈래가 **전부 다른 가구 유형 전용**이면 제외가 아니라 불일치다.
+       *
+       * 신혼·신생아 매입임대 2순위: "신혼부부면 혼인 7년 이내" 또는 "한부모면 6세 이하 자녀".
+       * 22세 미혼에게는 두 갈래 다 해당 없음으로 건너뛰어지는데, 그룹을 통째로 빼면 이 트랙에 자격 요건이
+       * 없는 것처럼 되어 "조건 맞음"이 됐다(2026-09-23 감사에서 432회). 건너뛴 갈래는 이 사람이 지나갈 길이 아니다.
+       *
+       * 가구원 수로 건너뛴 경우(소득표에 내 가구원 수 줄이 없음)는 여기서 자르지 않는다 — 그건 우리가 표를 못 읽은 것이다.
+       */
+      const byHousehold = group.mode === "any_of" && rules.every((r) => excludedByMarriage(r.rule, profile));
+      if (byHousehold) {
+        const mismatched = rules.map((r) => ({ ...r, status: "MISMATCH" as const, skipped: false, reason: "이 공급의 대상 가구 유형이 아니에요" }));
+        groups.push({ group, status: "MISMATCH", rules: mismatched });
+      }
+      continue;
+    }
     const status = combine(group.mode, counted.map((r) => r.status));
     const contradicted =
       group.mode === "any_of" && counted.some((r) => r.status === "MISMATCH") && !counted.some((r) => r.status === "MATCH");
@@ -327,7 +393,7 @@ export interface MatchOptions {
 const REGION_CLUSTERS: string[][] = [["11", "28", "41"]];
 
 const sameCluster = (a: string, b: string): boolean =>
-  a === b || REGION_CLUSTERS.some((c) => c.includes(a) && c.includes(b));
+  regionCodesOf(a).includes(b) || REGION_CLUSTERS.some((c) => c.includes(a) && c.includes(b));
 
 export function regionGuard(
   track: TrackResult,
@@ -484,6 +550,65 @@ const PERMANENT_RENTAL_STATUSES = [
  * 코드만으로는 가를 수 없다.
  */
 export function statusGuard(track: TrackResult, profile: UserProfile, title: string | undefined): TrackResult {
+  return pendingStatus(targetGuard(permanentRentalGuard(track, profile, title)), profile);
+}
+
+/**
+ * 계층을 입력하지 않아서 "확인 필요"가 된 계층 조건이 있는 트랙은 추천하지 않는다.
+ *
+ * 계층(대학생·수급자·장애인 등)은 첫 온보딩에서 묻지 않는다. 그래서 **대부분의 사용자가 비어 있다.**
+ * 그 상태로 "주거급여 수급자 계층"이 "확인 필요 1개"와 함께 후보가 되면, 다른 트랙에서 다 떨어진 사람에게
+ * 그 트랙이 추천으로 남는다 — 감사에서 22세 대학생(차 4천만 원)에게 주거급여 수급자 계층이 추천됐다(2026-09-23).
+ * "어긋난 게 없다"는 "맞는다"가 아니다(contradicted, regionGuard와 같은 판단).
+ *
+ * 청년 계층처럼 "나이 19~39세 또는 사회초년생"인 any_of는 나이가 맞으면 그룹이 MATCH라 여기에 걸리지 않는다.
+ * 계층이 **꼭 있어야** 하는 자리만 걸린다. 화면은 이 공고를 "대상 계층을 확인할 공고"로 세우고,
+ * 계층을 입력하면 곧바로 제자리(맞음/안 맞음)로 간다.
+ */
+export function pendingStatus(track: TrackResult, profile: UserProfile): TrackResult {
+  if (profile.statuses !== undefined || track.status_guarded) return track;
+  const pending = track.groups.some(
+    (g) => g.status === "NEEDS_CHECK" && g.rules.some((r) => !r.skipped && r.rule.category === "status" && r.status === "NEEDS_CHECK"),
+  );
+  return pending ? { ...track, status_guarded: true } : track;
+}
+
+/**
+ * 우리 입력으로는 누구도 대상이라고 말할 수 없는 공급 — 철거민, 이주대책 대상자, 장기복무 제대군인 등.
+ *
+ * 강서염창 통합공공임대의 "우선공급(철거민 등)"은 추출된 규칙이 무주택 하나뿐이라,
+ * 자산 5억 원인 22세에게도 "조건 맞음"이 됐다 — 감사에서 1,080회, 오추천의 절반(2026-09-23).
+ * 이런 대상은 입력 항목으로 만들 수도 없다(해당하는 사람이 극히 드물고 증빙이 제각각이다).
+ * 그래서 공급 이름으로 가려 한 줄을 얹고 추천에서 뺀다. 상세 화면에는 그대로 남아 해당하는 사람은 볼 수 있다.
+ */
+const UNLISTED_TARGET = /철거민|이주대책|제대군인|비닐간이|공작물|재해|사업지구|이주자/;
+
+export function targetGuard(track: TrackResult): TrackResult {
+  if (!UNLISTED_TARGET.test(track.track.name)) return track;
+  const guard: RuleResult = {
+    rule: {
+      group_id: "__target_guard__",
+      category: "status",
+      applies_to: {},
+      operator: "in",
+      value: [],
+      source: { page: 0, text: `${track.track.name} — 철거민 등 공고문이 정한 대상만 신청할 수 있어요.` },
+      confidence: 0,
+      verified: false,
+    },
+    status: "NEEDS_CHECK",
+    reason: "철거민·이주대책 대상자처럼 공고문이 정한 사람만 신청할 수 있어요. 해당하면 공고문의 자격을 확인해 주세요.",
+    skipped: false,
+  };
+  return {
+    ...track,
+    groups: [...track.groups, { group: { id: "__target_guard__", mode: "all_of" as const, label: "공급 대상" }, status: "NEEDS_CHECK" as const, rules: [guard] }],
+    summary: { ...track.summary, needs_check: track.summary.needs_check + 1 },
+    status_guarded: true,
+  };
+}
+
+function permanentRentalGuard(track: TrackResult, profile: UserProfile, title: string | undefined): TrackResult {
   if (!title || !title.includes("영구임대")) return track;
   if (/완화/.test(title) || /완화/.test(track.track.name)) return track;
   const hasStatusRule = track.groups.some((g) => g.rules.some((r) => !r.skipped && r.rule.category === "status"));

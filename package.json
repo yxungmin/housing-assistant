@@ -30,6 +30,7 @@
     "db:check": "bash supabase/test/run.sh",
     "app:enrich": "npm run app:enrich -w @housing/collector --",
     "simulate": "npm run simulate -w @housing/collector --",
+    "audit:match": "npm run audit:match -w @housing/collector --",
     "pdf:rehost": "npm run pdf:rehost -w @housing/collector --",
     "output:size": "npm run output:size -w @housing/collector",
     "bundle:push": "npm run bundle:push -w @housing/collector --",

@@ -241,7 +241,7 @@ export default function Home() {
         {needsTarget.length > 0 ? (
           <View style={{ gap: 12 }}>
             <Pressable onPress={toggle(setShowTarget)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
-              <T variant="bodyMedium" color={colors.text2}>대상 계층을 확인할 공고 {needsTarget.length}개</T>
+              <T variant="bodyMedium" color={colors.text2}>신청 대상을 확인할 공고 {needsTarget.length}개</T>
               <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
                 <T variant="small" color={colors.text3}>{showTarget ? "숨기기" : "보기"}</T>
                 <Icon name="right" size={16} color={colors.text4} />
@@ -250,8 +250,13 @@ export default function Home() {
             {showTarget ? (
               <>
                 <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
-                  수급자·국가유공자·한부모가족처럼 정해진 계층만 신청할 수 있는 공고예요. 내 조건에 해당 계층을 넣으면 맞는지 바로 알려드려요.
+                  대학생·수급자·장애인처럼 정해진 대상만 신청할 수 있는 공고예요.
+                  {state.profile?.statuses === undefined ? " 해당하는 게 있는지 알려 주시면 맞는지 바로 가려 드릴게요." : " 입력하신 계층으로는 대상인지 알 수 없어서, 공고문의 자격을 확인해 주세요."}
                 </Sub>
+                {/* 계층은 첫 온보딩에서 묻지 않는다. 그래서 이 묶음이 가장 흔하게 생기는 이유는 "안 넣어서"다 — 그 자리에서 넣게 한다 */}
+                {state.profile?.statuses === undefined ? (
+                  <PrimaryButton tone="soft" label="해당하는 계층 알려 주기" onPress={() => router.push("/onboarding?step=statuses")} />
+                ) : null}
                 <Section items={needsTarget} onOpen={open} />
               </>
             ) : null}
@@ -335,7 +340,7 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
           : m.match?.region_uncertain
             ? { tone: "warn" as const, icon: "alert" as const, text: "다른 지역 · 거주 요건 확인 필요" }
           : m.match?.status_uncertain
-            ? { tone: "warn" as const, icon: "alert" as const, text: "대상 계층 확인 필요" }
+            ? { tone: "warn" as const, icon: "alert" as const, text: "신청 대상 확인 필요" }
             : { tone: "danger" as const, icon: "x" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` };
   // 직장을 넣었으면 통근이 먼저, 아니면 가장 가까운 역, 그것도 없으면 지역명
   // 조건이 맞아도 보증금을 못 대면 못 간다. 그 사실만 무료로 알리고 금액은 비용 화면(유료)에서 본다.

@@ -173,3 +173,13 @@ export const SERVICE_REGION_LABEL: string = SERVICE_REGIONS.map((c) => regionByC
 /** 이 시도의 공고를 모으고 있는가. 코드가 없으면(입력 전) 판단하지 않고 true */
 export const isServiceRegion = (regionCode: string | undefined): boolean =>
   regionCode === undefined || (SERVICE_REGIONS as readonly string[]).includes(regionCode);
+
+/**
+ * 같은 시도의 다른 코드. 2023~2024년 특별자치도 출범으로 법정동 코드가 바뀌었다 — 강원 42→51, 전북 45→52.
+ * 우리 표준은 옛 코드(REGIONS)인데, 추출(LLM)은 새 코드를 내기도 한다. 군산 영구임대의 "군산시 거주"가
+ * ["52"]로 추출돼, 군산 사람(45)도 거주 요건에서 떨어졌다(2026-09-23 감사). 비교할 때는 둘을 같은 곳으로 본다.
+ */
+export const REGION_ALIASES: Record<string, string[]> = { "42": ["51"], "51": ["42"], "45": ["52"], "52": ["45"] };
+
+/** 이 시도 코드와 같은 곳을 가리키는 코드 전부 (자기 자신 포함) */
+export const regionCodesOf = (code: string): string[] => [code, ...(REGION_ALIASES[code] ?? [])];

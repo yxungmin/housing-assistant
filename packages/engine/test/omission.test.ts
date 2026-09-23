@@ -109,3 +109,23 @@ describe("판정에 실제로 반영된다", () => {
     expect(m.tracks).toHaveLength(3);
   });
 });
+
+describe("트랙을 가르는 조건은 비교하지 않는다", () => {
+  it("계층·나이·혼인이 형제 대부분에 있어도 신혼부부 트랙에 '못 읽었다'를 붙이지 않는다", () => {
+    // 행복주택: 대학생(계층)·청년(나이·계층)·고령자(나이)·주거급여(계층)·신혼부부(혼인)
+    const x = {
+      tracks: [
+        track("대학생", ["status", "asset", "housing"]),
+        track("청년", ["age", "status", "asset", "housing"]),
+        track("고령자", ["age", "asset", "housing"]),
+        track("주거급여", ["status", "housing"]),
+        track("신혼부부", ["marriage", "asset", "housing"]),
+      ],
+    } as unknown as ExtractionOutput;
+    const missing = missingCategories(x);
+    expect(missing[4]).not.toContain("status");
+    expect(missing[4]).not.toContain("age");
+    // 공통 뼈대(자산)는 여전히 잡는다 — 주거급여 트랙에 자산이 없다
+    expect(missing[3]).toContain("asset");
+  });
+});
