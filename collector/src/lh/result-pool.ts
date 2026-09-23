@@ -28,10 +28,15 @@ export async function buildResultPool(opts: PoolOptions = {}): Promise<PastResul
 
   const cut = new LhCutlineClient();
   const out: PastResult[] = [];
+  // 같은 추첨단위·회차를 두 번 받지 않는다. 커트라인은 파일을 하나씩 내려받는 일이라 낭비가 크다.
+  const seen = new Set<string>();
   let tried = 0;
   for (const n of notices) {
     if (tried >= (opts.limit ?? 40)) break;
     if (!n.unit_no || !n.draw_no) continue;
+    const key = `${n.unit_no}:${n.draw_no}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
     tried++;
     const c = await cut.fetch(n.unit_no, n.draw_no).catch(() => null);
     // 모든 공고에 커트라인이 붙지는 않는다 (선착순·잔여세대 등). 없으면 조용히 넘어간다.

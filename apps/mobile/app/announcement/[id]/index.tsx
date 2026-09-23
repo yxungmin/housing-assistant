@@ -356,6 +356,34 @@ export default function AnnouncementDetail() {
 
             단지명으로 이은 값이라 틀릴 수 있다. 그래서 어느 단지의 언제 결과인지 그대로 적는다 —
             사용자가 틀린 것을 알아볼 수 있어야 한다. */}
+        {/*
+          경쟁률이 없을 때도 자리를 비우지 않는다.
+          "없다"는 것도 답이다 — 빈 자리는 사용자가 "이 앱은 이걸 안 하는구나"로 읽고,
+          그러면 있는 공고에서도 찾아보지 않는다. 왜 없는지까지 적는다.
+        */}
+        {!a.past_results?.length ? (
+          <View style={{ gap: 12 }}>
+            <SectionTitle>지난 회차 결과</SectionTitle>
+            <Card style={{ gap: 6 }}>
+              <T variant="bodyMedium">지난 회차 결과가 없어요</T>
+              <Sub tone="3" variant="caption">
+                {/*
+                  왜 없는지를 유형으로 나눠 말한다. 커트라인은 **점수로 순위를 매기는 공급**에만 있다 —
+                  추첨으로 뽑는 유형에는 커트라인이라는 개념 자체가 없다.
+                  실측(2026-09-23, LH 당첨자 발표 250건): 국민임대 20% · 영구임대 8% ·
+                  행복주택 3% · 매입임대 0%.
+                  "아직 못 찾았다"로 뭉뚱그리면 사용자는 언젠가 생길 거라고 기다린다.
+                */}
+                {a.provider === "SH"
+                  ? "SH는 당첨 커트라인을 공개하지 않아요. 경쟁률은 공고문에서 확인해 주세요."
+                  : a.housing_type === "happy" || a.housing_type === "purchased_rental"
+                    ? "이 유형은 대부분 추첨으로 뽑아서 커트라인이 없어요. 대신 공급 호수와 접수 일정을 참고해 주세요."
+                    : "같은 단지의 지난 회차를 찾지 못했어요. 새로 짓는 단지이거나 LH가 커트라인을 공개하지 않은 경우예요."}
+              </Sub>
+            </Card>
+          </View>
+        ) : null}
+
         {a.past_results?.length ? (
           <View style={{ gap: 12 }}>
             <SectionTitle>지난 회차 결과</SectionTitle>

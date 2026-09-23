@@ -59,7 +59,7 @@ const rows = JSON.parse(readFileSync(TARGET, "utf8")) as Row[];
  * 지난 회차 결과 풀. 공고마다 부르면 같은 목록을 수십 번 받게 된다.
  * 실패해도 나머지 보강은 그대로 돈다 — 이건 있으면 좋은 값이지 필수가 아니다.
  */
-const resultPool: PastResult[] = await buildResultPool({ pages: 2, limit: 40, log: (m) => console.log(m) }).catch((e) => {
+const resultPool: PastResult[] = await buildResultPool({ pages: 8, limit: 200, log: (m) => console.log(m) }).catch((e) => {
   console.log(`지난 회차 결과 건너뜀: ${e instanceof Error ? e.message : String(e)}`);
   return [];
 });
