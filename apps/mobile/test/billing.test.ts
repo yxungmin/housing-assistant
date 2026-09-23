@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BILLING_DISCLOSURE, chargeDate, manageSubscriptionUrl, PRICE_TEXT, PRODUCT_ID } from "../src/lib/billing";
+import { BILLING_DISCLOSURE, billingHistoryUrl, chargeDate, manageSubscriptionUrl, PRICE_TEXT, PRODUCT_ID, priceParts } from "../src/lib/billing";
 import { plannedReminders } from "../src/lib/reminders";
 import { toSubscription } from "../src/lib/billing-store";
 
@@ -91,5 +91,26 @@ describe("스토어 응답 → 구독 상태", () => {
 
   it("첫 결제가 끝나 정상 구독이 되면 더 걸지 않는다 — 고지는 첫 결제 한 번이다", () => {
     expect(charges(toSubscription(info({ expirationDate: "2026-11-23T00:00:00Z", willRenew: true, periodType: "NORMAL" })))).toHaveLength(0);
+  });
+});
+
+describe("화면에 적는 가격", () => {
+  it("스토어 값을 못 받으면 코드의 가격으로 적는다", () => {
+    expect(priceParts()).toEqual({ monthly: PRICE_TEXT, amount: "1,900원" });
+  });
+
+  it("스토어가 다른 원화 가격을 주면 그걸 적는다 — 실제로 긁히는 금액이 화면의 약속이다", () => {
+    expect(priceParts({ price: 2200, currencyCode: "KRW", priceString: "₩2,200" })).toEqual({ monthly: "월 2,200원", amount: "2,200원" });
+  });
+
+  it("원화가 아니면 스토어가 만든 표기를 그대로 쓴다", () => {
+    expect(priceParts({ price: 1.99, currencyCode: "USD", priceString: "$1.99" }).monthly).toBe("월 $1.99");
+  });
+});
+
+describe("결제 내역", () => {
+  it("플랫폼마다 스토어의 구입 내역으로 보낸다", () => {
+    expect(billingHistoryUrl("ios").startsWith("https://reportaproblem.apple.com")).toBe(true);
+    expect(billingHistoryUrl("android").startsWith("https://play.google.com/store/account/orderhistory")).toBe(true);
   });
 });

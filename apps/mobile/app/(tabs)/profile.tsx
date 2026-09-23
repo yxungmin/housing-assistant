@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
+import { Linking, Pressable, View } from "react-native";
 import { ageFromBirthDate, monthsBetween } from "@housing/engine";
 import { SubscriptionManageSheet } from "@/components/SubscriptionSheet";
 import { BottomSheet, Card, Chip, ListRow, Notice, PageTitle, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { LOAN_AS_OF } from "@/data/loans";
 import { useAnnouncements } from "@/data/announcements";
 import { remoteConfigured } from "@/data/remote";
-import { daysLeft, PRICE_KRW } from "@/lib/billing";
+import { daysLeft } from "@/lib/billing";
+import { usePrice } from "@/data/price";
+import { BUSINESS, BUSINESS_FIELDS, businessBlanks, ftcLookupUrl } from "@/legal/business";
 import { longDate, manwon, yearsMonths } from "@/lib/format";
 import { getPushToken, notificationsSupported, requestNotificationPermission } from "@/lib/notifications";
 import { SERVICE_REGION_LABEL } from "@housing/schema";
@@ -19,7 +21,6 @@ import { SignInSheet } from "@/components/SignIn";
 import { useTheme } from "@/theme/ThemeProvider";
 
 const MARRIAGE: Record<string, string> = { single: "미혼", married: "기혼", pre_marriage: "예비 신혼부부", single_parent: "한부모" };
-const price = `월 ${PRICE_KRW.toLocaleString("ko-KR")}원`;
 
 /** 내 정보: 조건 수정(항상 무료), 구독 상태, 알림, 데이터 기준일, 화면 모드 */
 export default function Profile() {
@@ -27,6 +28,7 @@ export default function Profile() {
   const { colors } = useTheme();
   const router = useRouter();
   const feed = useAnnouncements();
+  const { monthly: price, amount } = usePrice();
   const [manage, setManage] = useState(false);
   const [signInSheet, setSignInSheet] = useState(false);
   const [confirmOut, setConfirmOut] = useState(false);
@@ -50,7 +52,7 @@ export default function Profile() {
   const age = p?.birth_date ? `${p.birth_date.slice(0, 4)}년생 · 만 ${ageFromBirthDate(p.birth_date)}세` : p?.age !== undefined ? `만 ${p.age}세` : "";
   const subLabel = { none: "구독 전", trial: "첫 달 무료 이용 중", active: "구독 중", expired: "구독 종료" }[sub.status];
   const subSub =
-    sub.status === "trial" ? `${longDate(sub.expiresAt?.slice(0, 10))}까지 무료 · 이후 ${price}`
+    sub.status === "trial" ? sub.cancelled ? `${longDate(sub.expiresAt?.slice(0, 10))}까지 무료 · 해지해서 결제되지 않아요` : `${longDate(sub.expiresAt?.slice(0, 10))}에 ${amount} 첫 결제 · 이후 ${price}`
     : sub.status === "active" ? `${price}${sub.cancelled ? ` · ${longDate(sub.expiresAt?.slice(0, 10))}에 종료` : ` · ${daysLeft(sub)}일 뒤 갱신`}`
     : sub.status === "expired" ? "다시 구독하면 모든 공고를 계산할 수 있어요"
     : "구독하면 필요한 현금과 월 주거비를 계산해 드려요";
@@ -196,6 +198,28 @@ export default function Profile() {
           <ListRow icon="info" label="이용약관" onPress={() => router.push("/legal/terms")} />
           <ListRow icon="info" label="개인정보처리방침" onPress={() => router.push("/legal/privacy")} />
         </Card>
+      </View>
+
+      {/*
+        사업자 정보 (legal/business.ts). 돈을 받는 서비스는 이용자가 쉽게 볼 수 있는 곳에 적어야 한다.
+        빈칸도 숨기지 않고 "준비 중"으로 보인다 — 숨기면 비어 있다는 사실까지 숨겨진다.
+      */}
+      <View style={{ gap: 6, paddingHorizontal: 4 }}>
+        <T variant="small" color={colors.text2}>사업자 정보</T>
+        {BUSINESS_FIELDS.map(([key, label]) => (
+          <View key={key} style={{ flexDirection: "row", gap: 12 }}>
+            <Sub tone="3" variant="caption" style={{ width: 124 }}>{label}</Sub>
+            <Sub tone={BUSINESS[key] ? "2" : "3"} variant="caption" style={{ flex: 1 }}>{BUSINESS[key] || "준비 중"}</Sub>
+          </View>
+        ))}
+        {businessBlanks().length > 0 ? (
+          <Sub tone="3" variant="caption">사업자 등록 중이에요. 등록이 끝나면 채워 둘게요.</Sub>
+        ) : null}
+        {ftcLookupUrl(BUSINESS.registrationNo) ? (
+          <Pressable onPress={() => void Linking.openURL(ftcLookupUrl(BUSINESS.registrationNo)!)} accessibilityRole="link" hitSlop={8} style={{ alignSelf: "flex-start" }}>
+            <Sub tone="3" variant="caption" style={{ textDecorationLine: "underline" }}>사업자 정보 확인 (공정거래위원회)</Sub>
+          </Pressable>
+        ) : null}
       </View>
 
       <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>입력한 조건은 이 기기에만 저장되고 서버로 보내지 않아요.</Sub>

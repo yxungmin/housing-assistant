@@ -4,13 +4,12 @@ import { Linking, Platform, Pressable, View } from "react-native";
 import { CoffeeMark } from "./CoffeeMark";
 import { Icon } from "./icon";
 import { BottomSheet, Card, PrimaryButton, Row, Sub, T, Tag } from "./ui";
-import { billing, canUseFirstMonthFree, daysLeft, manageSubscriptionUrl, PRICE_KRW } from "@/lib/billing";
+import { billing, billingHistoryUrl, canUseFirstMonthFree, daysLeft, manageSubscriptionUrl } from "@/lib/billing";
+import { usePrice } from "@/data/price";
 import Constants from "expo-constants";
 import { longDate } from "@/lib/format";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-
-const price = `월 ${PRICE_KRW.toLocaleString("ko-KR")}원`;
 
 /**
  * 구독 시트: 첫 무료 계산을 본 뒤 두 번째 공고에서 처음 뜬다.
@@ -23,6 +22,7 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
   const router = useRouter();
   const { state, setSubscription } = useAppState();
   const [busy, setBusy] = useState(false);
+  const price = usePrice().monthly;
   const expired = state.subscription.status === "expired";
   // 첫 달만 무료다. 해지했다 돌아와도 다시 주지 않는다.
   const freeMonth = canUseFirstMonthFree(state.subscription);
@@ -72,14 +72,19 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
         ))}
       </View>
 
+      {/*
+        결제될 금액이 가장 크게 보여야 한다. 전에는 "첫 달 0원"이 제목이고 "월 1,900원"이 회색 각주였다 —
+        무료 체험을 앞세우고 청구 금액을 흐리게 두는 구성은 App Store 3.1.2 심사에서 자주 반려된다.
+        첫 달 0원은 옆 표시로 내린다. 거짓은 아니지만, 사람이 기억해야 하는 숫자는 매달 나갈 돈이다.
+      */}
       <Card tone="white" style={{ gap: 6 }}>
         <Row center>
-          <T variant="heading">{freeMonth ? "첫 달 0원" : price}</T>
-          <Tag tone="gray">언제든 해지</Tag>
+          <T variant="heading">{price}</T>
+          {freeMonth ? <Tag tone="primary">첫 달 0원</Tag> : <Tag tone="gray">언제든 해지</Tag>}
         </Row>
         <Sub tone="3" variant="caption">
-          {freeMonth ? `그 뒤 ${price} 자동 결제 · 무료 기간에 해지하면 결제되지 않아요` : `${price} 매월 자동 결제`}
-          {" · 해지는 스토어에서"}
+          {freeMonth ? "첫 달은 0원이고, 그 뒤 매월 자동으로 결제돼요. 무료 기간에 해지하면 결제되지 않아요." : "매월 자동으로 결제돼요."}
+          {" 해지는 스토어에서 언제든 할 수 있어요."}
         </Sub>
         <Sub tone="3" variant="caption">
           결제일부터 7일 이내 청약철회할 수 있어요. 그 기간에 주거비 계산을 한 번이라도 쓰면 제한돼요.
@@ -111,6 +116,7 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
   const { state, setSubscription } = useAppState();
   const sub = state.subscription;
   const [msg, setMsg] = useState<string | null>(null);
+  const { monthly: price, amount } = usePrice();
   const left = daysLeft(sub);
   const label = { none: "구독 전", trial: "첫 달 무료 이용 중", active: "구독 중", expired: "구독 종료" }[sub.status];
 
@@ -144,14 +150,16 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
     <BottomSheet visible={visible} onClose={onClose}>
       <View style={{ gap: 8 }}>
         <T variant="title">구독 관리</T>
-        <T variant="body" color={colors.text2}>{price} · {canUseFirstMonthFree(sub) ? "첫 달 0원" : "첫 달 무료는 사용함"}</T>
+        {/* 체험 중인 사람에게 "첫 달 무료는 사용함"은 앞뒤가 안 맞았다. 구독 전일 때만 혜택을 말한다 */}
+        <T variant="body" color={colors.text2}>{price} · {sub.status === "none" && canUseFirstMonthFree(sub) ? "첫 달 0원" : "매월 자동 결제"}</T>
       </View>
       <Card style={{ gap: 6 }}>
         <Row center>
           <T variant="heading">{label}</T>
           {sub.cancelled ? <Tag tone="gray">갱신 해지됨</Tag> : sub.status === "trial" || sub.status === "active" ? <Tag tone="primary" icon="check">이용 중</Tag> : null}
         </Row>
-        {sub.expiresAt ? <Sub>{sub.status === "expired" ? "만료일" : sub.cancelled ? "이용 종료" : sub.status === "trial" ? "첫 달 종료" : "다음 결제"} {longDate(sub.expiresAt.slice(0, 10))}{left > 0 ? ` · ${left}일 남음` : ""}</Sub> : <Sub>구독하면 필요한 현금과 월 주거비를 계산해 드려요.</Sub>}
+        {/* 체험·구독 중인 사람이 알아야 하는 것은 "언제, 얼마가 나가나"다. 날짜만 있고 금액이 없으면 반쪽이다 */}
+        <Sub>{statusLine(sub, amount, left)}</Sub>
       </Card>
       {msg ? <Sub style={{ textAlign: "center" }}>{msg}</Sub> : null}
       <View style={{ gap: 10 }}>
@@ -160,6 +168,10 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
         ) : null}
         <PrimaryButton tone="soft" label="구매 복원" onPress={() => void restore()} />
       </View>
+      {/* 결제를 스토어가 하니 영수증도 스토어에 있다. 앱이 그걸 알려 주지 않으면 "어디서 보죠?"로 문의가 온다 */}
+      <Pressable onPress={() => void Linking.openURL(billingHistoryUrl(Platform.OS)).catch(() => setMsg(Platform.OS === "ios" ? "설정 → Apple 계정 → 미디어 및 구입 항목 → 구입 내역에서 볼 수 있어요." : "Play 스토어 → 결제 및 구독 → 예산 및 내역에서 볼 수 있어요."))} accessibilityRole="link" style={{ alignItems: "center", paddingVertical: 4 }}>
+        <T variant="small" color={colors.text3}>결제 내역·영수증 보기 (스토어)</T>
+      </Pressable>
       {/* 해지는 앱 안에서 못 한다. 그러니 그 경로만큼은 어느 상태에서나 1탭 거리에 둔다 */}
       {!billing.isMock ? (
         <Pressable onPress={() => void openStore()} accessibilityRole="button" style={{ alignItems: "center", paddingVertical: 4 }}>
@@ -171,4 +183,15 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
       </Sub>
     </BottomSheet>
   );
+}
+
+/** 구독 관리 시트의 상태 한 줄. 결제가 남아 있으면 날짜와 금액을 같이 적는다 */
+function statusLine(sub: { status: string; expiresAt?: string; cancelled?: boolean }, amount: string, left: number): string {
+  if (!sub.expiresAt) return "구독하면 필요한 현금과 월 주거비를 계산해 드려요.";
+  const day = longDate(sub.expiresAt.slice(0, 10));
+  const rest = left > 0 ? ` · ${left}일 남음` : "";
+  if (sub.status === "expired") return `${day}에 끝났어요`;
+  if (sub.cancelled) return `${day}까지 이용하고 더 결제되지 않아요${rest}`;
+  if (sub.status === "trial") return `${day}에 ${amount}이 처음 결제돼요${rest}`;
+  return `다음 결제 ${day} · ${amount}${rest}`;
 }

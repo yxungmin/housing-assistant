@@ -27,6 +27,32 @@ export const NOTICE_DAYS_BEFORE_CHARGE = 3;
 /** "월 1,900원". 가격을 각 화면에서 따로 만들면 하나를 고칠 때 나머지가 남는다 */
 export const PRICE_TEXT = `월 ${PRICE_KRW.toLocaleString("ko-KR")}원`;
 
+/** 스토어가 알려 주는 상품 가격. RevenueCat의 StoreProduct에서 이 셋만 쓴다 */
+export interface StorePrice {
+  price: number;
+  currencyCode: string;
+  priceString: string;
+}
+
+/**
+ * 화면에 적는 가격. **스토어가 준 값이 먼저다.**
+ *
+ * 스토어에서 실제로 긁히는 금액은 스토어 가격표가 정한다. 우리가 1,900원을 코드에 적어 두고
+ * 스토어에는 다른 가격 단계로 등록되면, 화면의 약속과 결제 금액이 달라진다 — 결제 화면에서
+ * 가장 나쁜 종류의 어긋남이다. 그래서 받을 수 있으면 스토어 값을 쓰고, 못 받을 때(오프라인·목)만
+ * PRICE_KRW로 적는다. 약관의 금액도 PRICE_KRW라 둘이 다르면 개발 빌드에서 경고한다(data/price.ts).
+ *
+ * monthly는 "월 1,900원"(가격 칸), amount는 "1,900원"(문장 안: "10월 23일에 1,900원이 결제돼요").
+ */
+export function priceParts(p?: StorePrice | null): { monthly: string; amount: string } {
+  const amount = !p
+    ? `${PRICE_KRW.toLocaleString("ko-KR")}원`
+    : p.currencyCode === "KRW"
+      ? `${Math.round(p.price).toLocaleString("ko-KR")}원`
+      : p.priceString;
+  return { monthly: `월 ${amount}`, amount };
+}
+
 /** 구매 버튼 위에 그대로 붙는 한 줄. 문구를 여러 화면에 흩어 두면 하나만 고치게 된다. */
 export const BILLING_DISCLOSURE = `첫 달 0원, 이후 월 ${PRICE_KRW.toLocaleString("ko-KR")}원이 자동으로 결제돼요. 언제든 취소할 수 있어요.`;
 
@@ -127,6 +153,15 @@ export const billing: BillingAdapter = storeBillingConfigured ? storeBilling : m
  *
  * 우리가 지킬 수 있는 약속은 "해지가 1탭 거리에 있다"까지다. 여기로 보낸다.
  */
+/**
+ * 결제 내역·영수증. 결제를 스토어가 하니 내역도 스토어에 있다 — 우리는 금액을 모른다.
+ * iOS는 "문제 신고" 사이트가 구입 내역과 환불 요청을 한곳에서 보여 준다 (설정 앱의 구입 내역은 바로 여는 주소가 없다).
+ * 안드로이드는 Play 계정의 주문 내역이다.
+ */
+export function billingHistoryUrl(platform: string): string {
+  return platform === "ios" ? "https://reportaproblem.apple.com/" : "https://play.google.com/store/account/orderhistory";
+}
+
 export function manageSubscriptionUrl(platform: string, packageName?: string): string {
   if (platform === "ios") return "itms-apps://apps.apple.com/account/subscriptions";
   const q = packageName ? `?sku=${PRODUCT_ID}&package=${packageName}` : "";

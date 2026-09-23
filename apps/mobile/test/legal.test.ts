@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { isDraft, LEGAL_DOCS, PRIVACY, TERMS } from "../src/legal";
 import { PRICE_KRW, TRIAL_DAYS } from "../src/lib/billing";
+import { BUSINESS, businessBlanks, ftcLookupUrl, type BusinessInfo } from "../src/legal/business";
 
 /**
  * 법률 문서는 코드와 어긋나면 안 된다. 어긋남이 오타가 아니라 위법 사실의 증거가 되는
@@ -93,5 +94,24 @@ describe("초안 표시", () => {
   it("시행일을 채워도 빈칸이 남아 있으면 여전히 초안이다", () => {
     expect(isDraft({ ...TERMS, effectiveAt: "2026-10-01" })).toBe(true);
     expect(isDraft({ ...TERMS, effectiveAt: "2026-10-01", blanks: [] })).toBe(false);
+  });
+});
+
+describe("사업자 정보", () => {
+  const full: BusinessInfo = { name: "상호", representative: "대표", registrationNo: "123-45-67890", mailOrderNo: "제2026-서울강남-0000호", address: "서울", contact: "help@example.com" };
+
+  it("빈칸을 이름으로 알려 준다 — 출시 전에 0개여야 한다", () => {
+    expect(businessBlanks(full)).toEqual([]);
+    expect(businessBlanks({ ...full, mailOrderNo: " " })).toEqual(["통신판매업 신고번호"]);
+  });
+
+  it("사업자 정보가 비어 있으면 약관도 초안이다 — 한쪽만 채우고 내보내지 않는다", () => {
+    if (businessBlanks(BUSINESS).length > 0) expect(isDraft(TERMS)).toBe(true);
+  });
+
+  it("공정위 조회는 10자리 번호일 때만 연다", () => {
+    expect(ftcLookupUrl("123-45-67890")).toBe("https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1234567890");
+    expect(ftcLookupUrl("")).toBeNull();
+    expect(ftcLookupUrl("123-45")).toBeNull();
   });
 });

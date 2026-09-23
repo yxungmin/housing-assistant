@@ -15,7 +15,7 @@
  */
 import Purchases, { LOG_LEVEL, type CustomerInfo } from "react-native-purchases";
 import { Platform } from "react-native";
-import type { BillingAdapter, Subscription } from "./billing";
+import type { BillingAdapter, StorePrice, Subscription } from "./billing";
 
 /** RevenueCat 대시보드에서 만드는 자격 이름. 상품이 여럿이어도 앱은 이것만 본다 */
 export const ENTITLEMENT = "paid";
@@ -92,6 +92,17 @@ export function onStoreSubscriptionChange(prev: () => Subscription, next: (s: Su
   const listener = (info: CustomerInfo) => next(toSubscription(info, prev()));
   Purchases.addCustomerInfoUpdateListener(listener);
   return () => void Purchases.removeCustomerInfoUpdateListener(listener);
+}
+
+/** 판매 중인 월 구독의 스토어 가격. 못 받으면 null — 화면은 PRICE_KRW로 적는다 (billing.ts priceParts) */
+export async function readStorePrice(): Promise<StorePrice | null> {
+  if (!storeBillingConfigured) return null;
+  try {
+    const product = (await Purchases.getOfferings()).current?.availablePackages[0]?.product;
+    return product ? { price: product.price, currencyCode: product.currencyCode, priceString: product.priceString } : null;
+  } catch {
+    return null;
+  }
 }
 
 async function buy(): Promise<Subscription> {
