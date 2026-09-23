@@ -39,14 +39,14 @@ export default function Profile() {
   const openReports = state.reports.filter(isOpen).length;
   const p = state.profile;
   const missing: string[] = [];
-  if (p?.car_value === undefined) missing.push("자동차가액");
+  if (p?.car_value === undefined) missing.push("자동차 가액");
   if (p?.monthly_debt_payment === undefined) missing.push("월 부채 상환액");
   if (!p?.workplace) missing.push("직장 위치");
   // 부부는 두 사람 통근을 같이 봐야 후보가 제대로 걸러진다
   else if ((p.marriage === "married" || p.marriage === "pre_marriage") && !p.workplace_partner) missing.push("배우자 직장 위치");
   const sub = state.subscription;
   const age = p?.birth_date ? `${p.birth_date.slice(0, 4)}년생 · 만 ${ageFromBirthDate(p.birth_date)}세` : p?.age !== undefined ? `만 ${p.age}세` : "";
-  const subLabel = { none: "미구독", trial: "첫 달 무료 이용 중", active: "구독 중", expired: "만료됨" }[sub.status];
+  const subLabel = { none: "구독 전", trial: "첫 달 무료 이용 중", active: "구독 중", expired: "구독 종료" }[sub.status];
   const subSub =
     sub.status === "trial" ? `${longDate(sub.expiresAt?.slice(0, 10))}까지 무료 · 이후 ${price}`
     : sub.status === "active" ? `${price}${sub.cancelled ? ` · ${longDate(sub.expiresAt?.slice(0, 10))}에 종료` : ` · ${daysLeft(sub)}일 뒤 갱신`}`
@@ -97,7 +97,7 @@ export default function Profile() {
         ) : (
           <Sub>아직 조건을 입력하지 않았어요.</Sub>
         )}
-        {missing.length > 0 ? <Sub tone="3" variant="caption">아직 입력하지 않은 항목: {missing.join(", ")}. 입력하면 "확인 필요"였던 조건이 판별돼요.</Sub> : null}
+        {missing.length > 0 ? <Sub tone="3" variant="caption">아직 입력하지 않은 항목: {missing.join(", ")}. 입력하면 "확인 필요"였던 조건까지 맞춰 볼 수 있어요.</Sub> : null}
       </Card>
 
       <View style={{ gap: 8 }}>
@@ -108,7 +108,7 @@ export default function Profile() {
               <ListRow
                 icon="user"
                 iconTone="primary"
-                label={`${PROVIDER_LABEL[state.account.provider]} 계정으로 로그인됨`}
+                label={`${PROVIDER_LABEL[state.account.provider]} 계정으로 로그인했어요`}
                 sub={state.account.email ?? "계정에는 구독 상태만 저장돼요"}
               />
               <ListRow icon="logout" label="로그아웃" sub="조건과 저장한 공고는 이 기기에 그대로 남아요" onPress={() => setConfirmOut(true)} />

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, ScrollView, View } from "react-native";
+import { PanResponder, Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
 import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchAnnouncement, shortfallPlans } from "@housing/engine";
 import { Icon } from "@/components/icon";
@@ -15,6 +15,7 @@ import { LOANS } from "@/data/loans";
 import { manwon, maskDigits, pct, won, dateText } from "@/lib/format";
 import { compareUnits, UNIT_SORT_LABEL, unitLabel, unitRent, unitsWithDistance, type UnitSort } from "@/lib/units";
 import { nearbyLines, transitLines } from "@/lib/commute";
+import { depositAt, fillRatio } from "@/lib/slider";
 import type { IconName } from "@/components/icon";
 import type { SupplyUnit } from "@housing/schema";
 import type { UnitRent } from "@/lib/units";
@@ -81,7 +82,7 @@ export default function Cost() {
               label: `${unitLabel(unit)}${unit.ho ? ` ${unit.ho}호` : ""}`,
               // 목록 한 줄에 들어갈 만큼만: 거리·크기·보증금. 나머지는 눌러서 본다.
               trackName: [
-                km !== null ? `직장 직선 ${km < 10 ? km.toFixed(1) : km.toFixed(0)}km` : null,
+                km !== null ? `직장에서 직선 ${km < 10 ? km.toFixed(1) : km.toFixed(0)}km` : null,
                 unit.exclusive_area_m2 !== undefined ? `전용 ${unit.exclusive_area_m2.toFixed(1)}㎡` : null,
               ]
                 .filter(Boolean)
@@ -304,7 +305,7 @@ export default function Cost() {
               {cost.loan ? (
                 <KeyValue label={`${cost.loan.product.name} (${Math.round(cost.loan.product.ltv * 100)}%)`} value={`− ${hide(won(cost.loan.amount))}`} amount={locked ? undefined : -cost.loan.amount} note={locked ? `${cost.loan.product.provider} · ${needsSignIn ? "로그인하면" : "구독하면"} 한도와 금리를 볼 수 있어요` : undefined} src={locked ? undefined : `${cost.loan.product.provider} · ${dateText(cost.loan.as_of_date)} 기준 · 연 ${(cost.loan.annual_rate * 100).toFixed(1)}%`} />
               ) : (
-                <KeyValue label="적용 가능한 대출" value="없음" note="입력 조건에 맞는 전세자금대출 상품이 없어요" />
+                <KeyValue label="적용 가능한 대출" value="없음" note="내 조건에 맞는 전세자금대출이 없어요" />
               )}
             </View>
           </Card>
@@ -417,7 +418,7 @@ export default function Cost() {
                 note={base.maintenance_estimate === undefined ? "공고문에 없어 추정값을 썼어요" : undefined}
                 src={base.maintenance_estimate === undefined ? undefined : `공고문 ${base.source.page}쪽`}
               />
-              {cost.monthly_debt_payment > 0 ? <KeyValue label="기존 부채 상환" value={hide(won(cost.monthly_debt_payment))} note="부담률 계산에만 포함" /> : null}
+              {cost.monthly_debt_payment > 0 ? <KeyValue label="기존 부채 상환" value={hide(won(cost.monthly_debt_payment))} note="부담률 계산에만 넣어요" /> : null}
             </View>
           </Card>
         </View>
@@ -443,14 +444,15 @@ export default function Cost() {
                 <BigNumber label="보증금" value={manwon(curDep).replace(/ ?원$/, "")} unit="원" size={26} />
                 <BigNumber label="월임대료" value={won(scenarioPricing.monthly_rent ?? 0).replace("원", "")} unit="원" size={26} align="right" />
               </Row>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-                <Stepper label="−100만 원" disabled={curDep - STEP < minDep} onPress={() => setDeposit(Math.max(minDep, curDep - STEP))} />
-                <View style={{ flex: 1, height: 6, backgroundColor: colors.cardStrong, borderRadius: 3, overflow: "hidden" }}>
-                  <View style={{ width: `${maxDep > minDep ? ((curDep - minDep) / (maxDep - minDep)) * 100 : 100}%`, height: "100%", backgroundColor: colors.primary }} />
-                </View>
-                <Stepper label="+100만 원" disabled={curDep + STEP > maxDep} onPress={() => setDeposit(Math.min(maxDep, curDep + STEP))} />
+              <View style={{ gap: 6 }}>
+                <DepositSlider value={curDep} min={minDep} max={maxDep} step={STEP} onChange={setDeposit} />
+                <Row><Sub tone="3" variant="caption">최소 {manwon(minDep)}</Sub><Sub tone="3" variant="caption">최대 {manwon(maxDep)}</Sub></Row>
               </View>
-              <Row><Sub tone="3" variant="caption">최소 {manwon(minDep)}</Sub><Sub tone="3" variant="caption">최대 {manwon(maxDep)}</Sub></Row>
+              {/* 끌어서는 100만 원을 정확히 맞추기 어렵다. 한 칸씩 움직이는 길을 같이 둔다 */}
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                <Stepper icon="minus" label="100만 원" disabled={curDep - STEP < minDep} onPress={() => setDeposit(Math.max(minDep, curDep - STEP))} />
+                <Stepper icon="plus" label="100만 원" disabled={curDep + STEP > maxDep} onPress={() => setDeposit(Math.min(maxDep, curDep + STEP))} />
+              </View>
             </Card>
           </>
         ) : (
@@ -458,7 +460,7 @@ export default function Cost() {
         )}
         <View style={{ gap: 10 }}>
           <T variant="subheading">대출 상품</T>
-          {loans.length === 0 ? <Sub>입력 조건에 맞는 전세자금대출 상품이 없어요.</Sub> : null}
+          {loans.length === 0 ? <Sub>내 조건에 맞는 전세자금대출이 없어요.</Sub> : null}
           {loans.map((q) => {
             const on = (loanId ?? cost.loan?.product.id) === q.product.id;
             return (
@@ -579,12 +581,108 @@ export default function Cost() {
   );
 }
 
-function Stepper({ label, onPress, disabled }: { label: string; onPress: () => void; disabled?: boolean }) {
+function Stepper({ icon, label, onPress, disabled }: { icon: IconName; label: string; onPress: () => void; disabled?: boolean }) {
   const { colors } = useTheme();
   return (
-    <Pressable onPress={onPress} disabled={disabled} accessibilityRole="button" style={({ pressed }) => ({ paddingHorizontal: 14, paddingVertical: 10, borderRadius: radius.pill, backgroundColor: pressed ? colors.cardStrong : colors.cardSoft, opacity: disabled ? 0.4 : 1 })}>
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={`${icon === "plus" ? "보증금 올리기" : "보증금 내리기"} ${label}`}
+      style={({ pressed }) => ({
+        flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+        paddingVertical: 12, borderRadius: radius.pill,
+        backgroundColor: pressed ? colors.cardStrong : colors.cardSoft, opacity: disabled ? 0.4 : 1,
+      })}
+    >
+      <Icon name={icon} size={16} color={colors.text2} />
       <T variant="small" numeric style={{ fontFamily: fonts.semiBold }}>{label}</T>
     </Pressable>
+  );
+}
+
+/** 끌어서 고르는 막대의 손잡이 지름. 44는 터치 최소 크기라 막대 높이로 쓰고, 손잡이는 그 안에 그린다 */
+const KNOB = 28;
+
+/**
+ * 보증금을 끌어서 고른다.
+ *
+ * 버튼만 있을 때는 1,000만 원에서 5,000만 원까지 가려면 마흔 번을 눌러야 했다.
+ * 그래서 사람들은 최대 전환이 어떤 그림인지 보지 않고 기본값만 보고 나간다 —
+ * 이 화면에서 제일 알고 싶은 것이 그건데.
+ *
+ * 값은 100만 원 눈금에 붙는다 (lib/slider.ts). 끄는 동안 숫자가 실시간으로 바뀌므로
+ * 보증금과 월임대료가 같이 움직이는 것이 보인다. 그게 이 시트가 설명하려는 전부다.
+ */
+function DepositSlider({ value, min, max, step, onChange }: { value: number; min: number; max: number; step: number; onChange: (v: number) => void }) {
+  const { colors } = useTheme();
+  const [width, setWidth] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const w = useRef(0);
+  const from = useRef(0);
+
+  /**
+   * PanResponder는 한 번만 만들어야 한다(다시 만들면 끌던 손가락을 놓친다). 그러면 핸들러가
+   * 첫 렌더의 min·max를 들고 있게 되는데, 목록에서 다른 집을 고르면 그 값이 바뀐다.
+   * 최신 계산을 ref에 담아 두고 핸들러는 그것을 부른다.
+   */
+  const emit = useRef<(x: number) => void>(() => {});
+  emit.current = (x) => onChange(depositAt(x, w.current, min, max, step));
+
+  const pan = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      /**
+       * 세로로 스크롤되는 시트 안이다. 붙잡아 두지 않으면 손가락이 조금만 비스듬해도
+       * 시트가 따라 내려가면서 끌던 값이 멈춘다.
+       */
+      onMoveShouldSetPanResponderCapture: () => true,
+      onPanResponderTerminationRequest: () => false,
+      onPanResponderGrant: (e) => {
+        setDragging(true);
+        // 손잡이를 잡지 않고 막대 아무 데나 눌러도 그 자리로 간다 — 먼 값으로 한 번에 가는 길
+        from.current = e.nativeEvent.locationX;
+        emit.current(from.current);
+      },
+      // 끄는 중의 locationX는 플랫폼마다 기준이 달라 믿을 수 없다. 내려놓은 자리 + 이동량으로 센다
+      onPanResponderMove: (_, g) => emit.current(from.current + g.dx),
+      onPanResponderRelease: () => setDragging(false),
+      onPanResponderTerminate: () => setDragging(false),
+    }),
+  ).current;
+
+  const t = fillRatio(value, min, max);
+  const left = width > KNOB ? Math.min(width - KNOB, Math.max(0, t * width - KNOB / 2)) : 0;
+
+  return (
+    <View
+      {...pan.panHandlers}
+      onLayout={(e) => {
+        w.current = e.nativeEvent.layout.width;
+        setWidth(e.nativeEvent.layout.width);
+      }}
+      accessibilityRole="adjustable"
+      accessibilityLabel="보증금"
+      accessibilityValue={{ min, max, now: value, text: manwon(value) }}
+      accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
+      onAccessibilityAction={(e) => onChange(Math.min(max, Math.max(min, value + (e.nativeEvent.actionName === "increment" ? step : -step))))}
+      // 6px 막대를 손가락으로 정확히 짚을 수는 없다. 누를 수 있는 높이를 따로 준다
+      style={{ height: 44, justifyContent: "center" }}
+    >
+      <View style={{ height: 6, borderRadius: 3, backgroundColor: colors.cardStrong, overflow: "hidden" }}>
+        <View style={{ width: `${t * 100}%`, height: "100%", backgroundColor: colors.primary }} />
+      </View>
+      {/* 손잡이는 그림이다 — 터치는 위의 View가 통째로 받는다. 여기서 받으면 막대를 눌러 옮기는 길이 막힌다 */}
+      <View
+        pointerEvents="none"
+        style={{
+          position: "absolute", left,
+          width: KNOB, height: KNOB, borderRadius: KNOB / 2,
+          backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.primary,
+          transform: [{ scale: dragging ? 1.15 : 1 }],
+        }}
+      />
+    </View>
   );
 }
 

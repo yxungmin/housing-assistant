@@ -395,7 +395,7 @@ export default function AnnouncementDetail() {
                 <KeyValue
                   key={`${r.draw_type ?? i}`}
                   label={r.draw_type ? `${r.draw_type}형` : "주택형을 못 읽음"}
-                  value={r.closed_rank ? `${r.closed_rank}순위 마감` : "마감 순위 미상"}
+                  value={r.closed_rank ? `${r.closed_rank}순위 마감` : "마감 순위 모름"}
                   note={
                     r.households !== undefined && r.applicants !== undefined
                       ? `${r.households}호 공급 · ${r.applicants.toLocaleString("ko-KR")}명 신청${r.competition ? ` · ${r.competition}대 1` : ""}`
@@ -451,7 +451,7 @@ export default function AnnouncementDetail() {
                 이미 담았으면 같은 말을 또 하지 않는다. */}
             {!saved && a.apply_end ? (
               <Sub tone="3" variant="caption">
-                오른쪽 위 북마크를 누르면 접수 마감 3일 전에 알려드려요.
+                오른쪽 위 관심 버튼을 누르면 접수 마감 3일 전에 알려드려요.
               </Sub>
             ) : null}
             {a.extraction.schedule.winner_announce ? (

@@ -140,13 +140,14 @@ export default function Home() {
           "~만"은 빼는 말이다. 필터는 좁히는 동작이지만 사람에게 당기는 건 **찾는 말**이라
           "서울만" 대신 "서울"로 둔다 — 켜진 상태는 색으로 이미 보인다.
           "직장 직선 20km 이내"는 우리 구현 사정이지 사용자의 말이 아니다.
+          장소("직장")가 아니라 사람이 하는 일("출퇴근")로 부른다 — 후자가 훨씬 가깝게 들린다.
           그리고 **고를 수 없는 칩은 띄우지 않는다.** 분양이 한 건도 없으면 "임대"를 눌러도
           결과가 그대로다 — 아무 일도 일어나지 않는 버튼은 신뢰를 깎는다.
         */}
         <Chip on={closingSoon} count={chipCount.closingSoon} onPress={toggle(setClosingSoon)}>곧 마감</Chip>
         <Chip on={myRegionOnly} count={chipCount.myRegionOnly} onPress={toggle(setMyRegionOnly)}>{regionLabel}</Chip>
         {hasSale ? <Chip on={rentalOnly} count={chipCount.rentalOnly} onPress={toggle(setRentalOnly)}>임대</Chip> : null}
-        {hasWorkplace ? <Chip on={nearWork} count={chipCount.nearWork} onPress={toggle(setNearWork)}>직장 가까이</Chip> : null}
+        {hasWorkplace ? <Chip on={nearWork} count={chipCount.nearWork} onPress={toggle(setNearWork)}>출퇴근 가까운 곳</Chip> : null}
       </View>
 
 
@@ -235,7 +236,7 @@ export default function Home() {
       <View style={{ flexDirection: "row", gap: 8, paddingTop: 8, paddingHorizontal: 4 }}>
         <Icon name="info" size={16} color={colors.text4} />
         <Sub tone="3" variant="caption" style={{ flex: 1 }}>
-          지금은 {SERVICE_REGION_LABEL}의 LH·SH 공고만 모으고 있어요. "조건 일치"는 공고문 조건과 입력값을 비교한 결과이며 신청 자격을 보장하지 않아요.
+          지금은 {SERVICE_REGION_LABEL}의 LH·SH 공고만 모으고 있어요. "조건 일치"는 공고문 조건과 입력한 값을 맞춰 본 결과예요. 신청 자격을 보장하지는 않아요.
         </Sub>
       </View>
     </Screen>

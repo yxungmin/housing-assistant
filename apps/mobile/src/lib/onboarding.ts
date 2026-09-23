@@ -95,8 +95,8 @@ export const STEPS: Step[] = [
     // 수집 범위 밖을 고르면 그 자리에서 알린다. 스무 질문을 다 답하고 빈 목록을 보는 것보다 낫다.
     hint: (p) =>
       isServiceRegion(p.region_code)
-        ? "공고 대부분이 거주지 기준으로 신청 자격을 봅니다."
-        : `공고 대부분이 거주지 기준으로 신청 자격을 봅니다. 다만 지금은 ${SERVICE_REGION_LABEL} 공고만 모으고 있어요 — 고른 지역 공고는 아직 없어요.`,
+        ? "공고 대부분이 거주지 기준으로 신청 자격을 봐요."
+        : `공고 대부분이 거주지 기준으로 신청 자격을 봐요. 다만 지금은 ${SERVICE_REGION_LABEL} 공고만 모으고 있어요 — 고른 지역 공고는 아직 없어요.`,
     options: REGIONS,
     apply: (p, v) => ({ ...p, region_code: String(v), region_sigungu: p.region_code === String(v) ? p.region_sigungu : undefined }),
     read: (p) => p.region_code ?? null,
@@ -111,7 +111,7 @@ export const STEPS: Step[] = [
     read: (p) => (p.region_sigungu ? p.region_sigungu.split(" ").slice(1).join(" ") : null),
   },
   {
-    id: "birth_date", core: true, kind: "date", title: "생년월일을 알려주세요", hint: "공고는 출생일 기준으로 청년·고령자 계층을 나눠요. 만 나이는 자동으로 계산해요.",
+    id: "birth_date", core: true, kind: "date", title: "생년월일을 알려 주세요", hint: "공고는 출생일 기준으로 청년·고령자 계층을 나눠요. 만 나이는 자동으로 계산해요.",
     apply: (p, v) => {
       const s = String(v ?? "").replace(/[^0-9]/g, "");
       if (s.length !== 8) return p;
@@ -121,7 +121,7 @@ export const STEPS: Step[] = [
     read: (p) => (p.birth_date ? p.birth_date.replace(/-/g, "") : null),
   },
   {
-    id: "marriage", core: true, kind: "select", title: "혼인 상태를 알려주세요",
+    id: "marriage", core: true, kind: "select", title: "혼인 상태를 알려 주세요",
     options: [
       { value: "single", label: "미혼" }, { value: "married", label: "기혼" },
       { value: "pre_marriage", label: "예비 신혼부부", hint: "입주 전까지 혼인 예정" }, { value: "single_parent", label: "한부모" },
@@ -139,7 +139,7 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, household_size: Number(v) }), read: (p) => p.household_size ?? null,
   },
   {
-    id: "children_count", kind: "count", title: "자녀는 몇 명인가요?", hint: "없으면 0. 태아도 포함합니다.",
+    id: "children_count", kind: "count", title: "자녀는 몇 명인가요?", hint: "없으면 0. 태아도 포함해요.",
     apply: (p, v) => ({ ...p, children_count: Number(v), children_ages: Number(v) === 0 ? [] : p.children_ages }), read: (p) => p.children_count ?? null,
   },
   {
@@ -178,7 +178,7 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, monthly_debt_payment: v === null ? undefined : Number(v) }), read: (p) => p.monthly_debt_payment ?? null,
   },
   {
-    id: "statuses", kind: "multi", title: "해당하는 것이 있나요?", hint: "공고의 계층(대학생·수급자 등) 자격을 판별하는 데 써요. 없으면 '해당 없음'.",
+    id: "statuses", kind: "multi", title: "해당하는 것이 있나요?", hint: "공고마다 따로 뽑는 계층(대학생·수급자 등)에 드는지 볼 때 써요. 없으면 '해당 없음'을 눌러 주세요.",
     options: [
       { value: "student", label: "대학생·입복학 예정" }, { value: "job_seeker", label: "취업준비생", hint: "졸업·중퇴 2년 이내" },
       { value: "new_worker", label: "사회초년생", hint: "소득 있는 일 5년 이내" }, { value: "artist", label: "예술인" },
@@ -245,7 +245,7 @@ export const STEPS: Step[] = [
   ...workplaceSteps("workplace", {
     core: true,
     title: "직장이 어디인가요?",
-    hint: "역·회사 이름을 검색하세요. 정확할수록 통근 거리·시간이 실제와 가까워요. 위치는 이 기기에만 저장돼요.",
+    hint: "역이나 회사 이름으로 찾아 주세요. 정확할수록 통근 거리·시간이 실제와 가까워요. 위치는 이 기기에만 저장돼요.",
   }),
   ...workplaceSteps("workplace_partner", {
     title: (p) => (p.marriage === "pre_marriage" ? "예비 배우자 직장은 어디인가요?" : "배우자 직장은 어디인가요?"),

@@ -45,7 +45,7 @@ export default function Saved() {
         <Card style={{ alignItems: "center", paddingVertical: 36, gap: 10 }}>
           <IconTile name="bookmark" size={48} tone="primary" />
           <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 관심 공고가 없어요</T>
-          <Sub style={{ textAlign: "center" }}>공고 상세에서 북마크를 누르면 여기에 모이고,{"\n"}접수 마감 3일 전에 알려드려요.</Sub>
+          <Sub style={{ textAlign: "center" }}>공고를 열고 오른쪽 위 관심 버튼을 누르면 여기에 모여요.{"\n"}접수 마감 3일 전에 알려드릴게요.</Sub>
         </Card>
       ) : (
         items.map((m) => <AnnouncementCard key={m.announcement.id} m={m} onPress={() => router.push(`/announcement/${m.announcement.id}`)} />)

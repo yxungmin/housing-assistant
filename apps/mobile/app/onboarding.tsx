@@ -196,7 +196,7 @@ function NumberField({ step, text, onChange }: { step: Step; text: string; onCha
   const isDate = step.kind === "date";
   const display = isDate ? formatDateDigits(digits) : text ? Number(digits).toLocaleString("ko-KR") : "";
   const valid = isDate && isValidBirthDate(digits);
-  const ageNote = valid ? `만 ${ageFromBirthDate(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`)}세` : isDate ? "8자리를 숫자로 입력하세요" : "";
+  const ageNote = valid ? `만 ${ageFromBirthDate(`${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`)}세` : isDate ? "8자리를 숫자로 입력해 주세요" : "";
   const isWon = step.kind === "won" || step.kind === "manwon";
   // 치는 값이 만 원 단위라 "5,000"이 얼마인지 바로 안 보인다. 원으로 환산해 그 자리에 적는다.
   const won = step.kind === "manwon" ? Number(digits) * 10_000 : Number(digits);

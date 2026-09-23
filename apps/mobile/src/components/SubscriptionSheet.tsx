@@ -99,7 +99,7 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
         </Pressable>
       </View>
       <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>
-        {billing.isMock ? "개발 빌드: 결제 없이 기기 상태만 바뀝니다" : "스토어 결제로 진행돼요"}
+        {billing.isMock ? "개발 빌드: 결제 없이 기기 상태만 바뀌어요" : "스토어 결제로 진행돼요"}
       </Sub>
     </BottomSheet>
   );
@@ -112,7 +112,7 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
   const sub = state.subscription;
   const [msg, setMsg] = useState<string | null>(null);
   const left = daysLeft(sub);
-  const label = { none: "미구독", trial: "첫 달 무료 이용 중", active: "구독 중", expired: "만료됨" }[sub.status];
+  const label = { none: "구독 전", trial: "첫 달 무료 이용 중", active: "구독 중", expired: "구독 종료" }[sub.status];
 
   const restore = async () => {
     const r = await billing.restore();
@@ -167,7 +167,7 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
         </Pressable>
       ) : null}
       <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>
-        {billing.isMock ? "개발 빌드: 결제 없이 기기 상태만 바뀝니다" : "해지는 스토어에서만 할 수 있어요. 결제·환불도 스토어 정책을 따라요."}
+        {billing.isMock ? "개발 빌드: 결제 없이 기기 상태만 바뀌어요" : "해지는 스토어에서만 할 수 있어요. 결제·환불도 스토어 정책을 따라요."}
       </Sub>
     </BottomSheet>
   );

@@ -117,7 +117,7 @@ export function SignInSheet({ visible, onClose, reason }: { visible: boolean; on
       <View style={{ gap: 16 }}>
         <View style={{ gap: 6 }}>
           <T variant="title">로그인하고 이어서 보기</T>
-          <Sub variant="body">{reason ?? "맞춤 공고는 내 조건으로 계산해서 보여드려요. 로그인하면 바로 이어집니다."}</Sub>
+          <Sub variant="body">{reason ?? "맞춤 공고는 내 조건으로 계산해서 보여드려요. 로그인하면 보던 화면으로 바로 돌아와요."}</Sub>
         </View>
         <SignInButtons onDone={onClose} />
         <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>

@@ -45,7 +45,7 @@ export default function Conditions() {
                   <ListRow
                     key={s.id}
                     label={stepLabel(s)}
-                    value={value ?? "입력 안 함"}
+                    value={value ?? "아직 안 넣었어요"}
                     onPress={() => open(s.id)}
                   />
                 );
