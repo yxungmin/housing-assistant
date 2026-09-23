@@ -378,10 +378,15 @@ function PlaceField({
       <TextInput
         value={q}
         onChangeText={setQ}
-        placeholder="예: 강남역, 판교 카카오, 삼성전자 수원"
+        /* 예시를 셋이나 넣으니 17pt 입력칸 폭을 넘어 잘렸다.
+           무엇을 넣어야 하는지는 위 설명이 이미 말한다 — 여기선 둘이면 충분하다. */
+        placeholder="예: 강남역, 판교 카카오"
         placeholderTextColor={colors.text4}
         autoCorrect={false}
-        style={{ fontFamily: fonts.medium, fontSize: 17, color: colors.text, backgroundColor: colors.card, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 16 }}
+        /* paddingVertical로 높이를 만들면 글자가 아래로 치우친다 — Pretendard는 ascent가 커서
+           iOS TextInput이 그 여백을 위쪽에 몰아 준다. 높이를 직접 주고 패딩을 0으로 두면
+           한 줄짜리 입력은 iOS가 가운데로 맞춘다 (이 파일의 다른 입력들도 padding: 0을 쓴다). */
+        style={{ fontFamily: fonts.medium, fontSize: 17, color: colors.text, backgroundColor: colors.card, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 0, height: 56 }}
       />
 
       {busy ? <Sub tone="3">찾는 중…</Sub> : null}
