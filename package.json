@@ -34,7 +34,8 @@
     "output:size": "npm run output:size -w @housing/collector",
     "bundle:push": "npm run bundle:push -w @housing/collector --",
     "legal:site": "npm run legal:site -w @housing/mobile",
-    "benchmark:restore": "npm run benchmark:restore -w @housing/collector"
+    "benchmark:restore": "npm run benchmark:restore -w @housing/collector",
+    "backfill:complex": "npm run backfill:complex -w @housing/collector --"
   },
   "engines": {
     "node": ">=20"
