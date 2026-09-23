@@ -9,18 +9,23 @@
  * 결과는 social/output/<id>.<type>.json. 영상(Remotion)과 게시(Instagram)는 이 JSON을 받는 다음 단계다.
  *
  * 다운로드 링크는 앱 출시 후에 SOCIAL_APP_LINK로 넣는다. 없으면 캡션의 링크 문장과 첫 댓글을 만들지 않는다.
+ *
+ * 이미 만든 대본은 **올린 게시물**로 보고 덮어쓰지 않는다. 공고가 정정돼 게시물에 나온 사실이 바뀌었으면
+ * <id>.<type>.correction.json에 고정 댓글 문안을 만든다(social/correction.ts). 대본을 새로 뽑으려면 --force.
  */
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildFacts } from "./social/facts";
 import { templateScript, typesFor, type ReelScript } from "./social/script";
 import { verifyScript, type Verdict } from "./social/verify";
 import { polishScript } from "./social/copy";
+import { detectCorrection } from "./social/correction";
 import { fromRoot } from "./paths";
 
 const args = process.argv.slice(2);
 const only = args.includes("--id") ? args[args.indexOf("--id") + 1] : undefined;
 const useLlm = args.includes("--llm");
+const force = args.includes("--force");
 const appLink = process.env.SOCIAL_APP_LINK || null;
 const today = new Date();
 
@@ -34,11 +39,25 @@ mkdirSync(outDir, { recursive: true });
 
 let ok = 0;
 let rejected = 0;
+let corrections = 0;
 for (const row of rows) {
   const facts = buildFacts(row);
   // 접수가 끝난 공고는 올리지 않는다
   if (facts.apply.end && facts.apply.end < today.toISOString().slice(0, 10)) continue;
   for (const type of typesFor(facts, today)) {
+    const file = join(outDir, `${row.id}.${type}.json`);
+    // 이미 만든 대본 = 올린 게시물. 바꾸지 않고, 정정이 있으면 고정 댓글만 만든다
+    if (existsSync(file) && !force) {
+      const posted = JSON.parse(readFileSync(file, "utf8")) as { facts: typeof facts };
+      const fix = detectCorrection(posted.facts, facts);
+      if (fix) {
+        corrections++;
+        writeFileSync(join(outDir, `${row.id}.${type}.correction.json`), JSON.stringify({ id: row.id, type, ...fix, facts_after: facts, generated_at: today.toISOString() }, null, 2));
+        const detail = [...fix.changes, ...fix.errors.map((e) => `✗ ${e}`)].map((l) => `\n      ${l}`).join("");
+        console.log(`${fix.ok ? "FIX" : "NG "} ${row.id} ${type.padEnd(8)} 정정 → 고정 댓글${detail}`);
+      }
+      continue;
+    }
     const draft = templateScript(facts, type, { appLink, today });
     let script: ReelScript = draft;
     let mode: "template" | "llm" = "template";
@@ -54,7 +73,6 @@ for (const row of rows) {
       }
     }
     const verdict: Verdict = verifyScript(script, facts, today);
-    const file = join(outDir, `${row.id}.${type}.json`);
     writeFileSync(file, JSON.stringify({ id: row.id, type, mode, verdict, script, facts, llm_note: llmNote, generated_at: today.toISOString() }, null, 2));
     if (verdict.ok) ok++;
     else rejected++;
@@ -62,5 +80,5 @@ for (const row of rows) {
     console.log(`${mark} ${row.id} ${type.padEnd(8)} ${mode.padEnd(8)} ${facts.title.slice(0, 30)}${verdict.errors.length ? `\n      ✗ ${verdict.errors.join("\n      ✗ ")}` : ""}${verdict.warnings.length ? `\n      ! ${verdict.warnings.join("\n      ! ")}` : ""}${llmNote ? `\n      (Claude 결과 버림: ${llmNote})` : ""}`);
   }
 }
-console.log(`\n${ok}편 통과, ${rejected}편 보류 → ${outDir}`);
+console.log(`\n새 대본 ${ok}편 통과, ${rejected}편 보류, 정정 댓글 ${corrections}건 → ${outDir}${force ? "" : "\n(이미 만든 대본은 올린 게시물로 보고 그대로 둔다. 새로 뽑으려면 --force)"}`);
 if (rejected > 0) process.exitCode = 1;

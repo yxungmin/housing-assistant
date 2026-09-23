@@ -132,3 +132,26 @@ describe("비용 차단", () => {
     if (prev !== undefined) process.env.SOCIAL_COPY_ENABLED = prev;
   });
 });
+
+describe("정정 → 고정 댓글", async () => {
+  const { detectCorrection } = await import("../src/social/correction");
+  const before = buildFacts(row("012"));
+
+  it("게시물에 나온 사실이 그대로면 댓글을 만들지 않는다", () => {
+    expect(detectCorrection(before, buildFacts(row("012")))).toBeNull();
+  });
+
+  it("접수 마감이 바뀌면 무엇이 어떻게 바뀌었는지 적는다", () => {
+    const after = buildFacts({ ...row("012"), apply_end: "2026-10-02" });
+    const fix = detectCorrection(before, after)!;
+    expect(fix.changes).toEqual(["접수 마감 9/30 → 10/2"]);
+    expect(fix.comment).toContain("[정정 안내]");
+    expect(fix.comment).toContain("게시물 내용은 정정 전 기준이에요");
+    expect(fix.ok).toBe(true);
+  });
+
+  it("모집 수가 바뀌면 이전·이후를 둘 다 적는다", () => {
+    const after = buildFacts({ ...row("012"), units: row("012").units.slice(0, 80) });
+    expect(detectCorrection(before, after)!.changes).toContain("모집 81호 → 80호");
+  });
+});
