@@ -48,7 +48,30 @@ export interface SocialFacts {
    * 예: 맞벌이는 소득 기준이 다르다, 1~4순위로 나뉜다, 소득 구간마다 임대료가 다르다.
    */
   splits: Fact<string>[];
+  /**
+   * 임대료 범위 (원). 게시물 앞부분이 "얼마인가"를 숫자로 말해야 광고가 아니라 정보가 된다.
+   * 집 단위 공고는 집마다의 **일반 구간**(높은 쪽) 임대료로 잡는다 — 낮은 구간으로 잡으면 대부분에게 싸게 보인다.
+   * lowerTier: 수급자·1순위 같은 낮은 구간이 따로 있다는 사실 (그 사람들은 이보다 싸다).
+   */
+  rent?: Fact<{ deposit: [number, number]; monthly: [number, number]; lowerTier: string | null }>;
+  /**
+   * 자격 기준 숫자. **공급 유형(트랙)마다 값이 같을 때만** 숫자로 둔다. 다르면 "varies" —
+   * 하나를 골라 적으면 다른 유형 대상자에게는 틀린 숫자가 된다.
+   */
+  limits: {
+    /** 1인 가구 월소득 상한 (외벌이) */
+    income1?: Limit;
+    /** 2인 가구 외벌이·맞벌이 월소득 상한 — "맞벌이는 기준이 달라요"를 숫자로 말할 때 */
+    income2single?: Limit;
+    income2dual?: Limit;
+    asset?: Limit;
+    car?: Limit;
+    /** 만 나이 [최소, 최대]. for가 있으면 그 계층에만 적용되는 기준 */
+    age?: (Fact<[number, number]> & { for?: string }) | "varies";
+  };
 }
+
+export type Limit = Fact<number> | "varies";
 
 type Row = {
   id: string;
@@ -77,6 +100,70 @@ const TARGET_RULES: [RegExp, Target][] = [
   [/장애인/, "장애인"],
   [/국가유공자/, "국가유공자"],
 ];
+
+type Rule = ExtractionOutput["tracks"][number]["rules"][number];
+
+/**
+ * 조건에 맞는 "이하" 규칙이 **모든 트랙에** 같은 값으로 있으면 그 값, 아니면 varies, 아무 데도 없으면 undefined.
+ * 규칙이 있는 트랙끼리만 비교하면 안 된다 — 강서염창의 "만 18~39세"는 청년 트랙에만 있는데
+ * 공고 전체 조건처럼 적힐 뻔했다. 고령자·일반공급 대상자에게는 틀린 숫자다.
+ */
+function limitOf(x: ExtractionOutput, test: (r: Rule) => boolean): Limit | undefined {
+  const hits = x.tracks.flatMap((t) => t.rules).filter((r) => test(r) && r.operator === "lte" && typeof r.value === "number");
+  if (hits.length === 0) return undefined;
+  const values = new Set(hits.map((r) => r.value as number));
+  const everywhere = x.tracks.every((t) => t.rules.some((r) => test(r) && r.operator === "lte"));
+  if (values.size > 1 || !everywhere) return "varies";
+  const r = hits[0]!;
+  return { value: r.value as number, source: { page: r.source.page, text: r.source.text.slice(0, 160) } };
+}
+
+/**
+ * 나이 [최소, 최대]. 모든 트랙에 같은 값이면 공고 전체 기준, 청년 트랙에만 있으면 "청년 계층" 기준으로 밝힌다(for).
+ * 그 밖에 흩어져 있으면 varies — 한 줄로 말할 수 없다.
+ */
+function ageOf(x: ExtractionOutput): SocialFacts["limits"]["age"] {
+  const isAge = (r: Rule) => r.category === "age" && r.operator === "between" && Array.isArray(r.value);
+  const hits = x.tracks.flatMap((t) => t.rules).filter(isAge);
+  if (hits.length === 0) return undefined;
+  const values = new Set(hits.map((r) => JSON.stringify(r.value)));
+  if (values.size > 1) return "varies";
+  const r = hits[0]!;
+  const [a, b] = r.value as [number, number];
+  const withAge = x.tracks.filter((t) => t.rules.some(isAge));
+  const scope = withAge.length === x.tracks.length ? undefined : withAge.every((t) => /청년/.test(t.name)) ? "청년 계층" : null;
+  if (scope === null) return "varies";
+  return { value: [a, b], for: scope, source: { page: r.source.page, text: r.source.text.slice(0, 160) } };
+}
+
+function rentOf(row: Row): SocialFacts["rent"] {
+  // 집 단위: 집마다 기본(전환 전) 조건 중 마지막 구간 = 일반 구간
+  if (row.units?.length) {
+    const general: { deposit: number; monthly: number }[] = [];
+    let lowerTier: string | null = null;
+    for (const u of row.units) {
+      const bases = (u.rent_options ?? []).filter((o) => !o.max_conversion);
+      const g = bases.at(-1);
+      if (g) general.push({ deposit: g.deposit, monthly: g.monthly_rent });
+      else if (u.deposit !== undefined) general.push({ deposit: u.deposit, monthly: u.monthly_rent ?? 0 });
+      if (bases.length > 1 && !lowerTier) lowerTier = bases[0]!.tier;
+    }
+    if (general.length === 0) return undefined;
+    const span = (xs: number[]): [number, number] => [Math.min(...xs), Math.max(...xs)];
+    return {
+      value: { deposit: span(general.map((g) => g.deposit)), monthly: span(general.map((g) => g.monthly)), lowerTier },
+      source: { page: 0, text: `공급주택목록 첨부 (${general.length}채, 일반 구간)` },
+    };
+  }
+  const rows = row.extraction.tracks.flatMap((t) => t.pricing).filter((p) => p.kind === "rental" && p.deposit !== undefined && p.deposit !== null);
+  if (rows.length === 0) return undefined;
+  const deps = rows.map((p) => p.deposit as number);
+  const mons = rows.map((p) => p.monthly_rent ?? 0);
+  return {
+    value: { deposit: [Math.min(...deps), Math.max(...deps)], monthly: [Math.min(...mons), Math.max(...mons)], lowerTier: null },
+    source: { page: rows[0]!.source.page, text: rows[0]!.source.text.slice(0, 160) },
+  };
+}
 
 /** 공고문 표기 그대로의 첫 근거 */
 const firstSource = (x: ExtractionOutput, test: (r: ExtractionOutput["tracks"][number]["rules"][number]) => boolean): Source | undefined => {
@@ -157,6 +244,16 @@ export function buildFacts(row: Row): SocialFacts {
   }
 
   return {
+    rent: rentOf(row),
+    limits: {
+      income1: limitOf(x, (r) => r.category === "income" && r.applies_to?.household_size === 1 && r.applies_to?.income_type !== "dual"),
+      income2single: limitOf(x, (r) => r.category === "income" && r.applies_to?.household_size === 2 && r.applies_to?.income_type === "single"),
+      income2dual: limitOf(x, (r) => r.category === "income" && r.applies_to?.household_size === 2 && r.applies_to?.income_type === "dual"),
+      asset: limitOf(x, (r) => r.category === "asset"),
+      // 자동차 0원 상한(수급자 트랙 등)은 "차가 없어야 한다"는 뜻이라 금액 기준과 섞지 않는다
+      car: limitOf(x, (r) => r.category === "car_value" && Number(r.value) > 0),
+      age: ageOf(x),
+    },
     id: row.id,
     provider: row.provider ?? "LH",
     title: row.title,

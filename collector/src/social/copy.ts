@@ -19,7 +19,7 @@ export const COPY_PROMPT_VERSION = "v1";
 
 /** 모델이 돌려주는 것. 시간(at)과 종류(type)는 템플릿 것을 쓰므로 받지 않는다 */
 const LlmCopy = z.object({
-  scenes: z.array(z.object({ kind: z.enum(["hook", "place", "checks", "split", "cta"]), lines: z.array(z.string()).min(1).max(4) })),
+  scenes: z.array(z.object({ kind: z.enum(["hook", "price", "who", "split", "cta"]), lines: z.array(z.string()).min(1).max(4) })),
   caption: z.string(),
   hashtags: z.array(z.string()).max(8),
 });
@@ -31,7 +31,7 @@ const SYSTEM = `당신은 공공주택 공고 알림 계정의 카피라이터�
 - 장면 순서와 종류(kind)는 템플릿과 같게 둡니다. 화면 한 줄은 18자 이내입니다.
 - 공고 사실은 충분히 말하고, 개인별 판단("내가 되는지")만 앱으로 넘깁니다. 정보를 일부러 숨겨 궁금하게 만들지 않습니다.
 - "신청 가능", "자격 충족", "당첨 보장", "누구나", "100%" 같은 단정 표현을 쓰지 않습니다. 대상은 "○○도 신청 대상"처럼 씁니다.
-- ✓는 "이 사람들도 신청 대상"이라는 사실, △는 "기준이 있고 사람마다 갈린다"는 뜻입니다. 기호는 템플릿 그대로 둡니다.
+- 앞 장면들은 공고 사실(금액·기준·일정)만 말합니다. 앱 이야기는 마지막 cta 장면에만 둡니다 — 광고처럼 들리면 안 됩니다.
 - 캡션의 고지 문장("공고 조건은 가구 상황에 따라 달라질 수 있어요")은 반드시 남깁니다.
 - 해요체로, 광고처럼 들뜨지 않게 씁니다. 이모지는 쓰지 않습니다.`;
 

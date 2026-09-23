@@ -1,8 +1,11 @@
 /**
  * 릴스 한 편. collector/src/social의 대본 JSON(social/output/<id>.<type>.json)을 그대로 props로 받는다.
  *
- * 화면은 매번 새로 만들지 않는다 — 장면 종류(hook·place·checks·split·cta)마다 틀이 정해져 있고
- * 대본은 글자만 채운다. 브랜드가 한결같아야 알림 계정으로 기억된다.
+ * 앞 12초는 **공고 사실만** — 무슨 공고인지(hook), 얼마인지(price), 누가 되는지(who), 어디서 갈리는지(split).
+ * 로고와 앱 이름은 마지막 장면(cta)에만 나온다. 전에는 모든 장면 위에 로고와 앱 이름이 붙어 있어서
+ * 공고 알림이 아니라 앱 광고처럼 보였다(2026-09-23).
+ *
+ * 화면은 매번 새로 만들지 않는다 — 장면 종류마다 틀이 정해져 있고 대본은 글자만 채운다.
  * 대본은 이미 재대조(verify.ts)를 통과한 것만 렌더한다(scripts/render.ts). 여기서는 글자를 바꾸지 않는다.
  */
 import { AbsoluteFill, Img, interpolate, Sequence, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
@@ -10,7 +13,7 @@ import { APP_NAME, colors, FONT, SAFE } from "./brand";
 
 export interface Scene {
   at: [number, number];
-  kind: "hook" | "place" | "checks" | "split" | "cta";
+  kind: "hook" | "price" | "who" | "split" | "cta";
   lines: string[];
 }
 
@@ -26,10 +29,22 @@ export const TAIL_SECONDS = 1;
 
 export const reelDuration = (p: ReelProps, fps: number) => Math.ceil(((p.script.scenes.at(-1)?.at[1] ?? 10) + TAIL_SECONDS) * fps);
 
+const WIDTH = 1080 - SAFE.left - SAFE.right;
+
+/**
+ * 한 줄에 들어가게 글자 크기를 줄인다. 공고마다 금액 길이가 달라("200만" / "9,066만~2억 3,313만")
+ * 고정 크기로 두면 긴 줄이 두 줄로 꺾여 카드가 넘친다. 한글은 1em, 숫자·기호는 좁게 셈한다.
+ */
+function fit(line: string, base: number, width = WIDTH - 20): number {
+  let em = 0;
+  for (const ch of line) em += /[가-힣]/.test(ch) ? 0.96 : /\s/.test(ch) ? 0.28 : /[0-9]/.test(ch) ? 0.58 : 0.5;
+  return Math.min(base, Math.floor(width / Math.max(em, 1)));
+}
+
 const BADGE: Record<ReelProps["type"], { bg: string; fg: string }> = {
-  new: { bg: colors.primary, fg: colors.onPrimary },
-  deadline: { bg: colors.danger, fg: "#FFFFFF" },
-  caution: { bg: colors.warning, fg: "#FFFFFF" },
+  new: { bg: colors.primarySoft, fg: colors.primaryPressed },
+  deadline: { bg: colors.dangerSoft, fg: colors.danger },
+  caution: { bg: colors.warningSoft, fg: colors.warning },
 };
 
 /** 들어오는 움직임. 모든 장면이 같은 움직임을 쓴다 */
@@ -40,45 +55,50 @@ function useEnter(delay = 0) {
   return { opacity: p, transform: `translateY(${interpolate(p, [0, 1], [36, 0])}px)` };
 }
 
-function Brand({ type, badge }: { type: ReelProps["type"]; badge: string }) {
-  const b = BADGE[type];
-  return (
-    <div style={{ position: "absolute", top: SAFE.top - 90, left: SAFE.left, right: SAFE.right, display: "flex", alignItems: "center", gap: 18 }}>
-      <Img src={staticFile("logo.png")} style={{ width: 64, height: 64 }} />
-      <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 36, color: colors.text, letterSpacing: -1, flex: 1 }}>{APP_NAME}</div>
-      <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 32, color: b.fg, background: b.bg, borderRadius: 999, padding: "10px 26px", letterSpacing: -0.5 }}>{badge}</div>
-    </div>
-  );
-}
-
-/*
- * 줄바꿈: 한국어는 단어(띄어쓰기) 단위로만 끊고(keep-all), 큰 글자는 줄 길이를 고르게 맞춘다(balance).
- * 안 그러면 "신혼부부라고 다 되는 / 건 아니에요"처럼 짧은 꼬리 한 줄이 남는다.
- */
+/* 줄바꿈: 한국어는 단어(띄어쓰기) 단위로만 끊고(keep-all), 큰 글자는 줄 길이를 고르게 맞춘다(balance). */
 const Body = ({ children }: { children: React.ReactNode }) => (
-  <div style={{ position: "absolute", top: SAFE.top + 40, bottom: SAFE.bottom, left: SAFE.left, right: SAFE.right, display: "flex", flexDirection: "column", justifyContent: "center", gap: 36, wordBreak: "keep-all", textWrap: "balance" }}>
+  <div style={{ position: "absolute", top: SAFE.top, bottom: SAFE.bottom, left: SAFE.left, right: SAFE.right, display: "flex", flexDirection: "column", justifyContent: "center", gap: 32, wordBreak: "keep-all", textWrap: "balance" }}>
     {children}
   </div>
 );
 
-function Hook({ lines }: { lines: string[] }) {
+const type = (size: number, weight: number, color: string, extra: React.CSSProperties = {}): React.CSSProperties => ({
+  fontFamily: FONT,
+  fontWeight: weight,
+  fontSize: size,
+  color,
+  letterSpacing: -size * 0.035,
+  lineHeight: 1.22,
+  ...extra,
+});
+
+function Hook({ lines, kind, badge }: { lines: string[]; kind: ReelProps["type"]; badge: string }) {
   const a = useEnter(0);
-  const b = useEnter(5);
+  const b = useEnter(4);
+  const c = useEnter(8);
+  const tone = BADGE[kind];
   return (
     <Body>
-      <div style={{ ...a, fontFamily: FONT, fontWeight: 700, fontSize: 60, color: colors.text2, letterSpacing: -1.5 }}>{lines[0]}</div>
-      <div style={{ ...b, fontFamily: FONT, fontWeight: 800, fontSize: 104, lineHeight: 1.18, color: colors.text, letterSpacing: -4, whiteSpace: "pre-line" }}>{lines.slice(1).join("\n")}</div>
+      <div style={{ ...a, alignSelf: "flex-start", ...type(40, 800, tone.fg), background: tone.bg, borderRadius: 999, padding: "12px 30px" }}>{badge}</div>
+      <div style={{ ...b, ...type(fit(lines[0] ?? "", 104), 800, colors.text) }}>{lines[0]}</div>
+      {lines[1] ? <div style={{ ...c, ...type(fit(lines[1], 60), 700, colors.text2) }}>{lines[1]}</div> : null}
     </Body>
   );
 }
 
-function Place({ lines }: { lines: string[] }) {
+/** 같은 역할의 줄은 같은 크기로 — 줄마다 따로 맞추면 짧은 줄만 커져 위계가 뒤집힌다 */
+const shared = (ls: string[], base: number, width: number) => Math.min(...ls.map((l) => fit(l, base, width)), base);
+
+function Price({ lines }: { lines: string[] }) {
   const a = useEnter(0);
+  const main = shared(lines.slice(0, 2), 76, WIDTH - 132);
+  const sub = shared(lines.slice(2), 52, WIDTH - 132);
   return (
     <Body>
-      <div style={{ ...a, background: colors.card, borderRadius: 48, padding: "64px 60px", display: "flex", flexDirection: "column", gap: 34 }}>
+      <div style={{ ...a, background: colors.card, borderRadius: 48, padding: "60px 56px", display: "flex", flexDirection: "column", gap: 28 }}>
         {lines.map((l, i) => (
-          <div key={l} style={{ fontFamily: FONT, fontWeight: i === 0 ? 800 : 700, fontSize: i === 0 ? 84 : 68, color: i === 0 ? colors.text : colors.text2, letterSpacing: -2.5 }}>
+          // 보증금·월세가 주인공이다. 면적과 구간 안내는 작게
+          <div key={l} style={type(i < 2 ? main : sub, i < 2 ? 800 : 600, i < 2 ? colors.text : colors.text2)}>
             {l}
           </div>
         ))}
@@ -87,33 +107,24 @@ function Place({ lines }: { lines: string[] }) {
   );
 }
 
-/** "✓ 청년도 신청 대상" / "△ 소득 기준 있음" — 기호는 그림으로 그린다. 글리프는 폰트마다 모양이 다르다 */
-function CheckRow({ line, delay }: { line: string; delay: number }) {
+/** 기준 한 줄. 판정(✓/✕)이 아니라 공고 사실이라 중립 표시(점)를 쓴다 */
+function WhoRow({ line, delay, size }: { line: string; delay: number; size: number }) {
   const s = useEnter(delay);
-  const maybe = line.startsWith("△");
-  const text = line.replace(/^[✓△]\s*/, "");
-  const tone = maybe ? { bg: colors.warningSoft, fg: colors.warning } : { bg: colors.primarySoft, fg: colors.primary };
+  const vague = /달라요$/.test(line);
   return (
-    <div style={{ ...s, display: "flex", alignItems: "center", gap: 32 }}>
-      <div style={{ width: 96, height: 96, borderRadius: 48, background: tone.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
-          {maybe ? (
-            <path d="M12 5 20 19H4L12 5Z" stroke={tone.fg} strokeWidth="2.6" strokeLinejoin="round" />
-          ) : (
-            <path d="M5.5 12.5 10 17 18.5 7.5" stroke={tone.fg} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-          )}
-        </svg>
-      </div>
-      <div style={{ fontFamily: FONT, fontWeight: 700, fontSize: 66, color: colors.text, letterSpacing: -2.5 }}>{text}</div>
+    <div style={{ ...s, display: "flex", alignItems: "center", gap: 28 }}>
+      <div style={{ width: 20, height: 20, borderRadius: 10, background: vague ? colors.text4 : colors.primary, flexShrink: 0 }} />
+      <div style={type(size, 700, vague ? colors.text2 : colors.text)}>{line}</div>
     </div>
   );
 }
 
-function Checks({ lines }: { lines: string[] }) {
+function Who({ lines }: { lines: string[] }) {
+  const size = shared(lines, 68, WIDTH - 48);
   return (
     <Body>
       {lines.map((l, i) => (
-        <CheckRow key={l} line={l} delay={i * 6} />
+        <WhoRow key={l} line={l} delay={i * 5} size={size} />
       ))}
     </Body>
   );
@@ -122,49 +133,57 @@ function Checks({ lines }: { lines: string[] }) {
 function Split({ lines }: { lines: string[] }) {
   const a = useEnter(0);
   const b = useEnter(6);
+  const [head, ...rest] = lines;
+  const size = shared(rest, 70, WIDTH - 124);
   return (
     <Body>
-      <div style={{ ...a, fontFamily: FONT, fontWeight: 700, fontSize: 60, color: colors.text3, letterSpacing: -1.5 }}>{lines[0]}</div>
-      <div style={{ ...b, background: colors.primarySoft, borderRadius: 48, padding: "60px 56px", fontFamily: FONT, fontWeight: 800, fontSize: 88, lineHeight: 1.22, color: colors.primaryPressed, letterSpacing: -3, whiteSpace: "pre-line" }}>
-        {lines.slice(1).join("\n")}
+      <div style={{ ...a, ...type(fit(head ?? "", 64), 800, colors.text) }}>{head}</div>
+      <div style={{ ...b, background: colors.primarySoft, borderRadius: 48, padding: "56px 52px", display: "flex", flexDirection: "column", gap: 24 }}>
+        {rest.map((l) => (
+          <div key={l} style={type(size, 800, colors.primaryPressed)}>
+            {l}
+          </div>
+        ))}
       </div>
     </Body>
   );
 }
 
+/** 앱 이야기는 여기 한 번뿐 */
 function Cta({ lines }: { lines: string[] }) {
   const a = useEnter(0);
   const b = useEnter(6);
   return (
     <Body>
       <div style={{ ...a, display: "flex", justifyContent: "center" }}>
-        <Img src={staticFile("logo.png")} style={{ width: 260, height: 260 }} />
+        <Img src={staticFile("logo.png")} style={{ width: 240, height: 240 }} />
       </div>
-      <div style={{ ...b, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 92, lineHeight: 1.2, color: colors.text, letterSpacing: -3.5, whiteSpace: "pre-line" }}>
-        {lines.join("\n")}
-      </div>
-      <div style={{ ...b, textAlign: "center", fontFamily: FONT, fontWeight: 700, fontSize: 44, color: colors.primary, letterSpacing: -1 }}>{APP_NAME}</div>
+      <div style={{ ...b, ...type(88, 800, colors.text, { textAlign: "center", whiteSpace: "pre-line" }) }}>{lines.join("\n")}</div>
+      <div style={{ ...b, ...type(44, 700, colors.primary, { textAlign: "center" }) }}>{APP_NAME}</div>
     </Body>
   );
 }
 
-const SCENES = { hook: Hook, place: Place, checks: Checks, split: Split, cta: Cta };
-
 export function Reel(props: ReelProps) {
   const { fps } = useVideoConfig();
   const scenes = props.script.scenes;
-  const badge = props.type === "deadline" ? (scenes[0]?.lines[1]?.match(/D-\d+|오늘/)?.[0] ?? "마감 임박") : props.type === "caution" ? "조건 주의" : "NEW";
+  const deadline = scenes[0]?.lines[1]?.match(/D-\d+|오늘 접수 마감/)?.[0];
+  const badge = props.type === "deadline" ? (deadline === "오늘 접수 마감" ? "오늘 마감" : `마감 ${deadline ?? "임박"}`) : props.type === "caution" ? "조건 주의" : "신규 공고";
   return (
     <AbsoluteFill style={{ background: colors.surface }}>
-      <Brand type={props.type} badge={badge} />
       {scenes.map((s, i) => {
-        const Comp = SCENES[s.kind];
         const from = Math.round(s.at[0] * fps);
         // 마지막 장면은 꼬리까지 이어서 보여 준다
         const until = i === scenes.length - 1 ? s.at[1] + TAIL_SECONDS : s.at[1];
+        const body =
+          s.kind === "hook" ? <Hook lines={s.lines} kind={props.type} badge={badge} />
+          : s.kind === "price" ? <Price lines={s.lines} />
+          : s.kind === "who" ? <Who lines={s.lines} />
+          : s.kind === "split" ? <Split lines={s.lines} />
+          : <Cta lines={s.lines} />;
         return (
           <Sequence key={`${s.kind}-${i}`} from={from} durationInFrames={Math.round((until - s.at[0]) * fps)} layout="none">
-            <Comp lines={s.lines} />
+            {body}
           </Sequence>
         );
       })}

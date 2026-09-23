@@ -9,7 +9,7 @@
  * 게시물은 그 사람의 조건을 모르니 더더욱 단정할 수 없다.
  */
 import type { SocialFacts, Target } from "./facts";
-import { daysLeft, md, type ReelScript } from "./script";
+import { daysLeft, md, priceLines, splitLines, whoLines, type ReelScript } from "./script";
 
 export interface Verdict {
   ok: boolean;
@@ -47,7 +47,11 @@ const TARGET_WORDS: [RegExp, Target[]][] = [
 const KINDS = ["영구임대", "장기전세", "통합공공임대", "전세임대", "국민임대", "행복주택", "신혼희망타운", "매입임대", "공공분양"];
 const REGION_NAMES = ["서울", "경기", "인천", "부산", "대구", "광주", "대전", "울산", "세종", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"];
 
-/** 대본에 나올 수 있는 숫자들 — 전부 사실에서 나온다 */
+/**
+ * 대본에 나올 수 있는 숫자들 — 전부 사실에서 나온다.
+ * 금액은 대본과 **같은 함수**(money.ts, priceLines·whoLines·splitLines)로 사실을 적어 본 뒤 그 안의 숫자만 허용한다.
+ * 표기가 두 벌이면 맞는 숫자도 틀렸다고 나온다.
+ */
 function allowedNumbers(f: SocialFacts, today: Date): Set<string> {
   const out = new Set<string>();
   if (f.supply) out.add(String(f.supply.value.count));
@@ -55,6 +59,8 @@ function allowedNumbers(f: SocialFacts, today: Date): Set<string> {
   for (const s of f.splits) for (const m of s.value.match(/\d+/g) ?? []) out.add(m);
   const left = daysLeft(f.apply.end, today);
   if (left !== null && left >= 0) out.add(String(left));
+  const texts = [...priceLines(f), ...whoLines(f), ...(splitLines(f) ?? [])];
+  for (const t of texts) for (const m of t.replace(/\d{1,2}\/\d{1,2}/g, " ").match(/\d[\d,]*/g) ?? []) out.add(m.replace(/,/g, ""));
   return out;
 }
 
@@ -90,7 +96,10 @@ export function verifyScript(script: ReelScript, f: SocialFacts, today = new Dat
   }
 
   // 4. 지역·유형
-  for (const r of REGION_NAMES) if (all.includes(r) && r !== f.region && !(f.district ?? "").includes(r)) errors.push(`다른 지역 이름: ${r}`);
+  // 앞에 한글이 붙어 있으면 지역 이름이 아니다 — "세대구성원" 안의 "대구"를 지역으로 잡았다
+  for (const r of REGION_NAMES) {
+    if (new RegExp(`(?<![가-힣])${r}`).test(all) && r !== f.region && !(f.district ?? "").includes(r)) errors.push(`다른 지역 이름: ${r}`);
+  }
   for (const d of all.match(/[가-힣]+구(?=[\s·,]|$)/gm) ?? []) {
     if (/[가-힣]{1,3}구$/.test(d) && d !== f.district && !/(지역|입구|출구|요구|연구|도구|친구|가구)$/.test(d)) errors.push(`다른 구 이름: ${d}`);
   }

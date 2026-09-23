@@ -11,6 +11,7 @@
  */
 import { z } from "zod";
 import type { SocialFacts } from "./facts";
+import { limitMan, rangeMan } from "./money";
 
 /** 자동으로 만드는 세 종류. 조건주의가 앱 기능과 가장 잘 이어진다 */
 export const ContentType = z.enum(["new", "deadline", "caution"]);
@@ -19,7 +20,11 @@ export type ContentType = z.infer<typeof ContentType>;
 export const Scene = z.object({
   /** 초 단위 [시작, 끝] */
   at: z.tuple([z.number(), z.number()]),
-  kind: z.enum(["hook", "place", "checks", "split", "cta"]),
+  /**
+   * hook: 무슨 공고인가(유형·지역·모집·접수) / price: 얼마인가 / who: 누가 되나(나이·소득·자산 숫자)
+   * split: 공고 안에서 갈리는 지점(숫자로) / cta: 앱 안내 — **앱 이야기는 여기 한 번뿐이다**
+   */
+  kind: z.enum(["hook", "price", "who", "split", "cta"]),
   lines: z.array(z.string().min(1)).min(1).max(4),
 });
 
@@ -66,64 +71,85 @@ export function headlineTarget(f: SocialFacts): string {
   return t[0] ?? "";
 }
 
-/** 대상 한 줄. 일반공급은 "누구나"가 아니라 "일반공급도 있어요"다 (verify.ts 금지 표현) */
-const targetLine = (v: string) => (v === "일반" ? "일반공급도 있어요" : `${v}도 신청 대상`);
-
 const supplyText = (f: SocialFacts) => (f.supply ? `모집 ${f.supply.value.count.toLocaleString("ko-KR")}${f.supply.value.unit}` : "");
 const areaText = (f: SocialFacts) => (f.area ? (f.area.value[0] === f.area.value[1] ? `전용 ${f.area.value[0]}㎡` : `전용 ${f.area.value[0]}~${f.area.value[1]}㎡`) : "");
 const applyText = (f: SocialFacts) => (f.apply.start && f.apply.end ? `접수 ${md(f.apply.start)}~${md(f.apply.end)}` : f.apply.end ? `접수 ~${md(f.apply.end)}` : "");
 
-/** 체크 줄: ✓ 대상(사실), △ 사람마다 갈리는 기준. 화면에 네 줄까지. 첫 줄에서 부른 대상을 먼저 둔다 */
-function checkLines(f: SocialFacts, lead: string): string[] {
-  const values = f.targets.map((t) => t.value as string);
-  const ordered = lead && values.includes(lead) ? [lead, ...values.filter((v) => v !== lead)] : values;
-  const yes = ordered.slice(0, 2).map((v) => `✓ ${targetLine(v)}`);
-  const maybe = [
-    f.criteria.homeless ? "✓ 무주택 요건" : null,
-    f.criteria.income ? "△ 소득 기준 있음" : null,
-    f.criteria.asset ? "△ 자산 기준 있음" : null,
-  ].filter((x): x is string => !!x);
-  return [...yes, ...maybe].slice(0, 4);
+/** 장면에 나오는 첫 줄들. 공고마다 없는 값은 건너뛴다 — 없는 숫자를 지어내지 않는다 */
+export function priceLines(f: SocialFacts): string[] {
+  const r = f.rent?.value;
+  if (!r) return areaText(f) ? [areaText(f)] : [];
+  const monthly = r.monthly[1] === 0 ? "월세 없음 (전세형)" : `월세 ${rangeMan(r.monthly)} 원`;
+  return [`보증금 ${rangeMan(r.deposit)} 원`, monthly, areaText(f), // 낮은 구간의 이름(수급자·1순위…)을 그대로 적으면 이 공고의 대상이 아닌 계층을 부르게 되고 줄도 길다
+    r.lowerTier ? "소득 구간에 따라 더 낮을 수 있어요" : ""].filter(Boolean).slice(0, 4);
+}
+
+export function whoLines(f: SocialFacts): string[] {
+  const L = f.limits;
+  const age = L.age === "varies" || !L.age ? null : `${L.age.for ? `${L.age.for} ` : ""}만 ${L.age.value[0]}~${L.age.value[1]}세`;
+  const income = L.income1 === "varies" ? "소득 기준은 유형마다 달라요" : L.income1 ? `1인 가구 월소득 ${limitMan(L.income1.value)} 원 이하` : null;
+  const asset = L.asset === "varies" ? "자산 기준은 유형마다 달라요" : L.asset ? `총자산 ${limitMan(L.asset.value)} 원 이하` : null;
+  const car = L.car && L.car !== "varies" ? `자동차 ${limitMan(L.car.value)} 원 이하` : null;
+  const homeless = f.criteria.homeless ? "무주택 세대구성원" : null;
+  return [age, income, asset, homeless, car].filter((x): x is string => !!x).slice(0, 4);
+}
+
+/**
+ * 갈리는 지점을 **숫자로**. "맞벌이는 기준이 따로 있어요"만 말하면 궁금하게만 만든다 —
+ * 2인 가구 외벌이·맞벌이 상한을 둘 다 적으면 그 자체로 쓸모 있는 정보다. 숫자가 없으면 사실 한 줄.
+ */
+export function splitLines(f: SocialFacts): string[] | null {
+  const s1 = f.limits.income2single;
+  const s2 = f.limits.income2dual;
+  if (s1 && s2 && s1 !== "varies" && s2 !== "varies") {
+    return ["맞벌이는 소득 기준이 달라요", `2인 가구 외벌이 ${limitMan(s1.value)} 원 이하`, `2인 가구 맞벌이 ${limitMan(s2.value)} 원 이하`];
+  }
+  const split = f.splits[0]?.value;
+  return split ? ["여기서 갈려요", split] : null;
 }
 
 export function templateScript(f: SocialFacts, type: ContentType, opts: ScriptOptions = {}): ReelScript {
   const today = opts.today ?? new Date();
   const who = headlineTarget(f);
-  const head = [f.region, who, f.kind].filter(Boolean).join(" ");
-  const split = f.splits[0]?.value;
+  const title = [f.region, f.district, who, f.kind].filter(Boolean).join(" ");
   const left = daysLeft(f.apply.end, today);
+  const facts = [supplyText(f), type === "deadline" && left !== null ? (left === 0 ? "오늘 접수 마감" : `접수 마감 D-${left} (${md(f.apply.end)})`) : applyText(f)].filter(Boolean);
 
-  const hook =
-    type === "deadline" && left !== null
-      ? [head, left === 0 ? "오늘 접수 마감이에요" : `접수 마감 D-${left}`]
-      : type === "caution" && split
-        ? [head, `${who || "이 공고"}라고 다 되는 건 아니에요`]
-        : [head, "새 공고가 올라왔어요"];
+  // 앞 12초는 공고 사실만. 앱 안내는 마지막 장면 하나에만 둔다 (광고처럼 보이지 않게)
+  const scenes: ReelScript["scenes"] = [];
+  let t = 0;
+  const push = (kind: ReelScript["scenes"][number]["kind"], lines: string[], secs: number) => {
+    if (lines.length === 0) return;
+    scenes.push({ at: [t, t + secs], kind, lines });
+    t += secs;
+  };
+  const split = splitLines(f);
+  push("hook", [title, facts.join(" · ")].filter(Boolean), 2.5);
+  // 조건주의 편은 갈리는 지점이 주인공이라 바로 뒤에 둔다
+  if (type === "caution" && split) push("split", split, 3);
+  push("price", priceLines(f), 3);
+  push("who", whoLines(f), 3.5);
+  if (type !== "caution" && split) push("split", split, 2.5);
+  push("cta", ["내 조건에 맞는지는", "앱에서 바로 확인"], 3);
 
-  const scenes: ReelScript["scenes"] = [
-    { at: [0, 2], kind: "hook", lines: hook },
-    { at: [2, 5], kind: "place", lines: [[f.district ?? f.region, areaText(f)].filter(Boolean).join(" · "), supplyText(f), applyText(f)].filter(Boolean) },
-    { at: [5, 8], kind: "checks", lines: checkLines(f, who) },
-  ];
-  if (split) scenes.push({ at: [8, 11], kind: "split", lines: ["근데 여기서 갈려요", split] });
-  scenes.push({ at: [split ? 11 : 8, split ? 14 : 11], kind: "cta", lines: ["내 조건에 맞는지는", "앱에서 바로 확인"] });
-
+  const r = f.rent?.value;
   const bullets = [
-    supplyText(f),
-    ...f.targets.map((t) => t.value).slice(0, 4).map(targetLine),
-    [f.criteria.income ? "소득" : null, f.criteria.asset ? "자산" : null].filter(Boolean).join("·") ? `${[f.criteria.income ? "소득" : null, f.criteria.asset ? "자산" : null].filter(Boolean).join("·")} 기준 있음` : "",
-    applyText(f),
+    [supplyText(f), applyText(f)].filter(Boolean).join(" · "),
+    r ? `보증금 ${rangeMan(r.deposit)} 원 · ${r.monthly[1] === 0 ? "월세 없음" : `월세 ${rangeMan(r.monthly)} 원`}` : "",
+    ...whoLines(f),
+    f.targets.length ? `${f.targets.map((x) => (x.value === "일반" ? "일반공급" : x.value)).join("·")} 신청 대상` : "",
+    f.winnerAnnounce ? `당첨자 발표 ${md(f.winnerAnnounce)}` : "",
   ].filter(Boolean);
 
   const caption = [
-    `${[f.region, f.district].filter(Boolean).join(" ")} ${f.kind} ${type === "deadline" ? "접수 마감 임박" : "신규 공고"}`,
+    `${title} ${type === "deadline" ? "접수 마감 임박" : "신규 공고"}`,
     "",
     ...bullets.map((b) => `• ${b}`),
-    ...(split ? ["", `${split} — 내 조건으로 되는지는 앱에서 확인할 수 있어요.`] : []),
+    ...(split && split.length > 2 ? ["", `${split[0]} — ${split.slice(1).join(", ")}`] : split ? ["", split.slice(1).join(" ")] : []),
     "",
     "공고 조건은 가구 상황에 따라 달라질 수 있어요. 신청 전에 공고문을 꼭 확인해 주세요.",
-    ...(opts.appLink ? ["", "내 조건과 비교하기 → 프로필 링크"] : []),
-  ].join("\n");
+    opts.appLink ? "내 조건으로 되는지는 앱에서 확인할 수 있어요 → 프로필 링크" : "",
+  ].filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n").trim();
 
   return {
     type,
@@ -140,6 +166,6 @@ export function typesFor(f: SocialFacts, today = new Date()): ContentType[] {
   const left = daysLeft(f.apply.end, today);
   const started = f.apply.start ? (daysLeft(f.apply.start, today) ?? 0) <= 0 : true;
   if (left !== null && left >= 0 && left <= 3 && started) out.push("deadline");
-  if (f.splits.length > 0 && headlineTarget(f)) out.push("caution");
+  if (splitLines(f)) out.push("caution");
   return out;
 }
