@@ -16,6 +16,7 @@
  */
 import { hasAccess, type Subscription } from "./billing";
 import type { AuthProvider } from "./auth";
+import type { TermsConsent } from "./consent";
 
 /**
  * 로그인한 계정. **구독을 묶는 열쇠일 뿐이고, 프로필은 여기 담지 않는다.**
@@ -27,6 +28,8 @@ export interface Account {
   signedInAt: string;
   /** 카카오는 Biz App 등록 전에는 이메일을 주지 않는다. 없을 수 있다 */
   email?: string;
+  /** 이용약관 동의 (lib/consent.ts). 계정에 붙어 있어 로그아웃하면 같이 사라진다 */
+  consent?: TermsConsent;
 }
 
 export type AccessLevel =

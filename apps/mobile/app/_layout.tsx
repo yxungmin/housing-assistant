@@ -11,6 +11,7 @@ import { chargeDate } from "@/lib/billing";
 import { usePrice } from "@/data/price";
 import { notifyChange, setupNotificationHandler, syncReminders } from "@/lib/notifications";
 import { AppStateProvider, useAppState } from "@/store/appState";
+import { TermsUpdateSheet } from "@/components/TermsUpdateSheet";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -49,6 +50,7 @@ function Root() {
         <Stack.Screen name="onboarding" options={{ animation: "fade" }} />
         <Stack.Screen name="(tabs)" options={{ animation: "fade" }} />
       </Stack>
+      <TermsUpdateSheet />
     </>
   );
 }

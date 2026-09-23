@@ -21,7 +21,8 @@ import {
 import { emptySeen, markOpened, noteSeen, type SeenState } from "@/lib/unseen";
 import { canOpenCost as canOpenCostRule, type Account } from "@/lib/access";
 import { CANCELLED, type AuthProvider } from "@/lib/auth";
-import { authConfigured, deleteAccountRemote, loadSession, refreshIfNeeded, signInWith, signOutRemote } from "@/data/auth";
+import { authConfigured, deleteAccountRemote, loadSession, recordConsentRemote, refreshIfNeeded, signInWith, signOutRemote } from "@/data/auth";
+import { consentToSend, newConsent, type TermsConsent as TermsConsentValue } from "@/lib/consent";
 import { initStoreBilling, linkStoreAccount, onStoreSubscriptionChange, readStoreSubscription, storeBillingConfigured } from "@/lib/billing-store";
 import { canSend, type LocalReport } from "@/lib/reports";
 import { fetchReportStatuses, remoteConfigured, sendIssueReport } from "@/data/remote";
@@ -64,6 +65,8 @@ type Action =
   | { type: "setProfile"; profile: UserProfile; onboarded?: boolean }
   | { type: "signIn"; account: Account }
   | { type: "signOut" }
+  | { type: "agreeTerms"; consent: TermsConsentValue }
+  | { type: "consentSent"; termsVersion: string }
   | { type: "toggleSaved"; id: string }
   | { type: "toggleApplied"; id: string }
   | { type: "setSubscription"; subscription: Subscription }
@@ -113,6 +116,10 @@ function reducer(s: AppState, a: Action): AppState {
       return { ...s, profile: withDerived(a.profile), onboarded: a.onboarded ?? s.onboarded };
     case "signIn":
       return { ...s, account: a.account };
+    case "agreeTerms":
+      return s.account ? { ...s, account: { ...s.account, consent: a.consent } } : s;
+    case "consentSent":
+      return s.account?.consent?.termsVersion === a.termsVersion ? { ...s, account: { ...s.account, consent: { ...s.account.consent, sent: true } } } : s;
     case "signOut":
       // 프로필·저장 목록은 기기에 남긴다. 로그아웃이 입력한 걸 지우는 일이 되면 안 된다.
       return { ...s, account: null };
@@ -218,7 +225,10 @@ interface Ctx {
    * 사용자가 창을 닫으면 조용히 false를 준다 (실패 문구를 띄우지 않는다).
    * 실제로 실패하면 던진다 — 호출부가 `signInErrorText`로 옮겨 보여 준다.
    */
+  /** 약관에 동의하고(만 14세 이상 확인 포함) 로그인한다. 동의는 계정에 붙는다 */
   signIn: (provider: AuthProvider) => Promise<boolean>;
+  /** 약관이 바뀌었거나 동의 기록이 없는 계정이 지금 판에 동의한다 */
+  agreeTerms: () => void;
   /**
    * 개발 빌드 전용 우회. 제공자를 아직 안 켠 동안에도 게이트 뒤를 볼 수 있어야 한다.
    * 배포 빌드에서는 아무 일도 하지 않는다 — 여기가 유료선이라 실수로 열리면 제품이 없어진다.
@@ -317,6 +327,28 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     };
   }, [state.loaded]);
 
+  // 약관 동의를 계정에 기록한다 (terms_consents). 로그인 직후 한 번, 실패했으면 다음 실행 때 다시.
+  // 모의 계정(서버 설정 없음)은 보낼 곳이 없어 기기에만 남는다.
+  const sendingConsent = useRef(false);
+  useEffect(() => {
+    const pending = consentToSend(state.account);
+    if (!state.loaded || !pending || !authConfigured || sendingConsent.current) return;
+    sendingConsent.current = true;
+    void (async () => {
+      try {
+        const stored = await loadSession();
+        const session = stored ? await refreshIfNeeded(stored) : null;
+        if (!session) return;
+        await recordConsentRemote(session, pending.termsVersion);
+        dispatch({ type: "consentSent", termsVersion: pending.termsVersion });
+      } catch {
+        // 못 보내도 동의 자체는 기기에 있다. 다음 실행 때 다시 보낸다.
+      } finally {
+        sendingConsent.current = false;
+      }
+    })();
+  }, [state.loaded, state.account]);
+
   // 신고 동기화: 못 보낸 건 보내고, 보낸 건의 처리 결과를 받아 "확인 중"을 끝맺는다.
   // Supabase가 없으면 기기에 그대로 둔다 — 버튼은 동작하고, 연결되면 그때 올라간다.
   const syncing = useRef(false);
@@ -370,13 +402,13 @@ export function AppStateProvider({ children }: PropsWithChildren) {
         if (authConfigured) {
           try {
             const session = await signInWith(provider);
-            account = { id: session.userId, provider, signedInAt: new Date().toISOString(), ...(session.email ? { email: session.email } : {}) };
+            account = { id: session.userId, provider, signedInAt: new Date().toISOString(), ...(session.email ? { email: session.email } : {}), consent: newConsent() };
           } catch (e) {
             if (e instanceof Error && e.message === CANCELLED) return false;
             throw e;
           }
         } else if (__DEV__) {
-          account = { id: `mock-${provider}-${Date.now()}`, provider, signedInAt: new Date().toISOString() };
+          account = { id: `mock-${provider}-${Date.now()}`, provider, signedInAt: new Date().toISOString(), consent: newConsent() };
         } else {
           throw new Error("로그인 설정이 없어요");
         }
@@ -398,7 +430,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       },
       devSignIn: async () => {
         if (!__DEV__) return;
-        dispatch({ type: "signIn", account: { id: `dev-${Date.now()}`, provider: "google", signedInAt: new Date().toISOString() } });
+        dispatch({ type: "signIn", account: { id: `dev-${Date.now()}`, provider: "google", signedInAt: new Date().toISOString(), consent: newConsent() } });
         if (canUseFirstMonthFree(state.subscription)) {
           dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
         }
@@ -417,6 +449,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
         else if (authConfigured && !__DEV__) throw new Error("로그인이 만료됐어요. 다시 로그인한 뒤 삭제해 주세요.");
         dispatch({ type: "reset" });
       },
+      agreeTerms: () => dispatch({ type: "agreeTerms", consent: newConsent() }),
       toggleSaved: (id) => dispatch({ type: "toggleSaved", id }),
       toggleApplied: (id) => dispatch({ type: "toggleApplied", id }),
       setSubscription: (subscription) => dispatch({ type: "setSubscription", subscription }),

@@ -119,4 +119,37 @@ begin
   if missing is not null then raise exception '앱이 읽는 컬럼이 뷰에 없다: %', missing; end if;
 end $$;
 
+-- ── 9. 약관 동의 기록 (0015) ────────────────────────────────────────────
+insert into auth.users (id) values ('33333333-3333-4333-8333-333333333333');
+insert into terms_consents (user_id, terms_version, age_confirmed)
+values ('33333333-3333-4333-8333-333333333333', 'v-test', true);
+
+do $$ begin
+  -- 14세 이상 확인 없이 들어오면 안 된다
+  begin
+    insert into terms_consents (user_id, terms_version, age_confirmed)
+    values ('33333333-3333-4333-8333-333333333333', 'v-test-2', false);
+    raise exception '나이 확인 없는 동의가 들어갔다';
+  exception when check_violation then null;
+  end;
+  -- 앱은 시각을 적지 못하고, 기록을 고치거나 지우지 못한다
+  if has_column_privilege('authenticated', 'terms_consents', 'agreed_at', 'INSERT') then
+    raise exception '앱이 동의 시각을 적을 수 있다';
+  end if;
+  if has_table_privilege('authenticated', 'terms_consents', 'UPDATE') or has_table_privilege('authenticated', 'terms_consents', 'DELETE') then
+    raise exception '앱이 동의 기록을 고치거나 지울 수 있다';
+  end if;
+  if has_table_privilege('anon', 'terms_consents', 'SELECT') then
+    raise exception '로그인 안 한 사람이 동의 기록을 읽을 수 있다';
+  end if;
+end $$;
+
+-- 계정을 지우면 동의 기록도 같이 사라진다
+delete from auth.users where id = '33333333-3333-4333-8333-333333333333';
+do $$ begin
+  if exists (select 1 from terms_consents where user_id = '33333333-3333-4333-8333-333333333333') then
+    raise exception '계정을 지웠는데 동의 기록이 남았다';
+  end if;
+end $$;
+
 select '모든 검증 통과' as result;

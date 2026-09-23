@@ -194,6 +194,20 @@ export async function signOutRemote(session: AuthSession | null): Promise<void> 
  * 실패하면 던진다. 조용히 로그아웃만 시키면 사용자는 지워진 줄 알고 떠나는데
  * 계정은 서버에 그대로 남는다. 되돌릴 수 없는 일에서 제일 나쁜 결말이다.
  */
+/**
+ * 약관 동의를 계정에 기록한다 (terms_consents). 같은 판을 두 번 보내도 한 줄만 남는다.
+ * 시각은 서버가 적는다 — 넣을 수 있는 칸이 id·판·나이 확인 셋뿐이다(0015).
+ */
+export async function recordConsentRemote(session: AuthSession, termsVersion: string): Promise<void> {
+  if (!authConfigured) return;
+  const res = await fetch(`${URL}/rest/v1/terms_consents?on_conflict=user_id,terms_version`, {
+    method: "POST",
+    headers: { ...headers(), Authorization: `Bearer ${session.accessToken}`, Prefer: "resolution=ignore-duplicates,return=minimal" },
+    body: JSON.stringify({ user_id: session.userId, terms_version: termsVersion, age_confirmed: true }),
+  });
+  if (!res.ok) throw new Error(`동의를 기록하지 못했어요 (${res.status})`);
+}
+
 export async function deleteAccountRemote(session: AuthSession): Promise<void> {
   if (!authConfigured) throw new Error("서버 설정이 없어요");
   const res = await fetch(`${URL}/functions/v1/delete-account`, {
