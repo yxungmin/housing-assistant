@@ -43,51 +43,47 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
 
   return (
     <BottomSheet visible={visible} onClose={onClose}>
-      {/* 값을 말로 설명하기 전에 한 번 보여 준다. 1,900원은 실제로 카페 아메리카노보다 싸다. */}
+      {/*
+        **스크롤이 생기지 않게** 짠다. 구독 시트는 한 화면에 들어와야 한다 —
+        스크롤이 생기면 구매 버튼이 접히고, 그 위에 있어야 할 고지도 같이 접힌다.
+
+        그래서 값이 겹치는 것을 합쳤다. 전에는 가격 카드와 "결제 전에 확인해 주세요" 카드가
+        따로 있으면서 둘 다 가격·자동갱신을 말했다. 한 블록이면 된다.
+
+        뺄 수 없는 것: 구매 버튼 **바로 위**의 가격·주기·자동갱신·해지(App Store 3.1.2)와
+        청약철회 제한 표시(전자상거래법 제17조 제6항 — 구매 화면에 없으면 제한이 아예 적용되지 않는다).
+      */}
       <View style={{ alignItems: "center", gap: 6 }}>
         <CoffeeMark />
-        <T variant="heading" style={{ textAlign: "center" }}>커피 한 잔이면 한 달이에요</T>
+        <T variant="heading" style={{ textAlign: "center" }}>
+          {expired ? (freeMonth ? "구독이 끝났어요" : "첫 달 무료는 다 쓰셨어요") : "커피 한 잔이면 한 달이에요"}
+        </T>
         <Sub variant="caption" tone="3" style={{ textAlign: "center" }}>
-          {freeMonth ? `첫 달 0원 · 그 뒤로 ${price}` : `${price} · 언제든 해지`}
+          필요한 현금과 월 주거비, 대출까지 계산해 드려요
         </Sub>
       </View>
-      <View style={{ gap: 8 }}>
-        <T variant="title">{expired ? (freeMonth ? "구독이 끝났어요" : "첫 달 무료는 다 쓰셨어요") : "다른 공고의 주거비도\n계산해 볼까요?"}</T>
-        <T variant="body" color={colors.text2}>
-          {expired ? `이어서 계산하려면 ${price} 구독이 필요해요. 공고와 조건 확인은 그대로 쓸 수 있어요.` : "필요한 현금과 월 주거비, 대출까지 계산해 드려요."}
-        </T>
-      </View>
-      <View style={{ gap: 12 }}>
-        {["모든 공고의 필요 현금·월 주거비 계산", "보증금·월세 시나리오와 대출 상품 비교", "공고 값이 바뀌면 알림 · 바뀐 값으로 다시 계산"].map((b) => (
+
+      <View style={{ gap: 10 }}>
+        {["모든 공고의 필요 현금·월 주거비", "보증금·월세 조정과 대출 비교", "값이 바뀌면 알림 · 다시 계산"].map((b) => (
           <View key={b} style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
             <Icon name="check" size={18} color={colors.primary} />
             <T variant="body">{b}</T>
           </View>
         ))}
       </View>
-      <Card>
+
+      <Card tone="white" style={{ gap: 6 }}>
         <Row center>
-          <View style={{ gap: 2 }}>
-            <T variant="heading">{freeMonth ? `첫 ${TRIAL_DAYS}일 0원` : price}</T>
-            <Sub>{freeMonth ? <>그 뒤로 <T variant="small" numeric style={{ fontSize: 15 }}>{price}</T> 자동 갱신</> : "매달 자동 갱신 · 언제든 해지"}</Sub>
-          </View>
+          <T variant="heading">{freeMonth ? `첫 ${TRIAL_DAYS}일 0원` : price}</T>
           <Tag tone="gray">언제든 해지</Tag>
         </Row>
-      </Card>
-      {/* 전자상거래법 제17조 제6항: 청약철회 제한 사유는 **구매 화면에** 표시해야 효력이 있다.
-          아래에 작게 깔거나 약관 안에만 두면 제한이 아예 적용되지 않는다.
-          동시에 App Store 3.1.2는 구매 버튼 바로 위에 가격·주기·갱신을 요구한다 — 같은 자리다. */}
-      <Card tone="white" style={{ gap: 6 }}>
-        <T variant="bodyMedium" style={{ fontSize: 14 }}>결제 전에 확인해 주세요</T>
         <Sub tone="3" variant="caption">
-          {freeMonth
-            ? `첫 ${TRIAL_DAYS}일은 0원이고, 그 뒤 ${price}이 매월 자동으로 결제돼요. 무료 기간에 해지하면 결제되지 않아요.`
-            : `${price}이 매월 자동으로 결제돼요.`}
+          {freeMonth ? `그 뒤 ${price} 자동 결제 · 무료 기간에 해지하면 결제되지 않아요` : `${price} 매월 자동 결제`}
+          {" · 해지는 스토어에서"}
         </Sub>
         <Sub tone="3" variant="caption">
-          결제일부터 7일 이내에 청약철회할 수 있어요. 다만 결제한 기간에 주거비 계산을 한 번이라도 사용하면 그 기간에 대해서는 청약철회가 제한돼요.
+          결제일부터 7일 이내 청약철회할 수 있어요. 그 기간에 주거비 계산을 한 번이라도 쓰면 제한돼요.
         </Sub>
-        <Sub tone="3" variant="caption">해지는 스토어의 구독 관리 화면에서 할 수 있어요.</Sub>
       </Card>
       <PrimaryButton label={busy ? "처리 중" : freeMonth ? "첫 달 0원으로 시작" : "구독 시작"} disabled={busy} onPress={() => void run(() => (freeMonth ? billing.startTrial() : billing.purchase()))} />
       <Pressable onPress={() => void run(() => billing.restore())} accessibilityRole="button" style={{ alignItems: "center", paddingVertical: 4 }}>

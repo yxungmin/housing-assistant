@@ -111,7 +111,7 @@ export default function Profile() {
                 label={`${PROVIDER_LABEL[state.account.provider]} 계정으로 로그인됨`}
                 sub={state.account.email ?? "계정에는 구독 상태만 저장돼요"}
               />
-              <ListRow icon="left" label="로그아웃" sub="조건과 저장한 공고는 이 기기에 그대로 남아요" onPress={() => setConfirmOut(true)} />
+              <ListRow icon="logout" label="로그아웃" sub="조건과 저장한 공고는 이 기기에 그대로 남아요" onPress={() => setConfirmOut(true)} />
               {/* App Store 5.1.1(v): 계정을 만들 수 있으면 앱 안에서 삭제도 시작할 수 있어야 한다.
                   숨겨 두면 조항을 어기는 것이고, 애초에 남의 계정을 우리가 쥐고 있을 이유가 없다. */}
               <ListRow icon="trash" label="계정 삭제" sub="계정과 이 기기의 입력을 모두 지워요" danger onPress={() => { setDeleteError(null); setConfirmDelete(true); }} />
@@ -257,7 +257,7 @@ export default function Profile() {
               입력한 조건, 저장한 공고, 마감 알림은 이 기기에 그대로 남아요. 다시 로그인하면 구독도 그대로 이어져요.
             </Sub>
           </View>
-          <ListRow icon="left" label="로그아웃" danger onPress={() => { setConfirmOut(false); void signOut(); }} />
+          <ListRow icon="logout" label="로그아웃" danger onPress={() => { setConfirmOut(false); void signOut(); }} />
         </View>
       </BottomSheet>
       <BottomSheet visible={reports} onClose={() => setReports(false)}>

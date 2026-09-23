@@ -19,6 +19,9 @@ import { fonts, radius } from "@/theme/tokens";
 /** 직장 근처 필터의 직선거리 상한 (km). 통근 시간 API 연결 전 대체 기준 */
 const NEAR_WORK_KM = 20;
 
+/** "곧 마감" 칩이 잡는 날수. 서류를 준비할 수 있는 마지막 주 정도다 */
+const CLOSING_SOON_DAYS = 7;
+
 /** 홈: "조건에 맞는 공고 N개" 한 문장과 큰 숫자로 시작한다. */
 export default function Home() {
   const { state, noteSeen, addChanges } = useAppState();
@@ -29,6 +32,7 @@ export default function Home() {
   const [showOthers, setShowOthers] = useState(false);
   const [showFar, setShowFar] = useState(false);
   const [nearWork, setNearWork] = useState(false);
+  const [closingSoon, setClosingSoon] = useState(false);
   const feed = useAnnouncements();
   const [refreshing, setRefreshing] = useState(false);
   /**
@@ -42,6 +46,8 @@ export default function Home() {
     void syncAnnouncementsOnce(state.saved, addChanges).finally(() => setRefreshing(false));
   };
   const hasWorkplace = !!state.profile?.workplace;
+  // 분양이 하나도 없으면 "임대" 칩은 아무것도 걸러 내지 못한다
+  const hasSale = feed.list.some((x) => x.housing_type === "public_sale");
 
   const all = useMemo(() => matchAll(state.profile, feed.list), [state.profile, feed.list]);
 
@@ -51,7 +57,7 @@ export default function Home() {
     if (state.loaded && feedIds.length > 0) noteSeen(feedIds);
   }, [state.loaded, feedIds]);
 
-  const filters = { myRegionOnly, rentalOnly, nearWork };
+  const filters = { myRegionOnly, rentalOnly, nearWork, closingSoon };
   /** 칩 조합 하나로 걸러 낸 결과. 칩마다 "켜면 몇 개 남나"를 세는 데도 같은 함수를 쓴다. */
   const apply = (f: typeof filters) =>
     all
@@ -60,6 +66,8 @@ export default function Home() {
         if (f.rentalOnly && m.announcement.housing_type === "public_sale") return false;
         // 부부는 더 먼 쪽이 그 집의 통근 부담이다 (commuteKm). 한 사람만 가까운 집은 후보가 아니다.
         if (f.nearWork && hasWorkplace) { const km = commuteKm(m); if (km === null || km > NEAR_WORK_KM) return false; }
+        // 이미 끝난 것은 "곧 마감"이 아니다. 음수를 빼지 않으면 지난 공고가 급한 척한다.
+        if (f.closingSoon) { const d = daysUntil(m.announcement.apply_end); if (d === null || d < 0 || d > CLOSING_SOON_DAYS) return false; }
         return true;
       })
       .sort((x, y) => {
@@ -74,7 +82,7 @@ export default function Home() {
         return d !== 0 ? d : (x.announcement.apply_end ?? "").localeCompare(y.announcement.apply_end ?? "");
       });
 
-  const filtered = useMemo(() => apply(filters), [all, myRegionOnly, rentalOnly, nearWork, hasWorkplace, state.profile?.region_code]);
+  const filtered = useMemo(() => apply(filters), [all, myRegionOnly, rentalOnly, nearWork, closingSoon, hasWorkplace, state.profile?.region_code]);
   const matched = matching(filtered);
   const newCount = unseenCount(state.seen, feedIds);
 
@@ -88,8 +96,9 @@ export default function Home() {
       myRegionOnly: matching(apply({ ...filters, myRegionOnly: true })).length,
       rentalOnly: matching(apply({ ...filters, rentalOnly: true })).length,
       nearWork: matching(apply({ ...filters, nearWork: true })).length,
+      closingSoon: matching(apply({ ...filters, closingSoon: true })).length,
     }),
-    [all, myRegionOnly, rentalOnly, nearWork, hasWorkplace, state.profile?.region_code],
+    [all, myRegionOnly, rentalOnly, nearWork, closingSoon, hasWorkplace, state.profile?.region_code],
   );
   const pending = filtered.filter((m) => !isReadable(m.announcement));
   // 거주 요건을 못 읽었고 공고 지역도 다른 것들. "맞지 않는다"와는 다른 말이라 따로 세운다 —
@@ -127,9 +136,17 @@ export default function Home() {
         <Logo size={56} />
       </FadeIn>
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
-        <Chip on={myRegionOnly} count={chipCount.myRegionOnly} onPress={toggle(setMyRegionOnly)}>{regionLabel}만</Chip>
-        <Chip on={rentalOnly} count={chipCount.rentalOnly} onPress={toggle(setRentalOnly)}>임대만</Chip>
-        {hasWorkplace ? <Chip on={nearWork} count={chipCount.nearWork} onPress={toggle(setNearWork)}>직장 직선 {NEAR_WORK_KM}km 이내</Chip> : null}
+        {/*
+          "~만"은 빼는 말이다. 필터는 좁히는 동작이지만 사람에게 당기는 건 **찾는 말**이라
+          "서울만" 대신 "서울"로 둔다 — 켜진 상태는 색으로 이미 보인다.
+          "직장 직선 20km 이내"는 우리 구현 사정이지 사용자의 말이 아니다.
+          그리고 **고를 수 없는 칩은 띄우지 않는다.** 분양이 한 건도 없으면 "임대"를 눌러도
+          결과가 그대로다 — 아무 일도 일어나지 않는 버튼은 신뢰를 깎는다.
+        */}
+        <Chip on={closingSoon} count={chipCount.closingSoon} onPress={toggle(setClosingSoon)}>곧 마감</Chip>
+        <Chip on={myRegionOnly} count={chipCount.myRegionOnly} onPress={toggle(setMyRegionOnly)}>{regionLabel}</Chip>
+        {hasSale ? <Chip on={rentalOnly} count={chipCount.rentalOnly} onPress={toggle(setRentalOnly)}>임대</Chip> : null}
+        {hasWorkplace ? <Chip on={nearWork} count={chipCount.nearWork} onPress={toggle(setNearWork)}>직장 가까이</Chip> : null}
       </View>
 
 
