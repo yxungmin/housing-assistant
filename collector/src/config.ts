@@ -32,6 +32,16 @@ const Env = z.object({
     .string()
     .default("false")
     .transform((v) => v.toLowerCase() === "true" || v === "1"),
+  /**
+   * 인스타 대본 문장 다듬기(social/copy.ts). 추출과 같은 이유로 **기본값은 꺼짐**이다 — 켜는 것은 명시적인 행동이어야 한다.
+   * 꺼져 있어도 템플릿 대본과 재대조는 그대로 돈다(LLM 없음).
+   */
+  SOCIAL_COPY_ENABLED: z
+    .string()
+    .default("false")
+    .transform((v) => v.toLowerCase() === "true" || v === "1"),
+  /** 대본 문장용 모델. Opus 5.5 — Opus 5보다 20% 싸다($4/$20 per MTok). thinking을 끌 수 없어 effort로 조절한다 */
+  SOCIAL_COPY_MODEL: z.string().default("claude-opus-5-5"),
   /** 수집할 공급기관. 쉼표 구분 (LH, SH) */
   COLLECT_PROVIDERS: z.string().default("LH,SH"),
   /**

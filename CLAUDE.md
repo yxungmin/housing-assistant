@@ -5,7 +5,7 @@
 ## 원칙 (문서에서 그대로)
 - **추출(LLM)은 기본 꺼짐이다.** `EXTRACTION_ENABLED=true`가 없으면 `extractFromText`가 거부한다 — 수집기·벤치마크·inspect 어느 경로로도 과금되지 않는다.
   테스트 기간(2026-09-21~)에는 `collect.yml`의 cron도 꺼 뒀다. 켜는 것은 명시적인 행동이어야 한다 (공고 1건 약 1,300원).
-- AI(LLM)는 수집기의 PDF → JSON 추출 한 곳에서만 쓴다. 매칭·계산은 `packages/engine`의 순수 함수로, 네트워크·LLM 없이 기기에서 돈다.
+- AI(LLM)는 수집기에서만 쓴다 — PDF → JSON 추출, 그리고 인스타 대본 문장 다듬기(`social/copy.ts`, `SOCIAL_COPY_ENABLED`, 기본 꺼짐). 매칭·계산은 `packages/engine`의 순수 함수로, 네트워크·LLM 없이 기기에서 돈다.
 - 사용자 프로필(소득·자산 등)은 서버에 저장하지 않는다. 서버 테이블은 공고 데이터 + 구독 상태 + 푸시 토큰만.
 - 확정적 문구 금지: "신청 가능"·"자격 충족" 대신 "조건 일치"·"충족 예상". 모든 숫자에 출처(공고문 페이지, 대출 기준일).
 - 원래 계획은 M3 벤치마크 통과 후 앱 착수였지만, 사용자 결정(2026-09-20)으로 `apps/mobile`을 로컬 데이터(추출 초안 5건)로 먼저 만들고 있다. 벤치마크와 정답 데이터 작업은 계속 병행한다.
@@ -62,6 +62,12 @@
   신고 큐는 `issue_reports`를 읽어 네 가지로 끝낸다(공고문과 같음·수정함·공고 정정·신고 아님).
   거기 적은 한 줄이 앱의 신고 내역에 그대로 보인다. Supabase가 없으면 큐만 꺼지고 나머지는 그대로 돈다.
 - `design/screens-mockup.html` 화면 시안(아티팩트). 앱 토큰·컴포넌트의 원본.
+- `collector/src/social/` 공식 인스타(공고 알림 미디어)용 릴스 대본·캡션. `npm run social:script` → `social/output/<id>.<type>.json`.
+  공고 → 사실(`facts.ts`, 코드, 근거 붙음) → 템플릿 대본(`script.ts`) → [Claude Opus 5.5 문장 다듬기(`copy.ts`)] → 재대조(`verify.ts`).
+  재대조는 대본의 숫자·날짜·대상·지역·유형을 사실과 맞춰 보고 금지 표현(앱과 같음)과 고지 문장을 본다. Claude 결과가 떨어지면 템플릿 대본을 쓴다.
+  종류는 셋(신규·마감임박·조건주의). 공고 사실은 충분히 주고 개인별 판단만 앱으로 넘긴다 — 정보를 숨겨 궁금하게 만들지 않는다.
+  대상은 제목이 먼저다(청년 공고의 "수급자·한부모 가구" 순위를 한부모 공급으로 부르지 않는다). 세대 수는 모든 트랙에 있을 때만 쓴다.
+  다운로드 링크는 출시 후 `SOCIAL_APP_LINK`. 영상(Remotion)·게시(Instagram Graph API)는 이 JSON을 받는 다음 단계다.
 
 ## 명령
 ```bash
@@ -74,6 +80,7 @@ npm run app:data                     # 초안/정답 → 앱 번들 데이터
 npm run app:enrich [-- --links]      # 번들에 원문 링크·그림·좌표·시세·대기·통근 (LLM 없음, --links는 링크·그림만)
 npm run simulate [-- --full]         # 프로필 10종 × 지금 공고로 매칭 점검 (LLM 없음)
 npm run audit:match [-- --matrix]    # 프로필 6,480개 × 공고로 오추천·놓친 추천 감사 (LLM 없음)
+npm run social:script [-- --id 012] [--llm]   # 인스타 릴스 대본·캡션 JSON (--llm은 SOCIAL_COPY_ENABLED=true 필요)
 npm run db:check                     # 빈 Postgres에 마이그레이션 전체 적용 + 동작 확인 (Docker 필요)
 npm run fixture:check -- 018         # 초안 ↔ 공고문 PDF 1차 대조 (사람 검수 전)
 npm run review                       # 검수 뷰어 4310 — 추출 검수 + 신고 큐

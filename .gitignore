@@ -19,3 +19,5 @@ apps/mobile/scripts/icon-preview.html
 # Supabase CLI 작업 파일 (버전 캐시·링크 정보). 커밋하지 않는다
 supabase/.temp/
 supabase/.branches/
+# 인스타 대본 생성물 (npm run social:script)
+social/output/
