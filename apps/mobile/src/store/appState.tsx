@@ -3,7 +3,7 @@
  * 구독 상태는 billing.ts 어댑터(지금은 로컬 목)로 바뀌고, 저장된 값은 불러올 때 만료 규칙으로 정리한다.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, type PropsWithChildren } from "react";
-import { Platform } from "react-native";
+import { AppState as AppLifecycle, Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { withDerived } from "@/lib/onboarding";
 import type { UserProfile } from "@housing/schema";
@@ -22,7 +22,7 @@ import { emptySeen, markOpened, noteSeen, type SeenState } from "@/lib/unseen";
 import { canOpenCost as canOpenCostRule, type Account } from "@/lib/access";
 import { CANCELLED, type AuthProvider } from "@/lib/auth";
 import { authConfigured, deleteAccountRemote, loadSession, refreshIfNeeded, signInWith, signOutRemote } from "@/data/auth";
-import { initStoreBilling, linkStoreAccount } from "@/lib/billing-store";
+import { initStoreBilling, linkStoreAccount, onStoreSubscriptionChange, readStoreSubscription, storeBillingConfigured } from "@/lib/billing-store";
 import { canSend, type LocalReport } from "@/lib/reports";
 import { fetchReportStatuses, remoteConfigured, sendIssueReport } from "@/data/remote";
 
@@ -299,6 +299,23 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     initStoreBilling();
   }, []);
+
+  // 구독 상태는 스토어가 진실 원본이다. 켤 때·앱으로 돌아올 때·SDK가 알릴 때 다시 맞춘다
+  // (billing-store.ts의 readStoreSubscription). 안 그러면 갱신한 사람이 잠기고, 해지한 사람에게 결제 고지가 간다.
+  const subscriptionRef = useRef(state.subscription);
+  subscriptionRef.current = state.subscription;
+  useEffect(() => {
+    if (!state.loaded || !storeBillingConfigured) return;
+    const apply = (subscription: Subscription) => dispatch({ type: "setSubscription", subscription });
+    const sync = () => void readStoreSubscription(subscriptionRef.current).then((s) => s && apply(s));
+    sync();
+    const off = onStoreSubscriptionChange(() => subscriptionRef.current, apply);
+    const lifecycle = AppLifecycle.addEventListener("change", (s) => s === "active" && sync());
+    return () => {
+      off();
+      lifecycle.remove();
+    };
+  }, [state.loaded]);
 
   // 신고 동기화: 못 보낸 건 보내고, 보낸 건의 처리 결과를 받아 "확인 중"을 끝맺는다.
   // Supabase가 없으면 기기에 그대로 둔다 — 버튼은 동작하고, 연결되면 그때 올라간다.

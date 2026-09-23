@@ -66,6 +66,34 @@ export function toSubscription(info: CustomerInfo, prev?: Subscription): Subscri
   };
 }
 
+/**
+ * 스토어가 아는 지금 상태로 다시 맞춘다. 켤 때·앱으로 돌아올 때·SDK가 바뀌었다고 알릴 때.
+ *
+ * 구매할 때 한 번 받은 상태만 들고 있으면 두 가지가 틀어진다.
+ *  - **갱신이 안 보인다.** 첫 달이 끝나고 결제가 돼도 기기의 만료일은 그대로라, 30일 + 유예 3일 뒤
+ *    돈을 낸 사람이 잠긴다.
+ *  - **해지가 안 보인다.** 해지는 스토어 설정에서 한다(앱 안에서는 못 한다). 그걸 모르면
+ *    이미 해지한 사람에게 "3일 뒤 첫 결제예요, 해지해 주세요" 알림이 간다.
+ *
+ * 스토어를 못 부르면(오프라인 등) null — 기기에 있던 상태를 그대로 둔다. 모른다고 잠그지 않는다.
+ */
+export async function readStoreSubscription(prev: Subscription): Promise<Subscription | null> {
+  if (!storeBillingConfigured) return null;
+  try {
+    return toSubscription(await Purchases.getCustomerInfo(), prev);
+  } catch {
+    return null;
+  }
+}
+
+/** SDK가 새 구독 정보를 받을 때마다(구매·복원·계정 전환·백그라운드 갱신). 해제 함수를 돌려준다 */
+export function onStoreSubscriptionChange(prev: () => Subscription, next: (s: Subscription) => void): () => void {
+  if (!storeBillingConfigured) return () => {};
+  const listener = (info: CustomerInfo) => next(toSubscription(info, prev()));
+  Purchases.addCustomerInfoUpdateListener(listener);
+  return () => void Purchases.removeCustomerInfoUpdateListener(listener);
+}
+
 async function buy(): Promise<Subscription> {
   const offerings = await Purchases.getOfferings();
   const pkg = offerings.current?.availablePackages[0];

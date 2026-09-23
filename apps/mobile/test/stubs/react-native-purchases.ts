@@ -23,6 +23,9 @@ export default {
   getOfferings: notUsed,
   purchasePackage: notUsed,
   restorePurchases: notUsed,
+  getCustomerInfo: notUsed,
+  addCustomerInfoUpdateListener: notUsed,
+  removeCustomerInfoUpdateListener: notUsed,
 };
 
 export type CustomerInfo = {

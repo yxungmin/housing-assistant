@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { BILLING_DISCLOSURE, manageSubscriptionUrl, PRICE_TEXT, PRODUCT_ID } from "../src/lib/billing";
+import { BILLING_DISCLOSURE, chargeDate, manageSubscriptionUrl, PRICE_TEXT, PRODUCT_ID } from "../src/lib/billing";
+import { plannedReminders } from "../src/lib/reminders";
 import { toSubscription } from "../src/lib/billing-store";
 
 /**
@@ -71,5 +72,24 @@ describe("스토어 응답 → 구독 상태", () => {
   it("첫 달을 썼다는 기록은 지우지 않는다 — 지우면 무료 달이 다시 생긴다", () => {
     const s = toSubscription(info({ willRenew: true, periodType: "NORMAL" }), { status: "none", firstMonthUsedAt: "2026-08-01" });
     expect(s.firstMonthUsedAt).toBe("2026-08-01");
+  });
+
+  // 스토어와 다시 맞춘 상태가 결제 고지까지 그대로 이어지는가 (appState가 켤 때·돌아올 때 맞춘다)
+  const now = new Date("2026-10-01T00:00:00Z");
+  const charges = (s: ReturnType<typeof toSubscription>) =>
+    plannedReminders([], now, { chargeAt: chargeDate(s), priceText: PRICE_TEXT }).filter((r) => r.kind === "charge");
+
+  it("체험 중이면 첫 결제 3일 전 고지가 걸리고 금액이 적힌다", () => {
+    const r = charges(toSubscription(info({ expirationDate: "2026-10-23T00:00:00Z", willRenew: true, periodType: "TRIAL" })));
+    expect(r).toHaveLength(1);
+    expect(r[0]!.body).toContain(PRICE_TEXT);
+  });
+
+  it("스토어 설정에서 해지했으면 고지를 걸지 않는다 — 해지한 사람에게 '해지해 주세요'를 보내지 않는다", () => {
+    expect(charges(toSubscription(info({ expirationDate: "2026-10-23T00:00:00Z", willRenew: false, periodType: "TRIAL" })))).toHaveLength(0);
+  });
+
+  it("첫 결제가 끝나 정상 구독이 되면 더 걸지 않는다 — 고지는 첫 결제 한 번이다", () => {
+    expect(charges(toSubscription(info({ expirationDate: "2026-11-23T00:00:00Z", willRenew: true, periodType: "NORMAL" })))).toHaveLength(0);
   });
 });
