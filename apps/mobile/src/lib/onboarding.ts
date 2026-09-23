@@ -35,6 +35,17 @@ export interface Step {
    * 처음에 스무 개를 물으면 목록을 보기도 전에 지친다. 목록이 쓸모 있어지는 최소치만 받는다.
    */
   core?: boolean;
+  /**
+   * "없어요"로 한 번에 답하기. 누르면 0을 넣고 바로 다음으로 간다.
+   *
+   * 자동차·부채·청약통장·자녀는 "없다"가 가장 흔한 답인데, 숫자 칸에 0을 치라고 하면
+   * 그게 답인 줄 모르고 "나중에"를 누른다. 그러면 값이 비고, 빈 값은 공고마다 "확인 필요"로 남는다.
+   * 실측(2026-09-24): 필수 7개만 넣은 사람은 자동차 가액 하나 때문에 공고 7건 중 6건의 판별이 막혔다.
+   *
+   * 0이 정확한 답인 항목에만 둔다. 대략 구간으로 받는 것은 하지 않는다 — 구간의 대표값을 넣으면
+   * 공고의 기준선과 어긋나 자격이 되는 사람을 떨어뜨릴 수 있다.
+   */
+  none?: { label: string };
   /** 이 단계를 보여줄 조건 */
   when?: (p: Partial<UserProfile>) => boolean;
   /** 입력값을 프로필에 반영 */
@@ -139,7 +150,8 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, household_size: Number(v) }), read: (p) => p.household_size ?? null,
   },
   {
-    id: "children_count", kind: "count", title: "자녀는 몇 명인가요?", hint: "없으면 0. 태아도 포함해요.",
+    id: "children_count", kind: "count", title: "자녀는 몇 명인가요?", hint: "태아도 포함해요.",
+    none: { label: "자녀가 없어요" },
     apply: (p, v) => ({ ...p, children_count: Number(v), children_ages: Number(v) === 0 ? [] : p.children_ages }), read: (p) => p.children_count ?? null,
   },
   {
@@ -172,11 +184,13 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, total_assets: Number(v) }), read: (p) => p.total_assets ?? null,
   },
   {
-    id: "car_value", kind: "manwon", title: "자동차가 있다면 가액은 얼마인가요?", hint: "없으면 0. 나중에 입력해도 돼요.", optional: true,
+    id: "car_value", kind: "manwon", title: "자동차가 있다면 가액은 얼마인가요?", hint: "공고마다 자동차 가액 상한이 있어요. 나중에 입력해도 돼요.", optional: true,
+    none: { label: "차가 없어요" },
     apply: (p, v) => ({ ...p, car_value: v === null ? undefined : Number(v) }), read: (p) => p.car_value ?? null,
   },
   {
-    id: "debt", kind: "manwon", title: "매달 갚는 대출금은 얼마인가요?", hint: "월 상환액. 없으면 0. 주거비 부담률 계산에 써요.", optional: true,
+    id: "debt", kind: "manwon", title: "매달 갚는 대출금은 얼마인가요?", hint: "월 상환액이에요. 주거비 부담률 계산에 써요.", optional: true,
+    none: { label: "갚는 대출이 없어요" },
     apply: (p, v) => ({ ...p, monthly_debt_payment: v === null ? undefined : Number(v) }), read: (p) => p.monthly_debt_payment ?? null,
   },
   {
@@ -235,7 +249,8 @@ export const STEPS: Step[] = [
     read: (p) => p.homeless_months ?? null,
   },
   {
-    id: "subscription_months", kind: "months", title: "청약통장은 얼마나 넣었나요?", hint: "가입 기간(개월). 없으면 0.",
+    id: "subscription_months", kind: "months", title: "청약통장은 얼마나 넣었나요?", hint: "가입 기간(개월)이에요.",
+    none: { label: "청약통장이 없어요" },
     apply: (p, v) => ({ ...p, subscription_months: Number(v), subscription_deposits: p.subscription_deposits ?? Number(v), subscription_as_of: todayIso() }),
     read: (p) => p.subscription_months ?? null,
   },

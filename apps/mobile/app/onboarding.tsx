@@ -155,6 +155,23 @@ export default function Onboarding() {
           )}
 
           {numeric && <NumberField step={step} text={text} onChange={setText} />}
+          {/* 0이 가장 흔한 답인 항목은 한 번에 답하게 한다 (onboarding.ts의 none 참고) */}
+          {step.none ? (
+            <Pressable
+              onPress={() => go(index + 1, step.apply(draft, 0))}
+              accessibilityRole="button"
+              style={({ pressed }) => ({
+                alignSelf: "flex-start",
+                marginTop: 4,
+                paddingVertical: 12,
+                paddingHorizontal: 18,
+                borderRadius: radius.pill,
+                backgroundColor: pressed ? colors.cardStrong : colors.cardSoft,
+              })}
+            >
+              <T variant="bodyMedium" color={colors.text}>{step.none.label}</T>
+            </Pressable>
+          ) : null}
           {isDuration && <DurationField text={text} onChange={setText} />}
 
           {step.helper ? (

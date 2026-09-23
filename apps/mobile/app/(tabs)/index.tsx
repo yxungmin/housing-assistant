@@ -8,7 +8,8 @@ import { housingLabel } from "@/lib/format";
 import { applyPhase, closesWithin, phaseLabel, phaseRank, phaseTone } from "@/lib/phase";
 import { sizeText } from "@/lib/units";
 import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
-import { REGIONS } from "@/lib/onboarding";
+import { REGIONS, stepById, stepLabel } from "@/lib/onboarding";
+import { topGap } from "@/lib/gaps";
 import { commuteFor, commuteShort, nearestHouseShort, splitStation } from "@/lib/commute";
 import { isUnseen, unseenCount } from "@/lib/unseen";
 import { fundsFor, fundsNote } from "@/lib/funds";
@@ -130,6 +131,20 @@ export default function Home() {
   // 수집 범위 밖에 사는 사람에게는 목록이 거의 비어 보인다. 왜 비었는지 말하지 않으면
   // "나한테 맞는 게 없구나"로 읽힌다 — 사실은 우리가 아직 그 지역을 안 모으는 것이다.
   const outsideService = !isServiceRegion(state.profile?.region_code);
+
+  /**
+   * 빈칸 하나를 권한다 (lib/gaps.ts). 전부가 아니라 가장 많이 푸는 하나만, 푸는 공고 수와 함께.
+   * 무엇을 얻는지 말하지 않는 "정보를 더 넣어 주세요"는 잘 안 먹힌다.
+   * 마감된 공고는 세지 않는다 — 판별돼도 할 수 있는 일이 없다.
+   * 닫으면 이번에 켠 동안만 숨긴다. 다음에 열 때 다시 한 번 권하는 정도가 잔소리와 무시 사이다.
+   */
+  const gap = useMemo(
+    () => topGap(all.filter((m) => isReadable(m.announcement) && applyPhase(m.announcement).kind !== "closed"), state.profile),
+    [all, state.profile],
+  );
+  const gapStep = gap && state.profile ? stepById(state.profile, gap.stepId) : undefined;
+  const [gapHidden, setGapHidden] = useState<string | null>(null);
+  const showGap = !!gap && !!gapStep && gapHidden !== gap.stepId;
   const open = (id: string) => router.push(`/announcement/${id}`);
   const toggle = (setter: (f: (v: boolean) => boolean) => void) => () => {
     animateLayout();
@@ -170,6 +185,36 @@ export default function Home() {
         <Notice tone="info" icon="info">
           지금은 {SERVICE_REGION_LABEL} 공고만 모으고 있어요. {regionLabel} 공고는 아직 없어요.
         </Notice>
+      ) : null}
+
+      {showGap ? (
+        // 카드 전체를 누를 수 있게 하면 닫기 버튼이 그 안에 들어가 버튼 속의 버튼이 된다. 둘을 나란히 둔다.
+        <View style={{ flexDirection: "row", alignItems: "center", borderRadius: radius.md, backgroundColor: colors.primarySoft }}>
+          <Pressable
+            onPress={() => router.push(`/onboarding?step=${gap!.stepId}`)}
+            accessibilityRole="button"
+            accessibilityLabel={`${stepLabel(gapStep!)} 입력하기`}
+            style={({ pressed }) => ({ flex: 1, flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 14, paddingLeft: 16, opacity: pressed ? 0.7 : 1 })}
+          >
+            <IconTile name="check-circle" tone="primary" size={36} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <T variant="bodyMedium" color={colors.text} style={{ fontSize: 15 }}>
+                {stepLabel(gapStep!)}만 넣으면
+              </T>
+              <Sub tone="2">공고 {gap!.announcements}개의 조건을 더 판별할 수 있어요</Sub>
+            </View>
+            <Icon name="right" size={18} color={colors.primary} />
+          </Pressable>
+          <Pressable
+            onPress={() => { animateLayout(); setGapHidden(gap!.stepId); }}
+            accessibilityRole="button"
+            accessibilityLabel="이 권유 닫기"
+            hitSlop={8}
+            style={({ pressed }) => ({ paddingHorizontal: 12, paddingVertical: 16, opacity: pressed ? 0.5 : 1 })}
+          >
+            <Icon name="x" size={16} color={colors.text3} />
+          </Pressable>
+        </View>
       ) : null}
 
       <FadeIn delay={120} style={{ gap: 20 }}>

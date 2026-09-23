@@ -591,19 +591,31 @@ export function KeyValue({
 }) {
   const { colors } = useTheme();
   const reading = redacted ? null : koreanWon(amount);
+  /*
+   * 좌우가 흩어져 보이던 이유가 셋이었다 (2026-09-24).
+   *  1. 값이 길면 라벨이 짓눌려 "주변 / 월세 / 중앙값"처럼 한 단어씩 세 줄이 됐다.
+   *     값 칸을 폭의 60%까지로 막는다. 라벨은 나머지를 쓰고, 긴 값은 그 안에서 줄바꿈한다.
+   *  2. "보증금 1억 원 / 월 460,000원"처럼 두 값이 한 줄에 붙어 있었다. " / "에서 나눠 오른쪽에 줄마다 세운다 —
+   *     오른쪽 칸이 늘 "한 줄에 한 값"이면 눈이 오른쪽 끝을 따라 내려가며 읽을 수 있다.
+   *  3. 라벨이 여러 줄이면 (i)가 그 가운데에 떠 있었다. 첫 줄 높이에 붙인다.
+   */
+  const lines = value.split(" / ");
   return (
     <View style={{ gap: 2 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 4 }}>
+        <View style={{ flex: 1, minWidth: 0, flexDirection: "row", alignItems: "flex-start", gap: 4 }}>
           <T variant="body" color={colors.text2} style={{ flexShrink: 1 }}>{label}</T>
-          {src ? <InfoTip text={src} label={`${label} 근거`} /> : null}
+          {src ? <View style={{ paddingTop: 2 }}><InfoTip text={src} label={`${label} 근거`} /></View> : null}
         </View>
-        {/* 긴 값은 잘리는 대신 줄바꿈한다. 금액은 짧아 이 설정에 영향받지 않는다. */}
-        <View style={{ flexShrink: 1, alignItems: "flex-end", gap: 1 }}>
+        <View style={{ maxWidth: "60%", flexShrink: 1, alignItems: "flex-end", gap: 1 }}>
           {redacted ? (
             <View style={{ paddingVertical: 2 }}><Redacted width={strong ? 112 : 88} height={strong ? 22 : 18} /></View>
           ) : (
-            <T variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold, textAlign: "right" }}>{value}</T>
+            lines.map((line, i) => (
+              <T key={i} variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold, textAlign: "right" }}>
+                {line}
+              </T>
+            ))
           )}
           {reading ? <Sub tone="3" variant="caption">{reading}</Sub> : null}
         </View>
