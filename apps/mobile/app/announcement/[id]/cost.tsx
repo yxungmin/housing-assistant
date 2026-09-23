@@ -7,8 +7,7 @@ import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SignInSheet } from "@/components/SignIn";
 import { SourceCard } from "@/components/SourceCard";
-import { applyLink } from "@/lib/apply";
-import { openSource } from "@/lib/source";
+import { applyLink, openApply } from "@/lib/apply";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
 import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconTile, KeyValue, LockNote, Notice, Redacted, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
@@ -266,7 +265,7 @@ export default function Cost() {
           secondary={!!apply}
           secondaryLabel={apply?.label}
           secondaryIcon="right"
-          onSecondary={() => apply && void openSource(apply.url)}
+          onSecondary={() => apply && void openApply(apply)}
         />
       }
     >

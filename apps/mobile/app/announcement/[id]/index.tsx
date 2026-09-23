@@ -17,8 +17,7 @@ import { userFacingNotes } from "@/lib/notes";
 import { isScattered, unitLabel, unitSpec, unitsWithDistance, priceRange, rangeText } from "@/lib/units";
 import { dateRange, dateText, daysUntil, housingLabel, longDate, looseDate, manwon } from "@/lib/format";
 import { applyPhase, phaseLabel, phaseTone } from "@/lib/phase";
-import { applyLink } from "@/lib/apply";
-import { openSource } from "@/lib/source";
+import { applyLink, openApply } from "@/lib/apply";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { commuteDetail, commuteFor, commuteLines, mapPlace, nearbyLines, openMapTarget, transitLines } from "@/lib/commute";
@@ -191,7 +190,7 @@ export default function AnnouncementDetail() {
   const openCost = () => router.push(`/announcement/${a.id}/cost`);
   // 신청하러 가는 길 (lib/apply.ts). 조건을 못 읽은 공고에는 판단할 거리가 없으니 이게 주 버튼이 된다.
   const apply = applyLink(a);
-  const openApply = () => apply && void openSource(apply.url);
+  const goApply = () => apply && void openApply(apply);
 
   return (
     <Screen
@@ -206,10 +205,10 @@ export default function AnnouncementDetail() {
             secondary={!!apply}
             secondaryLabel={apply?.label}
             secondaryIcon="right"
-            onSecondary={openApply}
+            onSecondary={goApply}
           />
         ) : apply ? (
-          <BottomCTA label={apply.label} onPress={openApply} />
+          <BottomCTA label={apply.label} onPress={goApply} />
         ) : undefined
       }
     >

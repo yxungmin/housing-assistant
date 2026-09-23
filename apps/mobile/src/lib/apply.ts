@@ -1,3 +1,4 @@
+import { Linking } from "react-native";
 import type { Announcement } from "@/data/announcements";
 import { applyPhase } from "./phase";
 import { hasSource } from "./source";
@@ -33,4 +34,21 @@ export function applyLink(a: Pick<Announcement, "provider" | "detail_url" | "app
   const who = a.provider && a.provider !== "기타" ? a.provider : "기관";
   if (phase.kind === "open" && LH_APPLY.test(url)) return { label: "LH청약플러스에서 신청하기", url };
   return { label: `${who} 공고 페이지 열기`, url };
+}
+
+/**
+ * 신청하러 갈 때는 외부 브라우저로 연다. 공고문 보기(openSource)는 앱 안 브라우저라 둘이 다르다.
+ *
+ * 공고문은 잠깐 보고 돌아오는 일이지만 신청은 로그인·본인인증·서류 입력까지 몇 분이 걸린다.
+ * 앱 안 브라우저는 우리 앱에 붙어 있어서, 인증하러 다른 앱(카카오·PASS)을 오가다 우리 앱이 꺼지면
+ * 쓰던 신청서가 같이 사라진다. iOS의 앱 안 브라우저는 Safari 로그인과도 분리돼 있어 다시 로그인해야 한다.
+ * 외부 브라우저면 그런 일이 없고, 사람도 기관 사이트로 넘어갔다는 것을 분명히 안다.
+ */
+export async function openApply(link: ApplyLink): Promise<boolean> {
+  try {
+    await Linking.openURL(link.url);
+    return true;
+  } catch {
+    return false;
+  }
 }
