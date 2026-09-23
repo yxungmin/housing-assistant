@@ -13,6 +13,8 @@
  * 지금은 `mockBilling`(기기 로컬 상태만), 배포 빌드에서는 RevenueCat 또는 react-native-iap 구현으로 교체하고
  * 영수증 검증은 Supabase Edge Function → subscriptions 테이블이 진실 원본이 된다.
  */
+import { storeBilling, storeBillingConfigured } from "./billing-store";
+
 export const PRICE_KRW = 1900;
 /** 첫 달 0원. "한 달"을 30일로 셈한다 — 스토어 도입 혜택도 P1M 단위다 */
 export const TRIAL_DAYS = 30;
@@ -104,8 +106,17 @@ export const mockBilling: BillingAdapter = {
   },
 };
 
-// TODO(M8): 스토어 빌드에서는 여기서 RevenueCat 어댑터를 고른다.
-export const billing: BillingAdapter = mockBilling;
+/**
+ * 어느 쪽을 쓸지는 **RevenueCat 키가 있느냐**로 정한다.
+ *
+ * `__DEV__`로 가르지 않는 이유: 개발 빌드에서도 샌드박스로 진짜 결제 흐름을 봐야 한다.
+ * 스토어 결제는 눌러 봐야 아는 것이 많고(상품이 안 불러와진다, 계약 미체결, 샌드박스 계정),
+ * 목으로만 돌리면 그걸 출시 직전에 알게 된다.
+ *
+ * 키가 없으면 목이다. 그래서 키를 안 넣은 사람은 아무것도 깨지지 않고, 키를 넣는 순간
+ * 같은 화면이 진짜 결제를 부른다.
+ */
+export const billing: BillingAdapter = storeBillingConfigured ? storeBilling : mockBilling;
 
 /**
  * 스토어의 구독 관리 화면.

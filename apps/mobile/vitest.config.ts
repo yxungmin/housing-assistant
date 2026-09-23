@@ -13,6 +13,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "react-native": "react-native-web",
+      // 네이티브 결제 모듈도 파싱하지 못한다. 대역으로 바꿔 끼우고, 순수 규칙만 테스트한다.
+      "react-native-purchases": path.resolve(__dirname, "test/stubs/react-native-purchases.ts"),
       "@": path.resolve(__dirname, "src"),
     },
   },

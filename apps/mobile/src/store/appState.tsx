@@ -22,6 +22,7 @@ import { emptySeen, markOpened, noteSeen, type SeenState } from "@/lib/unseen";
 import { canOpenCost as canOpenCostRule, type Account } from "@/lib/access";
 import { CANCELLED, type AuthProvider } from "@/lib/auth";
 import { authConfigured, deleteAccountRemote, loadSession, refreshIfNeeded, signInWith, signOutRemote } from "@/data/auth";
+import { initStoreBilling, linkStoreAccount } from "@/lib/billing-store";
 import { canSend, type LocalReport } from "@/lib/reports";
 import { fetchReportStatuses, remoteConfigured, sendIssueReport } from "@/data/remote";
 
@@ -289,8 +290,15 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     void (async () => {
       const stored = await loadSession();
       if (!stored || !(await refreshIfNeeded(stored))) dispatch({ type: "signOut" });
+      // 앱을 다시 켰을 때도 계정을 스토어에 다시 묶는다. 한 번만으로는 기기를 바꾼 경우가 빠진다.
+      else void linkStoreAccount(state.account!.id);
     })();
   }, [state.loaded, state.account]);
+
+  // 결제 SDK는 켤 때 한 번. 키가 없으면 아무것도 하지 않는다 (개발 빌드에서는 목으로 돈다)
+  useEffect(() => {
+    initStoreBilling();
+  }, []);
 
   // 신고 동기화: 못 보낸 건 보내고, 보낸 건의 처리 결과를 받아 "확인 중"을 끝맺는다.
   // Supabase가 없으면 기기에 그대로 둔다 — 버튼은 동작하고, 연결되면 그때 올라간다.
@@ -356,6 +364,9 @@ export function AppStateProvider({ children }: PropsWithChildren) {
           throw new Error("로그인 설정이 없어요");
         }
         dispatch({ type: "signIn", account });
+        // 구독을 계정에 묶는다. 안 하면 기기마다 익명 id가 생겨 아이폰에서 산 구독이
+        // 안드로이드에서 안 보인다.
+        void linkStoreAccount(account.id);
         if (canUseFirstMonthFree(state.subscription)) {
           dispatch({ type: "setSubscription", subscription: await billing.startTrial() });
         }
@@ -371,6 +382,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       // 토큰부터 지우고 상태를 바꾼다. 순서가 뒤집히면 화면은 로그아웃인데 키체인에 토큰이 남는다.
       signOut: async () => {
         await signOutRemote(await loadSession());
+        await linkStoreAccount(null);
         dispatch({ type: "signOut" });
       },
       // 서버를 먼저 지운다. 여기서 실패하면 기기 데이터는 건드리지 않고 던진다 —

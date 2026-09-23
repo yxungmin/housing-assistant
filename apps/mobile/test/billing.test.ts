@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { BILLING_DISCLOSURE, manageSubscriptionUrl, PRICE_TEXT, PRODUCT_ID } from "../src/lib/billing";
+import { toSubscription } from "../src/lib/billing-store";
 
 /**
  * 해지는 앱 안에서 못 한다 (애플·구글 정책). 그래서 "해지" 버튼이 앱 상태만 바꾸면
@@ -31,5 +32,44 @@ describe("가격 문구", () => {
   it("구매 고지에 자동 결제와 취소가 둘 다 적혀 있다 (App Store 심사 항목)", () => {
     expect(BILLING_DISCLOSURE).toContain("자동");
     expect(BILLING_DISCLOSURE).toContain("취소");
+  });
+});
+
+/**
+ * RevenueCat 응답을 우리 구독 상태로 옮기는 규칙.
+ * 스토어를 부르는 코드는 목으로 확인해 봐야 알 게 없지만, 이 변환이 틀리면
+ * "구독 중인데 만료로 보이는" 종류의 버그가 조용히 난다.
+ */
+describe("스토어 응답 → 구독 상태", () => {
+  const info = (ent?: { expirationDate?: string | null; willRenew: boolean; periodType: string }) =>
+    ({ entitlements: { active: ent ? { paid: ent } : {} } }) as never;
+
+  it("도입 혜택 기간이면 체험 중이다 — 첫 달 무료를 우리가 세지 않는다", () => {
+    const s = toSubscription(info({ expirationDate: "2026-10-23T00:00:00Z", willRenew: true, periodType: "TRIAL" }));
+    expect(s.status).toBe("trial");
+    expect(s.expiresAt).toBe("2026-10-23T00:00:00Z");
+  });
+
+  it("정상 기간이면 구독 중", () => {
+    expect(toSubscription(info({ willRenew: true, periodType: "NORMAL" })).status).toBe("active");
+  });
+
+  it("갱신 예정이 아니면 해지된 것 — 만료일까지는 그대로 쓴다", () => {
+    const s = toSubscription(info({ expirationDate: "2026-10-23T00:00:00Z", willRenew: false, periodType: "NORMAL" }));
+    expect(s.status).toBe("active");
+    expect(s.cancelled).toBe(true);
+  });
+
+  it("자격이 없고 쓴 적도 없으면 미구독", () => {
+    expect(toSubscription(info()).status).toBe("none");
+  });
+
+  it("자격이 없는데 첫 달을 쓴 적이 있으면 만료다 — 미구독과 구분된다", () => {
+    expect(toSubscription(info(), { status: "active", firstMonthUsedAt: "2026-08-01" }).status).toBe("expired");
+  });
+
+  it("첫 달을 썼다는 기록은 지우지 않는다 — 지우면 무료 달이 다시 생긴다", () => {
+    const s = toSubscription(info({ willRenew: true, periodType: "NORMAL" }), { status: "none", firstMonthUsedAt: "2026-08-01" });
+    expect(s.firstMonthUsedAt).toBe("2026-08-01");
   });
 });
