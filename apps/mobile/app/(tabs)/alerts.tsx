@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/icon";
-import { animateLayout, Card, IconTile, PageTitle, Screen, SectionTitle, Sub, T } from "@/components/ui";
+import { animateLayout, Card, EmptyState, IconTile, PageTitle, Screen, SectionTitle, Sub, T } from "@/components/ui";
 import { useAnnouncements } from "@/data/announcements";
 import { RETAIN_DAYS, syncInbox, unreadCount, type AppNotification, type NotificationKind } from "@/lib/inbox";
 import { unseenIds } from "@/lib/unseen";
@@ -81,13 +81,18 @@ export default function Alerts() {
       ) : null}
 
       {list.length === 0 ? (
-        <Card style={{ alignItems: "center", paddingVertical: 32, gap: 8 }}>
-          <IconTile name="bell" size={48} />
-          <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 받은 알림이 없어요</T>
-          <Sub style={{ textAlign: "center" }}>
-            관심 공고의 접수 마감이 다가오거나 임대조건이 바뀌면 여기에 남겨 드릴게요.
-          </Sub>
-        </Card>
+        // 알림은 관심 공고에서 나온다. 관심 공고가 없으면 거기부터, 있으면 거기로 보낸다.
+        <EmptyState
+          icon="bell"
+          title="아직 받은 알림이 없어요"
+          body="관심 공고의 접수 마감이 다가오거나 임대조건이 바뀌면 여기에 남겨 드릴게요."
+          action={
+            // 저장 목록에는 지금 목록에서 내려간 공고 id도 남아 있다. 관심 탭이 보여 주는 것과 같게 센다
+            feed.list.some((x) => state.saved.includes(x.id))
+              ? { label: "관심 공고 보기", onPress: () => router.navigate("/(tabs)/saved") }
+              : { label: "공고 둘러보기", onPress: () => router.navigate("/(tabs)") }
+          }
+        />
       ) : (
         <View style={{ gap: 10 }}>
           {list.map((n) => (

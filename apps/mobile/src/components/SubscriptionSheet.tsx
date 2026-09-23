@@ -56,11 +56,14 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
       <View style={{ alignItems: "center", gap: 6 }}>
         <CoffeeMark />
         <T variant="heading" style={{ textAlign: "center" }}>
-          {/* 만료된 사람은 첫 달 무료를 이미 썼다 — 전에는 그래서 늘 "첫 달 무료는 다 쓰셨어요"가 떴는데, 몇 달 낸 사람에게는 엉뚱한 말이다 */}
-          {expired ? "구독이 끝났어요" : freeMonth ? "커피 한 잔이면 한 달이에요" : "첫 달 무료는 다 쓰셨어요"}
+          {/*
+            제목은 무엇을 사는지를 말한다. 전에는 상태를 말했다("첫 달 무료는 다 쓰셨어요", "구독이 끝났어요") —
+            사려는 순간에 "당신은 이미 혜택을 썼다"를 제일 크게 들려주는 셈이었다. 첫 달 0원 여부는 가격 칸이 말한다.
+          */}
+          커피 한 잔 값의 주거비 비서
         </T>
         <Sub variant="caption" tone="3" style={{ textAlign: "center" }}>
-          필요한 현금과 월 주거비, 대출까지 계산해 드려요
+          {expired ? "다시 구독하면 모든 공고의 필요한 현금과 월 주거비를 계산해 드려요" : "필요한 현금과 월 주거비, 대출까지 계산해 드려요"}
         </Sub>
       </View>
 

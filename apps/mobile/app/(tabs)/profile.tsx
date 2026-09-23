@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import { Linking, Pressable, View } from "react-native";
 import { ageFromBirthDate, monthsBetween } from "@housing/engine";
-import { SubscriptionManageSheet } from "@/components/SubscriptionSheet";
+import { SubscriptionManageSheet, SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { BottomSheet, Card, Chip, ListRow, Notice, PageTitle, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { LOAN_AS_OF } from "@/data/loans";
 import { useAnnouncements } from "@/data/announcements";
@@ -30,6 +30,8 @@ export default function Profile() {
   const feed = useAnnouncements();
   const { monthly: price, amount } = usePrice();
   const [manage, setManage] = useState(false);
+  // 구독 전·만료인 사람이 여기서 바로 시작할 수 있게. 전에는 공고의 예상 주거비까지 가야만 구독할 수 있었다.
+  const [subscribe, setSubscribe] = useState(false);
   const [signInSheet, setSignInSheet] = useState(false);
   const [confirmOut, setConfirmOut] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -146,18 +148,25 @@ export default function Profile() {
         <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
           {/* 미구독에 체크 표시가 붙어 있었다 — 모양이 "됐다"는 말이라 상태와 어긋난다 */}
           <ListRow
-            icon={sub.status === "trial" || sub.status === "active" ? "check" : sub.status === "expired" ? "alert" : "info"}
+            icon={sub.status === "trial" || sub.status === "active" ? "check-circle" : sub.status === "expired" ? "alert" : "info"}
             iconTone={sub.status === "trial" || sub.status === "active" ? "primary" : sub.status === "expired" ? "warn" : "gray"}
             label={subLabel}
             sub={subSub}
+            value={sub.status === "none" || sub.status === "expired" ? <Tag tone="primary">{sub.status === "none" && !sub.firstMonthUsedAt ? "첫 달 0원" : "구독하기"}</Tag> : undefined}
+            onPress={sub.status === "none" || sub.status === "expired" ? () => setSubscribe(true) : undefined}
           />
           {/* 구독 전인 사람에게 "갱신 해지"는 해당이 없다 */}
           <ListRow icon="settings" label="구독 관리" sub={sub.status === "trial" || sub.status === "active" ? "결제 예정 · 해지 · 결제 내역" : "구매 복원 · 결제 내역"} onPress={() => setManage(true)} />
         </Card>
       </View>
 
+      {/*
+        설정과 정보를 나눴다. 전에는 "설정" 아래에 대출 금리 기준일·공고 데이터·신고가 같이 있어서
+        바꿀 수 있는 것(알림·화면 모드)과 읽기만 하는 것이 섞여 있었다.
+        아이콘은 전부 선 아이콘(MONO) 한 가족이다. 색이 박힌 그림(ASSET)을 섞으면 그것만 튄다.
+      */}
       <View style={{ gap: 8 }}>
-        <SectionTitle>알림</SectionTitle>
+        <SectionTitle>설정</SectionTitle>
         <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
           <ListRow
             icon="bell"
@@ -167,37 +176,36 @@ export default function Profile() {
             value={<Tag tone={state.notifications ? "primary" : "gray"}>{state.notifications ? "끄기" : "켜기"}</Tag>}
             onPress={() => void toggleNotifications()}
           />
+          <ListRow icon="contrast" label="화면 모드" />
+          {/* 칩은 글자 시작선에 맞춘다 (아이콘 40 + 간격 14 + 줄 여백 4) */}
+          <View style={{ flexDirection: "row", gap: 8, paddingLeft: 58, paddingBottom: 12, marginTop: -6 }}>
+            {(["system", "light", "dark"] as ThemePref[]).map((m) => (
+              <Chip key={m} on={state.themePref === m} onPress={() => setTheme(m)}>{{ system: "시스템 설정", light: "라이트", dark: "다크" }[m]}</Chip>
+            ))}
+          </View>
         </Card>
       </View>
 
       <View style={{ gap: 8 }}>
-        <SectionTitle>설정</SectionTitle>
+        <SectionTitle>공고 데이터</SectionTitle>
         <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
-          <ListRow icon="info" label="대출 금리 기준일" value={longDate(LOAN_AS_OF)} />
-          <ListRow icon="house" label="공고 데이터" sub={feed.source === "remote" ? `서버 동기화 ${feed.syncedAt ? longDate(feed.syncedAt.slice(0, 10)) : ""}` : feed.source === "cache" ? "마지막 동기화 데이터 (오프라인)" : remoteConfigured ? "동기화 중" : "앱에 포함된 데이터"} value={`${feed.list.length}건`} />
-          <ListRow icon="map-pin" label="제공 지역" sub="다른 지역은 아직 모으지 않아요" value={SERVICE_REGION_LABEL} />
+          <ListRow icon="home" label="공고" sub={feed.source === "remote" ? `서버 동기화 ${feed.syncedAt ? longDate(feed.syncedAt.slice(0, 10)) : ""}` : feed.source === "cache" ? "마지막 동기화 데이터 (오프라인)" : remoteConfigured ? "동기화 중" : "앱에 포함된 데이터"} value={`${feed.list.length}건`} />
+          <ListRow icon="pin" label="제공 지역" sub="다른 지역은 아직 모으지 않아요" value={SERVICE_REGION_LABEL} />
+          <ListRow icon="clock" label="대출 금리 기준일" value={longDate(LOAN_AS_OF)} />
           <ListRow
-            icon="alert"
+            icon="chat"
             label="이 숫자 이상해요"
             sub={state.reports.length === 0 ? "공고 화면에서 이상한 줄을 눌러 알려 주세요" : `신고 ${state.reports.length}건${openReports ? ` · 확인 중 ${openReports}건` : ""}`}
             onPress={state.reports.length > 0 ? () => setReports(true) : undefined}
           />
-          <View style={{ paddingVertical: 12, paddingHorizontal: 4, gap: 12 }}>
-            <T variant="bodyMedium">화면 모드</T>
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              {(["system", "light", "dark"] as ThemePref[]).map((m) => (
-                <Chip key={m} on={state.themePref === m} onPress={() => setTheme(m)}>{{ system: "시스템 설정", light: "라이트", dark: "다크" }[m]}</Chip>
-              ))}
-            </View>
-          </View>
         </Card>
       </View>
 
       <View style={{ gap: 8 }}>
         <SectionTitle>약관</SectionTitle>
         <Card style={{ gap: 4, paddingVertical: 8, paddingHorizontal: 12 }}>
-          <ListRow icon="info" label="이용약관" onPress={() => router.push("/legal/terms")} />
-          <ListRow icon="info" label="개인정보처리방침" onPress={() => router.push("/legal/privacy")} />
+          <ListRow icon="document" label="이용약관" onPress={() => router.push("/legal/terms")} />
+          <ListRow icon="lock" label="개인정보처리방침" onPress={() => router.push("/legal/privacy")} />
         </Card>
       </View>
 
@@ -230,6 +238,7 @@ export default function Profile() {
         <T variant="small" color={colors.text3}>모든 데이터 지우고 처음부터</T>
       </Pressable>
       <SubscriptionManageSheet visible={manage} onClose={() => setManage(false)} />
+      <SubscriptionSheet visible={subscribe} onClose={() => setSubscribe(false)} />
       <SignInSheet visible={signInSheet} onClose={() => setSignInSheet(false)} />
       <BottomSheet visible={confirmReset} onClose={() => setConfirmReset(false)}>
         <View style={{ gap: 16 }}>

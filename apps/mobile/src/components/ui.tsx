@@ -92,7 +92,7 @@ export function Screen({ children, scroll = true, padded = true, style, bottomIn
         <ScrollView
           ref={scroller}
           style={{ flex: 1 }}
-          contentContainerStyle={[inner, { paddingBottom: bottomInset, gap: space.xl }]}
+          contentContainerStyle={[inner, { flexGrow: 1, paddingBottom: bottomInset, gap: space.xl }]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -184,6 +184,37 @@ export function Sub({ children, style, tone = "2", variant = "small", lines }: P
 }
 
 /** 화면 제목 블록: 위 여백 넉넉히, 제목 크게, 부제 회색 */
+/**
+ * 빈 목록.
+ *
+ * 전에는 회색 상자 안에 아이콘·제목·설명을 넣어 화면 위쪽에 붙였다. 상자 아래가 통째로 비어 화면이 위로 쏠렸고,
+ * 상자는 "여기 뭔가 있어야 하는데 비었다"보다 고장 난 칸처럼 보였다. 그리고 할 수 있는 일이 없었다.
+ * 그래서 상자를 걷고 남은 자리 가운데에 두며, 채우는 방법을 버튼 하나로 같이 준다.
+ */
+export function EmptyState({ icon, title, body, action }: { icon: IconName; title: string; body: string; action?: { label: string; onPress: () => void } }) {
+  const { colors } = useTheme();
+  return (
+    <View style={{ flexGrow: 1, minHeight: 380, alignItems: "center", justifyContent: "center", paddingHorizontal: 16, paddingBottom: 40, gap: 16 }}>
+      <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colors.primarySoft, alignItems: "center", justifyContent: "center" }}>
+        <Icon name={icon} size={32} color={colors.primary} />
+      </View>
+      <View style={{ alignItems: "center", gap: 6 }}>
+        <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>{title}</T>
+        <Sub style={{ textAlign: "center", maxWidth: 280 }}>{body}</Sub>
+      </View>
+      {action ? (
+        <Pressable
+          onPress={action.onPress}
+          accessibilityRole="button"
+          style={({ pressed }) => ({ marginTop: 4, paddingVertical: 12, paddingHorizontal: 20, borderRadius: radius.pill, backgroundColor: pressed ? colors.cardStrong : colors.cardSoft })}
+        >
+          <T variant="bodyMedium" color={colors.text}>{action.label}</T>
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
 export function PageTitle({ title, sub }: { title: string; sub?: string }) {
   return (
     <View style={{ paddingTop: 20, gap: 8 }}>

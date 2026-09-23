@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "expo-router";
-import { Card, IconTile, Notice, PageTitle, Screen, Sub, T } from "@/components/ui";
+import { EmptyState, Notice, PageTitle, Screen } from "@/components/ui";
 import { matchAll, useAnnouncements } from "@/data/announcements";
 import { daysUntil, longDate } from "@/lib/format";
 import { applyPhase, closesWithin, phaseRank } from "@/lib/phase";
@@ -38,7 +38,7 @@ export default function Saved() {
 
   return (
     <Screen onRefresh={refresh} refreshing={refreshing}>
-      <PageTitle title={`관심 공고 ${items.length}개`} sub="알림을 켜면 접수 마감 3일 전에 알려드려요" />
+      <PageTitle title={items.length > 0 ? `관심 공고 ${items.length}개` : "관심 공고"} sub={items.length > 0 ? "알림을 켜면 접수 마감 3일 전에 알려드려요" : undefined} />
       {changed.length > 0 ? (
         <Notice tone="info" icon="bell">
           {changed.length === 1 ? `${changed[0]!.announcement.title} 정보가 바뀌었어요` : `관심 공고 ${changed.length}개의 정보가 바뀌었어요`}
@@ -46,11 +46,12 @@ export default function Saved() {
       ) : null}
       {nearest ? <Notice tone="warn" icon="bell">{nearest.announcement.title} 접수가 {longDate(nearest.announcement.apply_end)}에 끝나요</Notice> : null}
       {items.length === 0 ? (
-        <Card style={{ alignItems: "center", paddingVertical: 36, gap: 10 }}>
-          <IconTile name="bookmark" size={48} tone="primary" />
-          <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>아직 관심 공고가 없어요</T>
-          <Sub style={{ textAlign: "center" }}>공고에서 관심 버튼을 누르면 여기에 모여요.{"\n"}접수 마감 3일 전에 알려드릴게요.</Sub>
-        </Card>
+        <EmptyState
+          icon="bookmark"
+          title="아직 관심 공고가 없어요"
+          body="공고 오른쪽 위의 관심 버튼을 누르면 여기에 모여요. 접수 마감 3일 전에 알려 드릴게요."
+          action={{ label: "공고 둘러보기", onPress: () => router.navigate("/(tabs)") }}
+        />
       ) : (
         items.map((m) => <AnnouncementCard key={m.announcement.id} m={m} onPress={() => router.push(`/announcement/${m.announcement.id}`)} />)
       )}
