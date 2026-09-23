@@ -10,7 +10,7 @@ import { SourceCard } from "@/components/SourceCard";
 import { applyLink } from "@/lib/apply";
 import { openSource } from "@/lib/source";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
-import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconButton, IconTile, KeyValue, LockNote, Notice, Redacted, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconTile, KeyValue, LockNote, Notice, Redacted, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { getAnnouncement, useAnnouncements } from "@/data/announcements";
@@ -255,7 +255,7 @@ export default function Cost() {
   return (
     <Screen
       padded={false}
-      header={<Header onBack={() => router.back()} title="예상 주거비" right={<IconButton name="more" label="더보기" color={colors.text2} />} />}
+      header={<Header onBack={() => router.back()} title="예상 주거비" />}
       footer={
         <BottomCTA
           label={
