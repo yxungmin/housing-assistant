@@ -620,20 +620,30 @@ export function BottomSheet({ visible, onClose, children }: PropsWithChildren<{ 
         <Animated.View style={{ ...fill, backgroundColor: colors.dim, opacity: anim }}>
           <Pressable style={{ flex: 1 }} onPress={onClose} accessibilityLabel="닫기" />
         </Animated.View>
+        {/*
+          높이를 제한하고 안을 스크롤시킨다.
+          시트는 아래에 붙어 있어서(justifyContent: flex-end) 내용이 화면보다 길어지면
+          **위쪽이 잘린다** — 구독 시트에서 실제로 제목이 잘렸다.
+          자라게 두면 안 되고, 잘리게 두면 더 안 된다.
+        */}
         <Animated.View
           onLayout={onLayout}
           style={{
+            maxHeight: "88%",
             backgroundColor: colors.surface,
             borderTopLeftRadius: radius.xl,
             borderTopRightRadius: radius.xl,
-            paddingHorizontal: space.screen,
-            paddingTop: 28,
-            paddingBottom: 32,
-            gap: space.xl,
             transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [height || 520, 0] }) }],
           }}
         >
-          {children}
+          <ScrollView
+            bounces={false}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{ paddingHorizontal: space.screen, paddingTop: 28, paddingBottom: 32, gap: space.xl }}
+          >
+            {children}
+          </ScrollView>
         </Animated.View>
       </View>
     </Modal>
@@ -663,3 +673,64 @@ export function Notice({ tone = "primary", icon, children }: PropsWithChildren<{
 }
 
 export type { ReactNode };
+
+/**
+ * 토스트: 한 일을 알리고 사라진다.
+ *
+ * 북마크처럼 **되돌릴 수 있고 자주 하는 일**에 쓴다. 인라인 알림으로 띄우면 그 자리에
+ * 카드가 하나 생겼다 사라지면서 아래 내용이 밀린다 — 읽던 자리를 잃는다.
+ * 토스트는 내용 위에 뜨므로 레이아웃을 건드리지 않는다.
+ *
+ * 화면 아래에 둔다. 위쪽은 헤더와 겹치고, 손가락은 아래에 있다.
+ */
+export function Toast({ visible, children, tone = "info" }: PropsWithChildren<{ visible: boolean; tone?: "info" | "warn" }>) {
+  const { colors } = useTheme();
+  const anim = useRef(new Animated.Value(0)).current;
+  const [mounted, setMounted] = useState(visible);
+
+  useEffect(() => {
+    if (visible) setMounted(true);
+    const animation = Animated.timing(anim, {
+      toValue: visible ? 1 : 0,
+      duration: visible ? 180 : 140,
+      easing: visible ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
+      useNativeDriver: Platform.OS !== "web",
+    });
+    animation.start(({ finished }) => {
+      if (finished && !visible) setMounted(false);
+    });
+    return () => animation.stop();
+  }, [visible, anim]);
+
+  if (!mounted) return null;
+  return (
+    <Animated.View
+      pointerEvents="none"
+      style={{
+        position: "absolute",
+        left: space.screen,
+        right: space.screen,
+        bottom: 96,
+        opacity: anim,
+        transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }],
+      }}
+    >
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 10,
+          backgroundColor: tone === "warn" ? colors.warningSoft : colors.cardStrong,
+          borderRadius: radius.md,
+          paddingHorizontal: 16,
+          paddingVertical: 14,
+        }}
+      >
+        <Icon name={tone === "warn" ? "alert" : "bell"} size={18} color={tone === "warn" ? colors.warning : colors.primary} />
+        <Text {...wordWrap} style={{ flex: 1, fontFamily: fonts.medium, fontSize: 14, lineHeight: 20, color: tone === "warn" ? colors.warning : colors.text }}>
+          {children}
+        </Text>
+      </View>
+    </Animated.View>
+  );
+}

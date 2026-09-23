@@ -173,7 +173,13 @@ export function inputSummary(r: EligibilityRule, p: UserProfile | null, result: 
       return `자녀 ${count}명${r.unit === "child_age" ? ages : ""}`;
     }
     case "housing":
-      return p.is_homeless ? `무주택 ${yearsMonths(p.homeless_months)}째` : "집이 있어요";
+      // 기간을 입력하지 않았으면 "0개월째"가 아니라 모른다고 한다.
+      // yearsMonths는 undefined를 0으로 접는데, 여기서는 그게 단정이 된다.
+      return p.is_homeless
+        ? p.homeless_months === undefined
+          ? "무주택 (기간 미입력)"
+          : `무주택 ${yearsMonths(p.homeless_months)}째`
+        : "집이 있어요";
     case "residence":
       return `${p.region_sigungu ?? REGIONS.find((x) => x.value === p.region_code)?.label ?? p.region_code} 거주`;
     case "subscription": {

@@ -10,12 +10,12 @@ import { SignInButtons } from "@/components/SignIn";
 import { canSeeAnnouncement } from "@/lib/access";
 import { SourceCard } from "@/components/SourceCard";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
-import { BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
 import { userFacingNotes } from "@/lib/notes";
-import { isScattered, unitLabel, unitSpec, unitsWithDistance } from "@/lib/units";
-import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate } from "@/lib/format";
+import { isScattered, unitLabel, unitSpec, unitsWithDistance, priceRange, rangeText } from "@/lib/units";
+import { dateRange, dateText, daysUntil, dday, HOUSING_LABEL, longDate, looseDate, manwon } from "@/lib/format";
 import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { commuteDetail, commuteFor, commuteLines, mapPlace, nearbyLines, openMapTarget, transitLines } from "@/lib/commute";
@@ -182,6 +182,7 @@ export default function AnnouncementDetail() {
   };
   const shown = lastReport.current;
   const households = a.extraction.tracks.reduce((s, t) => s + (t.households ?? 0), 0);
+  const range = priceRange(a.units, state.profile);
   const days = daysUntil(a.apply_end);
   const openCost = () => {
     if (canOpenCost(state)) router.push(`/announcement/${a.id}/cost`);
@@ -205,14 +206,6 @@ export default function AnnouncementDetail() {
           <T variant="title" style={{ fontSize: 26, lineHeight: 34 }}>{a.title}</T>
           <Sub variant="body">{a.address ?? a.region_name}{households ? ` · 총 ${households.toLocaleString("ko-KR")}세대` : ""}</Sub>
         </View>
-
-        {justSaved ? (
-          <Notice tone={state.notifications ? "info" : "warn"} icon="bell">
-            {state.notifications
-              ? "관심 공고에 담았어요. 접수 마감 3일 전에 알려드릴게요."
-              : "관심 공고에 담았어요. 알림이 꺼져 있어서 마감 알림은 못 보내요 — 내 정보에서 켜 주세요."}
-          </Notice>
-        ) : null}
 
         {change ? (
           <Notice tone="info" icon="bell">
@@ -287,6 +280,15 @@ export default function AnnouncementDetail() {
                     detail={[km !== null ? `직장까지 직선거리 ${km < 10 ? km.toFixed(1) : km.toFixed(0)}km` : null, unitSpec(unit)].filter(Boolean).join(" · ")}
                   />
                 ))}
+                {/* 집이 수백 채면 세 곳만 봐서는 "대충 얼마인가"를 알 수 없다.
+                    범위는 공고문에 적힌 사실이라 가리지 않는다 — 우리가 계산한 값만 유료다. */}
+                {range?.deposit ? (
+                  <KeyValue
+                    label={`보증금 (${range.count}채)`}
+                    value={rangeText(range.deposit, manwon) ?? "-"}
+                    note={range.monthly_rent ? `월세 ${rangeText(range.monthly_rent, (n) => (n === 0 ? "0원" : manwon(n)))}` : undefined}
+                  />
+                ) : null}
                 <Sub tone="3" variant="caption">
                   {state.profile?.workplace
                     ? "직장에서 가까운 순으로 세 곳만 보여드려요. 예상 주거비에서 집마다 보증금·월세를 볼 수 있어요."
@@ -539,6 +541,13 @@ export default function AnnouncementDetail() {
           shown && addReport(draftReport({ announcementId: a.id, announcementTitle: a.title, target: shown.target, message, suggested }))
         }
       />
+      {/* 인라인 알림이 아니라 토스트다. 카드가 생겼다 사라지면 아래 내용이 밀려서
+          읽던 자리를 잃는다. 토스트는 내용 위에 떠서 레이아웃을 건드리지 않는다. */}
+      <Toast visible={justSaved} tone={state.notifications ? "info" : "warn"}>
+        {state.notifications
+          ? "관심 공고에 담았어요. 접수 마감 3일 전에 알려드릴게요."
+          : "관심 공고에 담았어요. 알림이 꺼져 있어 마감 알림은 못 보내요 — 내 정보에서 켜 주세요."}
+      </Toast>
     </Screen>
   );
 }

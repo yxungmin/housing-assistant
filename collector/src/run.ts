@@ -91,7 +91,7 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
   if (!result.output) return conflict([`추출 실패: ${result.error ?? "unknown"}`]);
 
   // 게시를 막을 지적(숫자를 믿을 수 없음)과 알리기만 할 지적(가격 정보 없음 등)을 나눈다.
-  const checked = autoChecks(result.output);
+  const checked = autoChecks(result.output, { unitPricing: detail.units?.some((u) => u.deposit !== undefined || u.monthly_rent !== undefined) });
   const blocking = blockingChecks(checked);
   const advisory = advisoryChecks(checked);
   const status = blocking.length ? "CONFLICT" : "UNVERIFIED";

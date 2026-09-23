@@ -97,7 +97,9 @@ export function dateRange(from: string | undefined, to: string | undefined): str
   const [fy, fm] = from.split("-");
   const [ty, tm, td] = to.split("-");
   if (fy !== ty) return `${dateText(from)} ~ ${dateText(to)}`;
-  if (fm === tm) return `${dateText(from)} ~ ${pad(td ?? "")}`;
+  // 같은 달이라고 일자만 남기면 "2026.09.28 ~ 30"이 되어 읽기 어렵다.
+  // 달까지는 붙여 준다 — 연도만 생략해도 충분히 짧다.
+  if (fm === tm) return `${dateText(from)} ~ ${pad(tm ?? "")}.${pad(td ?? "")}`;
   return `${dateText(from)} ~ ${pad(tm ?? "")}.${pad(td ?? "")}`;
 }
 

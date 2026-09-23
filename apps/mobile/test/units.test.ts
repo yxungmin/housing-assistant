@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { manwon } from "../src/lib/format";
 import type { SupplyUnit, UserProfile } from "@housing/schema";
-import { compareUnits, isScattered, unitLabel, unitRent, unitSpec, unitsWithDistance } from "../src/lib/units";
+import { compareUnits, isScattered, unitLabel, unitRent, unitSpec, unitsWithDistance, priceRange, rangeText } from "../src/lib/units";
 
 /** 2026-09-22 실제 행 (강동구 구천면로 317 403호) */
 const unit: SupplyUnit = {
@@ -138,5 +139,36 @@ describe("compareUnits", () => {
     const a = mk({ id: "a", exclusive_area_m2: 40 }, 10);
     const b = mk({ id: "b", exclusive_area_m2: 40 }, 3);
     expect([a, b].sort((x, y) => compareUnits("large", x, y))[0]!.unit.id).toBe("b");
+  });
+});
+
+/**
+ * 매입임대는 집이 수백 채씩 오고 값이 제각각이다. 화면은 가까운 세 곳만 보여 주므로
+ * 범위가 없으면 "이 공고는 대충 얼마인가"에 답하지 못한다.
+ */
+describe("가격 범위", () => {
+  const u = (deposit?: number, monthly_rent?: number): SupplyUnit =>
+    ({ id: `${deposit}-${monthly_rent}`, address: "x", deposit, monthly_rent }) as SupplyUnit;
+
+  it("최소와 최대를 준다", () => {
+    const r = priceRange([u(1_000_000, 300_000), u(5_000_000, 800_000), u(3_000_000, 500_000)], null);
+    expect(r?.deposit).toEqual([1_000_000, 5_000_000]);
+    expect(r?.monthly_rent).toEqual([300_000, 800_000]);
+    expect(r?.count).toBe(3);
+  });
+
+  it("값이 하나뿐이면 범위로 적지 않는다 — '100만~100만'은 읽는 사람을 속인다", () => {
+    expect(rangeText([1_000_000, 1_000_000], manwon)).toBe(manwon(1_000_000));
+  });
+
+  it("월세 0원인 집(전세형)도 범위에 넣는다 — 빼면 0원인 집이 숨는다", () => {
+    const r = priceRange([u(100_000_000, 0), u(10_000_000, 500_000)], null);
+    expect(r?.monthly_rent).toEqual([0, 500_000]);
+  });
+
+  it("가격이 없는 집만 있으면 범위를 지어내지 않는다", () => {
+    expect(priceRange([u(undefined, undefined)], null)).toBeNull();
+    expect(priceRange([], null)).toBeNull();
+    expect(priceRange(undefined, null)).toBeNull();
   });
 });

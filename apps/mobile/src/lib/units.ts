@@ -143,3 +143,37 @@ export function unitRent(unit: SupplyUnit, profile: UserProfile | null | undefin
     maxConversion: conversion ? { deposit: conversion.deposit, monthly_rent: conversion.monthly_rent } : undefined,
   };
 }
+
+/**
+ * 집 단위 공급의 보증금·월세 **범위**.
+ *
+ * 매입임대는 집이 420채씩 오고 값이 제각각이다. 그런데 화면은 가까운 세 곳만 보여 줘서
+ * "이 공고는 대충 얼마인가"에 답하지 못했다 — 그걸 알려면 비용 화면(유료)까지 가야 했다.
+ * 범위는 공고문에 적힌 사실이라 가리지 않는다.
+ *
+ * 같은 값만 있으면 범위가 아니라 한 값으로 돌려준다 — "100만~100만"은 읽는 사람을 속인다.
+ */
+export interface PriceRange {
+  deposit: [number, number] | null;
+  monthly_rent: [number, number] | null;
+  /** 값이 있는 집의 수 */
+  count: number;
+}
+
+export function priceRange(units: SupplyUnit[] | undefined, profile: UserProfile | null | undefined): PriceRange | null {
+  const rents = (units ?? []).map((u) => unitRent(u, profile)).filter((r): r is UnitRent => r !== null);
+  if (rents.length === 0) return null;
+  const span = (xs: number[]): [number, number] | null => (xs.length === 0 ? null : [Math.min(...xs), Math.max(...xs)]);
+  return {
+    deposit: span(rents.map((r) => r.deposit)),
+    // 월세가 0인 집(전세형)도 값이다. 빼면 "월세 20만~80만"이 되어 0원인 집을 숨긴다.
+    monthly_rent: span(rents.map((r) => r.monthly_rent)),
+    count: rents.length,
+  };
+}
+
+/** "100만 원 ~ 1,000만 원" / 하나뿐이면 "100만 원". 값이 없으면 null */
+export function rangeText(r: [number, number] | null, fmt: (n: number) => string): string | null {
+  if (!r) return null;
+  return r[0] === r[1] ? fmt(r[0]) : `${fmt(r[0])} ~ ${fmt(r[1])}`;
+}

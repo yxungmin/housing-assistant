@@ -15,7 +15,15 @@ export interface AutoCheck {
   blocking: boolean;
 }
 
-export function autoChecks(x: ExtractionOutput): AutoCheck[] {
+export function autoChecks(
+  x: ExtractionOutput,
+  /**
+   * 집 단위 공급(매입임대·든든전세)의 가격은 트랙이 아니라 **집마다** 붙는다.
+   * 그걸 모르고 `track.pricing`만 보면 420채에 값이 다 있는 공고에도 "가격 정보 없음"이 뜬다.
+   * 실제로 그랬다 (2026-09-23, 서울지역본부 청년매입임대).
+   */
+  opts: { unitPricing?: boolean } = {},
+): AutoCheck[] {
   const issues: AutoCheck[] = [];
   const bad = (message: string) => issues.push({ message, blocking: true });
   const note = (message: string) => issues.push({ message, blocking: false });
@@ -64,7 +72,7 @@ export function autoChecks(x: ExtractionOutput): AutoCheck[] {
       if (p.kind === "sale" && (p.sale_price ?? 0) < 10_000_000) bad(`${label}/${p.unit_type}: 분양가 1천만 원 미만 — 단위 오류 의심`);
     }
     // 가격이 없으면 계산 화면만 닫히고 조건 매칭은 그대로 쓸 수 있다 → 알리기만 한다
-    if (track.pricing.length === 0) note(`${label}: 가격 정보 없음`);
+    if (track.pricing.length === 0 && !opts.unitPricing) note(`${label}: 가격 정보 없음`);
   });
   /**
    * 빠진 조건. 위의 검사는 전부 **있는 값**을 본다 — 일정이 말이 되나, 세대수 합이 맞나.
