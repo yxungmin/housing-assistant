@@ -436,57 +436,125 @@ export function ListRow({ label, sub, value, icon, iconTone, onPress, danger }: 
  */
 export function InfoTip({ text, label = "자세히" }: { text: string; label?: string }) {
   const { colors } = useTheme();
-  const [at, setAt] = useState<{ x: number; y: number; w: number } | null>(null);
   const anchor = useRef<View>(null);
+  const [box, setBox] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+  const [size, setSize] = useState<{ w: number; h: number } | null>(null);
+  const anim = useRef(new Animated.Value(0)).current;
+  /**
+   * 연 직후 잠깐은 배경 누름을 무시한다.
+   *
+   * 마우스로 누르면 pointerup에서 열리고, 곧이어 click 이벤트가 한 번 더 온다. 그 사이 배경이 먼저 깔려 있으면
+   * 그 click이 배경에 떨어져 열리자마자 닫힌다 (웹에서 실측). 예전에는 모달 페이드 동안 배경이 입력을 안 받아
+   * 우연히 가려져 있었을 뿐이다.
+   */
+  const openedAt = useRef(0);
 
-  const open = () => {
-    anchor.current?.measureInWindow((x, y, w) => setAt({ x, y, w }));
+  const open = () =>
+    anchor.current?.measureInWindow((x, y, w, h) => {
+      openedAt.current = Date.now();
+      setSize(null);
+      setBox({ x, y, w, h });
+    });
+  const closeFromBackdrop = () => {
+    if (Date.now() - openedAt.current < 350) return;
+    close();
   };
+  const close = () =>
+    Animated.timing(anim, { toValue: 0, duration: 110, easing: Easing.in(Easing.quad), useNativeDriver: Platform.OS !== "web" }).start(() => setBox(null));
 
-  const WIDTH = 260;
+  // 크기를 잰 뒤에 나타난다. 재기 전에 보이면 엉뚱한 자리에서 한 번 깜빡인다.
+  useEffect(() => {
+    if (!box || !size) return;
+    anim.setValue(0);
+    Animated.timing(anim, { toValue: 1, duration: 160, easing: Easing.out(Easing.cubic), useNativeDriver: Platform.OS !== "web" }).start();
+  }, [box, size, anim]);
+
+  /**
+   * 자리 잡기.
+   *
+   * 말풍선은 글 길이만큼만 넓다 ("공고문 6쪽"에 260px 상자가 뜨지 않게). 폭은 재어서 안다.
+   * 가운데를 (i)에 맞추되 화면 가장자리 16px 안으로 당기고, 아래가 모자라면 위로 뒤집는다.
+   * 꼬리는 말풍선이 옆으로 밀려도 늘 (i)를 가리킨다 — 어느 (i)에서 나온 말인지가 꼬리의 일이다.
+   */
   const screen = Dimensions.get("window");
-  // 오른쪽으로 넘치면 화면 안으로 당긴다. 아래 공간이 모자라면 위로 띄운다.
-  const left = at ? Math.max(12, Math.min(at.x + at.w / 2 - WIDTH / 2, screen.width - WIDTH - 12)) : 0;
-  const below = at ? at.y + 26 : 0;
-  const flip = at ? below + 120 > screen.height : false;
+  const EDGE = 16;
+  const GAP = 6;
+  const TAIL = 6;
+  const maxWidth = Math.min(280, screen.width - EDGE * 2);
+  const cx = box ? box.x + box.w / 2 : 0;
+  const w = size?.w ?? 0;
+  const h = size?.h ?? 0;
+  const left = box ? Math.max(EDGE, Math.min(cx - w / 2, screen.width - w - EDGE)) : 0;
+  const flip = box ? box.y + box.h + GAP + TAIL + h + 24 > screen.height : false;
+  const top = box ? (flip ? box.y - GAP - TAIL - h : box.y + box.h + GAP + TAIL) : 0;
+  const tailLeft = Math.max(10, Math.min(cx - left - TAIL, w - 10 - TAIL * 2));
+
+  // 뒤집힌 색. 본문 카드와 한 톤 차이면 어디까지가 말풍선인지 안 보였다 —
+  // 글자색을 바탕으로 쓰면 라이트·다크 어느 쪽에서도 가장 멀리 떨어진 색이 된다.
+  const bg = colors.text;
+  const fg = colors.surface;
 
   return (
     <>
       <Pressable
         ref={anchor}
-        onPress={open}
-        hitSlop={10}
+        onPress={box ? close : open}
+        hitSlop={12}
         accessibilityRole="button"
         accessibilityLabel={label}
+        accessibilityState={{ expanded: !!box }}
         style={({ pressed }) => ({ padding: 2, opacity: pressed ? 0.5 : 1 })}
       >
-        <Icon name="info" size={15} color={colors.text4} />
+        {/* 열려 있는 동안 (i)도 진해진다. 말풍선과 출발점이 한 쌍으로 보이게. */}
+        <Icon name="info" size={16} color={box ? colors.text2 : colors.text4} />
       </Pressable>
-      <Modal visible={at !== null} transparent animationType="fade" onRequestClose={() => setAt(null)}>
-        <Pressable style={{ flex: 1 }} onPress={() => setAt(null)} accessibilityLabel="닫기">
-          {at ? (
-            <View
+      <Modal visible={box !== null} transparent animationType="none" onRequestClose={close}>
+        <Pressable style={{ flex: 1 }} onPress={closeFromBackdrop} accessibilityLabel="닫기">
+          {box ? (
+            <Animated.View
+              onLayout={(e: LayoutChangeEvent) => {
+                const { width, height } = e.nativeEvent.layout;
+                if (!size || Math.abs(size.w - width) > 0.5 || Math.abs(size.h - height) > 0.5) setSize({ w: width, h: height });
+              }}
               style={{
                 position: "absolute",
-                left,
-                ...(flip ? { bottom: screen.height - at.y + 8 } : { top: below }),
-                width: WIDTH,
-                backgroundColor: colors.cardStrong,
-                // 말풍선은 본문 위에 떠 있다. 테두리가 없으면 어디까지가 말풍선인지 안 보인다.
-                borderWidth: 1,
-                borderColor: colors.line,
-                borderRadius: radius.md,
-                paddingHorizontal: 14,
-                paddingVertical: 12,
-                shadowColor: "#000",
-                shadowOpacity: 0.18,
-                shadowRadius: 16,
-                shadowOffset: { width: 0, height: 4 },
-                elevation: 6,
+                left: size ? left : 0,
+                top: size ? top : 0,
+                maxWidth,
+                opacity: size ? anim : 0,
+                transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [flip ? 4 : -4, 0] }) }],
               }}
             >
-              <Text {...wordWrap} style={[type.small, { color: colors.text2 }]}>{text}</Text>
-            </View>
+              <View
+                style={{
+                  backgroundColor: bg,
+                  borderRadius: radius.sm + 2,
+                  paddingHorizontal: 12,
+                  paddingVertical: 9,
+                  shadowColor: "#000",
+                  shadowOpacity: 0.16,
+                  shadowRadius: 12,
+                  shadowOffset: { width: 0, height: 4 },
+                  elevation: 6,
+                }}
+              >
+                <Text {...wordWrap} style={[type.small, { color: fg, fontFamily: fonts.medium }]}>{text}</Text>
+              </View>
+              {/* 꼬리: 45도 돌린 사각형의 절반만 보이게 말풍선 가장자리에 걸친다 */}
+              <View
+                pointerEvents="none"
+                style={{
+                  position: "absolute",
+                  left: tailLeft,
+                  ...(flip ? { bottom: -TAIL + 1 } : { top: -TAIL + 1 }),
+                  width: TAIL * 2,
+                  height: TAIL * 2,
+                  backgroundColor: bg,
+                  borderRadius: 2,
+                  transform: [{ rotate: "45deg" }],
+                }}
+              />
+            </Animated.View>
           ) : null}
         </Pressable>
       </Modal>
