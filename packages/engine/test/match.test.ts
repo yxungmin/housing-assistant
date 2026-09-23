@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { UserProfile } from "@housing/schema";
+import type { EligibilityRule, ExtractionOutput, UserProfile } from "@housing/schema";
 import { applies, compare, matchAnnouncement, matchTrack } from "../src/index";
 import { marriedDualProfile, newlywedTrack, youthTrack } from "./fixtures";
 

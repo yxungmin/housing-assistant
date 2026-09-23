@@ -4,7 +4,7 @@ import { Linking, Platform, Pressable, View } from "react-native";
 import { CoffeeMark } from "./CoffeeMark";
 import { Icon } from "./icon";
 import { BottomSheet, Card, PrimaryButton, Row, Sub, T, Tag } from "./ui";
-import { billing, canUseFirstMonthFree, daysLeft, manageSubscriptionUrl, PRICE_KRW, TRIAL_DAYS } from "@/lib/billing";
+import { billing, canUseFirstMonthFree, daysLeft, manageSubscriptionUrl, PRICE_KRW } from "@/lib/billing";
 import Constants from "expo-constants";
 import { longDate } from "@/lib/format";
 import { useAppState } from "@/store/appState";
@@ -74,7 +74,7 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
 
       <Card tone="white" style={{ gap: 6 }}>
         <Row center>
-          <T variant="heading">{freeMonth ? `첫 ${TRIAL_DAYS}일 0원` : price}</T>
+          <T variant="heading">{freeMonth ? "첫 달 0원" : price}</T>
           <Tag tone="gray">언제든 해지</Tag>
         </Row>
         <Sub tone="3" variant="caption">
@@ -144,7 +144,7 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
     <BottomSheet visible={visible} onClose={onClose}>
       <View style={{ gap: 8 }}>
         <T variant="title">구독 관리</T>
-        <T variant="body" color={colors.text2}>{price} · {canUseFirstMonthFree(sub) ? `첫 ${TRIAL_DAYS}일 0원` : "첫 달 무료는 사용함"}</T>
+        <T variant="body" color={colors.text2}>{price} · {canUseFirstMonthFree(sub) ? "첫 달 0원" : "첫 달 무료는 사용함"}</T>
       </View>
       <Card style={{ gap: 6 }}>
         <Row center>

@@ -4,8 +4,20 @@
     {
       "name": "review",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "review"],
+      "runtimeArgs": [
+        "run",
+        "review"
+      ],
       "port": 4310
+    },
+    {
+      "name": "app",
+      "runtimeExecutable": "/bin/zsh",
+      "runtimeArgs": [
+        "-c",
+        "export PATH=\"$HOME/.nvm/versions/node/v22.22.0/bin:$PATH\" LANG=en_US.UTF-8; cd apps/mobile && exec npx expo start --web --port 8081"
+      ],
+      "port": 8081
     }
   ]
 }
