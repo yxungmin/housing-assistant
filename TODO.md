@@ -607,7 +607,11 @@ LH·SH·GH·HUG 공고를 지도로 보여 주는 앱 하나를 화면 녹화로
       - URL Configuration → Redirect URLs에 `housingassistant://auth` 추가. **없으면 리디렉트가 막힌다**
       - Providers에서 쓸 제공자를 켠다. 카카오는 "Allow users without an email"도 같이 켠다
         (Biz App 등록 전에는 이메일을 안 준다)
-- [ ] Apple Developer 등록 ($99/년) — 없으면 iOS 심사 자체가 막힌다
+- [x] **Apple Developer 등록** (2026-09-23) — 유료 팀 `RG483P5C3Z` 활성화.
+      App ID `com.yxungmin.housingassistant`에 **Push Notifications + Sign In with Apple** 켰다.
+      푸시를 켠 채로 빌드가 **에러 0개로 통과** — 개인 팀에서는 서명 자체가 안 되던 것이라,
+      이게 유료 팀이 제대로 붙었다는 증거다.
+      빌드할 때 `EXPO_IOS_PUSH=1`을 준다 (`plugins/with-optional-push.js`).
 - [~] **Sign in with Apple** (2026-09-22) — **네이티브**로 붙였다 (`expo-apple-authentication`).
       브라우저를 열지 않는다. "Apple로 로그인"을 눌렀는데 사파리가 뜨는 것은 아이폰 사용자가
       아는 그 동작이 아니고, 네이티브는 Services ID도 필요 없다 (App ID만 등록하면 된다).
