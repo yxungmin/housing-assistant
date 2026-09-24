@@ -215,6 +215,35 @@ if (live.filter((i) => i.id !== "pending-001").length === 0) {
   process.exit(1);
 }
 
+/**
+ * --only 012,008: 번들을 다시 만들지 않고 그 공고의 **추출 결과만** 갈아 끼운다.
+ *
+ * 번들에는 app:enrich가 외부 API로 채운 것(원문 링크·그림·좌표·시세·대기·통근·집 목록)이 들어 있다.
+ * 새 프롬프트로 몇 건만 다시 추출했을 때 번들을 통째로 다시 만들면 그게 다 날아가고, 되살리려면
+ * 하루 한도가 있는 API를 다시 불러야 한다. 그래서 추출에서 오는 값만 바꾼다.
+ */
+const onlyIdx = process.argv.indexOf("--only");
+if (onlyIdx >= 0) {
+  const ids = (process.argv[onlyIdx + 1] ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  const bundle = JSON.parse(readFileSync(TARGET, "utf8")) as AppAnnouncement[];
+  const replaced: string[] = [];
+  for (const id of ids) {
+    const next = live.find((i) => i.id === id);
+    const at = bundle.findIndex((b) => b.id === id);
+    if (!next || at < 0) {
+      console.error(`${id}: ${!next ? "초안·정답이 없다" : "번들에 없다"} — 건너뜀`);
+      continue;
+    }
+    const prev = bundle[at]!;
+    bundle[at] = { ...prev, title: next.title, housing_type: next.housing_type, status: next.status, checks: next.checks, notice_date: next.notice_date, address: next.address ?? prev.address, extraction: next.extraction };
+    replaced.push(id);
+  }
+  if (replaced.length === 0) process.exit(1);
+  writeFileSync(TARGET, JSON.stringify(bundle, null, 1));
+  console.log(`updated ${TARGET} (${replaced.join(", ")}의 추출 결과만 교체)`);
+  process.exit(0);
+}
+
 mkdirSync(join(TARGET, ".."), { recursive: true });
 writeFileSync(TARGET, JSON.stringify(live, null, 1));
 console.log(`wrote ${TARGET} (${live.length}건: ${live.map((i) => i.id).join(", ")})`);

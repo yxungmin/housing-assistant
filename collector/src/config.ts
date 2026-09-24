@@ -21,8 +21,12 @@ const Env = z.object({
   MYHOME_API_KEY: z.string().optional(),
   /** 서울시 대중교통 환승경로 (공공데이터포털). 통근 시간 계산용 */
   TRANSIT_API_KEY: z.string().optional(),
-  /** 추출 모델. 벤치마크로 바꿔가며 비교한다. */
-  EXTRACTION_MODEL: z.string().default("claude-opus-5"),
+  /**
+   * 추출 모델. 벤치마크로 바꿔가며 비교한다.
+   * 기본은 Opus 5.5 (2026-09-24): 단가가 Opus 5보다 싸고($4/$20 vs $5/$25) 시험 추출 2건에서 품질이 같거나 나았다.
+   * 전체 벤치마크는 아직 돌리지 않았다 (TODO).
+   */
+  EXTRACTION_MODEL: z.string().default("claude-opus-5-5"),
   /**
    * LLM 추출 스위치. **기본값은 꺼짐**이다.
    * 돈이 나가는 곳은 추출 한 군데뿐이라(공고 1건 약 1,300원) 켜는 것을 명시적인 행동으로 만든다.

@@ -4,7 +4,7 @@
   "provider": "LH",
   "lh_id": "2015122300020753",
   "title": "강서염창 통합공공임대주택 입주자 모집공고",
-  "housing_type": "other",
+  "housing_type": "long_term_rental",
   "region_code": "11",
   "region_name": "서울 강서구",
   "status": "AUTO",
@@ -16,14 +16,29 @@
   "lng": 126.876846681902,
   "extraction": {
    "title": "강서염창 통합공공임대주택 입주자 모집공고",
-   "housing_type": "other",
+   "housing_type": "long_term_rental",
    "address": "서울특별시 강서구 공항대로81길 14 (염창역 동문디이스트)",
    "schedule": {
     "notice_date": "2026-09-17",
     "apply_start": "2026-09-29",
     "apply_end": "2026-10-01",
     "winner_announce": "2027-01-28",
-    "move_in": "2027-02-18"
+    "move_in": "2027-02-18",
+    "documents_announce": "2026-10-13",
+    "documents_start": "2026-10-14",
+    "documents_end": "2026-10-19",
+    "contract_start": "2027-02-15",
+    "contract_end": "2027-02-17"
+   },
+   "application": {
+    "online": true,
+    "onsite": true,
+    "onsite_for": "장애인 및 65세 이상 고령자 등 인터넷 접수가 어려운 분(우선공급 철거민 등은 현장접수만 가능, 예약필수)",
+    "place": "LH 서울지역본부 1층 (서울특별시 강남구 선릉로121길 12)",
+    "source": {
+     "page": 6,
+     "text": "반드시 인터넷 (PC 또는 모바일)으로 신청하여 주시기 바라며, 인터넷 사용이 어려운 고객(장애인 및 65세 이상의 고령자)에 한하여 ... 현장 방문접수하시기 바랍니다. • 현장 신청접수 장소 : LH 서울지역본부 1층"
+    }
    },
    "tracks": [
     {
@@ -38,14 +53,14 @@
      ],
      "rule_groups": [
       {
-       "id": "g1",
+       "id": "g_all",
        "mode": "all_of",
-       "label": "공통 자격"
+       "label": "기본 자격"
       }
      ],
      "rules": [
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "housing",
        "applies_to": {},
        "operator": "gte",
@@ -55,14 +70,14 @@
         "page": 15,
         "text": "무주택세대구성원으로서 덕수연립 가로주택정비사업 지구 내 기존거주자 중 조합이 우선공급 대상자로 선정하여 LH에 통보한 사람으로, 관련 법에 정한 자격요건을 갖추고 있는 사람 ※ 소득 및 자산요건을 적용하지 않습니다. 다만, 입주자 모집공고일부터 입주 시까지 무주택세대구성원을 유지해야 하며"
        },
-       "confidence": 0.95,
+       "confidence": 0.9,
        "verified": false
       }
      ],
      "pricing": [
       {
        "unit_type": "59A",
-       "tier": "1구간(기준 중위소득 30% 이하)",
+       "tier": "1구간",
        "kind": "rental",
        "deposit": 90663000,
        "monthly_rent": 659460,
@@ -72,16 +87,6 @@
         "max_deposit": 169663000,
         "min_deposit": 21663000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
         "text": "1구간 90,663,000 4,533,150 86,129,850 659,460 + 79,000,000 169,663,000 264,460 - 69,000,000 21,663,000 860,710"
@@ -89,7 +94,7 @@
       },
       {
        "unit_type": "59A",
-       "tier": "2구간(기준 중위소득 50% 이하)",
+       "tier": "2구간",
        "kind": "rental",
        "deposit": 103615000,
        "monthly_rent": 753670,
@@ -99,16 +104,6 @@
         "max_deposit": 193615000,
         "min_deposit": 24615000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
         "text": "2구간 103,615,000 5,180,750 98,434,250 753,670 + 90,000,000 193,615,000 303,670 - 79,000,000 24,615,000 984,080"
@@ -116,7 +111,7 @@
       },
       {
        "unit_type": "59A",
-       "tier": "3구간(기준 중위소득 70% 이하)",
+       "tier": "3구간",
        "kind": "rental",
        "deposit": 129519000,
        "monthly_rent": 942090,
@@ -126,16 +121,6 @@
         "max_deposit": 242519000,
         "min_deposit": 30519000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
         "text": "3구간 129,519,000 6,475,950 123,043,050 942,090 + 113,000,000 242,519,000 377,090 - 99,000,000 30,519,000 1,230,840"
@@ -143,7 +128,7 @@
       },
       {
        "unit_type": "59A",
-       "tier": "4구간(기준 중위소득 100% 이하)",
+       "tier": "4구간",
        "kind": "rental",
        "deposit": 168375000,
        "monthly_rent": 1224720,
@@ -153,16 +138,6 @@
         "max_deposit": 314375000,
         "min_deposit": 39375000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
         "text": "4구간 168,375,000 8,418,750 159,956,250 1,224,720 + 146,000,000 314,375,000 494,720 - 129,000,000 39,375,000 1,600,970"
@@ -170,7 +145,7 @@
       },
       {
        "unit_type": "59A",
-       "tier": "5구간(기준 중위소득 110% 이하)",
+       "tier": "5구간",
        "kind": "rental",
        "deposit": 207230000,
        "monthly_rent": 1507350,
@@ -180,16 +155,6 @@
         "max_deposit": 387230000,
         "min_deposit": 48230000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
         "text": "5구간 207,230,000 10,361,500 196,868,500 1,507,350 + 180,000,000 387,230,000 607,350 - 159,000,000 48,230,000 1,971,100"
@@ -207,22 +172,31 @@
         "max_deposit": 436134000,
         "min_deposit": 54134000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "6구간(기타소득구간 포함) 233,134,000 11,656,700 221,477,300 1,695,770 + 203,000,000 436,134,000 680,770 - 179,000,000 54,134,000 2,217,850"
+        "text": "6구간 (기타소득구간 포함) 233,134,000 11,656,700 221,477,300 1,695,770 + 203,000,000 436,134,000 680,770 - 179,000,000 54,134,000 2,217,850"
+       }
+      },
+      {
+       "unit_type": "59A",
+       "tier": "생계·의료급여 수급자 등 상한(주거급여 미수급)",
+       "kind": "rental",
+       "deposit": 6754000,
+       "monthly_rent": 134520,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "min_deposit": 3754000
+       },
+       "source": {
+        "page": 28,
+        "text": "[주거급여 수급자가 아닌 경우] 상한 임대조건 ... 59A 6,754,000 337,700 6,416,300 134,520 + 전환불가 전환불가 전환불가 - 3,000,000 3,754,000 143,270"
        }
       }
-     ]
+     ],
+     "residence": {
+      "max_years": 30
+     }
     },
     {
      "name": "일반공급 - 청년",
@@ -234,14 +208,28 @@
      ],
      "rule_groups": [
       {
-       "id": "g1",
+       "id": "g_all",
        "mode": "all_of",
-       "label": "청년 공통 자격"
+       "label": "청년 기본 자격"
       }
      ],
      "rules": [
       {
-       "group_id": "g1",
+       "group_id": "g_all",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 16,
+        "text": "● 청년 • 무주택자로서 다음의 요건을 모두 갖춘 사람"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_all",
        "category": "age",
        "applies_to": {},
        "operator": "between",
@@ -252,43 +240,31 @@
        "unit": "years",
        "source": {
         "page": 16,
-        "text": "● 청년 ㉯ 18세 이상 39세 이하일 것 (출생일 : 1986.9.18.~2008.9.17.)"
+        "text": "㉯ 18세 이상 39세 이하일 것 (출생일 : 1986.9.18.~2008.9.17.)"
        },
-       "confidence": 0.97,
+       "confidence": 0.95,
        "verified": false
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "marriage",
        "applies_to": {},
        "operator": "in",
        "value": [
-        "single"
+        "single",
+        "pre_marriage",
+        "single_parent"
        ],
        "unit": "status",
        "source": {
         "page": 16,
-        "text": "● 청년 ㉰ 혼인 중이 아닐 것"
+        "text": "㉰ 혼인 중이 아닐 것"
        },
-       "confidence": 0.95,
+       "confidence": 0.85,
        "verified": false
       },
       {
-       "group_id": "g1",
-       "category": "housing",
-       "applies_to": {},
-       "operator": "gte",
-       "value": 0,
-       "unit": "months",
-       "source": {
-        "page": 16,
-        "text": "● 청년 • 무주택자로서 다음의 요건을 모두 갖춘 사람"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 1
@@ -298,13 +274,13 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족을 제외한 모든 계층 1인 0인 170% / (기준 중위소득 170% 1인 4,359,205원)"
+        "text": "신혼부부, 한부모가족을 제외한 모든 계층 × 1인 0인 170% (1인 기준중위소득 170% 4,359,205원)"
        },
        "confidence": 0.9,
        "verified": false
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 2
@@ -314,13 +290,19 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족을 제외한 모든 계층 2인 0인 160% / (기준 중위소득 160% 2인 6,718,867원)"
+        "text": "신혼부부, 한부모가족을 제외한 모든 계층 × 2인 0인 160% 1인 170% (2인 160% 6,718,867원 / 170% 7,138,796원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 7138796
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 3
@@ -330,13 +312,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족을 제외한 모든 계층 3인 이상 0인 150% / (기준 중위소득 150% 3인 8,038,554원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (3인 150% 8,038,554원 / 160% 8,574,458원 / 170% 9,110,361원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 8574458
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 9110361
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 4
@@ -346,13 +338,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 4인 9,742,107원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (4인 150% 9,742,107원 / 160% 10,391,581원 / 170% 11,041,055원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 10391581
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 11041055
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 5
@@ -362,13 +364,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 5인 11,335,079원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (5인 150% 11,335,079원 / 160% 12,090,750원 / 170% 12,846,422원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 12090750
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 12846422
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 6
@@ -378,13 +390,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 6인 12,833,928원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (6인 150% 12,833,928원 / 160% 13,689,523원 / 170% 14,545,118원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 13689523
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 14545118
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 7
@@ -394,13 +416,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 7인 14,272,725원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (7인 150% 14,272,725원 / 160% 15,224,240원 / 170% 16,175,755원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 15224240
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 16175755
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 8
@@ -410,13 +442,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 8인 15,711,522원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (8인 150% 15,711,522원 / 160% 16,758,957원 / 170% 17,806,392원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 16758957
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 17806392
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "asset",
        "applies_to": {},
        "operator": "lte",
@@ -424,30 +466,50 @@
        "unit": "KRW",
        "source": {
         "page": 15,
-        "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
+        "text": "자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @% ③ 출산자녀수 우대비율 : 출산자녀 2인 이상 20%p, 출산자녀 1인 10%p 가산 (1명 379,000,000원 / 2명 이상 413,000,000원)"
        },
        "confidence": 0.95,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 379000000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 413000000
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "car_value",
        "applies_to": {},
        "operator": "lte",
        "value": 45420000,
        "unit": "KRW",
        "source": {
-        "page": 15,
-        "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
+        "page": 11,
+        "text": "자동차가액 45,420,000원 이하 49,960,000원 이하 54,510,000원 이하"
        },
        "confidence": 0.95,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 49960000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 54510000
+        }
+       ]
       }
      ],
      "pricing": [
       {
        "unit_type": "59A",
-       "tier": "1구간(기준 중위소득 30% 이하)",
+       "tier": "1구간",
        "kind": "rental",
        "deposit": 90663000,
        "monthly_rent": 659460,
@@ -457,24 +519,14 @@
         "max_deposit": 169663000,
         "min_deposit": 21663000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "1구간 90,663,000 659,460 + 79,000,000 169,663,000 / - 69,000,000 21,663,000"
+        "text": "1구간 90,663,000 4,533,150 86,129,850 659,460 + 79,000,000 169,663,000 264,460 - 69,000,000 21,663,000 860,710"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "2구간(기준 중위소득 50% 이하)",
+       "tier": "2구간",
        "kind": "rental",
        "deposit": 103615000,
        "monthly_rent": 753670,
@@ -484,24 +536,14 @@
         "max_deposit": 193615000,
         "min_deposit": 24615000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "2구간 103,615,000 753,670 + 90,000,000 193,615,000 / - 79,000,000 24,615,000"
+        "text": "2구간 103,615,000 5,180,750 98,434,250 753,670 + 90,000,000 193,615,000 303,670 - 79,000,000 24,615,000 984,080"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "3구간(기준 중위소득 70% 이하)",
+       "tier": "3구간",
        "kind": "rental",
        "deposit": 129519000,
        "monthly_rent": 942090,
@@ -511,24 +553,14 @@
         "max_deposit": 242519000,
         "min_deposit": 30519000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "3구간 129,519,000 942,090 + 113,000,000 242,519,000 / - 99,000,000 30,519,000"
+        "text": "3구간 129,519,000 6,475,950 123,043,050 942,090 + 113,000,000 242,519,000 377,090 - 99,000,000 30,519,000 1,230,840"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "4구간(기준 중위소득 100% 이하)",
+       "tier": "4구간",
        "kind": "rental",
        "deposit": 168375000,
        "monthly_rent": 1224720,
@@ -538,24 +570,14 @@
         "max_deposit": 314375000,
         "min_deposit": 39375000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "4구간 168,375,000 1,224,720 + 146,000,000 314,375,000 / - 129,000,000 39,375,000"
+        "text": "4구간 168,375,000 8,418,750 159,956,250 1,224,720 + 146,000,000 314,375,000 494,720 - 129,000,000 39,375,000 1,600,970"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "5구간(기준 중위소득 110% 이하)",
+       "tier": "5구간",
        "kind": "rental",
        "deposit": 207230000,
        "monthly_rent": 1507350,
@@ -565,19 +587,9 @@
         "max_deposit": 387230000,
         "min_deposit": 48230000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "5구간 207,230,000 1,507,350 + 180,000,000 387,230,000 / - 159,000,000 48,230,000"
+        "text": "5구간 207,230,000 10,361,500 196,868,500 1,507,350 + 180,000,000 387,230,000 607,350 - 159,000,000 48,230,000 1,971,100"
        }
       },
       {
@@ -592,22 +604,65 @@
         "max_deposit": 436134000,
         "min_deposit": 54134000
        },
-       "payment_schedule": [
+       "source": {
+        "page": 6,
+        "text": "6구간 (기타소득구간 포함) 233,134,000 11,656,700 221,477,300 1,695,770 + 203,000,000 436,134,000 680,770 - 179,000,000 54,134,000 2,217,850"
+       }
+      },
+      {
+       "unit_type": "59A",
+       "tier": "생계·의료급여 수급자 등 상한(주거급여 미수급)",
+       "kind": "rental",
+       "deposit": 6754000,
+       "monthly_rent": 134520,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "min_deposit": 3754000
+       },
+       "source": {
+        "page": 28,
+        "text": "[주거급여 수급자가 아닌 경우] 상한 임대조건 ... 59A 6,754,000 337,700 6,416,300 134,520 + 전환불가 전환불가 전환불가 - 3,000,000 3,754,000 143,270"
+       }
+      }
+     ],
+     "priority_ranks": [
+      {
+       "rank": 1,
+       "label": "2세 미만 자녀가 있는 자(공급호수 5% 범위 추첨 우선선정)",
+       "mode": "all_of",
+       "conditions": [
         {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
+         "category": "children",
+         "applies_to": {},
+         "operator": "lte",
+         "value": 1,
+         "unit": "child_age"
         }
        ],
        "source": {
-        "page": 6,
-        "text": "6구간(기타소득구간 포함) 233,134,000 1,695,770 + 203,000,000 436,134,000 / - 179,000,000 54,134,000"
+        "page": 21,
+        "text": "공급형별 총 공급호수의 5% 범위에서 입주자격 구분(청년, 고령자, 신혼부부 등, 일반)에 따른 구분없이 모든 신청자를 대상으로 입주자 모집공고일 현재 2세 미만(2세가 되는 날을 포함한다)의 자녀가 있는 사람을 추첨의 방식으로 우선 선정"
+       }
+      },
+      {
+       "rank": 2,
+       "label": "잔여물량 추첨",
+       "mode": "all_of",
+       "conditions": [],
+       "source": {
+        "page": 21,
+        "text": "잔여 물량에 대해서는 추첨으로 입주자를 선정하되, 경쟁 시 소득구간별 입주자 비율이 법정비율 범위 이상이 되도록 선정합니다."
        }
       }
-     ]
+     ],
+     "selection_order": [
+      "rank",
+      "lottery"
+     ],
+     "residence": {
+      "max_years": 30
+     }
     },
     {
      "name": "일반공급 - 신혼부부·한부모가족",
@@ -619,19 +674,19 @@
      ],
      "rule_groups": [
       {
-       "id": "g1",
+       "id": "g_all",
        "mode": "all_of",
-       "label": "공통 자격"
+       "label": "기본 자격"
       },
       {
-       "id": "g2",
+       "id": "g_nw",
        "mode": "any_of",
-       "label": "신혼부부·한부모가족 해당 요건(택1)"
+       "label": "신혼부부·예비신혼부부·6세 이하 자녀 가구 중 하나"
       }
      ],
      "rules": [
       {
-       "group_id": "g2",
+       "group_id": "g_nw",
        "category": "marriage",
        "applies_to": {},
        "operator": "lte",
@@ -645,7 +700,7 @@
        "verified": false
       },
       {
-       "group_id": "g2",
+       "group_id": "g_nw",
        "category": "marriage",
        "applies_to": {},
        "operator": "in",
@@ -657,45 +712,25 @@
         "page": 17,
         "text": "㉯ 예비신혼부부 (혼인을 계획 중이며 해당 주택의 입주 전까지 혼인사실을 증명할 수 있는 사람)"
        },
-       "confidence": 0.93,
+       "confidence": 0.95,
        "verified": false
       },
       {
-       "group_id": "g2",
+       "group_id": "g_nw",
        "category": "children",
-       "applies_to": {
-        "marriage": [
-         "married"
-        ]
-       },
+       "applies_to": {},
        "operator": "lte",
        "value": 6,
        "unit": "child_age",
        "source": {
         "page": 17,
-        "text": "㉰ 혼인 중인 사람으로서 6세 이하 자녀(2019.9.18. 이후 출생, 태아 포함)를 둔 사람"
+        "text": "㉰ 혼인 중인 사람으로서 6세 이하 자녀(2019.9.18. 이후 출생, 태아 포함)를 둔 사람 ㉱ 6세 이하 자녀(2019.9.18. 이후 출생)를 둔 한부모가족 (자녀가 신청자와 동일한 세대별 주민등록표에 등재된 경우에 한함)"
        },
-       "confidence": 0.9,
+       "confidence": 0.85,
        "verified": false
       },
       {
-       "group_id": "g2",
-       "category": "marriage",
-       "applies_to": {},
-       "operator": "in",
-       "value": [
-        "single_parent"
-       ],
-       "unit": "status",
-       "source": {
-        "page": 17,
-        "text": "㉱ 6세 이하 자녀(2019.9.18. 이후 출생)를 둔 한부모가족 (자녀가 신청자와 동일한 세대별 주민등록표에 등재된 경우에 한함)"
-       },
-       "confidence": 0.9,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "housing",
        "applies_to": {},
        "operator": "gte",
@@ -705,11 +740,11 @@
         "page": 17,
         "text": "(2) 무주택세대구성원(예비신혼부부의 경우 혼인으로 구성될 세대의 세대구성원 모두 무주택자인 경우)일 것"
        },
-       "confidence": 0.95,
+       "confidence": 0.9,
        "verified": false
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 2,
@@ -720,13 +755,19 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족 그 외 × 2인 0인 160% / (기준 중위소득 160% 2인 6,718,867원)"
+        "text": "신혼부부, 한부모가족 × 2인 0인 160% 1인 170% (2인 160% 6,718,867원 / 170% 7,138,796원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 7138796
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 3,
@@ -737,13 +778,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족 그 외 × 3인 0인 150% / (기준 중위소득 150% 3인 8,038,554원)"
+        "text": "신혼부부, 한부모가족 × 3인 0인 150% 1인 160% (한부모 3인 이상 2인 이상 170%) (3인 150% 8,038,554원 / 160% 8,574,458원 / 170% 9,110,361원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 8574458
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 9110361
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 4,
@@ -754,13 +805,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족 그 외 × 4인 이상 0인 150% / (기준 중위소득 150% 4인 9,742,107원)"
+        "text": "신혼부부, 한부모가족 × 4인 이상 0인 150% 1인 160% 2인 이상 170% (4인 150% 9,742,107원 / 160% 10,391,581원 / 170% 11,041,055원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 10391581
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 11041055
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 5,
@@ -771,13 +832,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "4인 이상 0인 150% / (기준 중위소득 150% 5인 11,335,079원)"
+        "text": "신혼부부, 한부모가족 × 4인 이상 0인 150% 1인 160% 2인 이상 170% (5인 150% 11,335,079원 / 160% 12,090,750원 / 170% 12,846,422원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 12090750
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 12846422
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 6,
@@ -788,13 +859,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "4인 이상 0인 150% / (기준 중위소득 150% 6인 12,833,928원)"
+        "text": "신혼부부, 한부모가족 × 4인 이상 0인 150% 1인 160% 2인 이상 170% (6인 150% 12,833,928원 / 160% 13,689,523원 / 170% 14,545,118원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 13689523
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 14545118
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 7,
@@ -805,13 +886,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "4인 이상 0인 150% / (기준 중위소득 150% 7인 14,272,725원)"
+        "text": "신혼부부, 한부모가족 × 4인 이상 0인 150% 1인 160% 2인 이상 170% (7인 150% 14,272,725원 / 160% 15,224,240원 / 170% 16,175,755원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 15224240
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 16175755
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 8,
@@ -822,132 +913,226 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "4인 이상 0인 150% / (기준 중위소득 150% 8인 15,711,522원)"
+        "text": "신혼부부, 한부모가족 × 4인 이상 0인 150% 1인 160% 2인 이상 170% (8인 150% 15,711,522원 / 160% 16,758,957원 / 170% 17,806,392원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 16758957
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 17806392
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 2,
-        "income_type": "dual"
+        "income_type": "dual",
+        "marriage": [
+         "married",
+         "pre_marriage"
+        ]
        },
        "operator": "lte",
        "value": 7978655,
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족 그 외 ○(신혼맞벌이) 2인 0인 190% / (기준 중위소득 190% 2인 7,978,655원)"
+        "text": "신혼부부 맞벌이 ○ 2인 0인 190% (2인 190% 7,978,655원) ※ \"6세 이하 자녀를 둔 한부모가족\"는 적용 제외"
        },
-       "confidence": 0.88,
+       "confidence": 0.85,
        "verified": false
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 3,
-        "income_type": "dual"
+        "income_type": "dual",
+        "marriage": [
+         "married",
+         "pre_marriage"
+        ]
        },
        "operator": "lte",
        "value": 9646265,
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "○(신혼맞벌이) 3인 0인 180% / (기준 중위소득 180% 3인 9,646,265원)"
+        "text": "신혼부부 맞벌이 ○ 3인 0인 180% 1인 190% (3인 180% 9,646,265원 / 190% 10,182,168원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 10182168
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 4,
-        "income_type": "dual"
+        "income_type": "dual",
+        "marriage": [
+         "married",
+         "pre_marriage"
+        ]
        },
        "operator": "lte",
        "value": 11690528,
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 4인 11,690,528원)"
+        "text": "신혼부부 맞벌이 ○ 4인 이상 0인 180% 1인 190% 2인 이상 200% (4인 180% 11,690,528원 / 190% 12,340,002원 / 200% 12,989,476원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 12340002
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 12989476
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 5,
-        "income_type": "dual"
+        "income_type": "dual",
+        "marriage": [
+         "married",
+         "pre_marriage"
+        ]
        },
        "operator": "lte",
        "value": 13602094,
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 5인 13,602,094원)"
+        "text": "신혼부부 맞벌이 ○ 4인 이상 0인 180% 1인 190% 2인 이상 200% (5인 180% 13,602,094원 / 190% 14,357,766원 / 200% 15,113,438원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 14357766
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 15113438
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 6,
-        "income_type": "dual"
+        "income_type": "dual",
+        "marriage": [
+         "married",
+         "pre_marriage"
+        ]
        },
        "operator": "lte",
        "value": 15400714,
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 6인 15,400,714원)"
+        "text": "신혼부부 맞벌이 ○ 4인 이상 0인 180% 1인 190% 2인 이상 200% (6인 180% 15,400,714원 / 190% 16,256,309원 / 200% 17,111,904원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 16256309
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 17111904
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 7,
-        "income_type": "dual"
+        "income_type": "dual",
+        "marriage": [
+         "married",
+         "pre_marriage"
+        ]
        },
        "operator": "lte",
        "value": 17127270,
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 7인 17,127,270원)"
+        "text": "신혼부부 맞벌이 ○ 4인 이상 0인 180% 1인 190% 2인 이상 200% (7인 180% 17,127,270원 / 190% 18,078,785원 / 200% 19,030,300원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 18078785
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 19030300
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 8,
-        "income_type": "dual"
+        "income_type": "dual",
+        "marriage": [
+         "married",
+         "pre_marriage"
+        ]
        },
        "operator": "lte",
        "value": 18853826,
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "○(신혼맞벌이) 4인 이상 0인 180% / (기준 중위소득 180% 8인 18,853,826원)"
+        "text": "신혼부부 맞벌이 ○ 4인 이상 0인 180% 1인 190% 2인 이상 200% (8인 180% 18,853,826원 / 190% 19,901,261원 / 200% 20,948,696원)"
        },
-       "confidence": 0.88,
-       "verified": false
+       "confidence": 0.85,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 19901261
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 20948696
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "asset",
        "applies_to": {},
        "operator": "lte",
@@ -955,30 +1140,50 @@
        "unit": "KRW",
        "source": {
         "page": 15,
-        "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
+        "text": "자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @% ③ 출산자녀수 우대비율 : 출산자녀 2인 이상 20%p, 출산자녀 1인 10%p 가산 (1명 379,000,000원 / 2명 이상 413,000,000원)"
        },
        "confidence": 0.95,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 379000000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 413000000
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "car_value",
        "applies_to": {},
        "operator": "lte",
        "value": 45420000,
        "unit": "KRW",
        "source": {
-        "page": 15,
-        "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
+        "page": 11,
+        "text": "자동차가액 45,420,000원 이하 49,960,000원 이하 54,510,000원 이하"
        },
        "confidence": 0.95,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 49960000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 54510000
+        }
+       ]
       }
      ],
      "pricing": [
       {
        "unit_type": "59A",
-       "tier": "1구간(기준 중위소득 30% 이하)",
+       "tier": "1구간",
        "kind": "rental",
        "deposit": 90663000,
        "monthly_rent": 659460,
@@ -988,24 +1193,14 @@
         "max_deposit": 169663000,
         "min_deposit": 21663000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "1구간 90,663,000 659,460 + 79,000,000 169,663,000 / - 69,000,000 21,663,000"
+        "text": "1구간 90,663,000 4,533,150 86,129,850 659,460 + 79,000,000 169,663,000 264,460 - 69,000,000 21,663,000 860,710"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "2구간(기준 중위소득 50% 이하)",
+       "tier": "2구간",
        "kind": "rental",
        "deposit": 103615000,
        "monthly_rent": 753670,
@@ -1015,24 +1210,14 @@
         "max_deposit": 193615000,
         "min_deposit": 24615000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "2구간 103,615,000 753,670 + 90,000,000 193,615,000 / - 79,000,000 24,615,000"
+        "text": "2구간 103,615,000 5,180,750 98,434,250 753,670 + 90,000,000 193,615,000 303,670 - 79,000,000 24,615,000 984,080"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "3구간(기준 중위소득 70% 이하)",
+       "tier": "3구간",
        "kind": "rental",
        "deposit": 129519000,
        "monthly_rent": 942090,
@@ -1042,24 +1227,14 @@
         "max_deposit": 242519000,
         "min_deposit": 30519000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "3구간 129,519,000 942,090 + 113,000,000 242,519,000 / - 99,000,000 30,519,000"
+        "text": "3구간 129,519,000 6,475,950 123,043,050 942,090 + 113,000,000 242,519,000 377,090 - 99,000,000 30,519,000 1,230,840"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "4구간(기준 중위소득 100% 이하)",
+       "tier": "4구간",
        "kind": "rental",
        "deposit": 168375000,
        "monthly_rent": 1224720,
@@ -1069,24 +1244,14 @@
         "max_deposit": 314375000,
         "min_deposit": 39375000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "4구간 168,375,000 1,224,720 + 146,000,000 314,375,000 / - 129,000,000 39,375,000"
+        "text": "4구간 168,375,000 8,418,750 159,956,250 1,224,720 + 146,000,000 314,375,000 494,720 - 129,000,000 39,375,000 1,600,970"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "5구간(기준 중위소득 110% 이하)",
+       "tier": "5구간",
        "kind": "rental",
        "deposit": 207230000,
        "monthly_rent": 1507350,
@@ -1096,19 +1261,9 @@
         "max_deposit": 387230000,
         "min_deposit": 48230000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "5구간 207,230,000 1,507,350 + 180,000,000 387,230,000 / - 159,000,000 48,230,000"
+        "text": "5구간 207,230,000 10,361,500 196,868,500 1,507,350 + 180,000,000 387,230,000 607,350 - 159,000,000 48,230,000 1,971,100"
        }
       },
       {
@@ -1123,22 +1278,65 @@
         "max_deposit": 436134000,
         "min_deposit": 54134000
        },
-       "payment_schedule": [
+       "source": {
+        "page": 6,
+        "text": "6구간 (기타소득구간 포함) 233,134,000 11,656,700 221,477,300 1,695,770 + 203,000,000 436,134,000 680,770 - 179,000,000 54,134,000 2,217,850"
+       }
+      },
+      {
+       "unit_type": "59A",
+       "tier": "생계·의료급여 수급자 등 상한(주거급여 미수급)",
+       "kind": "rental",
+       "deposit": 6754000,
+       "monthly_rent": 134520,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "min_deposit": 3754000
+       },
+       "source": {
+        "page": 28,
+        "text": "[주거급여 수급자가 아닌 경우] 상한 임대조건 ... 59A 6,754,000 337,700 6,416,300 134,520 + 전환불가 전환불가 전환불가 - 3,000,000 3,754,000 143,270"
+       }
+      }
+     ],
+     "priority_ranks": [
+      {
+       "rank": 1,
+       "label": "2세 미만 자녀가 있는 자(공급호수 5% 범위 추첨 우선선정)",
+       "mode": "all_of",
+       "conditions": [
         {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
+         "category": "children",
+         "applies_to": {},
+         "operator": "lte",
+         "value": 1,
+         "unit": "child_age"
         }
        ],
        "source": {
-        "page": 6,
-        "text": "6구간(기타소득구간 포함) 233,134,000 1,695,770 + 203,000,000 436,134,000 / - 179,000,000 54,134,000"
+        "page": 21,
+        "text": "공급형별 총 공급호수의 5% 범위에서 입주자격 구분(청년, 고령자, 신혼부부 등, 일반)에 따른 구분없이 모든 신청자를 대상으로 입주자 모집공고일 현재 2세 미만(2세가 되는 날을 포함한다)의 자녀가 있는 사람을 추첨의 방식으로 우선 선정"
+       }
+      },
+      {
+       "rank": 2,
+       "label": "잔여물량 추첨",
+       "mode": "all_of",
+       "conditions": [],
+       "source": {
+        "page": 21,
+        "text": "잔여 물량에 대해서는 추첨으로 입주자를 선정하되, 경쟁 시 소득구간별 입주자 비율이 법정비율 범위 이상이 되도록 선정합니다."
        }
       }
-     ]
+     ],
+     "selection_order": [
+      "rank",
+      "lottery"
+     ],
+     "residence": {
+      "max_years": 30
+     }
     },
     {
      "name": "일반공급 - 고령자",
@@ -1150,28 +1348,14 @@
      ],
      "rule_groups": [
       {
-       "id": "g1",
+       "id": "g_all",
        "mode": "all_of",
-       "label": "고령자 공통 자격"
+       "label": "고령자 기본 자격"
       }
      ],
      "rules": [
       {
-       "group_id": "g1",
-       "category": "age",
-       "applies_to": {},
-       "operator": "gte",
-       "value": 65,
-       "unit": "years",
-       "source": {
-        "page": 17,
-        "text": "● 고령자 ㉯ 65세 이상(1961.9.17. 이전 출생)일 것"
-       },
-       "confidence": 0.97,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "housing",
        "applies_to": {},
        "operator": "gte",
@@ -1179,13 +1363,27 @@
        "unit": "months",
        "source": {
         "page": 17,
-        "text": "• 무주택세대구성원(혼인 중이 아닌 경우로서 단독세대주로 입주하려는 사람의 경우에는 무주택자)으로서 다음의 요건을 모두 갖춘 사람"
+        "text": "● 고령자 • 무주택세대구성원(혼인 중이 아닌 경우로서 단독세대주로 입주하려는 사람의 경우에는 무주택자)으로서 다음의 요건을 모두 갖춘 사람"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_all",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 65,
+       "unit": "years",
+       "source": {
+        "page": 17,
+        "text": "㉯ 65세 이상(1961.9.17. 이전 출생)일 것"
        },
        "confidence": 0.95,
        "verified": false
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 1
@@ -1195,13 +1393,13 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족을 제외한 모든 계층 1인 0인 170% / (기준 중위소득 170% 1인 4,359,205원)"
+        "text": "신혼부부, 한부모가족을 제외한 모든 계층 × 1인 0인 170% (1인 기준중위소득 170% 4,359,205원)"
        },
        "confidence": 0.9,
        "verified": false
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 2
@@ -1211,13 +1409,19 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족을 제외한 모든 계층 2인 0인 160% / (기준 중위소득 160% 2인 6,718,867원)"
+        "text": "신혼부부, 한부모가족을 제외한 모든 계층 × 2인 0인 160% 1인 170% (2인 160% 6,718,867원 / 170% 7,138,796원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 7138796
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 3
@@ -1227,13 +1431,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족을 제외한 모든 계층 3인 이상 0인 150% / (기준 중위소득 150% 3인 8,038,554원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (3인 150% 8,038,554원 / 160% 8,574,458원 / 170% 9,110,361원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 8574458
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 9110361
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 4
@@ -1243,13 +1457,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 4인 9,742,107원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (4인 150% 9,742,107원 / 160% 10,391,581원 / 170% 11,041,055원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 10391581
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 11041055
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 5
@@ -1259,13 +1483,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 5인 11,335,079원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (5인 150% 11,335,079원 / 160% 12,090,750원 / 170% 12,846,422원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 12090750
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 12846422
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 6
@@ -1275,13 +1509,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 6인 12,833,928원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (6인 150% 12,833,928원 / 160% 13,689,523원 / 170% 14,545,118원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 13689523
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 14545118
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 7
@@ -1291,13 +1535,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 7인 14,272,725원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (7인 150% 14,272,725원 / 160% 15,224,240원 / 170% 16,175,755원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 15224240
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 16175755
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 8
@@ -1307,13 +1561,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 8인 15,711,522원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (8인 150% 15,711,522원 / 160% 16,758,957원 / 170% 17,806,392원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 16758957
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 17806392
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "asset",
        "applies_to": {},
        "operator": "lte",
@@ -1321,30 +1585,50 @@
        "unit": "KRW",
        "source": {
         "page": 15,
-        "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
+        "text": "자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @% ③ 출산자녀수 우대비율 : 출산자녀 2인 이상 20%p, 출산자녀 1인 10%p 가산 (1명 379,000,000원 / 2명 이상 413,000,000원)"
        },
        "confidence": 0.95,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 379000000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 413000000
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "car_value",
        "applies_to": {},
        "operator": "lte",
        "value": 45420000,
        "unit": "KRW",
        "source": {
-        "page": 15,
-        "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
+        "page": 11,
+        "text": "자동차가액 45,420,000원 이하 49,960,000원 이하 54,510,000원 이하"
        },
        "confidence": 0.95,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 49960000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 54510000
+        }
+       ]
       }
      ],
      "pricing": [
       {
        "unit_type": "59A",
-       "tier": "1구간(기준 중위소득 30% 이하)",
+       "tier": "1구간",
        "kind": "rental",
        "deposit": 90663000,
        "monthly_rent": 659460,
@@ -1354,24 +1638,14 @@
         "max_deposit": 169663000,
         "min_deposit": 21663000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "1구간 90,663,000 659,460 + 79,000,000 169,663,000 / - 69,000,000 21,663,000"
+        "text": "1구간 90,663,000 4,533,150 86,129,850 659,460 + 79,000,000 169,663,000 264,460 - 69,000,000 21,663,000 860,710"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "2구간(기준 중위소득 50% 이하)",
+       "tier": "2구간",
        "kind": "rental",
        "deposit": 103615000,
        "monthly_rent": 753670,
@@ -1381,24 +1655,14 @@
         "max_deposit": 193615000,
         "min_deposit": 24615000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "2구간 103,615,000 753,670 + 90,000,000 193,615,000 / - 79,000,000 24,615,000"
+        "text": "2구간 103,615,000 5,180,750 98,434,250 753,670 + 90,000,000 193,615,000 303,670 - 79,000,000 24,615,000 984,080"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "3구간(기준 중위소득 70% 이하)",
+       "tier": "3구간",
        "kind": "rental",
        "deposit": 129519000,
        "monthly_rent": 942090,
@@ -1408,24 +1672,14 @@
         "max_deposit": 242519000,
         "min_deposit": 30519000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "3구간 129,519,000 942,090 + 113,000,000 242,519,000 / - 99,000,000 30,519,000"
+        "text": "3구간 129,519,000 6,475,950 123,043,050 942,090 + 113,000,000 242,519,000 377,090 - 99,000,000 30,519,000 1,230,840"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "4구간(기준 중위소득 100% 이하)",
+       "tier": "4구간",
        "kind": "rental",
        "deposit": 168375000,
        "monthly_rent": 1224720,
@@ -1435,24 +1689,14 @@
         "max_deposit": 314375000,
         "min_deposit": 39375000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "4구간 168,375,000 1,224,720 + 146,000,000 314,375,000 / - 129,000,000 39,375,000"
+        "text": "4구간 168,375,000 8,418,750 159,956,250 1,224,720 + 146,000,000 314,375,000 494,720 - 129,000,000 39,375,000 1,600,970"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "5구간(기준 중위소득 110% 이하)",
+       "tier": "5구간",
        "kind": "rental",
        "deposit": 207230000,
        "monthly_rent": 1507350,
@@ -1462,19 +1706,9 @@
         "max_deposit": 387230000,
         "min_deposit": 48230000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "5구간 207,230,000 1,507,350 + 180,000,000 387,230,000 / - 159,000,000 48,230,000"
+        "text": "5구간 207,230,000 10,361,500 196,868,500 1,507,350 + 180,000,000 387,230,000 607,350 - 159,000,000 48,230,000 1,971,100"
        }
       },
       {
@@ -1489,22 +1723,65 @@
         "max_deposit": 436134000,
         "min_deposit": 54134000
        },
-       "payment_schedule": [
+       "source": {
+        "page": 6,
+        "text": "6구간 (기타소득구간 포함) 233,134,000 11,656,700 221,477,300 1,695,770 + 203,000,000 436,134,000 680,770 - 179,000,000 54,134,000 2,217,850"
+       }
+      },
+      {
+       "unit_type": "59A",
+       "tier": "생계·의료급여 수급자 등 상한(주거급여 미수급)",
+       "kind": "rental",
+       "deposit": 6754000,
+       "monthly_rent": 134520,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "min_deposit": 3754000
+       },
+       "source": {
+        "page": 28,
+        "text": "[주거급여 수급자가 아닌 경우] 상한 임대조건 ... 59A 6,754,000 337,700 6,416,300 134,520 + 전환불가 전환불가 전환불가 - 3,000,000 3,754,000 143,270"
+       }
+      }
+     ],
+     "priority_ranks": [
+      {
+       "rank": 1,
+       "label": "2세 미만 자녀가 있는 자(공급호수 5% 범위 추첨 우선선정)",
+       "mode": "all_of",
+       "conditions": [
         {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
+         "category": "children",
+         "applies_to": {},
+         "operator": "lte",
+         "value": 1,
+         "unit": "child_age"
         }
        ],
        "source": {
-        "page": 6,
-        "text": "6구간(기타소득구간 포함) 233,134,000 1,695,770 + 203,000,000 436,134,000 / - 179,000,000 54,134,000"
+        "page": 21,
+        "text": "공급형별 총 공급호수의 5% 범위에서 입주자격 구분(청년, 고령자, 신혼부부 등, 일반)에 따른 구분없이 모든 신청자를 대상으로 입주자 모집공고일 현재 2세 미만(2세가 되는 날을 포함한다)의 자녀가 있는 사람을 추첨의 방식으로 우선 선정"
+       }
+      },
+      {
+       "rank": 2,
+       "label": "잔여물량 추첨",
+       "mode": "all_of",
+       "conditions": [],
+       "source": {
+        "page": 21,
+        "text": "잔여 물량에 대해서는 추첨으로 입주자를 선정하되, 경쟁 시 소득구간별 입주자 비율이 법정비율 범위 이상이 되도록 선정합니다."
        }
       }
-     ]
+     ],
+     "selection_order": [
+      "rank",
+      "lottery"
+     ],
+     "residence": {
+      "max_years": 30
+     }
     },
     {
      "name": "일반공급 - 일반",
@@ -1516,14 +1793,14 @@
      ],
      "rule_groups": [
       {
-       "id": "g1",
+       "id": "g_all",
        "mode": "all_of",
-       "label": "일반 공통 자격"
+       "label": "일반 기본 자격"
       }
      ],
      "rules": [
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "housing",
        "applies_to": {},
        "operator": "gte",
@@ -1533,11 +1810,11 @@
         "page": 17,
         "text": "● 일반 • 무주택세대구성원으로서 해당 세대의 월평균소득이 기준 중위소득의 150퍼센트(1~2인 가구 및 출산가구의 경우에는 우대비율을 가산) 이하일 것"
        },
-       "confidence": 0.95,
+       "confidence": 0.9,
        "verified": false
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 1
@@ -1547,13 +1824,13 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족을 제외한 모든 계층 1인 0인 170% / (기준 중위소득 170% 1인 4,359,205원)"
+        "text": "신혼부부, 한부모가족을 제외한 모든 계층 × 1인 0인 170% (1인 기준중위소득 170% 4,359,205원)"
        },
        "confidence": 0.9,
        "verified": false
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 2
@@ -1563,13 +1840,19 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족을 제외한 모든 계층 2인 0인 160% / (기준 중위소득 160% 2인 6,718,867원)"
+        "text": "신혼부부, 한부모가족을 제외한 모든 계층 × 2인 0인 160% 1인 170% (2인 160% 6,718,867원 / 170% 7,138,796원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 7138796
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 3
@@ -1579,13 +1862,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "신혼부부, 한부모가족을 제외한 모든 계층 3인 이상 0인 150% / (기준 중위소득 150% 3인 8,038,554원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (3인 150% 8,038,554원 / 160% 8,574,458원 / 170% 9,110,361원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 8574458
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 9110361
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 4
@@ -1595,13 +1888,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 4인 9,742,107원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (4인 150% 9,742,107원 / 160% 10,391,581원 / 170% 11,041,055원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 10391581
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 11041055
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 5
@@ -1611,13 +1914,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 5인 11,335,079원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (5인 150% 11,335,079원 / 160% 12,090,750원 / 170% 12,846,422원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 12090750
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 12846422
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 6
@@ -1627,13 +1940,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 6인 12,833,928원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (6인 150% 12,833,928원 / 160% 13,689,523원 / 170% 14,545,118원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 13689523
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 14545118
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 7
@@ -1643,13 +1966,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 7인 14,272,725원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (7인 150% 14,272,725원 / 160% 15,224,240원 / 170% 16,175,755원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 15224240
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 16175755
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "income",
        "applies_to": {
         "household_size": 8
@@ -1659,13 +1992,23 @@
        "unit": "KRW_monthly",
        "source": {
         "page": 16,
-        "text": "3인 이상 0인 150% / (기준 중위소득 150% 8인 15,711,522원)"
+        "text": "3인 이상 0인 150% 1인 160% 2인 이상 170% (8인 150% 15,711,522원 / 160% 16,758,957원 / 170% 17,806,392원)"
        },
        "confidence": 0.9,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 16758957
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 17806392
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "asset",
        "applies_to": {},
        "operator": "lte",
@@ -1673,30 +2016,50 @@
        "unit": "KRW",
        "source": {
         "page": 15,
-        "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
+        "text": "자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @% ③ 출산자녀수 우대비율 : 출산자녀 2인 이상 20%p, 출산자녀 1인 10%p 가산 (1명 379,000,000원 / 2명 이상 413,000,000원)"
        },
        "confidence": 0.95,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 379000000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 413000000
+        }
+       ]
       },
       {
-       "group_id": "g1",
+       "group_id": "g_all",
        "category": "car_value",
        "applies_to": {},
        "operator": "lte",
        "value": 45420000,
        "unit": "KRW",
        "source": {
-        "page": 15,
-        "text": "• 자산기준 : 총자산 345,000,000원 및 자동차 45,420,000원 이하 + @%"
+        "page": 11,
+        "text": "자동차가액 45,420,000원 이하 49,960,000원 이하 54,510,000원 이하"
        },
        "confidence": 0.95,
-       "verified": false
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 49960000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 54510000
+        }
+       ]
       }
      ],
      "pricing": [
       {
        "unit_type": "59A",
-       "tier": "1구간(기준 중위소득 30% 이하)",
+       "tier": "1구간",
        "kind": "rental",
        "deposit": 90663000,
        "monthly_rent": 659460,
@@ -1706,24 +2069,14 @@
         "max_deposit": 169663000,
         "min_deposit": 21663000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "1구간 90,663,000 659,460 + 79,000,000 169,663,000 / - 69,000,000 21,663,000"
+        "text": "1구간 90,663,000 4,533,150 86,129,850 659,460 + 79,000,000 169,663,000 264,460 - 69,000,000 21,663,000 860,710"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "2구간(기준 중위소득 50% 이하)",
+       "tier": "2구간",
        "kind": "rental",
        "deposit": 103615000,
        "monthly_rent": 753670,
@@ -1733,24 +2086,14 @@
         "max_deposit": 193615000,
         "min_deposit": 24615000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "2구간 103,615,000 753,670 + 90,000,000 193,615,000 / - 79,000,000 24,615,000"
+        "text": "2구간 103,615,000 5,180,750 98,434,250 753,670 + 90,000,000 193,615,000 303,670 - 79,000,000 24,615,000 984,080"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "3구간(기준 중위소득 70% 이하)",
+       "tier": "3구간",
        "kind": "rental",
        "deposit": 129519000,
        "monthly_rent": 942090,
@@ -1760,24 +2103,14 @@
         "max_deposit": 242519000,
         "min_deposit": 30519000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "3구간 129,519,000 942,090 + 113,000,000 242,519,000 / - 99,000,000 30,519,000"
+        "text": "3구간 129,519,000 6,475,950 123,043,050 942,090 + 113,000,000 242,519,000 377,090 - 99,000,000 30,519,000 1,230,840"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "4구간(기준 중위소득 100% 이하)",
+       "tier": "4구간",
        "kind": "rental",
        "deposit": 168375000,
        "monthly_rent": 1224720,
@@ -1787,24 +2120,14 @@
         "max_deposit": 314375000,
         "min_deposit": 39375000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "4구간 168,375,000 1,224,720 + 146,000,000 314,375,000 / - 129,000,000 39,375,000"
+        "text": "4구간 168,375,000 8,418,750 159,956,250 1,224,720 + 146,000,000 314,375,000 494,720 - 129,000,000 39,375,000 1,600,970"
        }
       },
       {
        "unit_type": "59A",
-       "tier": "5구간(기준 중위소득 110% 이하)",
+       "tier": "5구간",
        "kind": "rental",
        "deposit": 207230000,
        "monthly_rent": 1507350,
@@ -1814,19 +2137,9 @@
         "max_deposit": 387230000,
         "min_deposit": 48230000
        },
-       "payment_schedule": [
-        {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
-        }
-       ],
        "source": {
         "page": 6,
-        "text": "5구간 207,230,000 1,507,350 + 180,000,000 387,230,000 / - 159,000,000 48,230,000"
+        "text": "5구간 207,230,000 10,361,500 196,868,500 1,507,350 + 180,000,000 387,230,000 607,350 - 159,000,000 48,230,000 1,971,100"
        }
       },
       {
@@ -1841,44 +2154,74 @@
         "max_deposit": 436134000,
         "min_deposit": 54134000
        },
-       "payment_schedule": [
+       "source": {
+        "page": 6,
+        "text": "6구간 (기타소득구간 포함) 233,134,000 11,656,700 221,477,300 1,695,770 + 203,000,000 436,134,000 680,770 - 179,000,000 54,134,000 2,217,850"
+       }
+      },
+      {
+       "unit_type": "59A",
+       "tier": "생계·의료급여 수급자 등 상한(주거급여 미수급)",
+       "kind": "rental",
+       "deposit": 6754000,
+       "monthly_rent": 134520,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "min_deposit": 3754000
+       },
+       "source": {
+        "page": 28,
+        "text": "[주거급여 수급자가 아닌 경우] 상한 임대조건 ... 59A 6,754,000 337,700 6,416,300 134,520 + 전환불가 전환불가 전환불가 - 3,000,000 3,754,000 143,270"
+       }
+      }
+     ],
+     "priority_ranks": [
+      {
+       "rank": 1,
+       "label": "2세 미만 자녀가 있는 자(공급호수 5% 범위 추첨 우선선정)",
+       "mode": "all_of",
+       "conditions": [
         {
-         "label": "계약금(5%)",
-         "ratio": 0.05
-        },
-        {
-         "label": "잔금(95%)",
-         "ratio": 0.95
+         "category": "children",
+         "applies_to": {},
+         "operator": "lte",
+         "value": 1,
+         "unit": "child_age"
         }
        ],
        "source": {
-        "page": 6,
-        "text": "6구간(기타소득구간 포함) 233,134,000 1,695,770 + 203,000,000 436,134,000 / - 179,000,000 54,134,000"
+        "page": 21,
+        "text": "공급형별 총 공급호수의 5% 범위에서 입주자격 구분(청년, 고령자, 신혼부부 등, 일반)에 따른 구분없이 모든 신청자를 대상으로 입주자 모집공고일 현재 2세 미만(2세가 되는 날을 포함한다)의 자녀가 있는 사람을 추첨의 방식으로 우선 선정"
+       }
+      },
+      {
+       "rank": 2,
+       "label": "잔여물량 추첨",
+       "mode": "all_of",
+       "conditions": [],
+       "source": {
+        "page": 21,
+        "text": "잔여 물량에 대해서는 추첨으로 입주자를 선정하되, 경쟁 시 소득구간별 입주자 비율이 법정비율 범위 이상이 되도록 선정합니다."
        }
       }
-     ]
+     ],
+     "selection_order": [
+      "rank",
+      "lottery"
+     ],
+     "residence": {
+      "max_years": 30
+     }
     }
    ],
    "notes": [
-    "■ 공급대상 : 통합공공임대주택 14호 (전용59㎡) - 우선공급(철거민등) 4호, 일반공급 10호[청년, 신혼부부·한부모가족, 고령자, 일반]. 일반공급 대상호수는 우선공급 신청 미달로 인한 잔여호수 일반공급 전환으로 증가될 수 있습니다.",
-    "우선공급 대상자(철거민 등)는 덕수연립 가로주택정비사업 지구 내 기존거주자 중 조합이 우선공급 대상자로 선정하여 LH에 통보한 사람으로 관련 법에서 정한 자격요건을 갖추고 있어야 하며, 해당 우선공급 접수기간(’26.9.30.)에 본인이 접수를 별도로 하여야 합니다.(현장접수만 가능, 예약필수, 별도 안내문 참고) ※ 소득 및 자산요건을 적용하지 않습니다.",
-    "입주자 모집공고일(2026. 9. 17.) 현재 무주택세대구성원(청년 및 혼인 중이 아닌 경우로서 단독세대주로 입주하려는 고령자는 무주택자)으로서 자산・소득 기준 및 입주자격 구분별 입주자격을 충족한 자에게 1세대 1주택 기준으로 공급합니다. 다만, 신청자의 세대구성원 중 과거 공공임대주택 임차인으로서 불법양도, 전대 행위로 적발된 후 4년이 경과되지 않은 자는 입주자로 선정이 불가합니다.",
-    "「민법」상 미성년자(19세 미만)는 신청하실 수 없습니다. 다만, 자녀를 양육하는 세대주인 미성년자, 형제자매를 부양하여야 하는 세대주인 미성년자, 부 또는 모가 외국인인 한부모가족으로서 미성년 자녀(내국인)가 세대주인 경우, 청년·예비신혼부부의 경우에는 법정대리인의 동의 또는 대리를 통해 공급신청이 가능합니다.",
-    "자산보유기준 : 총자산가액 345,000,000원 이하 / 자동차가액 45,420,000원 이하. 출산자녀수(’23.3.28. 이후 출산한 미성년 자녀, 태아 포함) 1명은 기준+10%p(총자산 379,000,000원, 자동차 49,960,000원), 2명 이상은 기준+20%p(총자산 413,000,000원, 자동차 54,510,000원)를 적용합니다.",
-    "소득기준 우대 : ② 세대원수 우대비율 1인 20%p, 2인 10%p 가산 ③ 출산자녀수 우대비율 1인 10%p, 2인 이상 20%p 가산 ① 신혼부부 맞벌이 우대비율 30%p 가산(\"신혼부부, 한부모가족\"의 입주자격으로 당첨된 자만 적용, \"6세 이하 자녀를 둔 한부모가족\"은 적용 제외).",
-    "청년 계층의 소득·자산은 신청자 본인에 한하여 검증합니다. 다만, 세대원이 있는 세대의 세대주인 경우에는 세대구성원 전체를 대상으로 검증하되, 주택소유는 신청자 본인만 검증합니다. 고령자 계층의 소득·자산은 세대구성원 전체를 대상으로 검증합니다(혼인 중이 아니면서 단독세대주로 입주하려는 경우 포함).",
-    "1세대(세대구성원 전원) 1주택 신청·공급원칙에 따라, 1세대 내에서 중복 신청할 경우 전부 무효처리됩니다. 다만, 세대주가 아닌 청년의 경우 1세대 내에서 세대원인 청년계층이 각각 신청하실 수 있습니다.",
-    "동일한 공급유형(통합, 국민, 행복, 영구)내에서 중복신청도 가능하나, 신청 후 예비입주자로 선정되면 종전에 동일한 공급유형에 선정된 예비입주자 지위는 자동 상실됩니다.",
-    "임대기간 : 통합공공임대주택은 최대 거주기간(30년) 제한이 있는 공공임대주택이며, 분양전환되지 않습니다.",
-    "입주자 선정방법 : ① 우선공급(철거민 등) 신청자를 대상으로 입주자를 우선 선정 후, ② 일반공급 입주자를 선정하며(2세 미만 자녀가 있는 자 추첨으로 우선 선정(5% 범위) → 잔여물량 추첨), ③ 일정 규모의 예비입주자를 선정합니다. 우선공급 대상자는 우선공급으로만 신청가능하며, 일반공급 등 중복신청 시 부적격처리됩니다.",
-    "생계·의료급여 수급자 등(생계·의료급여 수급자, 소득인정액이 생계·의료급여 수급자 기준을 충족하는 국가유공자 등, 등록 일본군위안부 피해자, 지원대상 한부모가족)은 임대조건 상한이 적용되며, 주거급여 수급 여부에 따라 상한 임대조건이 달라집니다. 단, 신청자의 미신청 시 적용을 받으실 수 없습니다.",
-    "[주거급여 수급자가 아닌 경우] 59A 상한 임대조건 : 임대보증금 6,754,000원(계약금 337,700원, 잔금 6,416,300원), 월임대료 134,520원 / 보증금 3,000,000원 감액 전환 시 보증금 3,754,000원, 월임대료 143,270원 (증액 전환 불가).",
-    "[주거급여 수급자인 경우] 상한 임대조건(서울 1급지, ’27년 기준액) : 1인 보증금 35,919,000원·월 261,260원, 2인 40,632,000원·295,550원, 3인 48,457,000원·352,470원, 4인 56,188,000원·408,700원, 5인 58,262,000원·423,790원, 6~7인 68,915,000원·501,280원, 8~9인 75,797,000원·551,340원, 10인 83,340,000원·606,190원.",
-    "월임대료의 임대보증금 전환 및 임대보증금의 월임대료 전환은 임차인의 선택사항으로서 100만원 단위로 전환 가능하며, 월임대료의 임대보증금 전환 시 이율 연6.0%, 임대보증금의 월임대료 전환 시 이율 연3.5%를 적용합니다.",
-    "갱신계약 시 소득(6구간 초과), 자산기준 초과, 최대 거주기간(30년) 초과 시 임대조건이 할증 적용되며, 다른 주택을 소유하게 된 경우에는 갱신계약이 거절됩니다. 우선공급(철거민 등)은 소득·자산기준 초과 할증을 적용하지 않습니다.",
-    "해당 단지는 소규모단지로, 인근 타 단지에 비해 관리비(공용관리비)가 높을 수 있습니다. 전 세대 발코니 일부 확장 세대이며, 가구(인덕션 및 에어컨)가 설치되어 있습니다. 금회 임대주택 14호에 별도의 전용 주차구획이 배정되지 않으며, 전체 단지 입주민과 공동으로 사용합니다.",
-    "신청접수는 온라인접수[LH청약플러스 홈페이지 또는 모바일 앱]로 진행하며, 장애인 및 65세 이상의 고령자 등 온라인 접수가 어려우신 분에 한하여 현장접수가 가능합니다. 서류제출대상자 발표 ’26.10.13.(화) 17:00 이후, 서류제출 기간 ’26.10.14.(수)~19.(월) 등기우편.",
-    "입주지정기간 : ’27.2.18.(목) ~ 4.19.(월). 전자계약 ’27.2.15.~16., 현장계약 ’27.2.17."
+    "우선공급(철거민 등): 무주택세대구성원으로서 덕수연립 가로주택정비사업 지구 내 기존거주자 중 조합이 우선공급 대상자로 선정하여 LH에 통보한 사람으로, 관련 법에 정한 자격요건을 갖추고 있는 사람(대상자에게 별도 안내, 지정된 대상자만 신청가능) ※ 소득 및 자산요건을 적용하지 않습니다.",
+    "우선공급 대상자는 우선공급(철거민 등)으로만 신청가능하며, 일반공급 등 중복신청 시 부적격처리되오니 유의하시기 바랍니다.",
+    "신청자의 세대구성원 중 과거 공공임대주택 임차인으로서 불법양도, 전대 행위로 적발된 후 4년이 경과되지 않은 자는 입주자로 선정이 불가합니다.",
+    "청년계층의 소득 및 자산은 신청자 본인에 한하여 검증. 다만, 세대원이 있는 세대의 세대주인 경우에는 세대구성원 전체를 대상으로 검증하되, 주택소유는 신청자 본인만 검증",
+    "1세대(세대구성원) 1주택 신청·공급원칙에 따라, 1세대 내에서 중복 신청할 경우 전부 무효처리됩니다. 다만, 세대주가 아닌 청년의 경우, 1세대 내에서 세대원인 청년계층이 각각 신청하실 수 있습니다.",
+    "입주자 중 생계·의료급여 수급자 등에 해당되는 경우에는 공급형・소득구간별 임대조건에도 불구하고, 임대조건 상한 금액만을 부담하게 됩니다. [주거급여 수급자인 경우] 1인 35,919,000/261,260, 2인 40,632,000/295,550, 3인 48,457,000/352,470, 4인 56,188,000/408,700 (임대보증금/월임대료)"
    ]
   },
   "transit": {
@@ -2151,6 +2494,9 @@
     "name": "동호배치도.jpg",
     "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=68653739"
    }
+  ],
+  "checks": [
+   "자산 기준·자동차 가액을 읽지 못했어요 (다른 공급 유형에는 있어요)"
   ]
  },
  {
@@ -2172,32 +2518,43 @@
   "extraction": {
    "title": "서울지역본부 신혼·신생아 매입임대주택Ⅰ 예비입주자 모집공고",
    "housing_type": "purchased_rental",
-   "address": "서울특별시",
    "schedule": {
     "notice_date": "2026-09-17",
     "apply_start": "2026-09-28",
     "apply_end": "2026-09-30",
-    "winner_announce": "2026-12-11"
+    "winner_announce": "2026-12-11",
+    "documents_announce": "2026-10-02",
+    "documents_start": "2026-10-06",
+    "documents_end": "2026-10-08"
+   },
+   "application": {
+    "online": true,
+    "onsite": false,
+    "source": {
+     "page": 6,
+     "text": "신혼·신생아 매입임대는 인터넷(https://apply.lh.or.kr) 또는 모바일 앱(LH청약플러스)로 신청 가능합니다."
+    }
    },
    "tracks": [
     {
-     "name": "1순위 (신생아 가구, 지원대상 한부모가족)",
+     "name": "신혼·신생아 매입임대주택Ⅰ",
+     "households": 81,
      "unit_types": [],
      "rule_groups": [
       {
-       "id": "g1",
+       "id": "g_base",
        "mode": "all_of",
-       "label": "공통 입주자격(무주택·소득·자산)"
+       "label": "무주택·소득·자산 기준"
       },
       {
-       "id": "g2",
+       "id": "g_type",
        "mode": "any_of",
-       "label": "1순위 자격요건"
+       "label": "신혼부부·예비신혼부부·한부모가족·유자녀 혼인가구·신생아 가구 중 하나"
       }
      ],
      "rules": [
       {
-       "group_id": "g1",
+       "group_id": "g_base",
        "category": "housing",
        "applies_to": {},
        "operator": "gte",
@@ -2205,559 +2562,43 @@
        "unit": "months",
        "source": {
         "page": 3,
-        "text": "공고일(‘26.09.17) 현재 무주택세대구성원으로서 신혼·신생아 매입임대주택Ⅰ 소득 및 자산기준을 충족하는"
+        "text": "공고일('26.09.17) 현재 무주택세대구성원으로서 신혼·신생아 매입임대주택Ⅰ 소득 및 자산기준을 충족하는"
        },
        "confidence": 0.95,
        "verified": false
       },
       {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 1,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 3432027,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "전년도 도시근로자 가구원수별 월평균소득의 70% 이하 / 70% 1인 가구 3,432,027원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 2,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 4693016,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 2인 가구 4,693,016원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 3,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 5717900,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 3인 가구 5,717,900원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 4,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6161541,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 4인 가구 6,161,541원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 5,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6528890,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 5인 가구 6,528,890원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 6,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6934384,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 6인 가구 6,934,384원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 1,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 4194699,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "(본인 및 배우자 모두 소득이 있는 경우 90% 이하) / 90% 1인 가구 4,194,699원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 2,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 5866270,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 2인 가구 5,866,270원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 3,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 7351586,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 3인 가구 7,351,586원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 4,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 7921982,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 4인 가구 7,921,982원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 5,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 8394287,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 5인 가구 8,394,287원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 6,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 8915637,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 6인 가구 8,915,637원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "asset",
-       "applies_to": {},
-       "operator": "lte",
-       "value": 345000000,
-       "unit": "KRW",
-       "source": {
-        "page": 4,
-        "text": "국민임대 자산기준 충족 - 총자산 34,500만원 이하, 자동차 4,542만원 이하"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "car_value",
-       "applies_to": {},
-       "operator": "lte",
-       "value": 45420000,
-       "unit": "KRW",
-       "source": {
-        "page": 4,
-        "text": "자동차가액 45,420,000원 이하"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g2",
-       "category": "children",
-       "applies_to": {},
-       "operator": "lte",
-       "value": 2,
-       "unit": "child_age",
-       "source": {
-        "page": 3,
-        "text": "⑤ 신생아 가구 : 2년 이내 출산한 자녀가 있는 가구(‘24.9.17이후 출생한 자녀·입양자녀 및 태아)"
-       },
-       "confidence": 0.85,
-       "verified": false
-      },
-      {
-       "group_id": "g2",
-       "category": "status",
-       "applies_to": {},
-       "operator": "in",
-       "value": [
-        "single_parent_support"
-       ],
-       "unit": "status",
-       "source": {
-        "page": 4,
-        "text": "1순위 Ÿ 신생아 가구 Ÿ 지원대상 한부모가족(「한부모가족 지원법 시행규칙」 제3조에 따라 여성가족부장관이 정하여 고시하는 모자가족 또는 부자가족)"
-       },
-       "confidence": 0.9,
-       "verified": false
-      }
-     ],
-     "pricing": []
-    },
-    {
-     "name": "2순위 (미성년 자녀가 있는 신혼부부·예비신혼부부, 6세 이하 자녀가 있는 한부모가족)",
-     "unit_types": [],
-     "rule_groups": [
-      {
-       "id": "g1",
-       "mode": "all_of",
-       "label": "공통 입주자격(무주택·소득·자산)"
-      },
-      {
-       "id": "g2",
-       "mode": "any_of",
-       "label": "2순위 자격요건"
-      }
-     ],
-     "rules": [
-      {
-       "group_id": "g1",
-       "category": "housing",
-       "applies_to": {},
-       "operator": "gte",
-       "value": 0,
-       "unit": "months",
-       "source": {
-        "page": 3,
-        "text": "공고일(‘26.09.17) 현재 무주택세대구성원으로서 신혼·신생아 매입임대주택Ⅰ 소득 및 자산기준을 충족하는"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 1,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 3432027,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 1인 가구 3,432,027원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 2,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 4693016,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 2인 가구 4,693,016원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 3,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 5717900,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 3인 가구 5,717,900원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 4,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6161541,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 4인 가구 6,161,541원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 5,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6528890,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 5인 가구 6,528,890원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 6,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6934384,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 6인 가구 6,934,384원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 1,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 4194699,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 1인 가구 4,194,699원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 2,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 5866270,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 2인 가구 5,866,270원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 3,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 7351586,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 3인 가구 7,351,586원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 4,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 7921982,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 4인 가구 7,921,982원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 5,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 8394287,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 5인 가구 8,394,287원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 6,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 8915637,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 6인 가구 8,915,637원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "asset",
-       "applies_to": {},
-       "operator": "lte",
-       "value": 345000000,
-       "unit": "KRW",
-       "source": {
-        "page": 4,
-        "text": "총자산 34,500만원 이하, 자동차 4,542만원 이하"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "car_value",
-       "applies_to": {},
-       "operator": "lte",
-       "value": 45420000,
-       "unit": "KRW",
-       "source": {
-        "page": 4,
-        "text": "자동차가액 45,420,000원 이하"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g2",
+       "group_id": "g_type",
        "category": "marriage",
-       "applies_to": {
-        "marriage": [
-         "married",
-         "pre_marriage"
-        ]
-       },
+       "applies_to": {},
        "operator": "lte",
        "value": 7,
        "unit": "years",
        "source": {
         "page": 3,
-        "text": "① 신혼부부 : 공고일 현재 혼인 7년 이내(혼인신고일이 2019.9.17 ~ 2026.9.17)인 사람 / ② 예비신혼부부 : 공고일 현재 혼인 예정인 사람으로서 입주일 전일까지 혼인신고를 하는 사람"
+        "text": "① 신혼부부 : 공고일 현재 혼인 7년 이내(혼인신고일이 2019.9.17 ~ 2026.9.17)인 사람"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g_type",
+       "category": "marriage",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "pre_marriage"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 3,
+        "text": "② 예비신혼부부 : 공고일 현재 혼인 예정인 사람으로서 입주일 전일까지 혼인신고를 하는 사람"
        },
        "confidence": 0.9,
        "verified": false
       },
       {
-       "group_id": "g2",
+       "group_id": "g_type",
        "category": "children",
        "applies_to": {
         "marriage": [
@@ -2768,623 +2609,445 @@
        "value": 6,
        "unit": "child_age",
        "source": {
-        "page": 4,
-        "text": "2순위 1순위가 아닌, Ÿ 미성년 자녀가 있는 신혼부부 및 예비신혼부부 Ÿ 6세 이하 자녀가 있는 한부모 가족"
-       },
-       "confidence": 0.85,
-       "verified": false
-      }
-     ],
-     "pricing": []
-    },
-    {
-     "name": "3순위 (미성년 자녀가 없는 신혼부부·예비신혼부부)",
-     "unit_types": [],
-     "rule_groups": [
-      {
-       "id": "g1",
-       "mode": "all_of",
-       "label": "공통 입주자격(무주택·소득·자산)"
-      },
-      {
-       "id": "g2",
-       "mode": "all_of",
-       "label": "3순위 자격요건"
-      }
-     ],
-     "rules": [
-      {
-       "group_id": "g1",
-       "category": "housing",
-       "applies_to": {},
-       "operator": "gte",
-       "value": 0,
-       "unit": "months",
-       "source": {
         "page": 3,
-        "text": "공고일(‘26.09.17) 현재 무주택세대구성원으로서 신혼·신생아 매입임대주택Ⅰ 소득 및 자산기준을 충족하는"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 1,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 3432027,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 1인 가구 3,432,027원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 2,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 4693016,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 2인 가구 4,693,016원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 3,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 5717900,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 3인 가구 5,717,900원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 4,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6161541,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 4인 가구 6,161,541원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 5,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6528890,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 5인 가구 6,528,890원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 6,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6934384,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 6인 가구 6,934,384원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 1,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 4194699,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 1인 가구 4,194,699원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 2,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 5866270,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 2인 가구 5,866,270원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 3,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 7351586,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 3인 가구 7,351,586원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 4,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 7921982,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 4인 가구 7,921,982원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 5,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 8394287,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 5인 가구 8,394,287원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 6,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 8915637,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 6인 가구 8,915,637원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "asset",
-       "applies_to": {},
-       "operator": "lte",
-       "value": 345000000,
-       "unit": "KRW",
-       "source": {
-        "page": 4,
-        "text": "총자산 34,500만원 이하, 자동차 4,542만원 이하"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "car_value",
-       "applies_to": {},
-       "operator": "lte",
-       "value": 45420000,
-       "unit": "KRW",
-       "source": {
-        "page": 4,
-        "text": "자동차가액 45,420,000원 이하"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g2",
-       "category": "marriage",
-       "applies_to": {
-        "marriage": [
-         "married",
-         "pre_marriage"
-        ]
-       },
-       "operator": "lte",
-       "value": 7,
-       "unit": "years",
-       "source": {
-        "page": 3,
-        "text": "① 신혼부부 : 공고일 현재 혼인 7년 이내(혼인신고일이 2019.9.17 ~ 2026.9.17)인 사람"
+        "text": "◯3-1 한부모가족 : 6세 이하 자녀를 둔 모자가족 또는 부자가족('19.9.18이후 출생한 자녀 및 태아)"
        },
        "confidence": 0.9,
        "verified": false
       },
       {
-       "group_id": "g2",
-       "category": "children",
-       "applies_to": {},
-       "operator": "eq",
-       "value": 0,
-       "unit": "count",
-       "source": {
-        "page": 4,
-        "text": "3순위 Ÿ 미성년 자녀가 없는 신혼부부 및 예비신혼부부"
-       },
-       "confidence": 0.85,
-       "verified": false
-      }
-     ],
-     "pricing": []
-    },
-    {
-     "name": "4순위 (6세 이하 자녀가 있는 혼인가구)",
-     "unit_types": [],
-     "rule_groups": [
-      {
-       "id": "g1",
-       "mode": "all_of",
-       "label": "공통 입주자격(무주택·소득·자산)"
-      },
-      {
-       "id": "g2",
-       "mode": "all_of",
-       "label": "4순위 자격요건"
-      }
-     ],
-     "rules": [
-      {
-       "group_id": "g1",
-       "category": "housing",
-       "applies_to": {},
-       "operator": "gte",
-       "value": 0,
-       "unit": "months",
-       "source": {
-        "page": 3,
-        "text": "공고일(‘26.09.17) 현재 무주택세대구성원으로서 신혼·신생아 매입임대주택Ⅰ 소득 및 자산기준을 충족하는"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 1,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 3432027,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 1인 가구 3,432,027원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 2,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 4693016,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 2인 가구 4,693,016원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 3,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 5717900,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 3인 가구 5,717,900원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 4,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6161541,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 4인 가구 6,161,541원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 5,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6528890,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 5인 가구 6,528,890원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 6,
-        "income_type": "single"
-       },
-       "operator": "lte",
-       "value": 6934384,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "70% 6인 가구 6,934,384원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 1,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 4194699,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 1인 가구 4,194,699원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 2,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 5866270,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 2인 가구 5,866,270원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 3,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 7351586,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 3인 가구 7,351,586원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 4,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 7921982,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 4인 가구 7,921,982원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 5,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 8394287,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 5인 가구 8,394,287원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "income",
-       "applies_to": {
-        "household_size": 6,
-        "income_type": "dual"
-       },
-       "operator": "lte",
-       "value": 8915637,
-       "unit": "KRW_monthly",
-       "source": {
-        "page": 4,
-        "text": "90% 6인 가구 8,915,637원"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "asset",
-       "applies_to": {},
-       "operator": "lte",
-       "value": 345000000,
-       "unit": "KRW",
-       "source": {
-        "page": 4,
-        "text": "총자산 34,500만원 이하, 자동차 4,542만원 이하"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g1",
-       "category": "car_value",
-       "applies_to": {},
-       "operator": "lte",
-       "value": 45420000,
-       "unit": "KRW",
-       "source": {
-        "page": 4,
-        "text": "자동차가액 45,420,000원 이하"
-       },
-       "confidence": 0.95,
-       "verified": false
-      },
-      {
-       "group_id": "g2",
-       "category": "marriage",
+       "group_id": "g_type",
+       "category": "status",
        "applies_to": {},
        "operator": "in",
        "value": [
-        "married"
+        "single_parent_support"
        ],
        "unit": "status",
        "source": {
-        "page": 4,
-        "text": "4순위 1,2순위가 아닌, Ÿ 6세 이하 자녀가 있는 혼인가구"
+        "page": 3,
+        "text": "◯3-2 지원대상 한부모가족 : 「한부모가족 지원법 시행규칙」 제3조에 따라 여성가족부장관이 정하여 고시하는 모자가족 또는 부자가족"
        },
-       "confidence": 0.9,
+       "confidence": 0.95,
        "verified": false
       },
       {
-       "group_id": "g2",
+       "group_id": "g_type",
        "category": "children",
-       "applies_to": {},
+       "applies_to": {
+        "marriage": [
+         "married"
+        ]
+       },
        "operator": "lte",
        "value": 6,
        "unit": "child_age",
        "source": {
         "page": 3,
-        "text": "④ 유자녀 혼인가구 : 6세 이하 자녀가 있는 혼인가구(‘19.9.18이후 출생한 자녀 및 태아)"
+        "text": "④ 유자녀 혼인가구 : 6세 이하 자녀가 있는 혼인가구('19.9.18이후 출생한 자녀 및 태아)"
        },
        "confidence": 0.9,
        "verified": false
+      },
+      {
+       "group_id": "g_type",
+       "category": "children",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 1,
+       "unit": "child_age",
+       "source": {
+        "page": 3,
+        "text": "⑤ 신생아 가구 : 2년 이내 출산한 자녀가 있는 가구('24.9.17이후 출생한 자녀·입양자녀 및 태아)"
+       },
+       "confidence": 0.75,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 3432027,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "전년도 도시근로자 가구원수별 월평균소득의 70% 이하 ... 70% 3,432,027원(1인 가구) * 1인가구는 20%p, 2인가구는 10%p 가산 적용한 금액"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 4693016,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "70% ... 2인 가구 4,693,016원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 5717900,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "70% ... 3인 가구 5,717,900원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 6161541,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "70% ... 4인 가구 6,161,541원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 6528890,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "70% ... 5인 가구 6,528,890원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 6934384,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "70% ... 6인 가구 6,934,384원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 4194699,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "(본인 및 배우자 모두 소득이 있는 경우 90% 이하) ... 90% 1인 가구 4,194,699원"
+       },
+       "confidence": 0.85,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 5866270,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "(본인 및 배우자 모두 소득이 있는 경우 90% 이하) ... 90% 2인 가구 5,866,270원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 7351586,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "(본인 및 배우자 모두 소득이 있는 경우 90% 이하) ... 90% 3인 가구 7,351,586원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 7921982,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "(본인 및 배우자 모두 소득이 있는 경우 90% 이하) ... 90% 4인 가구 7,921,982원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 8394287,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "(본인 및 배우자 모두 소득이 있는 경우 90% 이하) ... 90% 5인 가구 8,394,287원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 8915637,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "(본인 및 배우자 모두 소득이 있는 경우 90% 이하) ... 90% 6인 가구 8,915,637원"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g_base",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 345000000,
+       "unit": "KRW",
+       "source": {
+        "page": 4,
+        "text": "총자산가액 345,000,000원 이하 / 1인(+10%p) 379,000,000원 이하 / 2인 이상(+20%p) 413,000,000원 이하"
+       },
+       "confidence": 0.95,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 379000000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 413000000
+        }
+       ]
+      },
+      {
+       "group_id": "g_base",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 4,
+        "text": "자동차가액 45,420,000원 이하 / 1인(+10%p) 49,960,000원 이하 / 2인 이상(+20%p) 54,510,000원 이하"
+       },
+       "confidence": 0.95,
+       "verified": false,
+       "bonuses": [
+        {
+         "newborn_children_min": 1,
+         "value": 49960000
+        },
+        {
+         "newborn_children_min": 2,
+         "value": 54510000
+        }
+       ]
       }
      ],
-     "pricing": []
+     "pricing": [],
+     "priority_ranks": [
+      {
+       "rank": 1,
+       "label": "신생아 가구 / 지원대상 한부모가족",
+       "mode": "any_of",
+       "conditions": [
+        {
+         "category": "children",
+         "applies_to": {},
+         "operator": "lte",
+         "value": 1,
+         "unit": "child_age"
+        },
+        {
+         "category": "status",
+         "applies_to": {},
+         "operator": "in",
+         "value": [
+          "single_parent_support"
+         ],
+         "unit": "status"
+        }
+       ],
+       "source": {
+        "page": 4,
+        "text": "1순위 신생아 가구 / 지원대상 한부모가족(「한부모가족 지원법 시행규칙」 제3조에 따라 여성가족부장관이 정하여 고시하는 모자가족 또는 부자가족)"
+       }
+      },
+      {
+       "rank": 2,
+       "label": "미성년 자녀가 있는 (예비)신혼부부 / 6세 이하 자녀가 있는 한부모가족",
+       "mode": "any_of",
+       "conditions": [
+        {
+         "category": "children",
+         "applies_to": {
+          "marriage": [
+           "married",
+           "pre_marriage"
+          ]
+         },
+         "operator": "lte",
+         "value": 18,
+         "unit": "child_age"
+        },
+        {
+         "category": "children",
+         "applies_to": {
+          "marriage": [
+           "single_parent"
+          ]
+         },
+         "operator": "lte",
+         "value": 6,
+         "unit": "child_age"
+        }
+       ],
+       "source": {
+        "page": 4,
+        "text": "2순위 1순위가 아닌, 미성년 자녀가 있는 신혼부부 및 예비신혼부부 / 6세 이하 자녀가 있는 한부모 가족"
+       }
+      },
+      {
+       "rank": 3,
+       "label": "미성년 자녀가 없는 신혼부부 및 예비신혼부부",
+       "mode": "any_of",
+       "conditions": [
+        {
+         "category": "marriage",
+         "applies_to": {},
+         "operator": "lte",
+         "value": 7,
+         "unit": "years"
+        },
+        {
+         "category": "marriage",
+         "applies_to": {},
+         "operator": "in",
+         "value": [
+          "pre_marriage"
+         ],
+         "unit": "status"
+        }
+       ],
+       "source": {
+        "page": 4,
+        "text": "3순위 미성년 자녀가 없는 신혼부부 및 예비신혼부부"
+       }
+      },
+      {
+       "rank": 4,
+       "label": "1,2순위가 아닌 6세 이하 자녀가 있는 혼인가구",
+       "mode": "all_of",
+       "conditions": [
+        {
+         "category": "children",
+         "applies_to": {
+          "marriage": [
+           "married"
+          ]
+         },
+         "operator": "lte",
+         "value": 6,
+         "unit": "child_age"
+        }
+       ],
+       "source": {
+        "page": 4,
+        "text": "4순위 1,2순위가 아닌, 6세 이하 자녀가 있는 혼인가구"
+       }
+      }
+     ],
+     "selection_order": [
+      "rank",
+      "score",
+      "lottery"
+     ],
+     "residence": {
+      "contract_years": 2,
+      "max_years": 20,
+      "note": "거주 중 출생한 2024.1.1 이후 자녀가 있으면 자녀 성년 전까지 재계약 가능"
+     }
     }
    ],
    "notes": [
-    "공급대상 주택 : 총 81호. 주택군, 주택별 소재지, 면적, 임대조건 등 세부내역은 첨부 “주택내역” 참조",
-    "임대조건 : 시중 시세의 30~40% 수준의 임대보증금 및 임대료. 수급자, 지원대상 한부모가족, 차상위계층은 시중 시세 30%, 그 외(소득 70% 이하, 본인 및 배우자 모두 소득이 있는 경우 90% 이하)는 시중 시세 40%",
-    "임대보증금-월임대료 상호전환 : ① 임대보증금을 10만원 단위로 증액하여 월임대료를 낮출 수 있음 - (전환한도) 기본월임대료의 최대 60%를 보증금으로 전환 가능(단, 월임대료는 주택별 월임대료 하한기준액 이하로 낮아질 수 없음) - (증액 전환이율) 연 6% ② 월임대료를 추가 납부하고 임대보증금을 10만원 단위로 낮출 수 있음 - (전환한도) 기본 임대보증금의 10% 또는 전환 후 월임대료의 24개월분 중 큰 금액 - (감액 전환이율) 연 3.5%",
-    "임대기간 : 2년, 재계약 9회 가능(자격 충족 시 최장 20년 거주)",
-    "③-1 한부모가족 : 6세 이하 자녀를 둔 모자가족 또는 부자가족(‘19.9.18이후 출생한 자녀 및 태아) / ③-2 지원대상 한부모가족 : 「한부모가족 지원법 시행규칙」 제3조에 따라 여성가족부장관이 정하여 고시하는 모자가족 또는 부자가족",
-    "② 예비신혼부부 : 공고일 현재 혼인 예정인 사람으로서 입주일 전일까지 혼인신고를 하는 사람. 예비신혼부부로 선정된 자가 입주일 전일까지 혼인신고를 하지 않은 경우 계약이 취소됩니다.",
-    "’23.03.28 이후 출산(입양, 태아 포함)한 자녀가 있는 경우, 자녀 1인당 자산요건 10% 완화(최대 2자녀 20%p) : 총자산가액 1인 379,000,000원 이하, 2인 이상 413,000,000원 이하 / 자동차가액 1인 49,960,000원 이하, 2인 이상 54,510,000원 이하",
+    "임대조건: 시중 시세의 30~40% 수준(수급자, 지원대상 한부모가족, 차상위계층 시중 시세 30% / 그 외 시중 시세 40%). 공급대상 주택별 임대조건은 첨부 \"주택내역\" 참조",
+    "임대보증금-월임대료 상호전환: 증액 전환이율 연 6%(기본월임대료의 최대 60%를 보증금으로 전환 가능, 월임대료는 주택별 하한기준액 이하로 낮아질 수 없음) / 감액 전환이율 연 3.5%(기본 임대보증금의 10% 또는 전환 후 월임대료의 24개월분 중 큰 금액)",
     "수급자, 지원대상 한부모가족, 차상위계층은 소득·자산 검증 불필요 (예비신혼부부 제외)",
-    "동일 순위 내 경합 시 배점 : ① 수급자 3점/차상위계층 2점 ② 자녀의 수 3인 이상 4점, 2인 3점, 1인 2점 ③ 청약저축 또는 주택청약종합저축 납입횟수 24회 이상 3점, 12회 이상 24회 미만 2점, 6회 이상 12회 미만 1점 ④ 해당 사업대상지역인 시·군 연속 거주기간 5년 이상 3점, 3년 이상 5년 미만 2점, 3년 미만 1점(타 지역은 가점 없음) ⑤ 신청자의 장애인 등록 2점 ⑥ 65세 이상 직계존속 부양 1점",
-    "1세대(세대구성원 전원) 1주택 신청하여야 하며, 중복 신청하는 경우 전부 무효처리합니다. 신혼·신생아 매입임대주택Ⅰ 기계약자(배우자 포함)의 동일 지자체(시·군·구) 신청은 불가하며, “신혼·신생아Ⅰ 공고”와 “신혼·신생아Ⅱ(전세형) 공고”를 중복 신청하실 수 없습니다.",
-    "외국인은 신청 불가합니다. 신청자 본인의 주민등록이 거주불명 또는 말소인 경우 신청 불가합니다. 배우자가 국내 거주하지 않는 재외국민이거나 외국인 등록을 하지 않은 외국인인 경우 그와 혼인관계에 있는 국민은 공급 신청이 불가합니다.",
-    "예비입주자 자격은 모집단위별 예비입주자 순번 발표일로부터 60일간 유지되며, 60일이 경과한 다음 날 예비입주자 지위가 소멸됩니다. 계약체결 후 60일 이내에 입주를 완료하여야 합니다.",
-    "재계약 시 무주택세대구성원으로서 해당 세대의 월평균 소득이 전년도 도시근로자 가구당 월평균 소득의 105% 이하이고, 국민임대주택 자산기준을 충족한 경우 재계약이 가능합니다."
+    "배우자가 국내 거주하지 않는 재외국민이거나 외국인 등록을 하지 않은 외국인(국내거소신고를 하지 않은 외국국적동포 포함)인 경우 그와 혼인관계에 있는 국민은 공급 신청이 불가합니다. 외국인은 신청 불가합니다.",
+    "신혼·신생아 매입임대주택Ⅰ 기계약자(배우자 포함)의 동일 지자체(시·군·구) 신청은 불가합니다. \"신혼·신생아Ⅰ 공고\"와 \"신혼·신생아Ⅱ(전세형) 공고\"를 중복 신청하실 수 없습니다. 서류제출까지 완료한 경우 예비입주자 순번 발표 시까지 동일 유형 타 매입임대주택 공고의 신청이 불가합니다.",
+    "예비신혼부부로 선정된 자가 입주일 전일까지 혼인신고를 하지 않은 경우 계약이 취소됩니다."
    ]
   },
   "lat": 37.5668260046608,

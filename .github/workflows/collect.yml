@@ -50,7 +50,7 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
-          EXTRACTION_MODEL: ${{ vars.EXTRACTION_MODEL || 'claude-opus-5' }}
+          EXTRACTION_MODEL: ${{ vars.EXTRACTION_MODEL || 'claude-opus-5-5' }}
           # 없으면 꺼짐. 켜지 않으면 목록·신규 판정까지만 하고 LLM 호출이 없다.
           EXTRACTION_ENABLED: ${{ vars.EXTRACTION_ENABLED || 'false' }}
           MAX_ANNOUNCEMENTS_PER_RUN: ${{ vars.MAX_ANNOUNCEMENTS_PER_RUN || '10' }}

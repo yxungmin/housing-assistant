@@ -10,6 +10,7 @@ import type {
 } from "@housing/schema";
 import { regionCodesOf } from "@housing/schema";
 import { categoryLabel, missingCategories } from "./omission";
+import { rankGuard } from "./rank";
 
 /** 생년월일(YYYY-MM-DD) → 기준일의 만 나이 */
 export function ageFromBirthDate(birthDate: string, today = new Date()): number {
@@ -60,7 +61,8 @@ export function profileValueFor(
       if (profile.marriage === "single" || profile.marriage === "single_parent") return Number.POSITIVE_INFINITY;
       return profile.marriage_years ?? (profile.marriage === "pre_marriage" ? 0 : undefined);
     case "children":
-      if (unit === "child_age") return profile.children_ages;
+      // 자녀가 없다고 답했으면 나이 목록도 빈 것이다. 목록이 없다는 이유로 "확인 필요"를 만들지 않는다
+      if (unit === "child_age") return profile.children_ages ?? (profile.children_count === 0 ? [] : undefined);
       return profile.children_count;
     case "age":
       return profile.birth_date ? ageFromBirthDate(profile.birth_date, today) : profile.age;
@@ -683,7 +685,9 @@ export function matchAnnouncement(
     .map((t) => regionGuard(t, profile, options.announcement_region))
     .map(incomeGuard)
     .map((t, i) => siblingGuard(t, missing[i] ?? []))
-    .map((t) => statusGuard(t, profile, options.announcement_title));
+    .map((t) => statusGuard(t, profile, options.announcement_title))
+    // 순위가 자격을 대신한 추출을 막는다 (rank.ts rankGuard)
+    .map((t) => rankGuard(t, profile));
   const byFit = (a: TrackResult, b: TrackResult) => b.summary.matched - a.summary.matched || a.summary.needs_check - b.summary.needs_check;
   const clean = tracks.filter((t) => t.summary.mismatched === 0).sort(byFit);
   // 거주 요건을 확인 못 한 트랙은 후보에서 뺀다.

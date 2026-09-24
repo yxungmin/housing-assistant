@@ -13,9 +13,10 @@
  * 그 사람은 1순위일 수도 있다. 그때는 판별하지 못한 순위를 같이 돌려주고 화면이 "~면 N순위"로 말한다.
  */
 import type { PriorityRank, RankCondition, SupplyTrack, UserProfile } from "@housing/schema";
-import { applies, compare, profileValueFor } from "./match";
+import { applies, compare, profileValueFor, type RuleResult, type TrackResult } from "./match";
 
-type Status = "MATCH" | "MISMATCH" | "NEEDS_CHECK";
+/** SKIP: 이 가구 유형에는 해당하지 않는 조건 (applies_to). 맞다고도 아니라고도 세지 않는다 */
+type Status = "MATCH" | "MISMATCH" | "NEEDS_CHECK" | "SKIP";
 
 export interface RankEstimate {
   /** 내 예상 순위. 판별한 순위가 하나도 맞지 않으면 null */
@@ -31,17 +32,23 @@ export interface RankEstimate {
 
 function evaluate(c: RankCondition, profile: UserProfile): Status {
   const app = applies(c.applies_to, profile);
-  // 이 가구 유형에 적용되지 않는 조건은 이 순위를 막지 않는다
-  if (app === false) return "MATCH";
+  if (app === false) return "SKIP";
   if (app === null) return "NEEDS_CHECK";
   const actual = profileValueFor(c.category, profile, c.unit);
   if (actual === undefined || actual === null) return "NEEDS_CHECK";
   return compare(actual, c.operator, c.value) ? "MATCH" : "MISMATCH";
 }
 
+/**
+ * 순위 하나의 판정. 가구 유형별로 갈린 조건("신혼부부는 미성년 자녀 / 한부모는 6세 이하 자녀")은
+ * 내 유형에 해당하는 것만 본다. 해당하지 않는 조건을 맞은 것으로 세면 any_of에서 모두가 이 순위가 되고,
+ * 어긋난 것으로 세면 all_of에서 아무도 이 순위가 못 된다. 전부 해당하지 않으면 이 순위가 아니다.
+ * 조건이 애초에 없는 순위는 "나머지"라 늘 맞는다.
+ */
 function rankStatus(r: PriorityRank, profile: UserProfile): Status {
-  const s = r.conditions.map((c) => evaluate(c, profile));
-  if (s.length === 0) return "MATCH";
+  if (r.conditions.length === 0) return "MATCH";
+  const s = r.conditions.map((c) => evaluate(c, profile)).filter((x) => x !== "SKIP");
+  if (s.length === 0) return "MISMATCH";
   if (r.mode === "any_of") return s.includes("MATCH") ? "MATCH" : s.includes("NEEDS_CHECK") ? "NEEDS_CHECK" : "MISMATCH";
   return s.includes("MISMATCH") ? "MISMATCH" : s.includes("NEEDS_CHECK") ? "NEEDS_CHECK" : "MATCH";
 }
@@ -58,7 +65,8 @@ export function expectedRank(track: Pick<SupplyTrack, "priority_ranks">, profile
     }
     if (s === "NEEDS_CHECK") undecided.push(r.rank);
   }
-  return { rank: null, certain: false, undecided };
+  // 판별한 순위가 하나도 맞지 않았다. 못 가린 순위가 없으면 그건 확실한 결과다 — 어느 순위에도 해당하지 않는 사람
+  return { rank: null, certain: undecided.length === 0, undecided };
 }
 
 /**
@@ -78,3 +86,42 @@ export const RANK_VS_PAST_LABEL: Record<RankVsPast, string> = {
   same: "같은 순위에서 경쟁",
   behind: "지난 회차 기준 차례 안 옴",
 };
+
+/**
+ * 순위 안전망 (regionGuard·statusGuard와 같은 자리).
+ *
+ * 순위가 자격을 대신해 버린 추출을 막는다. 2026-09-24 v7 시험 추출에서 신혼·신생아 매입임대의
+ * 자격(신혼부부·한부모·신생아 가구)이 순위 조건으로만 옮겨지고 rules에서 빠졌다 — 그러자 미혼에게 이 공고가
+ * "조건 일치"로 나갔다(감사 오추천 360회). 공고문이 순위로 신청자 전부를 가른 공고에서 어느 순위에도
+ * 해당하지 않으면 그 사람은 신청 대상이 아니다.
+ *
+ * 그래도 MISMATCH로 자르지 않는다 — 확인 필요 한 줄을 얹고 후보에서만 뺀다(status_guarded).
+ * 앞 순위를 입력이 없어 못 가린 사람(certain: false)에게는 얹지 않는다. 입력하면 어느 순위인지 드러난다.
+ * 조건 없는 "나머지" 순위가 있는 공고는 누구나 어느 순위엔가 들어가므로 여기에 걸리지 않는다.
+ */
+export function rankGuard(track: TrackResult, profile: UserProfile): TrackResult {
+  if (!track.track.priority_ranks?.length || track.status_guarded) return track;
+  const est = expectedRank(track.track, profile);
+  if (!est || est.rank !== null || !est.certain) return track;
+  const guard: RuleResult = {
+    rule: {
+      group_id: "__rank_guard__",
+      category: "status",
+      applies_to: {},
+      operator: "in",
+      value: [],
+      source: { page: track.track.priority_ranks[0]!.source.page, text: track.track.priority_ranks.map((r) => `${r.rank}순위 ${r.label}`).join(" / ") },
+      confidence: 0,
+      verified: false,
+    },
+    status: "NEEDS_CHECK",
+    reason: "이 공고는 신청자를 순위로 가르는데, 입력한 조건은 어느 순위에도 해당하지 않아요. 신청 대상인지 공고문의 순위 자격을 확인해 주세요.",
+    skipped: false,
+  };
+  return {
+    ...track,
+    groups: [...track.groups, { group: { id: "__rank_guard__", mode: "all_of" as const, label: "신청 순위" }, status: "NEEDS_CHECK" as const, rules: [guard] }],
+    summary: { ...track.summary, needs_check: track.summary.needs_check + 1 },
+    status_guarded: true,
+  };
+}

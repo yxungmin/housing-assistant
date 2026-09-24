@@ -32,6 +32,8 @@
   순위는 자격과 따로다(`rank.ts`, 스키마 `priority_ranks`·`selection_order`, 추출 v5). 순위 조건을 rules에 넣으면 2순위가 "불일치"로 공고를 잃는다.
   조건이 모두 맞는 첫 순위가 예상 순위이고, 앞 순위를 입력이 없어 못 가렸으면 `certain: false` — 화면은 "더 앞 순위일 수 있어요"라고만 말한다.
   순위별 접수일(`apply_date`)이 있으면 알린다 — 다른 날 접수하면 부적격이다.
+  `rankGuard`는 어느 순위에도 확실히 해당하지 않는 사람에게 확인 필요를 얹고 추천에서 뺀다 — 순위가 자격을 대신한 추출을 막는 안전망이다.
+  any_of 순위에서 내 가구 유형에 해당하지 않는 갈래(applies_to.marriage)는 맞다고도 아니라고도 세지 않는다(SKIP).
   출산가구 가산은 룰의 `bonuses`(v6). 기본 상한을 넘어도 가산 상한 안이면 맞고, 출산 자녀 수(`newborn_children`)를 모르면
   불일치가 아니라 확인 필요다. 자녀가 0명이라고 답했으면 0명으로 본다. 가산된 상한을 별도 룰로 만들지 않는다.
   v6는 그 밖에 접수 방법(`application`, 인터넷 불가면 "신청하기"를 띄우지 않는다)·서류 일정(`schedule.documents_*`)·거주 기간(트랙 `residence`)을 받는다.
@@ -90,7 +92,8 @@ npm run inspect -- benchmark/pdfs/001.pdf [--text] [--extract]   # PDF 점검 / 
 npm run lh:dump                      # LH API 원본 응답 확인 (LH_API_KEY 필요)
 npm run benchmark                    # 추출 벤치마크 (ANTHROPIC_API_KEY 필요)
 npm run benchmark:fetch -- --count 10   # LH API에서 공고문 PDF 추가 수집 (LH_API_KEY 필요)
-npm run app:data                     # 초안/정답 → 앱 번들 데이터
+npm run app:data                     # 초안/정답 → 앱 번들 데이터 (서비스 지역만, --all로 전부)
+npm run app:data -w @housing/collector -- --only 012,008   # 그 공고의 추출 결과만 번들에 갈아 끼움 (enrich 값은 그대로)
 npm run app:enrich [-- --links]      # 번들에 원문 링크·그림·좌표·시세·대기·통근 (LLM 없음, --links는 링크·그림만)
 npm run simulate [-- --full]         # 프로필 10종 × 지금 공고로 매칭 점검 (LLM 없음)
 npm run audit:match [-- --matrix]    # 프로필 6,480개 × 공고로 오추천·놓친 추천 감사 (LLM 없음)

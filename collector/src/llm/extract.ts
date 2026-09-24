@@ -12,7 +12,7 @@ import { LlmExtraction, toExtractionOutput } from "./llmSchema";
  * 1차: 구조화 출력(output_config.format)으로 스키마를 강제한다.
  * 2차: API가 "문법이 너무 크다"고 거부하면 같은 스키마를 프롬프트에 넣고 JSON 텍스트로 받아 클라이언트에서 검증한다.
  */
-export const EXTRACTION_PROMPT_VERSION = "v7";
+export const EXTRACTION_PROMPT_VERSION = "v8";
 
 const SYSTEM_PROMPT = `당신은 LH 공공주택 모집공고문을 구조화하는 추출기입니다. 판단이나 요약을 하지 않고, 공고문에 적힌 조건과 금액을 주어진 스키마에 그대로 옮깁니다.
 
@@ -30,6 +30,7 @@ const SYSTEM_PROMPT = `당신은 LH 공공주택 모집공고문을 구조화하
 - 없는 값은 null로 둡니다. 공고문에 없는 조건은 만들지 않습니다. 확신이 낮으면 confidence를 낮게 두고 notes에 원문을 남깁니다.
 - applies_to는 그 룰이 일부 대상(가구원 수·맞벌이·혼인 상태)에게만 적용될 때만 채웁니다. 모두에게 적용되면 객체째 null입니다.
 - 입주자 선정 순위(1순위·2순위…)가 있으면 그 트랙의 priority_ranks에 순위마다 하나씩 넣습니다. 순위 조건은 rules에 넣지 않습니다 — 순위는 자격이 아니라 선정 순서라, rules에 넣으면 2순위인 사람이 자격이 없는 것으로 판정됩니다. conditions는 룰과 같은 category·operator·value_json으로 쓰고, "제1순위에 해당하지 않는 자"처럼 나머지를 뜻하는 순위는 conditions를 빈 배열로 둡니다. 순위별로 접수일이 따로 정해져 있으면 apply_date에 적습니다(다른 날 접수하면 부적격이 되는 공고가 있습니다). 한 순위 안에 자격이 여럿 나열되어 그중 하나만 해당해도 되면(예: "1순위 신생아 가구 / 지원대상 한부모가족") mode는 any_of입니다 — all_of로 두면 둘 다 갖춘 사람만 1순위가 됩니다. 가구 유형마다 조건이 다르면(신혼부부는 미성년 자녀, 한부모는 6세 이하 자녀) 조건마다 applies_to.marriage로 대상을 나눕니다. "N세 미만"은 child_age lte N-1로 적습니다. 순위가 주택 면적 등으로 갈리면 해당 주택형의 트랙에 맞는 순위만 넣고 나머지는 notes에 남깁니다.
+- 순위를 만들어도 **누가 신청할 수 있는가(자격)는 그대로 rules에 둡니다.** 순위는 자격을 대신하지 않습니다 — 예: 신혼·신생아 매입임대는 rules에 "혼인 7년 이내 신혼부부·예비신혼부부·6세 이하 자녀 한부모·2세 미만 자녀 가구" 자격(any_of)이 있고, priority_ranks는 그 안에서 1~4순위를 가릅니다. 자격이 rules에 없으면 대상이 아닌 사람에게 공고가 "조건 일치"로 나갑니다.
 - 경쟁 시 선정 순서가 적혀 있으면 selection_order에 순서대로 적습니다: 순위 rank, 배점 score, 추첨 lottery (예: "순위 → 배점 → 추첨" → [rank, score, lottery], 추첨만 → [lottery]). 없으면 null.
 - 소득·자산·자동차 상한이 출산자녀(2023.3.28 이후 출산·입양, 태아 포함) 수에 따라 올라가면, 기본 상한 룰 하나에 bonuses로 완화된 상한을 붙입니다 (예: 총자산 345000000 이하 + bonuses [{newborn_children_min:1, value:379000000}, {newborn_children_min:2, value:413000000}]). 가산된 상한을 별도 룰로 만들지 않습니다. 가산이 없으면 빈 배열입니다.
 - 접수 방법을 application에 넣습니다: 인터넷·모바일 접수 여부 online, 현장 접수 여부 onsite, 현장 접수가 일부 대상(고령자·장애인 등)에게만 되면 onsite_for, 현장 접수 장소 place. "인터넷 접수 불가, 현장접수만"이면 online false.

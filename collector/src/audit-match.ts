@@ -116,8 +116,14 @@ function nameOracle(title: string, trackName: string, pr: UserProfile): string |
   if (/대학생/.test(n) && !/청년/.test(n.replace(/대학생계층·청/, "")) && !has(pr, "student", "job_seeker")) return "대학생·취준생이 아님";
   if (/청년/.test(n) && !/대학생/.test(n) && (age(pr) < 19 || age(pr) > 39)) return "청년 나이(19~39) 밖";
   if (/고령자/.test(n) && !/주거약자/.test(n) && age(pr) < 65) return "65세 미만";
-  if (/신생아/.test(n) && !pr.children_ages?.some((a) => a <= 1) && !singleParent(pr)) return "신생아 가구가 아님";
-  if (/신혼/.test(n) && /한부모/.test(n)) {
+  if (/신생아/.test(n)) {
+    // "신혼·신생아 매입임대"처럼 한 공급이 신혼부부·신생아 가구·한부모를 다 받는 이름이면 셋 중 하나면 대상이다.
+    // v4 추출은 순위마다 트랙을 나눠("1순위 신생아 가구…") 이 줄이 순위 이름을 봤지만, v7부터는 트랙 하나에
+    // 순위가 priority_ranks로 들어가 트랙 이름이 공급 이름이 됐다 (2026-09-24).
+    const combined = /신혼/.test(n);
+    const ok = !!pr.children_ages?.some((a) => a <= 1) || singleParent(pr) || (combined && newlywed(pr));
+    if (!ok) return combined ? "신혼부부·한부모·신생아 가구가 아님" : "신생아 가구가 아님";
+  } else if (/신혼/.test(n) && /한부모/.test(n)) {
     if (!newlywed(pr) && !singleParent(pr) && !/혼인가구/.test(n)) return "신혼부부·한부모가 아님";
   } else if (/신혼|예비신혼/.test(n) && !newlywed(pr)) return "신혼부부가 아님";
   else if (/한부모/.test(n) && !/수급자/.test(n) && !singleParent(pr)) return "한부모가 아님";
