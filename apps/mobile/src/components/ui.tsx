@@ -243,7 +243,8 @@ export function Card({ children, style, onPress, tone = "soft" }: PropsWithChild
 export function SectionTitle({ children, right, onRight }: PropsWithChildren<{ right?: string; onRight?: () => void }>) {
   const { colors } = useTheme();
   return (
-    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingTop: 8, paddingHorizontal: 4 }}>
+    // 좌우 여백을 두지 않는다. 카드·본문은 화면 여백에서 시작하는데 제목만 4px 안에서 시작해 왼쪽 선이 두 줄이었다
+    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingTop: 8 }}>
       <T variant="subheading">{children}</T>
       {right ? (
         <Pressable onPress={onRight} accessibilityRole="button" style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>

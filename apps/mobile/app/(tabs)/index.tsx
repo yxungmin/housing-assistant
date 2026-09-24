@@ -162,7 +162,8 @@ export default function Home() {
             {newCount > 0 ? ` · 새 공고 ${newCount}개` : ""}
           </Sub>
         </View>
-        <Logo size={56} />
+        {/* 로고가 56이면 "2개"와 무게를 다퉜다. 이 화면의 주인공은 숫자다 */}
+        <Logo size={44} />
       </FadeIn>
       <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         {/*
@@ -261,20 +262,19 @@ export default function Home() {
             ) : null}
           </Card>
         ) : null}
-        {pending.length > 0 ? <Section title="조건을 아직 못 읽음" items={pending} onOpen={open} /> : null}
+        {pending.length > 0 ? <Section title="공고문을 직접 봐야 하는 공고" items={pending} onOpen={open} /> : null}
 
+        {/*
+          접힌 묶음들. 전에는 테두리 없는 글줄이 큰 간격으로 떠 있어 무엇에 딸린 줄인지 보이지 않았다.
+          한 모양의 줄로 바꾸고 서로 가깝게 둔다 — 한 무리의 "그 밖의 공고"로 읽히게.
+        */}
+        <View style={{ gap: 8 }}>
         {farAway.length > 0 ? (
           <View style={{ gap: 12 }}>
-            <Pressable onPress={toggle(setShowFar)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
-              <T variant="bodyMedium" color={colors.text2}>다른 지역 공고 {farAway.length}개</T>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
-                <T variant="small" color={colors.text3}>{showFar ? "숨기기" : "보기"}</T>
-                <Icon name="right" size={16} color={colors.text4} />
-              </View>
-            </Pressable>
+            <MoreRow label="다른 지역 공고" count={farAway.length} open={showFar} onPress={toggle(setShowFar)} />
             {showFar ? (
               <>
-                <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
+                <Sub tone="3" variant="caption">
                   다른 조건은 어긋나지 않지만, 공고문에서 거주 요건을 읽지 못했어요. 사는 지역이 달라 신청할 수 있는지는 공고문을 확인해 주세요.
                 </Sub>
                 <Section items={farAway} onOpen={open} />
@@ -285,16 +285,10 @@ export default function Home() {
 
         {needsTarget.length > 0 ? (
           <View style={{ gap: 12 }}>
-            <Pressable onPress={toggle(setShowTarget)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
-              <T variant="bodyMedium" color={colors.text2}>신청 대상을 확인할 공고 {needsTarget.length}개</T>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
-                <T variant="small" color={colors.text3}>{showTarget ? "숨기기" : "보기"}</T>
-                <Icon name="right" size={16} color={colors.text4} />
-              </View>
-            </Pressable>
+            <MoreRow label="신청 대상을 확인할 공고" count={needsTarget.length} open={showTarget} onPress={toggle(setShowTarget)} />
             {showTarget ? (
               <>
-                <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
+                <Sub tone="3" variant="caption">
                   대학생·수급자·장애인처럼 정해진 대상만 신청할 수 있는 공고예요.
                   {state.profile?.statuses === undefined ? " 해당하는 게 있는지 알려 주시면 맞는지 바로 가려 드릴게요." : " 입력하신 계층으로는 대상인지 알 수 없어서, 공고문의 자격을 확인해 주세요."}
                 </Sub>
@@ -309,28 +303,16 @@ export default function Home() {
         ) : null}
 
         {others.length > 0 ? (
-          <Pressable onPress={toggle(setShowOthers)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
-            <T variant="bodyMedium" color={colors.text2}>조건이 맞지 않는 공고 {others.length}개</T>
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
-              <T variant="small" color={colors.text3}>{showOthers ? "숨기기" : "보기"}</T>
-              <Icon name="right" size={16} color={colors.text4} />
-            </View>
-          </Pressable>
+          <MoreRow label="조건이 맞지 않는 공고" count={others.length} open={showOthers} onPress={toggle(setShowOthers)} />
         ) : null}
         {showOthers && others.length > 0 ? <Section items={others} onOpen={open} /> : null}
 
         {closedList.length > 0 ? (
           <View style={{ gap: 12 }}>
-            <Pressable onPress={toggle(setShowClosed)} accessibilityRole="button" style={({ pressed }) => ({ paddingVertical: 14, paddingHorizontal: 4, flexDirection: "row", alignItems: "center", justifyContent: "space-between", opacity: pressed ? 0.6 : 1 })}>
-              <T variant="bodyMedium" color={colors.text2}>접수가 끝난 공고 {closedList.length}개</T>
-              <View style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
-                <T variant="small" color={colors.text3}>{showClosed ? "숨기기" : "보기"}</T>
-                <Icon name="right" size={16} color={colors.text4} />
-              </View>
-            </Pressable>
+            <MoreRow label="접수가 끝난 공고" count={closedList.length} open={showClosed} onPress={toggle(setShowClosed)} />
             {showClosed ? (
               <>
-                <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
+                <Sub tone="3" variant="caption">
                   접수가 끝나고 일주일 동안 보여드려요. 신청했다면 당첨자 발표 일정을 확인해 보세요.
                 </Sub>
                 <Section items={closedList} onOpen={open} />
@@ -338,15 +320,33 @@ export default function Home() {
             ) : null}
           </View>
         ) : null}
+        </View>
       </FadeIn>
 
-      <View style={{ flexDirection: "row", gap: 8, paddingTop: 8, paddingHorizontal: 4 }}>
+      <View style={{ flexDirection: "row", gap: 8, paddingTop: 8 }}>
         <Icon name="info" size={16} color={colors.text4} />
         <Sub tone="3" variant="caption" style={{ flex: 1 }}>
           지금은 {SERVICE_REGION_LABEL}의 LH·SH 공고만 모으고 있어요. "조건 일치"는 공고문 조건과 입력한 값을 맞춰 본 결과예요. 신청 자격을 보장하지는 않아요.
         </Sub>
       </View>
     </Screen>
+  );
+}
+
+/** 접힌 묶음 한 줄. 열면 "접기", 닫혀 있으면 개수를 오른쪽에 둔다 */
+function MoreRow({ label, count, open, onPress }: { label: string; count: number; open: boolean; onPress: () => void }) {
+  const { colors } = useTheme();
+  return (
+    <Card onPress={onPress} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 16 }}>
+      <T variant="bodyMedium" color={colors.text}>{label}</T>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+        <T variant="small" color={colors.text3}>{open ? "접기" : `${count}개`}</T>
+        {/* 펼치면 아래를 가리킨다 — 열린 묶음이 이 줄 아래에 있다는 표시 */}
+        <View style={{ transform: [{ rotate: open ? "90deg" : "0deg" }] }}>
+          <Icon name="right" size={16} color={colors.text4} />
+        </View>
+      </View>
+    </Card>
   );
 }
 

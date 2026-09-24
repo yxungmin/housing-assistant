@@ -74,7 +74,7 @@ export default function Alerts() {
             readAllNotifications();
           }}
           accessibilityRole="button"
-          style={({ pressed }) => ({ alignSelf: "flex-start", paddingVertical: 8, paddingHorizontal: 4, opacity: pressed ? 0.6 : 1 })}
+          style={({ pressed }) => ({ alignSelf: "flex-start", paddingVertical: 8, opacity: pressed ? 0.6 : 1 })}
         >
           <T variant="small" color={colors.primary}>모두 읽음으로 표시</T>
         </Pressable>
@@ -102,7 +102,7 @@ export default function Alerts() {
       )}
 
       {list.length > 0 ? (
-        <View style={{ flexDirection: "row", gap: 8, paddingTop: 8, paddingHorizontal: 4 }}>
+        <View style={{ flexDirection: "row", gap: 8, paddingTop: 8 }}>
           <Icon name="info" size={16} color={colors.text4} />
           <Sub tone="3" variant="caption" style={{ flex: 1 }}>알림은 {RETAIN_DAYS}일 동안 보관하고 그 뒤에는 자동으로 지워져요.</Sub>
         </View>

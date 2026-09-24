@@ -213,7 +213,7 @@ export default function Profile() {
         사업자 정보 (legal/business.ts). 돈을 받는 서비스는 이용자가 쉽게 볼 수 있는 곳에 적어야 한다.
         빈칸도 숨기지 않고 "준비 중"으로 보인다 — 숨기면 비어 있다는 사실까지 숨겨진다.
       */}
-      <View style={{ gap: 6, paddingHorizontal: 4 }}>
+      <View style={{ gap: 6 }}>
         <T variant="small" color={colors.text2}>사업자 정보</T>
         {BUSINESS_FIELDS.map(([key, label]) => (
           <View key={key} style={{ flexDirection: "row", gap: 12 }}>
@@ -231,10 +231,10 @@ export default function Profile() {
         ) : null}
       </View>
 
-      <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>입력한 조건은 이 기기에만 저장되고 서버로 보내지 않아요.</Sub>
+      <Sub tone="3" variant="caption">입력한 조건은 이 기기에만 저장되고 서버로 보내지 않아요.</Sub>
       {/* 한 번 물어본다. 바로 위 계정 삭제는 두 번 확인하는데 이건 한 번에 실행되고 있었다 —
           잃는 것은 거의 같다(조건·저장한 공고·알림). 되돌릴 수 없는 일은 같은 격으로 다룬다. */}
-      <Pressable onPress={() => setConfirmReset(true)} accessibilityRole="button" style={{ paddingVertical: 12, paddingHorizontal: 4 }}>
+      <Pressable onPress={() => setConfirmReset(true)} accessibilityRole="button" style={{ paddingVertical: 12, alignSelf: "flex-start" }}>
         <T variant="small" color={colors.text3}>모든 데이터 지우고 처음부터</T>
       </Pressable>
       <SubscriptionManageSheet visible={manage} onClose={() => setManage(false)} />
