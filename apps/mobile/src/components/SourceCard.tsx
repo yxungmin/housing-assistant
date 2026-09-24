@@ -25,7 +25,7 @@ export function SourceCard({ pdfUrl, detailUrl, what }: { pdfUrl?: string; detai
 
   const body = (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
-      <IconTile name="info" tone={canOpen ? "primary" : "gray"} />
+      <IconTile name="document" tone={canOpen || canOpenDetail ? "primary" : "gray"} />
       <View style={{ flex: 1, gap: 2 }}>
         <T variant="bodyMedium">{canOpen ? "공고문 보기" : canOpenDetail ? "기관 공고 페이지 열기" : "확실한 건 공고문이에요"}</T>
         <Sub tone="3" variant="caption">

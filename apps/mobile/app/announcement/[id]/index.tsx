@@ -10,7 +10,7 @@ import { SignInButtons } from "@/components/SignIn";
 import { canSeeAnnouncement } from "@/lib/access";
 import { SourceCard } from "@/components/SourceCard";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
-import { LockNote, BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
+import { animateLayout, LockNote, BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
 import { userFacingNotes } from "@/lib/notes";
@@ -38,6 +38,7 @@ export default function AnnouncementDetail() {
   // (본 것으로 표시하면 목록에서 사라지므로 이 화면에서는 따로 붙들어 둔다.)
   const incoming = unseenChange(state.changes, id ?? "");
   const [change, setChange] = useState(incoming);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [report, setReport] = useState<{ target: ReportTarget; sourceText?: string } | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
   /** 북마크를 **방금** 눌렀을 때만 뜬다. 늘 띄우면 소음이 된다 */
@@ -126,7 +127,8 @@ export default function AnnouncementDetail() {
     return (
       <Screen header={<Header onBack={() => router.back()} />}>
         <View style={{ gap: 10, paddingTop: 12 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            {a.provider ? <Tag tone="gray">{a.provider}</Tag> : null}
             <Tag tone="gray">{housingLabel(a)}</Tag>
             {phaseLabel(applyPhase(a)) ? <Tag tone={phaseTone(applyPhase(a))}>{phaseLabel(applyPhase(a))}</Tag> : null}
           </View>
@@ -216,7 +218,8 @@ export default function AnnouncementDetail() {
         <View style={{ gap: 12, paddingTop: 4 }}>
           <View style={{ flexDirection: "row", gap: 6, flexWrap: "wrap" }}>
             {/* 기관이 먼저다 — 신청처와 절차가 기관마다 다르다 */}
-            {a.provider ? <Tag tone="info">{a.provider}</Tag> : null}
+            {/* 홈 카드와 같은 회색. 파랑은 접수 단계가 쓴다 — 둘 다 파랑이면 어느 쪽이 상태인지 안 보였다 */}
+            {a.provider ? <Tag tone="gray">{a.provider}</Tag> : null}
             <Tag tone="gray">{housingLabel(a)}</Tag>
             {phaseLabel(phase) ? <Tag tone={phaseTone(phase)}>{phaseLabel(phase)}</Tag> : null}
           </View>
@@ -270,7 +273,7 @@ export default function AnnouncementDetail() {
               })}
             </Card>
             {match && match.tracks.length > 1 ? (
-              <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>다른 공급 유형 · {match.tracks.filter((t) => t !== track).map((t) => { const c = ruleCounts(t); return `${t.track.name} ${c.matched}/${c.total}`; }).join(" · ")}</Sub>
+              <Sub tone="3" variant="caption">다른 공급 유형 · {match.tracks.filter((t) => t !== track).map((t) => { const c = ruleCounts(t); return `${t.track.name} ${c.matched}/${c.total}`; }).join(" · ")}</Sub>
             ) : null}
           </View>
         ) : null}
@@ -361,12 +364,15 @@ export default function AnnouncementDetail() {
             </Card>
 
             {a.nearby?.length ? (
+              <View style={{ gap: 12, paddingTop: 12 }}>
+              <SectionTitle>가까운 생활 시설</SectionTitle>
               <Card style={{ gap: 16 }}>
                 {nearbyLines(a.nearby).map((n) => (
                   <Row key={n.kind} icon={n.icon as IconName} tone="gray" title={n.title} detail={n.detail} />
                 ))}
                 <Sub tone="3" variant="caption">종류마다 가장 가까운 한 곳만 보여드려요.</Sub>
               </Card>
+              </View>
             ) : null}
           </View>
         ) : null}
@@ -390,7 +396,7 @@ export default function AnnouncementDetail() {
           "아직 못 찾았다"로 뭉뚱그리면 추첨 유형 사용자는 영영 오지 않을 것을 기다린다.
         */}
         {!a.past_results?.length ? (
-          <View style={{ flexDirection: "row", gap: 8, paddingHorizontal: 4 }}>
+          <View style={{ flexDirection: "row", gap: 8 }}>
             <Icon name="info" size={16} color={colors.text4} />
             <Sub tone="3" variant="caption" style={{ flex: 1 }}>
               {a.provider === "SH"
@@ -522,11 +528,25 @@ export default function AnnouncementDetail() {
           <View style={{ gap: 12 }}>
             <SectionTitle>그 밖의 조건</SectionTitle>
             <Card style={{ gap: 12 }}>
-              {notes.slice(0, 4).map((n, i) => <Sub key={i}>{n}</Sub>)}
+              {/* 공고문 원문 문단이라 길다. 전부 펼쳐 두면 화면 한 장 반이 이 글이었다 — 두 개만 먼저 보이고 나머지는 펼친다 */}
+              {notes.slice(0, notesOpen ? 4 : 2).map((n, i) => <Sub key={i}>{n}</Sub>)}
+              {Math.min(notes.length, 4) > 2 ? (
+                <Pressable
+                  onPress={() => { animateLayout(); setNotesOpen((v) => !v); }}
+                  accessibilityRole="button"
+                  hitSlop={8}
+                  style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 4, alignSelf: "flex-start", paddingVertical: 8, paddingRight: 8, opacity: pressed ? 0.6 : 1 })}
+                >
+                  <T variant="small" color={colors.text2}>{notesOpen ? "접기" : `${Math.min(notes.length, 4) - 2}개 더 보기`}</T>
+                  <View style={{ transform: [{ rotate: notesOpen ? "-90deg" : "90deg" }] }}>
+                    <Icon name="right" size={14} color={colors.text3} />
+                  </View>
+                </Pressable>
+              ) : null}
             </Card>
           </View>
         ) : null}
-        <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>
+        <Sub tone="3" variant="caption">
           조건 일치는 공고문과 적어 두신 값을 맞춰 본 결과예요. 실제 자격은 서류 심사로 확정돼요.
           {a.status === "VERIFIED" ? " 이 공고의 조건은 사람이 공고문과 대조했어요." : ""} 숫자가 이상하면 그 줄을 눌러 알려 주세요.
         </Sub>
