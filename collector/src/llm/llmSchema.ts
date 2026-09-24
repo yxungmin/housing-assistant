@@ -23,6 +23,7 @@ import {
   PricingKind,
   RuleCategory,
   RuleOperator,
+  SelectionStep,
 } from "@housing/schema";
 
 const nstr = z.string().nullable();
@@ -85,6 +86,23 @@ const LlmPricing = z.object({
   source: LlmSource,
 });
 
+const LlmRankCondition = z.object({
+  category: RuleCategory,
+  applies_to: LlmAppliesTo.nullable(),
+  operator: RuleOperator,
+  value_json: z.string().describe("룰의 value_json과 같은 형식"),
+  unit: nstr,
+});
+
+const LlmRank = z.object({
+  rank: z.number().describe("1 = 1순위"),
+  label: z.string().describe("원문 요약 (예: 양산시 거주자). 60자 이내"),
+  mode: GroupMode,
+  conditions: z.array(LlmRankCondition).describe("빈 배열 = 앞 순위에 해당하지 않는 나머지 전부"),
+  apply_date: nstr.describe("순위별 접수일이 따로 있을 때만 YYYY-MM-DD, 아니면 null"),
+  source: LlmSource,
+});
+
 const LlmTrack = z.object({
   name: z.string(),
   households: nnum,
@@ -92,6 +110,8 @@ const LlmTrack = z.object({
   rule_groups: z.array(LlmRuleGroup),
   rules: z.array(LlmRule),
   pricing: z.array(LlmPricing),
+  priority_ranks: z.array(LlmRank).describe("입주자 선정 순위. 순위제가 아니면 빈 배열"),
+  selection_order: z.array(SelectionStep).nullable().describe("경쟁 시 선정 순서 (예: 순위→배점→추첨이면 [rank,score,lottery]). 공고문에 없으면 null"),
 });
 
 export const LlmExtraction = z.object({
@@ -183,6 +203,34 @@ export function toExtractionOutput(llm: LlmExtraction): ReturnType<typeof Extrac
         maintenance_estimate: und(p.maintenance_estimate),
         source: p.source,
       })),
+      // 빈 배열은 "순위제 아님"이라 필드째 뺀다 — 내부 스키마에서 없음과 같은 뜻이다
+      ...(t.priority_ranks.length
+        ? {
+            priority_ranks: t.priority_ranks.map((r) => ({
+              rank: r.rank,
+              label: r.label,
+              mode: r.mode,
+              conditions: r.conditions.map((c) => ({
+                category: c.category,
+                applies_to: c.applies_to
+                  ? {
+                      household_size: und(c.applies_to.household_size),
+                      household_size_min: und(c.applies_to.household_size_min),
+                      household_size_max: und(c.applies_to.household_size_max),
+                      income_type: und(c.applies_to.income_type),
+                      marriage: und(c.applies_to.marriage),
+                    }
+                  : {},
+                operator: c.operator,
+                value: parseValue(c.value_json),
+                unit: und(c.unit),
+              })),
+              apply_date: und(r.apply_date),
+              source: r.source,
+            })),
+          }
+        : {}),
+      ...(t.selection_order?.length ? { selection_order: t.selection_order } : {}),
     })),
     notes: llm.notes,
   };

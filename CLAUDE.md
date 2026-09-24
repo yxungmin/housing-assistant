@@ -29,6 +29,9 @@
   **추천을 바꾸면 `npm run audit:match`를 돌린다** — 프로필 6,480개 × 공고로 추천이 공급 이름(대학생·고령자·철거민…)과 어긋나는지,
   확실히 자격이 되는 사람을 놓치는지 본다(`--matrix`로 누구에게 무엇이 나가는지 표). 오추천이 있으면 종료 코드 1.
   무주택 기간은 `homeless.ts`가 청약 가점제 규칙으로 계산한다(만 30세부터, 그 전 혼인이면 혼인신고일부터). 사람이 적은 값보다 규칙이 이긴다.
+  순위는 자격과 따로다(`rank.ts`, 스키마 `priority_ranks`·`selection_order`, 추출 v5). 순위 조건을 rules에 넣으면 2순위가 "불일치"로 공고를 잃는다.
+  조건이 모두 맞는 첫 순위가 예상 순위이고, 앞 순위를 입력이 없어 못 가렸으면 `certain: false` — 화면은 "더 앞 순위일 수 있어요"라고만 말한다.
+  순위별 접수일(`apply_date`)이 있으면 알린다 — 다른 날 접수하면 부적격이다.
   룰의 `verified`(사람 검수 여부)는 판정에 쓰지 않는다 — 검수 전이라고 숨기면 자격이 되는 사람에게 공고를 감추게 된다. 화면이 사실대로 알린다.
 - `collector` 기관 목록 → PDF → 텍스트/섹션 → Claude 구조화 추출(`llm/extract.ts`) → `autoChecks` → Supabase(`db/supabase.ts`, 버저닝). 기관 어댑터는 `sources.ts` 한 곳(LH는 공공데이터포털 API, SH는 게시판 HTML 파싱 `sh/api.ts`). 수집 범위는 `COLLECT_PROVIDERS`·`COLLECT_REGIONS`(기본 LH,SH / 서울·경기)로 줄여 비용을 통제한다.
 - `supabase/functions/transit` 흩어진 집까지의 대중교통 소요를 카카오에 물어 캐시한다(`commute_cache`).

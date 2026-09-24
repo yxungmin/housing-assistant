@@ -447,6 +447,192 @@
                     "source"
                   ]
                 }
+              },
+              "priority_ranks": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "rank": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 9,
+                      "description": "순위 (1 = 1순위)"
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "description": "원문 요약 (예: 양산시 거주자)"
+                    },
+                    "mode": {
+                      "default": "all_of",
+                      "type": "string",
+                      "enum": [
+                        "all_of",
+                        "any_of"
+                      ]
+                    },
+                    "conditions": {
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "category": {
+                            "type": "string",
+                            "enum": [
+                              "income",
+                              "asset",
+                              "car_value",
+                              "debt",
+                              "residence",
+                              "housing",
+                              "marriage",
+                              "children",
+                              "age",
+                              "subscription",
+                              "commute",
+                              "status"
+                            ]
+                          },
+                          "applies_to": {
+                            "default": {},
+                            "type": "object",
+                            "properties": {
+                              "household_size": {
+                                "description": "가구원 수 (정확히 이 값)",
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 10
+                              },
+                              "household_size_min": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 9007199254740991
+                              },
+                              "household_size_max": {
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 9007199254740991
+                              },
+                              "income_type": {
+                                "type": "string",
+                                "enum": [
+                                  "single",
+                                  "dual"
+                                ]
+                              },
+                              "marriage": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string",
+                                  "enum": [
+                                    "single",
+                                    "married",
+                                    "pre_marriage",
+                                    "single_parent"
+                                  ]
+                                }
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "operator": {
+                            "type": "string",
+                            "enum": [
+                              "eq",
+                              "lte",
+                              "gte",
+                              "between",
+                              "in",
+                              "is_true"
+                            ]
+                          },
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "boolean",
+                                "const": true
+                              },
+                              {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                },
+                                "description": "in: 허용 값 목록"
+                              },
+                              {
+                                "minItems": 1,
+                                "type": "array",
+                                "items": {
+                                  "type": "number"
+                                },
+                                "description": "between: [min, max] / in: 허용 숫자 목록"
+                              }
+                            ]
+                          },
+                          "unit": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "category",
+                          "operator",
+                          "value"
+                        ]
+                      }
+                    },
+                    "apply_date": {
+                      "description": "이 순위의 접수일 YYYY-MM-DD",
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "object",
+                      "properties": {
+                        "page": {
+                          "type": "integer",
+                          "minimum": 1,
+                          "maximum": 9007199254740991,
+                          "description": "공고문 PDF 페이지 (1부터)"
+                        },
+                        "text": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 500,
+                          "description": "근거가 되는 원문 발췌"
+                        }
+                      },
+                      "required": [
+                        "page",
+                        "text"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "rank",
+                    "label",
+                    "source"
+                  ]
+                }
+              },
+              "selection_order": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "rank",
+                    "score",
+                    "lottery"
+                  ]
+                }
               }
             },
             "required": [

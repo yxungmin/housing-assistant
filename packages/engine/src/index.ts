@@ -6,4 +6,5 @@ export * from "./sale";
 export * from "./shortfall";
 export * from "./omission";
 export * from "./results";
+export * from "./rank";
 export * from "./labels";

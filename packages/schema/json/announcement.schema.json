@@ -383,6 +383,46 @@
         "source"
       ]
     },
+    "complex": {
+      "type": "string"
+    },
+    "past_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "unit_no": {
+            "type": "string"
+          },
+          "complex": {
+            "type": "string"
+          },
+          "announced_at": {
+            "type": "string"
+          },
+          "draw_type": {
+            "type": "string"
+          },
+          "households": {
+            "type": "number"
+          },
+          "applicants": {
+            "type": "number"
+          },
+          "competition": {
+            "type": "number"
+          },
+          "closed_rank": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "complex"
+        ]
+      }
+    },
     "commute": {
       "type": "object",
       "propertyNames": {

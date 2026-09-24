@@ -55,6 +55,13 @@ export type RuleOperator = z.infer<typeof RuleOperator>;
 export const GroupMode = z.enum(["all_of", "any_of"]);
 export type GroupMode = z.infer<typeof GroupMode>;
 
+/**
+ * 경쟁이 붙었을 때 입주자를 가르는 단계, 공고문에 적힌 순서대로 (예: 순위 → 배점 → 추첨).
+ * 사람이 가장 먼저 묻는 "내 노력으로 되는 건가, 운인가"에 답하는 값이다.
+ */
+export const SelectionStep = z.enum(["rank", "score", "lottery"]);
+export type SelectionStep = z.infer<typeof SelectionStep>;
+
 /** 공급 유형 (LH 공고 유형 코드 → enum 매핑 결과) */
 export const HousingType = z.enum([
   "happy", // 행복주택

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Constants from "expo-constants";
 import { Pressable, View } from "react-native";
-import { haversineKm, matchAnnouncement, type RuleResult, pastResultText, toughest } from "@housing/engine";
+import { expectedRank, haversineKm, matchAnnouncement, RANK_VS_PAST_LABEL, rankVsPast, type RuleResult, pastResultText, toughest } from "@housing/engine";
 import { Icon, type IconName } from "@/components/icon";
 import { ReportSheet } from "@/components/ReportSheet";
 import { NoticeImages } from "@/components/NoticeImages";
@@ -144,6 +144,9 @@ export default function AnnouncementDetail() {
     );
   }
   const counts = track ? ruleCounts(track) : { matched: 0, needsCheck: 0, total: 0 };
+  // 자격과 순위는 다른 질문이다. 순위 기준을 읽은 공고에서만 (engine/rank.ts)
+  const rank = track && state.profile ? expectedRank(track.track, state.profile) : null;
+  const selection = track?.track.selection_order?.map((x) => ({ rank: "순위", score: "배점", lottery: "추첨" })[x]).join(" → ");
   const notes = userFacingNotes(a.extraction.notes);
   /**
    * 집이 흩어져 있는 공고는 좌표가 하나일 수 없다.
@@ -259,8 +262,7 @@ export default function AnnouncementDetail() {
                   전에는 "사람이 아직 확인하지 않았어요"였다 — 사실이지만 "그럼 믿지 말라는 건가"로 읽혔다.
                   사실은 줄이지 않는다: AI가 옮겼다는 것은 줄에 바로 쓰고(무엇이 옮겼는지 숨기지 않는다), 틀릴 수 있다는 것은 (i) 안에 있다.
                 */}
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 5, marginTop: 6 }}>
-                  <Icon name={a.status === "VERIFIED" ? "check-circle" : "document"} size={14} color={a.status === "VERIFIED" ? colors.primary : colors.text3} />
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 6 }}>
                   <Sub tone="3" variant="caption" style={{ flexShrink: 1 }}>
                     {a.status === "VERIFIED" ? "공고문과 한 줄씩 대조했어요" : "AI가 공고문에서 옮긴 조건이에요"}
                   </Sub>
@@ -291,6 +293,28 @@ export default function AnnouncementDetail() {
                   <ConditionRow key={`${g.group.id}-${i}`} status={r.status} title={ruleTitle(r.rule)} why={inputSummary(r.rule, state.profile, r)} page={r.rule.source.page} {...rowReport(r)} {...fillProps(r)} />
                 ));
               })}
+              {/*
+                자격 아래에 순위를 둔다. "조건 6개 일치"만 보고 되는 줄 알았다가, 2순위라 차례가 안 오는 공고가 흔하다.
+                앞 순위를 판별하지 못했으면 단정하지 않는다 — "더 앞 순위일 수 있어요"라고 말한다.
+              */}
+              {rank || selection ? (
+                <View style={{ borderTopWidth: 1, borderTopColor: colors.line, marginTop: 8, paddingTop: 14, paddingHorizontal: 4, gap: 10 }}>
+                  {rank ? (
+                    <KeyValue
+                      label="예상 순위"
+                      value={rank.rank ? `${rank.rank}순위` : "해당 순위 없음"}
+                      strong
+                      note={[rank.label, rank.certain ? null : "입력하지 않은 조건이 있어 더 앞 순위일 수 있어요"].filter(Boolean).join(" · ") || undefined}
+                    />
+                  ) : null}
+                  {rank?.apply_date ? (
+                    <Notice tone="warn" icon="clock">
+                      {rank.rank}순위 접수일은 {longDate(rank.apply_date)}이에요. 순위마다 접수일이 달라서 다른 날 접수하면 부적격이 돼요.
+                    </Notice>
+                  ) : null}
+                  {selection ? <Sub tone="3" variant="caption">경쟁이 붙으면 {selection} 순서로 뽑아요.</Sub> : null}
+                </View>
+              ) : null}
             </Card>
             {match && match.tracks.length > 1 ? (
               <Sub tone="3" variant="caption">다른 공급 유형 · {match.tracks.filter((t) => t !== track).map((t) => { const c = ruleCounts(t); return `${t.track.name} ${c.matched}/${c.total}`; }).join(" · ")}</Sub>
@@ -444,9 +468,13 @@ export default function AnnouncementDetail() {
                   label={r.draw_type ? `${r.draw_type}형` : "주택형을 못 읽음"}
                   value={r.closed_rank ? `${r.closed_rank}순위 마감` : "마감 순위 모름"}
                   note={
-                    r.households !== undefined && r.applicants !== undefined
-                      ? `${r.households}호 공급 · ${r.applicants.toLocaleString("ko-KR")}명 신청${r.competition ? ` · ${r.competition}대 1` : ""}`
-                      : undefined
+                    [
+                      r.households !== undefined && r.applicants !== undefined
+                        ? `${r.households}호 공급 · ${r.applicants.toLocaleString("ko-KR")}명 신청${r.competition ? ` · ${r.competition}대 1` : ""}`
+                        : null,
+                      // 내 순위를 확실히 알 때만 견준다. 모르는데 "차례 안 옴"이라 하면 거짓 절망이다
+                      rank?.certain && rank.rank && r.closed_rank ? `내 예상 순위(${rank.rank}순위) · ${RANK_VS_PAST_LABEL[rankVsPast(rank.rank, r.closed_rank)]}` : null,
+                    ].filter(Boolean).join("\n") || undefined
                   }
                 />
               ))}

@@ -25,6 +25,8 @@ describe("LlmExtraction → ExtractionOutput", () => {
           pricing: [
             { unit_type: "26", tier: null, kind: "rental", deposit: 40000000, monthly_rent: 200000, sale_price: null, conversion: { rate: 0.07, rate_down: 0.035, max_deposit: 60000000, min_deposit: null }, payment_schedule: null, maintenance_estimate: null, source: src },
           ],
+          priority_ranks: [],
+          selection_order: null,
         },
       ],
       notes: [],
@@ -47,7 +49,7 @@ describe("LlmExtraction → ExtractionOutput", () => {
       schedule: { notice_date: null, apply_start: null, apply_end: null, winner_announce: null, move_in: null },
       tracks: [{ name: "x", households: null, unit_types: [], rule_groups: [], rules: [
         { group_id: "missing", category: "age", applies_to: { household_size: null, household_size_min: null, household_size_max: null, income_type: null, marriage: null }, operator: "gte", value_json: "19", unit: null, source: src, confidence: 1 },
-      ], pricing: [] }],
+      ], pricing: [], priority_ranks: [], selection_order: null }],
       notes: [],
     });
     expect(toExtractionOutput(llm).success).toBe(false);
@@ -75,6 +77,8 @@ describe("v4에서 줄인 출력 (2026-09-21)", () => {
         rule_groups: [{ id: "basic", mode: "all_of" as const, label: "기본" }],
         rules: [{ group_id: "basic", category: "age", operator: "gte", value_json: "19", unit: "years", source: src, confidence: 0.9, ...rule }],
         pricing: [{ unit_type: "26", tier: null, kind: "rental", deposit: 1, monthly_rent: 1, sale_price: null, conversion: null, maintenance_estimate: null, source: src, ...pricing }],
+        priority_ranks: [],
+        selection_order: null,
       },
     ],
     notes: [],
@@ -102,5 +106,40 @@ describe("v4에서 줄인 출력 (2026-09-21)", () => {
     expect(out.success).toBe(true);
     if (!out.success) return;
     expect(out.data.tracks[0]!.pricing[0]!.payment_schedule).toBeUndefined();
+  });
+});
+
+describe("순위 (v5)", () => {
+  const withRanks = (priority_ranks: unknown[], selection_order: string[] | null) => ({
+    title: "t", housing_type: "national_rental", address: null,
+    schedule: { notice_date: null, apply_start: null, apply_end: null, winner_announce: null, move_in: null },
+    tracks: [{ name: "일반공급", households: null, unit_types: [], rule_groups: [], rules: [], pricing: [], priority_ranks, selection_order }],
+    notes: [],
+  });
+
+  it("순위 조건과 순위별 접수일을 옮긴다", () => {
+    const out = toExtractionOutput(LlmExtraction.parse(withRanks([
+      { rank: 1, label: "양산시 거주자", mode: "all_of", conditions: [{ category: "residence", applies_to: null, operator: "in", value_json: "[\"경남 양산시\"]", unit: "region_code" }], apply_date: "2026-09-28", source: src },
+      { rank: 2, label: "그 외", mode: "all_of", conditions: [], apply_date: "2026-09-29", source: src },
+    ], ["rank", "score", "lottery"])));
+    expect(out.success).toBe(true);
+    if (!out.success) return;
+    const t = out.data.tracks[0]!;
+    expect(t.priority_ranks?.[0]).toMatchObject({ rank: 1, apply_date: "2026-09-28", conditions: [{ category: "residence", value: ["경남 양산시"], applies_to: {} }] });
+    expect(t.priority_ranks?.[1]?.conditions).toEqual([]);
+    expect(t.selection_order).toEqual(["rank", "score", "lottery"]);
+  });
+
+  it("순위제가 아니면 필드를 남기지 않는다 — 빈 배열과 없음을 같게 본다", () => {
+    const out = toExtractionOutput(LlmExtraction.parse(withRanks([], null)));
+    expect(out.success).toBe(true);
+    if (!out.success) return;
+    expect(out.data.tracks[0]!.priority_ranks).toBeUndefined();
+    expect(out.data.tracks[0]!.selection_order).toBeUndefined();
+  });
+
+  it("같은 순위가 두 번 나오면 거부한다", () => {
+    const dup = { rank: 1, label: "x", mode: "all_of", conditions: [], apply_date: null, source: src };
+    expect(toExtractionOutput(LlmExtraction.parse(withRanks([dup, dup], null))).success).toBe(false);
   });
 });

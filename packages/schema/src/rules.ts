@@ -8,6 +8,7 @@ import {
   PricingKind,
   RuleCategory,
   RuleOperator,
+  SelectionStep,
   VersionStatus,
 } from "./enums";
 
@@ -141,6 +142,38 @@ export const Pricing = z
   });
 export type Pricing = z.infer<typeof Pricing>;
 
+/**
+ * 순위 하나의 조건. EligibilityRule과 같은 모양이지만 그룹·신뢰도 없이 이 순위 안에서만 쓴다.
+ * 자격(되느냐)과 순위(되면 몇 번째냐)는 다른 질문이라 섞지 않는다 — 순위 조건이 자격 룰로 들어가면
+ * 2순위인 사람이 "조건 불일치"로 공고를 잃는다.
+ */
+export const RankCondition = z.object({
+  category: RuleCategory,
+  applies_to: AppliesTo.default({}),
+  operator: RuleOperator,
+  value: RuleValue,
+  unit: z.string().optional(),
+});
+export type RankCondition = z.infer<typeof RankCondition>;
+
+/**
+ * 입주자 선정 순위 (예: 1순위 해당 주택건설지역 거주자 / 2순위 연접 시·군 / 3순위 그 외).
+ * 조건이 빈 순위는 "앞 순위에 해당하지 않는 나머지 전부"다.
+ */
+export const PriorityRank = z.object({
+  rank: z.number().int().min(1).max(9).describe("순위 (1 = 1순위)"),
+  label: z.string().min(1).max(120).describe("원문 요약 (예: 양산시 거주자)"),
+  mode: GroupMode.default("all_of"),
+  conditions: z.array(RankCondition).default([]),
+  /**
+   * 이 순위의 접수일. 순위별로 접수일이 따로 있는 공고에서만 채운다 — 다른 날 접수하면 부적격이다
+   * (2026-09 양산 국민임대: 1순위 9/28, 2·3순위 9/29). 기간 전체는 schedule에 있다.
+   */
+  apply_date: z.string().optional().describe("이 순위의 접수일 YYYY-MM-DD"),
+  source: Source,
+});
+export type PriorityRank = z.infer<typeof PriorityRank>;
+
 export const SupplyTrack = z
   .object({
     name: z.string().min(1).describe("공급 트랙 이름 (예: 신혼부부 우선공급, 일반공급)"),
@@ -149,8 +182,16 @@ export const SupplyTrack = z
     rule_groups: z.array(RuleGroup).default([]),
     rules: z.array(EligibilityRule).default([]),
     pricing: z.array(Pricing).default([]),
+    /** 순위 기준. 순위제가 아닌 공급(추첨만)이면 없다 */
+    priority_ranks: z.array(PriorityRank).optional(),
+    /** 경쟁 시 선정 순서 (순위 → 배점 → 추첨 …) */
+    selection_order: z.array(SelectionStep).optional(),
   })
   .superRefine((track, ctx) => {
+    const ranks = (track.priority_ranks ?? []).map((r) => r.rank);
+    if (new Set(ranks).size !== ranks.length) {
+      ctx.addIssue({ code: "custom", path: ["priority_ranks"], message: "같은 순위가 두 번 있다" });
+    }
     const groupIds = new Set(track.rule_groups.map((g) => g.id));
     if (groupIds.size !== track.rule_groups.length) {
       ctx.addIssue({ code: "custom", path: ["rule_groups"], message: "그룹 id가 중복됨" });

@@ -33,7 +33,12 @@
         ],
         "pricing": [
           { "unit_type": "36", "kind": "rental", "deposit": 60000000, "monthly_rent": 280000, "conversion": { "rate": 0.06, "max_deposit": 110000000 }, "source": { "page": 9, "text": "36형 보증금 6,000만 원 / 월 28만 원" } }
-        ]
+        ],
+        "priority_ranks": [
+          { "rank": 1, "label": "해당 주택건설지역(서울) 거주 또는 소득 근거지", "mode": "all_of", "conditions": [{ "category": "residence", "applies_to": {}, "operator": "in", "value": ["11"], "unit": "region_code" }], "source": { "page": 9, "text": "1순위 : 해당 주택건설지역(서울특별시)이 거주지이거나 소득근거지인 자" } },
+          { "rank": 2, "label": "1순위에 해당하지 않는 자", "mode": "all_of", "conditions": [], "source": { "page": 9, "text": "2순위 : 제1순위에 해당되지 않는 자" } }
+        ],
+        "selection_order": ["rank", "lottery"]
       }
     ],
     "notes": []

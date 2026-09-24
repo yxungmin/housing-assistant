@@ -79,3 +79,42 @@ describe("ExtractionOutput", () => {
     expect(res.success).toBe(false);
   });
 });
+
+describe("PriorityRank", () => {
+  const src = { page: 3, text: "1순위 : 해당 주택건설지역 거주자" };
+  const track = (priority_ranks: unknown[]) => ({ name: "일반공급", priority_ranks });
+
+  it("순위와 조건, 순위별 접수일을 받는다. 조건이 빈 순위는 '나머지'다", () => {
+    const r = SupplyTrack.safeParse(track([
+      { rank: 1, label: "양산시 거주자", conditions: [{ category: "residence", operator: "in", value: ["경남 양산시"] }], apply_date: "2026-09-28", source: src },
+      { rank: 2, label: "그 외", source: src },
+    ]));
+    expect(r.success).toBe(true);
+    if (!r.success) return;
+    expect(r.data.priority_ranks?.[0]?.mode).toBe("all_of");
+    expect(r.data.priority_ranks?.[1]?.conditions).toEqual([]);
+  });
+
+  it("같은 순위가 두 번이면 거부한다", () => {
+    expect(SupplyTrack.safeParse(track([{ rank: 1, label: "a", source: src }, { rank: 1, label: "b", source: src }])).success).toBe(false);
+  });
+
+  it("없어도 된다 — 추첨만 하는 공급", () => {
+    const r = SupplyTrack.safeParse({ name: "일반공급" });
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.priority_ranks).toBeUndefined();
+  });
+});
+
+describe("예시 정답 (benchmark/fixtures/000.example.json)", () => {
+  // 스키마를 바꾸면 이 파일도 같이 고친다 (CLAUDE.md). 안 고치면 여기서 깨진다.
+  it("내부 스키마를 통과한다", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { resolve } = await import("node:path");
+    const raw = JSON.parse(readFileSync(resolve(__dirname, "../../../benchmark/fixtures/000.example.json"), "utf8"));
+    const r = ExtractionOutput.safeParse(raw.gold);
+    if (!r.success) console.error(r.error.issues);
+    expect(r.success).toBe(true);
+    if (r.success) expect(r.data.tracks[0]!.priority_ranks?.length).toBe(2);
+  });
+});

@@ -12,7 +12,7 @@ import { LlmExtraction, toExtractionOutput } from "./llmSchema";
  * 1차: 구조화 출력(output_config.format)으로 스키마를 강제한다.
  * 2차: API가 "문법이 너무 크다"고 거부하면 같은 스키마를 프롬프트에 넣고 JSON 텍스트로 받아 클라이언트에서 검증한다.
  */
-export const EXTRACTION_PROMPT_VERSION = "v4";
+export const EXTRACTION_PROMPT_VERSION = "v5";
 
 const SYSTEM_PROMPT = `당신은 LH 공공주택 모집공고문을 구조화하는 추출기입니다. 판단이나 요약을 하지 않고, 공고문에 적힌 조건과 금액을 주어진 스키마에 그대로 옮깁니다.
 
@@ -29,6 +29,9 @@ const SYSTEM_PROMPT = `당신은 LH 공공주택 모집공고문을 구조화하
 - 전환보증금 조건이 있으면 conversion에 rate(보증금 증액·월세 감액 이율, 소수), rate_down(보증금 감액·월세 증액 이율), max_deposit(최대 증액 시 보증금), min_deposit(최대 감액 시 보증금)을 넣습니다. 표의 "최대전환 시 임대조건"이 상한·하한입니다.
 - 없는 값은 null로 둡니다. 공고문에 없는 조건은 만들지 않습니다. 확신이 낮으면 confidence를 낮게 두고 notes에 원문을 남깁니다.
 - applies_to는 그 룰이 일부 대상(가구원 수·맞벌이·혼인 상태)에게만 적용될 때만 채웁니다. 모두에게 적용되면 객체째 null입니다.
+- 입주자 선정 순위(1순위·2순위…)가 있으면 그 트랙의 priority_ranks에 순위마다 하나씩 넣습니다. 순위 조건은 rules에 넣지 않습니다 — 순위는 자격이 아니라 선정 순서라, rules에 넣으면 2순위인 사람이 자격이 없는 것으로 판정됩니다. conditions는 룰과 같은 category·operator·value_json으로 쓰고, "제1순위에 해당하지 않는 자"처럼 나머지를 뜻하는 순위는 conditions를 빈 배열로 둡니다. 순위별로 접수일이 따로 정해져 있으면 apply_date에 적습니다(다른 날 접수하면 부적격이 되는 공고가 있습니다). 순위가 주택 면적 등으로 갈리면 해당 주택형의 트랙에 맞는 순위만 넣고 나머지는 notes에 남깁니다.
+- 경쟁 시 선정 순서가 적혀 있으면 selection_order에 순서대로 적습니다: 순위 rank, 배점 score, 추첨 lottery (예: "순위 → 배점 → 추첨" → [rank, score, lottery], 추첨만 → [lottery]). 없으면 null.
+- 순위·선정 순서를 구조화했으면 같은 내용을 notes에 다시 적지 않습니다.
 - notes는 가장 중요한 것 6개까지만 남깁니다. 더 있으면 중요한 순으로 고릅니다.
 - notes는 앱 사용자에게 "그 밖의 조건"으로 그대로 보입니다. 구조화하지 못한 자격·제한 조건의 공고문 원문 발췌만 넣고, 추출 과정 설명이나 판단 근거("~로 판단함", "스키마에 없어 생성하지 않음", "null로 둠")는 절대 넣지 않습니다.
 - 날짜는 YYYY-MM-DD.`;
