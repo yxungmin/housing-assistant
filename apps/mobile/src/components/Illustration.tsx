@@ -71,7 +71,7 @@ export function Illustration({ name, width = 220 }: { name: IllustrationName; wi
   return (
     <Svg {...props}>
       {/* 카드만 살짝 기울인다 — 정면으로 놓으면 픽토그램이지 그림이 아니다. 책갈피는 바로 세워 기준이 된다 */}
-      <G rotation={-4} origin="136, 103">
+      <G transform="rotate(-4 136 103)">
         <Rect x={52} y={36} width={168} height={134} rx={18} fill={c.paper} stroke={c.gray} strokeWidth={2} />
         <Path d="M86 92 L131 56 Q136 51 141 56 L186 92 Q189 97 183 98 L89 98 Q83 97 86 92 Z" fill={c.green} />
         <Rect x={96} y={97} width={80} height={48} rx={8} fill={c.greenSoft} />
