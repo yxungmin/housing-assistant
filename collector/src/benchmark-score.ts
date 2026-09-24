@@ -16,9 +16,12 @@ import type { EligibilityRule, ExtractionOutput, Pricing, SupplyTrack } from "@h
  * 이 표로 계산하면 $22.58이다. 차이 4%는 캐시 토큰 배수(쓰기 1.25× · 읽기 0.1×) 가정 때문이고,
  * 한때 의심했던 $15/$75였다면 $67.74가 나왔어야 한다. 이 표가 맞다.
  */
+// USD / 백만 토큰. platform.claude.com/docs/en/about-claude/pricing (2026-09-24 확인).
+// Sonnet 5는 출시 때 $2/$10이 9/1부터 $3/$15로 오른다고 했다가 인상이 취소돼 $2/$10이 정가가 됐다.
 export const MODEL_PRICES: Record<string, { input: number; output: number }> = {
+  "claude-opus-5-5": { input: 4, output: 20 },
   "claude-opus-5": { input: 5, output: 25 },
-  "claude-sonnet-5": { input: 3, output: 15 },
+  "claude-sonnet-5": { input: 2, output: 10 },
   "claude-haiku-4-5-20251001": { input: 1, output: 5 },
 };
 

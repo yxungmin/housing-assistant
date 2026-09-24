@@ -6,10 +6,13 @@ import { headlineTarget, templateScript, type ReelScript } from "../src/social/s
 import { verifyScript } from "../src/social/verify";
 import { polishScript } from "../src/social/copy";
 
-// 번들은 커밋되는 실제 공고 데이터다 (apps/mobile/data)
-const rows = JSON.parse(readFileSync(new URL("../../apps/mobile/data/announcements.json", import.meta.url), "utf8")).filter(
-  (r: { status: string }) => r.status !== "UNVERIFIED",
-);
+// 번들은 커밋되는 실제 공고 데이터다 (apps/mobile/data). 앱 번들은 서비스 지역(수도권)만 담으므로,
+// 지방 공고로만 확인되는 경우(제주 행복주택 세대 수, 양산 완화 모집)는 그 공고를 떼어 둔 픽스처에서 읽는다.
+const load = (url: URL) => JSON.parse(readFileSync(url, "utf8"));
+const rows = [
+  ...load(new URL("../../apps/mobile/data/announcements.json", import.meta.url)),
+  ...load(new URL("./fixtures/outside-region-announcements.json", import.meta.url)),
+].filter((r: { status: string }) => r.status !== "UNVERIFIED");
 const row = (id: string) => rows.find((r: { id: string }) => r.id === id)!;
 const TODAY = new Date(2026, 8, 23);
 

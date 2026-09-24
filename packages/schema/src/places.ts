@@ -165,9 +165,10 @@ export function parsePlaceLabel(label: string | undefined): { regionCode: string
  *
  * 넓힐 때 고치는 곳: 이 배열 하나. 화면 문구는 SERVICE_REGION_LABEL에서 만들어진다.
  */
-export const SERVICE_REGIONS = ["11", "41"] as const;
+// 수도권 셋 (2026-09-24 인천 추가). 엔진의 regionGuard도 11·28·41을 한 생활권으로 묶는다
+export const SERVICE_REGIONS = ["11", "28", "41"] as const;
 
-/** 고지에 쓰는 이름 ("서울·경기"). 코드 목록이 바뀌면 문구도 따라 바뀐다 */
+/** 고지에 쓰는 이름 ("서울·인천·경기"). 코드 목록이 바뀌면 문구도 따라 바뀐다 */
 export const SERVICE_REGION_LABEL: string = SERVICE_REGIONS.map((c) => regionByCode(c)?.label ?? c).join("·");
 
 /** 이 시도의 공고를 모으고 있는가. 코드가 없으면(입력 전) 판단하지 않고 true */

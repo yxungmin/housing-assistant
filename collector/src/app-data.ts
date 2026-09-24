@@ -6,7 +6,7 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { ExtractionOutput, type HousingType } from "@housing/schema";
+import { ExtractionOutput, SERVICE_REGION_LABEL, SERVICE_REGIONS, type HousingType } from "@housing/schema";
 import { advisoryChecks, autoChecks, blockingChecks } from "./validate/autoChecks";
 import type { PdfMeta } from "./fetch-pdfs";
 import { fromRoot } from "./paths";
@@ -197,7 +197,18 @@ if (fromSources === 0) {
 const cutoff = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
 const expired = items.filter((i) => i.apply_end && i.apply_end < cutoff);
 if (expired.length) console.log(`마감 지난 공고 ${expired.length}건은 넣지 않습니다: ${expired.map((i) => `${i.id}(${i.apply_end})`).join(", ")}`);
-const live = items.filter((i) => !expired.includes(i));
+/**
+ * 서비스 지역 공고만 앱에 넣는다. 추출 벤치마크 PDF는 유형을 고루 모으려고 전국에서 받는데(benchmark:fetch),
+ * 그걸 그대로 번들로 만들어 군산·제주·양산 공고가 서울 사람 앱에 떴다 (2026-09-24).
+ * 수집기(COLLECT_REGIONS)와 같은 SERVICE_REGIONS 기준이다. 지역을 모르는 공고("00")도 넣지 않는다.
+ * 다른 지역 공고를 앱에서 보려면 --all.
+ */
+const all = process.argv.includes("--all");
+const outside = all ? [] : items.filter((i) => !(SERVICE_REGIONS as readonly string[]).includes(i.region_code));
+if (outside.length) {
+  console.log(`서비스 지역(${SERVICE_REGION_LABEL}) 밖 공고 ${outside.length}건은 넣지 않습니다: ${outside.map((i) => `${i.id}(${i.region_name || i.region_code})`).join(", ")}`);
+}
+const live = items.filter((i) => !expired.includes(i) && !outside.includes(i));
 // 위의 "하나도 못 읽었으면 멈춘다"와 같은 이유 — 전부 지난 공고라 비었어도 덮어쓰지 않는다
 if (live.filter((i) => i.id !== "pending-001").length === 0) {
   console.error(`남는 공고가 없습니다 (전부 마감 7일 경과). ${TARGET}를 덮어쓰지 않고 멈춥니다.`);

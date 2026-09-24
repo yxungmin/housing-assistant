@@ -1,0 +1,2560 @@
+[
+ {
+  "id": "005",
+  "provider": "LH",
+  "lh_id": "2015122300020801",
+  "title": "군산시 (군산나운4) 영구임대주택 입주자격완화 예비입주자 모집",
+  "housing_type": "long_term_rental",
+  "region_code": "45",
+  "region_name": "전북 군산시",
+  "status": "AUTO",
+  "notice_date": "2026-09-18",
+  "apply_start": "2026-09-29",
+  "apply_end": "2026-09-29",
+  "address": "전북특별자치도 군산시 문화로 36",
+  "lat": 35.9694641851937,
+  "lng": 126.709955551767,
+  "transit": {},
+  "extraction": {
+   "title": "군산시 (군산나운4) 영구임대주택 입주자격완화 예비입주자 모집",
+   "housing_type": "long_term_rental",
+   "address": "전북특별자치도 군산시 문화로 36",
+   "schedule": {
+    "notice_date": "2026-09-18",
+    "apply_start": "2026-09-29",
+    "apply_end": "2026-09-29",
+    "winner_announce": "2026-12-04"
+   },
+   "tracks": [
+    {
+     "name": "영구임대주택 입주자격완화 예비입주자(일반)",
+     "households": 500,
+     "unit_types": [
+      {
+       "name": "26.37㎡",
+       "exclusive_area_m2": 26.37,
+       "households": 1433
+      },
+      {
+       "name": "26.37㎡(407동, 408동)",
+       "exclusive_area_m2": 26.37
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 신청자격(무주택·거주지·성년·자동차)"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "residence",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "52"
+       ],
+       "unit": "region_code",
+       "source": {
+        "page": 3,
+        "text": "입주자 모집공고일(2026.09.18.) 현재 군산시에 거주하는 성년자인 무주택세대구성원으로서 아래의 소득, 자산보유 기준, 기타 법에 정한 요건을 충족하고, 입주자격제한(불법양도·전대)에 해당하지 않는 자"
+       },
+       "confidence": 0.5,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 3,
+        "text": "■ 무주택세대구성원 (세대에 속하는 사람 전체가 무주택인 세대의 구성원) … 주택 또는 분양권등*을 소유하고 있지 아니할 것"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 19,
+       "unit": "years",
+       "source": {
+        "page": 3,
+        "text": "■ 성년자 신청자는 민법상 성년자(만19세)이어야 합니다. 단, 아래의 경우 세대주인 미성년자도 신청 가능합니다."
+       },
+       "confidence": 0.8,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 1,
+        "text": "총자산 요건 배제 (단, 자동차가액 4,542만원 이하 요건 적용)"
+       },
+       "confidence": 0.95,
+       "verified": false
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "26.37㎡",
+       "tier": "가군(생계·의료급여수급자 등)",
+       "kind": "rental",
+       "deposit": 2404000,
+       "monthly_rent": 47860,
+       "payment_schedule": [
+        {
+         "label": "계약금(계약 시)",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금(입주 시)",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "26.37 2,404,000 120,200 2,283,800 47,860 3,358,000 167,900 3,190,100 74,730"
+       }
+      },
+      {
+       "unit_type": "26.37㎡",
+       "tier": "나군(일반 등)",
+       "kind": "rental",
+       "deposit": 3358000,
+       "monthly_rent": 74730,
+       "payment_schedule": [
+        {
+         "label": "계약금(계약 시)",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금(입주 시)",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "26.37 2,404,000 120,200 2,283,800 47,860 3,358,000 167,900 3,190,100 74,730"
+       }
+      },
+      {
+       "unit_type": "26.37㎡(407동, 408동)",
+       "tier": "가군(생계·의료급여수급자 등)",
+       "kind": "rental",
+       "deposit": 2404000,
+       "monthly_rent": 47860,
+       "payment_schedule": [
+        {
+         "label": "계약금(계약 시)",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금(입주 시)",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "26.37 (407동, 408동) 2,404,000 120,200 2,283,800 47,860 7,828,000 391,400 7,436,600 116,560"
+       }
+      },
+      {
+       "unit_type": "26.37㎡(407동, 408동)",
+       "tier": "나군(일반 등)",
+       "kind": "rental",
+       "deposit": 7828000,
+       "monthly_rent": 116560,
+       "payment_schedule": [
+        {
+         "label": "계약금(계약 시)",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금(입주 시)",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "26.37 (407동, 408동) 2,404,000 120,200 2,283,800 47,860 7,828,000 391,400 7,436,600 116,560 ※ 예비입주자로 선정 시 예비순번에 따라 407동 ~ 408동으로 선정될 수 있으며, 비수급자의 경우 임대조건이 상이하오니 이 점 양지하시기 바랍니다."
+       }
+      }
+     ]
+    }
+   ],
+   "notes": [
+    "금회 공고는 입주자격 완화(소득·총자산 배제) 모집으로, 소득요건 및 총자산요건이 배제됨(자동차가액 4,542만원 이하 요건만 적용). 따라서 income·asset 룰을 생성하지 않음. 원문: '소득요건 배제 / 총자산 요건 배제 (단, 자동차가액 4,542만원 이하 요건 적용)' (p.1)",
+    "p.5 소득 및 자산 보유기준 표에 월평균소득 50%/70%/150% 금액표와 총자산 24,500만원 이하 기준이 기재되어 있으나, 본 공고는 소득·총자산 요건 배제 모집이므로 자격 룰로 반영하지 않음. 신청서(p.25)에는 소득조건 체크란이 있음.",
+    "건설위치: 전북특별자치도 군산시 문화로 36 영구임대주택 1,954호. 공급형별 26㎡ 건설세대수 1,433호, 현재 공가 447호, 금회 모집 예비자 500명(402·403·406동 전용 26.37/주거공용 12.77, 407·408동 전용 26.37/주거공용 12.75).",
+    "가군: 공공주택 특별법 시행규칙 별표3 제1호 가목~라목 해당자(생계·의료급여수급자, 국가유공자 등으로 소득인정액이 수급자 수준인 자, 위안부 피해자, 지원대상 한부모가족 등). 나군: 가군 이외의 영구임대 입주 가능자.",
+    "임대보증금 계약금/잔금 비율은 표의 금액(계약금 5%, 잔금 95%)을 근거로 산출한 값임.",
+    "신청접수는 인터넷 불가, 2026.09.29(화) 10:00~16:00 군산나운4관리사무소 현장접수만 가능.",
+    "거주지 요건 '군산시'를 시도 코드(전북특별자치도)로 변환하여 기재하였으며, 실제 요건은 시·군 단위(군산시)임.",
+    "입주(계약)는 공가 발생 시 예비순번에 따라 개별 안내되므로 입주일(move_in) 정보 없음.",
+    "전환보증금(상호전환) 관련 조건은 공고문에 기재되어 있지 않음."
+   ]
+  },
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "나운어린이집",
+    "distance_m": 85
+   },
+   {
+    "kind": "school",
+    "name": "군산서흥중학교",
+    "distance_m": 220
+   },
+   {
+    "kind": "mart",
+    "name": "오픈박스 군산점",
+    "distance_m": 664
+   },
+   {
+    "kind": "convenience",
+    "name": "GS25 군산나운스타점",
+    "distance_m": 71
+   },
+   {
+    "kind": "hospital",
+    "name": "이형룡내과의원",
+    "distance_m": 57
+   },
+   {
+    "kind": "park",
+    "name": "고운빛깔",
+    "distance_m": 1031
+   }
+  ],
+  "b_code": "5213014400",
+  "market": {
+   "lawd_cd": "52130",
+   "area_from": 18.5,
+   "area_to": 34.3,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 56,
+   "jeonse_median": 25000000,
+   "monthly_deposit_median": 10600000,
+   "monthly_rent_median": 120000,
+   "source": "국토교통부 전월세 실거래가"
+  },
+  "waiting": {
+   "complex": "군산나운주공4단지",
+   "rows": [
+    {
+     "unit_type": "31",
+     "waiting": 126,
+     "terminated": 19
+    },
+    {
+     "unit_type": "26",
+     "waiting": 18,
+     "terminated": 67
+    },
+    {
+     "unit_type": "52",
+     "waiting": 14,
+     "terminated": 1
+    },
+    {
+     "unit_type": "26",
+     "waiting": 0,
+     "terminated": 1
+    },
+    {
+     "unit_type": "26",
+     "waiting": 0,
+     "terminated": 1
+    }
+   ],
+   "total_waiting": 158,
+   "as_of": "2026-09-21",
+   "source": "마이홈포털 예비입주자 대기현황"
+  },
+  "detail_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=2015122300020801&ccrCnntSysDsCd=03&uppAisTpCd=06&aisTpCd=09&mi=1026",
+  "pdf_url": "https://tomybypxvhrkwvfnthva.supabase.co/storage/v1/object/public/announcement-pdfs/LH/2015122300020801/v1.pdf"
+ },
+ {
+  "id": "007",
+  "provider": "LH",
+  "lh_id": "2015122300020804",
+  "title": "제주일도·삼도 행복주택 예비입주자 모집",
+  "housing_type": "happy",
+  "region_code": "50",
+  "region_name": "제주 제주시",
+  "status": "AUTO",
+  "notice_date": "2026-09-18",
+  "apply_start": "2026-10-01",
+  "apply_end": "2026-10-02",
+  "address": "제주특별자치도 제주시 삼성로 134(일도), 제주특별자치도 제주시 탑동로13길 27(삼도1), 제주특별자치도 제주시 탑동로13길 40(삼도2)",
+  "lat": 33.5116889090284,
+  "lng": 126.538093826205,
+  "extraction": {
+   "title": "제주일도·삼도 행복주택 예비입주자 모집",
+   "housing_type": "happy",
+   "address": "제주특별자치도 제주시 삼성로 134(일도), 제주특별자치도 제주시 탑동로13길 27(삼도1), 제주특별자치도 제주시 탑동로13길 40(삼도2)",
+   "schedule": {
+    "notice_date": "2026-09-18",
+    "apply_start": "2026-10-01",
+    "apply_end": "2026-10-02",
+    "winner_announce": "2026-12-28"
+   },
+   "tracks": [
+    {
+     "name": "대학생 계층 (일반공급)",
+     "households": 15,
+     "unit_types": [
+      {
+       "name": "일도 16A",
+       "exclusive_area_m2": 16.64,
+       "households": 15
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "대학생 계층 일반공급 자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "student",
+        "job_seeker"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 3,
+        "text": "①-㉮ (대학생) ‘대학’에 재학중이거나 다음 학기에 입학 또는 복학 예정일 것 / ①-㉯ (취업준비생) ‘대학 또는 고등학교’를 졸업 또는 중퇴한 지 2년 이내일 것"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 3,
+        "text": "입주자모집공고일(2026.09.18) 현재, 무주택자로서 아래의 요건을 모두 갖춘 자 / ※ ‘무주택자’란 주택을 소유하고 있지 않은 자를 말함"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "marriage",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "single"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 3,
+        "text": "② 혼인 중이 아닐 것"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 4576036,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 3,
+        "text": "가구원수 월평균소득금액 기준 / 1인 4,576,036원 이하 120%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2
+       },
+       "operator": "lte",
+       "value": 6452897,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 3,
+        "text": "2인 6,452,897원 이하 110%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3
+       },
+       "operator": "lte",
+       "value": 8168429,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 3,
+        "text": "3인 8,168,429원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4
+       },
+       "operator": "lte",
+       "value": 8802202,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 3,
+        "text": "4인 8,802,202원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5
+       },
+       "operator": "lte",
+       "value": 9326985,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 3,
+        "text": "5인 9,326,985원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6
+       },
+       "operator": "lte",
+       "value": 9906263,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 3,
+        "text": "6인 9,906,263원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 108000000,
+       "unit": "KRW",
+       "source": {
+        "page": 3,
+        "text": "④ 신청자 본인의 총 자산가액 합산기준이 10,800만원 이하이고, 자동차가액 산출대상 자동차를 소유하고 있지 않을 것"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 0,
+       "unit": "KRW",
+       "source": {
+        "page": 3,
+        "text": "자동차가액 산출대상 자동차를 소유하고 있지 않을 것"
+       },
+       "confidence": 0.85,
+       "verified": false
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "일도 16A",
+       "tier": "대학생",
+       "kind": "rental",
+       "deposit": 28866000,
+       "monthly_rent": 132300,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 42866000,
+        "min_deposit": 4866000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 1,
+        "text": "16A 대학생 60 - 3 - 15 16.64 ... 28,866 1,443 27,423 132,300 (+)14,000 42,866 62,300 (-)24,000 4,866 202,300"
+       }
+      }
+     ]
+    },
+    {
+     "name": "청년 계층 (일반공급)",
+     "households": 21,
+     "unit_types": [
+      {
+       "name": "일도 16A",
+       "exclusive_area_m2": 16.64
+      },
+      {
+       "name": "일도 21A",
+       "exclusive_area_m2": 21.87,
+       "households": 3
+      },
+      {
+       "name": "삼도1 26A",
+       "exclusive_area_m2": 26.94,
+       "households": 8
+      },
+      {
+       "name": "삼도2 26A",
+       "exclusive_area_m2": 26.15,
+       "households": 10
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "청년 계층 공통 요건"
+      },
+      {
+       "id": "g2",
+       "mode": "any_of",
+       "label": "청년(19~39세) 또는 사회초년생"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g2",
+       "category": "age",
+       "applies_to": {},
+       "operator": "between",
+       "value": [
+        19,
+        39
+       ],
+       "unit": "years",
+       "source": {
+        "page": 4,
+        "text": "➀-㉮ (청년) 19세 이상 39세 이하인 자(출생일 1986.09.18.∼2007.09.17.)"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g2",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "new_worker",
+        "artist"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 4,
+        "text": "➀-㉯ (사회초년생) 1) 소득이 있는 업무에 종사중인 자 2) 퇴직한 후 1년이 지나지 않은 사람으로서 구직급여 수급자격을 인정받은 자 3) 「예술인 복지법」제2조제2호에 따른 예술인 으로서, 소득이 있는 업무에 종사한 기간이 총 5년 이내인 자"
+       },
+       "confidence": 0.85,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 4,
+        "text": "입주자모집공고일(2026.09.18) 현재, 무주택자로서 아래의 요건을 모두 갖춘 자"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "marriage",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "single"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 4,
+        "text": "② 혼인 중이 아닐 것"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 4576036,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "1인 4,576,036원 이하 120%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2
+       },
+       "operator": "lte",
+       "value": 6452897,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "2인 6,452,897원 이하 110%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3
+       },
+       "operator": "lte",
+       "value": 8168429,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "3인 8,168,429원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4
+       },
+       "operator": "lte",
+       "value": 8802202,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "4인 8,802,202원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5
+       },
+       "operator": "lte",
+       "value": 9326985,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "5인 9,326,985원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6
+       },
+       "operator": "lte",
+       "value": 9906263,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 4,
+        "text": "6인 9,906,263원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 251000000,
+       "unit": "KRW",
+       "source": {
+        "page": 4,
+        "text": "④ 해당세대가 보유하고 있는 총 자산가액이 25,100만원 이하이고 총 자산 중 자동차가액이 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 4,
+        "text": "총 자산 중 자동차가액이 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "subscription",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 4,
+        "text": "⑤ 본인 입주전까지 주택청약종합저축(청약저축 포함) 가입사실을 증명할 수 있을 것"
+       },
+       "confidence": 0.8,
+       "verified": false
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "일도 16A",
+       "tier": "청년(소득 없음)",
+       "kind": "rental",
+       "deposit": 28866000,
+       "monthly_rent": 132300,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 42866000,
+        "min_deposit": 4866000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 1,
+        "text": "16A 청년 소득無(무) 28,866 1,443 27,423 132,300 (+)14,000 42,866 62,300 (-)24,000 4,866 202,300"
+       }
+      },
+      {
+       "unit_type": "일도 16A",
+       "tier": "청년(소득 있음)",
+       "kind": "rental",
+       "deposit": 30564000,
+       "monthly_rent": 140080,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 46564000,
+        "min_deposit": 5564000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 1,
+        "text": "16A 청년 소득有(유) 30,564 1,528 29,036 140,080 (+)16,000 46,564 60,080 (-)25,000 5,564 212,990"
+       }
+      },
+      {
+       "unit_type": "일도 21A",
+       "tier": "청년(소득 없음)",
+       "kind": "rental",
+       "deposit": 35496000,
+       "monthly_rent": 162690,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 54496000,
+        "min_deposit": 6496000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 1,
+        "text": "21A 청년 소득無(무) 6 - 1 - 3 21.87 ... 35,496 1,775 33,721 162,690 (+)19,000 54,496 67,690 (-)29,000 6,496 247,270"
+       }
+      },
+      {
+       "unit_type": "일도 21A",
+       "tier": "청년(소득 있음)",
+       "kind": "rental",
+       "deposit": 37584000,
+       "monthly_rent": 172260,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 57584000,
+        "min_deposit": 6584000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 1,
+        "text": "21A 청년 소득有(유) 37,584 1,879 35,705 172,260 (+)20,000 57,584 72,260 (-)31,000 6,584 262,670"
+       }
+      },
+      {
+       "unit_type": "삼도1 26A",
+       "tier": "청년(소득 없음)",
+       "kind": "rental",
+       "deposit": 32606000,
+       "monthly_rent": 149440,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 49606000,
+        "min_deposit": 5606000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "26A 청년 소득無(무) 16 - 4 - 8 26.94 ... 32,606 1,630 30,976 149,440 (+)17,000 49,606 64,440 (-)27,000 5,606 228,190"
+       }
+      },
+      {
+       "unit_type": "삼도1 26A",
+       "tier": "청년(소득 있음)",
+       "kind": "rental",
+       "deposit": 34524000,
+       "monthly_rent": 158230,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 52524000,
+        "min_deposit": 6524000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "26A 청년 소득有(유) 34,524 1,726 32,798 158,230 (+)18,000 52,524 68,230 (-)28,000 6,524 239,890"
+       }
+      },
+      {
+       "unit_type": "삼도2 26A",
+       "tier": "청년(소득 없음)",
+       "kind": "rental",
+       "deposit": 32606000,
+       "monthly_rent": 149440,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 49606000,
+        "min_deposit": 5606000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "2. 제주삼도이동 행복주택(H-2BL) 26A 청년 소득無(무) 26 1 0 - 10 26.15 ... 32,606 1,630 30,976 149,440 (+)17,000 49,606 64,440 (-)27,000 5,606 228,190"
+       }
+      },
+      {
+       "unit_type": "삼도2 26A",
+       "tier": "청년(소득 있음)",
+       "kind": "rental",
+       "deposit": 34524000,
+       "monthly_rent": 158230,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 52524000,
+        "min_deposit": 6524000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "2. 제주삼도이동 행복주택(H-2BL) 26A 청년 소득有(유) 34,524 1,726 32,798 158,230 (+)18,000 52,524 68,230 (-)28,000 6,524 239,890"
+       }
+      }
+     ]
+    },
+    {
+     "name": "신혼부부·한부모가족 계층 (일반공급)",
+     "households": 17,
+     "unit_types": [
+      {
+       "name": "일도 44A",
+       "exclusive_area_m2": 44.98,
+       "households": 10
+      },
+      {
+       "name": "삼도1 36A",
+       "exclusive_area_m2": 36.95,
+       "households": 7
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "신혼부부·한부모가족 공통 요건"
+      },
+      {
+       "id": "g2",
+       "mode": "any_of",
+       "label": "혼인기간 7년 이내 또는 6세 이하 자녀"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "marriage",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "married",
+        "pre_marriage",
+        "single_parent"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 5,
+        "text": "➀-㉮ (신혼부부) 혼인중인 자 ➀-㉯ (예비신혼부부) 혼인을 계획 중이며 입주 전까지 혼인사실을 증명할 수 있을 것 ➀-㉰ (한부모가족) 6세이하 자녀를 둔 한부모인 자(태아포함)"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g2",
+       "category": "marriage",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 7,
+       "unit": "years",
+       "source": {
+        "page": 5,
+        "text": "② 혼인기간이 7년 이내일 것 또는 6세 이하 자녀(태아포함)를 둔 자"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g2",
+       "category": "children",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 6,
+       "unit": "child_age",
+       "source": {
+        "page": 5,
+        "text": "② 혼인기간이 7년 이내일 것 또는 6세 이하 자녀(태아포함)를 둔 자"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 5,
+        "text": "입주자모집공고일(2026.09.18) 현재, 무주택세대구성원(예비신혼부부의 경우 혼인으로 구성될 세대의 세대구성원 모두 무주택자)으로서"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 6452897,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "가구원수 일반 신혼부부 2인 6,452,897원 이하 110%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 8168429,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "3인 8,168,429원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 8802202,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "4인 8,802,202원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 9326985,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "5인 9,326,985원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "single"
+       },
+       "operator": "lte",
+       "value": 9906263,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "6인 9,906,263원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 7626151,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "맞벌이 신혼부부 2인 7,626,151원 이하 130%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 9802115,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "맞벌이 신혼부부 3인 9,802,115원 이하 120%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 10562642,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "맞벌이 신혼부부 4인 10,562,642원 이하 120%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 11192382,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "맞벌이 신혼부부 5인 11,192,382원 이하 120%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6,
+        "income_type": "dual"
+       },
+       "operator": "lte",
+       "value": 11887516,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 5,
+        "text": "맞벌이 신혼부부 6인 11,887,516원 이하 120%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 345000000,
+       "unit": "KRW",
+       "source": {
+        "page": 5,
+        "text": "④ 해당 세대가 보유하고 있는 총 자산가액 합산기준 34,500만원 이하이고, 총 자산 중 자동차가액이 4,542만원 이하 일 것"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 5,
+        "text": "총 자산 중 자동차가액이 4,542만원 이하 일 것"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "subscription",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 5,
+        "text": "⑤ 본인 또는 배우자(예비신혼부부의 경우는 혼인 예정인 배우자) 중 1인이 입주 전까지 주택청약종합저축(청약저축 포함) 가입사실을 증명할 수 있을 것 (단, 한부모가족은 본인만 해당)"
+       },
+       "confidence": 0.8,
+       "verified": false
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "일도 44A",
+       "kind": "rental",
+       "deposit": 75920000,
+       "monthly_rent": 347960,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 116920000,
+        "min_deposit": 12920000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 1,
+        "text": "44A 신혼부부·한부모가족 24 - 6 - 10 44.98 ... 75,920 3,796 72,124 347,960 (+)41,000 116,920 142,960 (-)63,000 12,920 531,710"
+       }
+      },
+      {
+       "unit_type": "삼도1 36A",
+       "kind": "rental",
+       "deposit": 51520000,
+       "monthly_rent": 236130,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 79520000,
+        "min_deposit": 9520000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "36A 신혼부부·한부모가족 26 5 - 7 36.95 ... 51,520 2,576 48,944 236,130 (+)28,000 79,520 96,130 (-)42,000 9,520 358,630"
+       }
+      }
+     ]
+    },
+    {
+     "name": "고령자 (주거약자용, 일반공급)",
+     "households": 2,
+     "unit_types": [
+      {
+       "name": "삼도1 26B",
+       "exclusive_area_m2": 26.94,
+       "households": 2
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "고령자 일반공급 자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 65,
+       "unit": "years",
+       "source": {
+        "page": 6,
+        "text": "3-4. 고령자 ■ 일반공급대상자 입주자모집공고일(2026.09.18) 현재, 무주택세대구성원으로서 아래의 요건을 모두 갖춘 65세 이상인 자"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 6,
+        "text": "입주자모집공고일(2026.09.18) 현재, 무주택세대구성원으로서"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 1
+       },
+       "operator": "lte",
+       "value": 4576036,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 6,
+        "text": "1인 4,576,036원 이하 120%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 2
+       },
+       "operator": "lte",
+       "value": 6452897,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 6,
+        "text": "2인 6,452,897원 이하 110%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 3
+       },
+       "operator": "lte",
+       "value": 8168429,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 6,
+        "text": "3인 8,168,429원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 4
+       },
+       "operator": "lte",
+       "value": 8802202,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 6,
+        "text": "4인 8,802,202원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 5
+       },
+       "operator": "lte",
+       "value": 9326985,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 6,
+        "text": "5인 9,326,985원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "income",
+       "applies_to": {
+        "household_size": 6
+       },
+       "operator": "lte",
+       "value": 9906263,
+       "unit": "KRW_monthly",
+       "source": {
+        "page": 6,
+        "text": "6인 9,906,263원 이하 100%"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "asset",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 345000000,
+       "unit": "KRW",
+       "source": {
+        "page": 6,
+        "text": "② 해당 세대가 보유하고 있는 총 자산가액이 34,500만원 이하이고 총 자산 중 자동차가액이 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 6,
+        "text": "총 자산 중 자동차가액이 4,542만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": false
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "삼도1 26B",
+       "tier": "고령자(주거약자)",
+       "kind": "rental",
+       "deposit": 36442000,
+       "monthly_rent": 167020,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 56442000,
+        "min_deposit": 6442000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "26B 고령자(주거약자) 3 1 - 2 26.94 ... 36,442 1,822 34,620 167,020 (+)20,000 56,442 67,020 (-)30,000 6,442 254,520"
+       }
+      }
+     ]
+    },
+    {
+     "name": "주거급여수급자 (일반공급)",
+     "households": 2,
+     "unit_types": [
+      {
+       "name": "삼도1 26A",
+       "exclusive_area_m2": 26.94,
+       "households": 2
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "주거급여수급자 일반공급 자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "welfare_recipient"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 7,
+        "text": "3-5. 주거급여수급자 ■ 일반공급대상자 입주자모집공고일(2026.09.18) 현재 무주택세대구성원인 주거급여수급자 / ※ ‘주거급여수급자’란 「주거급여법」 제2조 제2호 및 제3호에 따른 수급권자 또는 수급자를 말함"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 7,
+        "text": "입주자모집공고일(2026.09.18) 현재 무주택세대구성원인 주거급여수급자 / ※ 무주택세대구성원이란 해당 세대 구성원 전원이 주택을 소유하지 않는 것을 말함"
+       },
+       "confidence": 0.9,
+       "verified": false
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "삼도1 26A",
+       "tier": "주거급여수급자",
+       "kind": "rental",
+       "deposit": 28770000,
+       "monthly_rent": 131860,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 42770000,
+        "min_deposit": 5770000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0.05
+        },
+        {
+         "label": "잔금",
+         "ratio": 0.95
+        }
+       ],
+       "source": {
+        "page": 2,
+        "text": "26A 주거급여수급자 6 1 - 2 26.94 ... 28,770 1,438 27,332 131,860 (+)14,000 42,770 61,860 (-)23,000 5,770 198,940"
+       }
+      }
+     ]
+    }
+   ],
+   "notes": [
+    "일반공급은 입주자모집공고일 현재 2세미만의 자녀(세대구성원)가 있는자(태아포함)를 대상으로 모집호수(공급형별·대상별)의 30퍼센트 범위 내 우선배정(경쟁 시 계층별 입주자 선정순서를 따름)하고, 우선배정 탈락 시 잔여물량에 대해 그 외 신청자와 계층별 입주자 선정순서에 따라 재경쟁",
+    "대학생 계층 순위 : 1순위 해당 주택건설지역(제주특별자치도)이 거주지이거나 재학 중인 대학 소재지인 자, 2순위 제1순위에 해당되지 않는 자. 경쟁 시 입주자 선정기준 : 순위 → 추첨",
+    "청년 계층 순위 : 1순위 해당 주택건설지역(제주특별자치도)이 거주지이거나 소득 근거지인 자, 2순위 제1순위에 해당되지 않는 자. 경쟁 시 입주자 선정기준 : 순위 → 추첨",
+    "신혼부부·한부모가족 계층 순위 : 1순위 신청자 본인 또는 배우자(예비신혼부부의 경우 대표신청자 또는 예비배우자)가 해당 주택건설지역(제주특별자치도) 거주지이거나 소득근거지인 자, 2순위 제1순위에 해당되지 않는 자. 경쟁 시 입주자 선정기준 : 순위 → 추첨",
+    "고령자 및 주거급여수급자 경쟁 시 입주자 선정기준 : 추첨",
+    "소득기준 가산 내용 ① 가구원 수 가산항목 및 비율 : 1인 가구 20% 가산, 2인 가구 10% 가산 ② 출산자녀 수 가산항목 및 비율 : 출산자녀 2인 이상 20% 가산, 출산자녀 1인 10% 가산 / 자산기준 가산 내용 ① 출산자녀 수 가산항목 및 비율 : 출산자녀 2인 이상 20% 가산, 출산자녀 1인 10% 가산 (’23.3.28 이후 출산자녀, 최대 2자녀 인정)",
+    "7인이상의 가구는 6인가구 기준소득금액에 추가 1인당 평균금액 579,278원을 합산하여 산정",
+    "대학생 계층 출생자녀 가산 자산기준 : 출산자녀 1인 119,000,000원, 2인 이상 130,000,000원 / 청년 계층 : 1인 276,000,000원(자동차 49,960,000원), 2인 이상 301,000,000원(자동차 54,510,000원) / 신혼부부·한부모가족, 고령자 : 1인 379,000,000원(자동차 49,960,000원), 2인 이상 413,000,000원(자동차 54,510,000원)",
+    "소득이 없는 “청년 계층” 신청자는 동일 면적의 대학생 계층 임대조건이 적용됩니다. 임대조건은 갱신계약전까지 유지되며 갱신계약시 소득 유무에 따라 변경된 임대조건을 적용합니다.",
+    "일도이동 16A형의 “대학생계층”의 일반공급 물량과 “청년계층”의 일반공급 물량은 통합 추첨하여 공급합니다.",
+    "우선공급이 미달된 경우 남은 우선공급물량은 해당 공급대상자의 일반 공급물량으로 전환하여 공급합니다.",
+    "월임대료의 임대보증금 전환(임대보증금 증액) 및 임대보증금의 월임대료 전환(임대보증금 감액)은 임차인의 선택사항으로서 임대보증금 100만원 단위로 전환 가능하며, 월임대료의 임대보증금으로 전환시 이율 6%, 임대보증금의 월임대료로 전환시 이율 3.5%를 적용합니다.",
+    "입주 자격별 최대 거주기간 : 대학생·청년 계층 10년, 신혼부부·한부모가족 계층 무자녀 10년·자녀 1명 이상 14년, 고령자·주거급여수급자 20년",
+    "고령자에 배정된 주거약자용 주택은 편의시설이 설치된 주택으로 「공공주택 업무처리지침」에 따라 3층 이하에 공급됩니다.(65세 이상 고령자가 신청 대상입니다.)",
+    "이 주택의 입주자(세대구성원 전원 포함)는 입주자모집공고일 현재부터 임대차계약 종료일까지 무주택세대구성원이어야 합니다. 대학생 계층 및 청년 계층은 입주자모집공고일 현재부터 임대차계약 종료일까지 무주택자이어야 합니다.",
+    "외국인은 신청 불가합니다. 1세대 1주택 무주택세대구성원에게 신청가능하며, 중복 신청할 경우 전부 무효 처리됩니다.",
+    "동일한 공급유형(통합공임, 국민, 행복, 영구)내에서 중복신청도 가능하나, 신청 후 예비입주자로 선정되면 종전에 동일한 공급유형에 선정된 예비입주자 지위는 자동 상실됩니다.",
+    "불법양도・전대자 재입주 금지 규정(공공주택 특별법 시행규칙 제36조의2)에 따라 신청자의 세대구성원중에 과거에 공공임대주택 임차인으로서 불법양도・전대 행위로 적발된 후 4년이 경과되지 않은 자가 있는 경우 공공임대주택 입주자로 선정이 불가합니다.",
+    "대학생 계층은 신청자 부모와 본인의 월평균소득 합계를 기준으로 하며, 이혼 등의 사유로 가족관계가 단절된 상태인 경우 실질적으로 부양의무를 이행하고 있는 부 또는 모의 소득을 조회합니다.",
+    "위 임대조건의 임대보증금 및 월임대료는 입주자모집공고일 현재 기준이며, 예비입주자로 선정된 분은 추후 공가가 발생하여 임대차계약을 체결하게 되는 시점의 주변시세를 반영한 변경 임대조건이 적용됩니다."
+   ]
+  },
+  "transit": {},
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "파랑새어린이집",
+    "distance_m": 335
+   },
+   {
+    "kind": "school",
+    "name": "제주여자상업고등학교",
+    "distance_m": 381
+   },
+   {
+    "kind": "convenience",
+    "name": "CU 제주서반점",
+    "distance_m": 55
+   },
+   {
+    "kind": "hospital",
+    "name": "한라 동물종합병원",
+    "distance_m": 127
+   },
+   {
+    "kind": "park",
+    "name": "두맹이골목",
+    "distance_m": 405
+   }
+  ],
+  "b_code": "5011010200",
+  "market": {
+   "lawd_cd": "50110",
+   "area_from": 18.9,
+   "area_to": 35,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 315,
+   "jeonse_median": 111000000,
+   "monthly_deposit_median": 2000000,
+   "monthly_rent_median": 450000,
+   "source": "국토교통부 전월세 실거래가"
+  },
+  "detail_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=2015122300020804&ccrCnntSysDsCd=03&uppAisTpCd=06&aisTpCd=10&mi=1026",
+  "pdf_url": "https://tomybypxvhrkwvfnthva.supabase.co/storage/v1/object/public/announcement-pdfs/LH/2015122300020804/v1.pdf",
+  "images": [
+   {
+    "kind": "위치도",
+    "name": "LH일도이동_위치도(가로형).jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=46459910"
+   },
+   {
+    "kind": "단지조감도",
+    "name": "단지조감도(제주일도).jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=46460281"
+   },
+   {
+    "kind": "단지배치도",
+    "name": "단지배치도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=46459911"
+   },
+   {
+    "kind": "동호배치도",
+    "name": "동호배치도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=46459912"
+   },
+   {
+    "kind": "위치도",
+    "name": "위치도(H-1_2공통).jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=48717451"
+   },
+   {
+    "kind": "단지조감도",
+    "name": "01조감도H1.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=48717453"
+   },
+   {
+    "kind": "단지배치도",
+    "name": "01단지배치도H1.jpeg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=48717452"
+   },
+   {
+    "kind": "위치도",
+    "name": "위치도(H-1_2공통).jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=48717787"
+   },
+   {
+    "kind": "단지조감도",
+    "name": "01조감도H2.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=48717789"
+   },
+   {
+    "kind": "단지배치도",
+    "name": "01단지배치도H2.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=48717788"
+   }
+  ]
+ },
+ {
+  "id": "010",
+  "provider": "LH",
+  "lh_id": "2015122300020796",
+  "title": "양산시 국민임대주택 예비입주자 완화 모집 [소득·자산·무주택요건 완화/계약금 50만원 정액]",
+  "housing_type": "national_rental",
+  "region_code": "48",
+  "region_name": "경남 양산시",
+  "status": "AUTO",
+  "notice_date": "2026-09-15",
+  "apply_start": "2026-09-28",
+  "apply_end": "2026-09-29",
+  "address": "경상남도 양산시 (물금2·물금5·사송A-4·사송A-5·금산휴먼시아·소주휴먼시아)",
+  "lat": 35.3349920568283,
+  "lng": 129.037272788805,
+  "extraction": {
+   "title": "양산시 국민임대주택 예비입주자 완화 모집 [소득·자산·무주택요건 완화/계약금 50만원 정액]",
+   "housing_type": "national_rental",
+   "address": "경상남도 양산시 (물금2·물금5·사송A-4·사송A-5·금산휴먼시아·소주휴먼시아)",
+   "schedule": {
+    "notice_date": "2026-09-15",
+    "apply_start": "2026-09-28",
+    "apply_end": "2026-09-29",
+    "winner_announce": "2026-11-27"
+   },
+   "tracks": [
+    {
+     "name": "일반공급 (전용면적 50㎡ 미만)",
+     "households": 265,
+     "unit_types": [
+      {
+       "name": "물금2 46형",
+       "exclusive_area_m2": 46.63,
+       "households": 10
+      },
+      {
+       "name": "물금5 36형",
+       "exclusive_area_m2": 36.61,
+       "households": 5
+      },
+      {
+       "name": "물금5 46형",
+       "exclusive_area_m2": 46.78,
+       "households": 10
+      },
+      {
+       "name": "사송A-4 29A형",
+       "exclusive_area_m2": 29.21,
+       "households": 20
+      },
+      {
+       "name": "사송A-4 37A형",
+       "exclusive_area_m2": 37.66,
+       "households": 15
+      },
+      {
+       "name": "사송A-4 37B형",
+       "exclusive_area_m2": 37.38,
+       "households": 5
+      },
+      {
+       "name": "사송A-4 46형",
+       "exclusive_area_m2": 46.62,
+       "households": 10
+      },
+      {
+       "name": "사송A-5 29형",
+       "exclusive_area_m2": 29.9,
+       "households": 40
+      },
+      {
+       "name": "사송A-5 37형",
+       "exclusive_area_m2": 37.76,
+       "households": 10
+      },
+      {
+       "name": "사송A-5 46형",
+       "exclusive_area_m2": 46.69,
+       "households": 5
+      },
+      {
+       "name": "금산 36형",
+       "exclusive_area_m2": 36.65,
+       "households": 5
+      },
+      {
+       "name": "금산 39형",
+       "exclusive_area_m2": 39.48,
+       "households": 10
+      },
+      {
+       "name": "금산 46형",
+       "exclusive_area_m2": 46.9,
+       "households": 20
+      },
+      {
+       "name": "소주 33형",
+       "exclusive_area_m2": 33.55,
+       "households": 50
+      },
+      {
+       "name": "소주 36형",
+       "exclusive_area_m2": 36.74,
+       "households": 10
+      },
+      {
+       "name": "소주 46형",
+       "exclusive_area_m2": 46.43,
+       "households": 40
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 신청자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 4,
+        "text": "입주자모집공고일(2026.09.15) 현재 무주택세대구성원으로서 아래의 ‘소득 및 자산보유 기준’을 충족하는 사람 (단, 입주자모집공고일로부터 입주 시까지 무주택세대구성원을 유지해야 하며, 무주택세대구성원을 유지하지 않을 경우 당첨 취소 및 계약거절 등의 불이익을 받을 수 있습니다.)"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 4,
+        "text": "금번 공고에서는 별도의 소득 및 자산 기준을 적용하지 아니함 (단, 자동차 가액 기준은 충족하여야 함) / 자동차 : 세대구성원 전원이 보유하고 있는 개별 자동차가액 ( 4,542 )만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 19,
+       "unit": "years",
+       "source": {
+        "page": 4,
+        "text": "■ 성년자 「민법」상 미성년자(19세 미만)는 공급 신청할 수 없습니다. 단, 아래의 어느 하나에 해당하는 경우 미성년자도 공급 신청 가능합니다."
+       },
+       "confidence": 0.8,
+       "verified": false
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "물금2 46형",
+       "kind": "rental",
+       "deposit": 30107000,
+       "monthly_rent": 343620,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 70107000,
+        "min_deposit": 10107000
+       },
+       "payment_schedule": [
+        {
+         "label": "계약금",
+         "ratio": 0
+        }
+       ],
+       "source": {
+        "page": 3,
+        "text": "물금2 46형 30,107,000 / 계약금 50만원 정액 / 잔금 29,607,000 / 월임대료 343,620 / (+)40,000,000 70,107,000 143,620 / (-)20,000,000 10,107,000 401,950"
+       }
+      },
+      {
+       "unit_type": "물금5 36형",
+       "kind": "rental",
+       "deposit": 12557000,
+       "monthly_rent": 261630,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 42557000,
+        "min_deposit": 7557000
+       },
+       "source": {
+        "page": 3,
+        "text": "물금5 36형 12,557,000 12,057,000 261,630 (+)30,000,000 42,557,000 111,630 (-)5,000,000 7,557,000 276,210"
+       }
+      },
+      {
+       "unit_type": "물금5 46형",
+       "kind": "rental",
+       "deposit": 27347000,
+       "monthly_rent": 340000,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 67347000,
+        "min_deposit": 10347000
+       },
+       "source": {
+        "page": 3,
+        "text": "물금5 46형 27,347,000 26,847,000 340,000 (+)40,000,000 67,347,000 140,000 (-)17,000,000 10,347,000 389,580"
+       }
+      },
+      {
+       "unit_type": "사송A-4 29A형",
+       "kind": "rental",
+       "deposit": 10611000,
+       "monthly_rent": 177930,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 30611000,
+        "min_deposit": 5611000
+       },
+       "source": {
+        "page": 3,
+        "text": "사송A-4 29A형 10,611,000 10,111,000 177,930 (+)20,000,000 30,611,000 77,930 (-)5,000,000 5,611,000 192,510"
+       }
+      },
+      {
+       "unit_type": "사송A-4 37A형",
+       "kind": "rental",
+       "deposit": 18855000,
+       "monthly_rent": 235620,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 45855000,
+        "min_deposit": 6855000
+       },
+       "source": {
+        "page": 3,
+        "text": "37A형 18,855,000 18,355,000 235,620 (+)27,000,000 45,855,000 100,620 (-)12,000,000 6,855,000 270,620"
+       }
+      },
+      {
+       "unit_type": "사송A-4 37B형",
+       "kind": "rental",
+       "deposit": 18715000,
+       "monthly_rent": 234440,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 45715000,
+        "min_deposit": 7715000
+       },
+       "source": {
+        "page": 4,
+        "text": "37B형 18,715,000 18,215,000 234,440 (+)27,000,000 45,715,000 99,440 (-)11,000,000 7,715,000 266,520"
+       }
+      },
+      {
+       "unit_type": "사송A-4 46형",
+       "kind": "rental",
+       "deposit": 29271000,
+       "monthly_rent": 306000,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 65271000,
+        "min_deposit": 9271000
+       },
+       "source": {
+        "page": 4,
+        "text": "46형 29,271,000 28,772,000 306,000 (+)36,000,000 65,271,000 126,000 (-)20,000,000 9,271,000 364,330"
+       }
+      },
+      {
+       "unit_type": "사송A-5 29형",
+       "kind": "rental",
+       "deposit": 9802000,
+       "monthly_rent": 159200,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 27802000,
+        "min_deposit": 4802000
+       },
+       "source": {
+        "page": 4,
+        "text": "사송A-5 29형 9,802,000 9,302,000 159,200 (+)18,000,000 27,802,000 69,200 (-)5,000,000 4,802,000 173,780"
+       }
+      },
+      {
+       "unit_type": "사송A-5 37형",
+       "kind": "rental",
+       "deposit": 16964000,
+       "monthly_rent": 207300,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 39964000,
+        "min_deposit": 6964000
+       },
+       "source": {
+        "page": 4,
+        "text": "37형 16,964,000 16,464,000 207,300 (+)23,000,000 39,964,000 92,300 (-)10,000,000 6,964,000 236,910"
+       }
+      },
+      {
+       "unit_type": "사송A-5 46형",
+       "kind": "rental",
+       "deposit": 26267000,
+       "monthly_rent": 269630,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 57267000,
+        "min_deposit": 9267000
+       },
+       "source": {
+        "page": 4,
+        "text": "46형 26,267,000 25,767,000 269,630 (+)31,000,000 57,267,000 114,630 (-)17,000,000 9,267,000 319,210"
+       }
+      },
+      {
+       "unit_type": "금산 36형",
+       "kind": "rental",
+       "deposit": 12137000,
+       "monthly_rent": 101150,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 19137000,
+        "min_deposit": 4137000
+       },
+       "source": {
+        "page": 4,
+        "text": "금산 36형 12,137,000 11,637,000 101,150 (+)7,000,000 19,137,000 66,150 (-)8,000,000 4,137,000 124,480"
+       }
+      },
+      {
+       "unit_type": "금산 39형",
+       "kind": "rental",
+       "deposit": 15375000,
+       "monthly_rent": 128110,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 27375000,
+        "min_deposit": 4375000
+       },
+       "source": {
+        "page": 4,
+        "text": "39형 15,375,000 14,875,000 128,110 (+)12,000,000 27,375,000 68,110 (-)11,000,000 4,375,000 160,190"
+       }
+      },
+      {
+       "unit_type": "금산 46형",
+       "kind": "rental",
+       "deposit": 21581000,
+       "monthly_rent": 190180,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 42581000,
+        "min_deposit": 6581000
+       },
+       "source": {
+        "page": 4,
+        "text": "46형 21,581,000 21,081,000 190,180 (+)21,000,000 42,581,000 85,180 (-)15,000,000 6,581,000 233,930"
+       }
+      },
+      {
+       "unit_type": "소주 33형",
+       "kind": "rental",
+       "deposit": 12422000,
+       "monthly_rent": 104170,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 20422000,
+        "min_deposit": 3422000
+       },
+       "source": {
+        "page": 4,
+        "text": "소주 33형 12,422,000 11,922,000 104,170 (+)8,000,000 20,422,000 64,170 (-)9,000,000 3,422,000 130,420"
+       }
+      },
+      {
+       "unit_type": "소주 36형",
+       "kind": "rental",
+       "deposit": 13623000,
+       "monthly_rent": 113540,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 23623000,
+        "min_deposit": 4623000
+       },
+       "source": {
+        "page": 4,
+        "text": "36형 13,623,000 13,123,000 113,540 (+)10,000,000 23,623,000 63,540 (-)9,000,000 4,623,000 139,790"
+       }
+      },
+      {
+       "unit_type": "소주 46형",
+       "kind": "rental",
+       "deposit": 21105000,
+       "monthly_rent": 176310,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 41105000,
+        "min_deposit": 6105000
+       },
+       "source": {
+        "page": 4,
+        "text": "46형 21,105,000 20,605,000 176,310 (+)20,000,000 41,105,000 76,310 (-)15,000,000 6,105,000 220,060"
+       }
+      }
+     ]
+    },
+    {
+     "name": "일반공급 (전용면적 50㎡ 이상)",
+     "households": 20,
+     "unit_types": [
+      {
+       "name": "소주 51형",
+       "exclusive_area_m2": 51.55,
+       "households": 20
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 신청자격"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 4,
+        "text": "입주자모집공고일(2026.09.15) 현재 무주택세대구성원으로서 아래의 ‘소득 및 자산보유 기준’을 충족하는 사람"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 4,
+        "text": "금번 공고에서는 별도의 소득 및 자산 기준을 적용하지 아니함 (단, 자동차 가액 기준은 충족하여야 함) / 자동차 : 세대구성원 전원이 보유하고 있는 개별 자동차가액 ( 4,542 )만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 19,
+       "unit": "years",
+       "source": {
+        "page": 4,
+        "text": "■ 성년자 「민법」상 미성년자(19세 미만)는 공급 신청할 수 없습니다."
+       },
+       "confidence": 0.8,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "subscription",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 6,
+       "unit": "count",
+       "source": {
+        "page": 6,
+        "text": "■ 선정방법 (전용면적 50㎡이상주택) ① 1순위 : 주택청약종합저축에 가입하여 24회 이상 납입한 사람 ② 2순위 : 주택청약종합저축에 가입하여 6회 이상 납입한 사람 ③ 3순위 : 제1순위 및 제2순위에 해당되지 아니하는 자"
+       },
+       "confidence": 0.5,
+       "verified": false
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "소주 51형",
+       "kind": "rental",
+       "deposit": 26048000,
+       "monthly_rent": 216390,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 51048000,
+        "min_deposit": 8048000
+       },
+       "source": {
+        "page": 4,
+        "text": "51형 26,048,000 25,548,000 216,390 (+)25,000,000 51,048,000 91,390 (-)18,000,000 8,048,000 268,890"
+       }
+      }
+     ]
+    },
+    {
+     "name": "주거약자용 주택",
+     "households": 45,
+     "unit_types": [
+      {
+       "name": "사송A-4 29A-1형(주거약자용)",
+       "exclusive_area_m2": 29.21,
+       "households": 40
+      },
+      {
+       "name": "사송A-4 37A-1형(주거약자용)",
+       "exclusive_area_m2": 37.66,
+       "households": 5
+      }
+     ],
+     "rule_groups": [
+      {
+       "id": "g1",
+       "mode": "all_of",
+       "label": "기본 신청자격"
+      },
+      {
+       "id": "g2",
+       "mode": "any_of",
+       "label": "주거약자 요건(경쟁 시 최우선 공급)"
+      }
+     ],
+     "rules": [
+      {
+       "group_id": "g1",
+       "category": "housing",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 0,
+       "unit": "months",
+       "source": {
+        "page": 4,
+        "text": "입주자모집공고일(2026.09.15) 현재 무주택세대구성원으로서 아래의 ‘소득 및 자산보유 기준’을 충족하는 사람"
+       },
+       "confidence": 0.9,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "car_value",
+       "applies_to": {},
+       "operator": "lte",
+       "value": 45420000,
+       "unit": "KRW",
+       "source": {
+        "page": 4,
+        "text": "자동차 : 세대구성원 전원이 보유하고 있는 개별 자동차가액 ( 4,542 )만원 이하"
+       },
+       "confidence": 0.95,
+       "verified": false
+      },
+      {
+       "group_id": "g1",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 19,
+       "unit": "years",
+       "source": {
+        "page": 4,
+        "text": "■ 성년자 「민법」상 미성년자(19세 미만)는 공급 신청할 수 없습니다."
+       },
+       "confidence": 0.8,
+       "verified": false
+      },
+      {
+       "group_id": "g2",
+       "category": "age",
+       "applies_to": {},
+       "operator": "gte",
+       "value": 65,
+       "unit": "years",
+       "source": {
+        "page": 5,
+        "text": "“주거약자” 란? 국민임대주택 일반공급대상의 자격을 갖춘 아래의 자를 말합니다. ① 고령자(65세 이상인 자) ② 「장애인복지법」 제2조제2항에 해당하는 장애인"
+       },
+       "confidence": 0.85,
+       "verified": false
+      },
+      {
+       "group_id": "g2",
+       "category": "status",
+       "applies_to": {},
+       "operator": "in",
+       "value": [
+        "disabled",
+        "national_merit"
+       ],
+       "unit": "status",
+       "source": {
+        "page": 5,
+        "text": "② 「장애인복지법」 제2조제2항에 해당하는 장애인 ③ 「국가유공자 등 예우 및 지원에 관한 법률」에 따른 국가유공자로서 상이등급 1급부터 7급까지의 판정을 받은 자 ④ 「보훈보상대상자 지원에 관한 법률」에 따른 보훈보상대상자로서 상이등급 1급부터 7급까지의 판정을 받은 자 ⑤ 5ㆍ18민주화운동부상자 ⑥ 고엽제후유의증환자 ⑦ 국가유공자에 준하는 군경 등"
+       },
+       "confidence": 0.8,
+       "verified": false
+      }
+     ],
+     "pricing": [
+      {
+       "unit_type": "사송A-4 29A-1형(주거약자용)",
+       "kind": "rental",
+       "deposit": 10611000,
+       "monthly_rent": 177930,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 30611000,
+        "min_deposit": 5611000
+       },
+       "source": {
+        "page": 3,
+        "text": "29A-1형 10,611,000 10,111,000 177,930 (+)20,000,000 30,611,000 77,930 (-)5,000,000 5,611,000 192,510"
+       }
+      },
+      {
+       "unit_type": "사송A-4 37A-1형(주거약자용)",
+       "kind": "rental",
+       "deposit": 18855000,
+       "monthly_rent": 235620,
+       "conversion": {
+        "rate": 0.06,
+        "rate_down": 0.035,
+        "max_deposit": 45855000,
+        "min_deposit": 6855000
+       },
+       "source": {
+        "page": 4,
+        "text": "37A-1형 18,855,000 18,355,000 235,620 (+)27,000,000 45,855,000 100,620 (-)12,000,000 6,855,000 270,620"
+       }
+      }
+     ]
+    }
+   ],
+   "notes": [
+    "【입주자격 완화 주요내용】 전체 단지 : 계약금 50만원 정액 고정 / 소득 및 자산 기준 미적용 / 무주택 여부 - 양산시에만 주택이 없으면 허용, 양산시의 소형ㆍ저가주택은 무주택으로 간주, 양산시 외 주택은 모두 무주택으로 간주",
+    "※ 소형‧저가주택의 무주택 요건 기준(주거전용면적 60㎡이하이고, 1억원(수도권 1.6억원) 이하인 주택 또는 분양권), 2호 또는 2세대 이상의 주택 또는 분양권을 소유하고 있는 사람은 제외",
+    "• (소득·총자산 요건 완화 입주자) 소득, 총자산 요건이 1회 미충족시에도 재계약 허용(임대조건 할증 X) / 2회 미충족시에는 「공공주택특별법 시행규칙」 제17조 제1항에 따른 요건을 충족하는 예비입주자가 없는 경우 추후 재계약 허용(할증X). (무주택요건 완화 입주자) 공고일 전 취득한 주택에 한해 1회차까지 재계약이 가능하며, 2회차 재계약부터는 종전 주택을 계속 보유하거나 새로 취득하는 경우에는 재계약이 거절되어 계약이 해제·해지될 수 있습니다.",
+    "자산기준 가산 : 출산자녀 2인 이상 20%p 가산, 출산자녀 1인 10%p 가산 (출산자녀 1명 자동차가액 4,996만원, 2명 5,451만원). ’23.3.28. 이후 출산한 미성년자녀(입양자녀 및 태아 포함)",
+    "■ 불법전대자 입주자격 제한 : 신청자의 세대구성원중에 과거에 공공임대주택 임차인으로서 불법양도・전대 행위로 적발된 후 4년이 경과되지 않은 자가 있는 경우 공공임대주택 입주자로 선정 불가",
+    "■ 선정방법 (전용면적 50㎡미만주택) 선정순서 : 순위 → 배점 → 추첨. ① 1순위 : 모집공고일 현재 주민등록표등본상 경상남도 양산시에 거주하는 자 ② 2순위 : 경상남도 김해시, 밀양시, 부산광역시 기장군, 북구, 금정구, 울산광역시 울주군에 거주하는 자 ③ 3순위 : 제1순위 및 제2순위에 해당되지 아니하는 자",
+    "■ 선정방법 (전용면적 50㎡이상주택) ① 1순위 : 주택청약종합저축에 가입하여 24회 이상 납입한 사람 ② 2순위 : 6회 이상 납입한 사람 ③ 3순위 : 제1순위 및 제2순위에 해당되지 아니하는 자",
+    "■ 배점기준 : ① 당해 주택건설지역(양산시) 계속거주기간 1년 이상 3년 미만 1점 / 3년 이상 5년 미만 2점 / 5년 이상 3점 ② 청약저축 납입횟수 6~12회 1점 ~ 61회 이상 6점 ③ 미성년자녀수 2자녀 2점, 3자녀 이상 3점 ④ 신혼부부·예비신혼부부·한부모가족·유자녀혼인가구 각 3점 ⑤ 부모·자녀간 육아 지원세대 각 3점 ⑥ 사회취약계층 3점 ⑦ 공사 국민임대주택 최근 1년 이내 계약사실 -5점, 최근 3년 이내 -3점",
+    "주거약자용 주택은 일반공급대상자도 신청 가능하나, 경쟁 시 주거약자에게 최우선 공급하며 「공공주택 업무처리지침」에 따라 3층 이하에 공급됩니다. 주거약자용 배점 : 부양가족수, 당해 주택건설지역 거주기간, 사회취약계층(3점), 장애정도, 과거 계약사실 감점",
+    "본 모집공고문의 모집대상 주택에 대하여 1세대 1주택 신청을 원칙으로 하며, 중복 신청하는 경우 전부 무효처리 합니다. 배우자 세대분리는 중복입주로서 본 임대주택 입주가 불가합니다.",
+    "동일한 유형(예, 국민⟷국민, 행복⟷행복)의 예비입주자 모집 신청은 가능하나 신청 후 예비입주자로 선정되면 종전 선정된 예비입주자로서의 지위는 자동 탈락 처리됩니다. 장기임대주택(통합공공임대, 국민임대, 영구임대, 행복주택) 입주 시 모든 대기자 명부에서 제외 처리됩니다.",
+    "순위별로 청약일자가 지정되어 있으며(1순위 2026.09.28., 2·3순위 2026.09.29.), 반드시 해당순위 날짜에 신청하여야 하고 다른 순위 날짜에 접수시에는 모두 부적격 처리됩니다. 1순위 접수 시 신청자 수가 모집 인원을 초과하는 경우 2, 3순위 접수를 받지 않습니다.",
+    "인터넷/모바일 청약을 원칙으로 하며, 신청자 본인이 중증장애인 또는 고령자(만65세 이상)인 경우에 한하여 현장대행 접수를 진행합니다.",
+    "임대차계약 기간은 2년이며, 계속 거주를 희망하는 경우에는 관계법령에서 정한 입주자격을 충족하는 자에 한하여 2년 단위로 갱신할 수 있습니다. 이 주택은 분양전환 되지 않는 공공임대주택으로 입주자격 충족 시 단지별 최초 임대개시일로부터 최장 30년간 거주 가능합니다.",
+    "월임대료의 임대보증금 전환 및 임대보증금의 월임대료 전환은 임차인의 선택사항으로 임대보증금 100만원 단위로 전환 가능하며, 전환 이율은 월임대료→보증금 6%, 보증금→월임대료 3.5%입니다.",
+    "서류제출대상자 발표 2026.10.16.(금) 17:00 이후, 서류접수 2026.10.19.~23, 예비입주자 당첨발표 2026.11.27.(금) 17:00 이후"
+   ]
+  },
+  "transit": {
+   "nearest_station": "양산역 부산2호선",
+   "station_distance_m": 1069,
+   "station_walk_min": 16
+  },
+  "nearby": [
+   {
+    "kind": "daycare",
+    "name": "성아어린이집",
+    "distance_m": 294
+   },
+   {
+    "kind": "school",
+    "name": "중부초등학교",
+    "distance_m": 466
+   },
+   {
+    "kind": "mart",
+    "name": "GS더프레시 양산중부점",
+    "distance_m": 668
+   },
+   {
+    "kind": "convenience",
+    "name": "GS25 양산대동점",
+    "distance_m": 325
+   },
+   {
+    "kind": "hospital",
+    "name": "현대치과의원",
+    "distance_m": 500
+   },
+   {
+    "kind": "park",
+    "name": "양산젊음의거리",
+    "distance_m": 835
+   }
+  ],
+  "b_code": "4833000000",
+  "market": {
+   "lawd_cd": "48330",
+   "area_from": 20.4,
+   "area_to": 38,
+   "from": "2026-03",
+   "to": "2026-08",
+   "deals": 145,
+   "jeonse_median": 60000000,
+   "monthly_deposit_median": 16960000,
+   "monthly_rent_median": 170000,
+   "source": "국토교통부 전월세 실거래가"
+  },
+  "detail_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=2015122300020796&ccrCnntSysDsCd=03&uppAisTpCd=06&aisTpCd=07&mi=1026",
+  "pdf_url": "https://tomybypxvhrkwvfnthva.supabase.co/storage/v1/object/public/announcement-pdfs/LH/2015122300020796/v1.pdf",
+  "images": [
+   {
+    "kind": "위치도",
+    "name": "물금1,2,5단지위치도.png",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=39897608"
+   },
+   {
+    "kind": "위치도",
+    "name": "물금1,2,5단지위치도.png",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=39897586"
+   },
+   {
+    "kind": "지역조감도",
+    "name": "지역조감도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=46950564"
+   },
+   {
+    "kind": "위치도",
+    "name": "위치도.JPG",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=46950566"
+   },
+   {
+    "kind": "단지배치도",
+    "name": "단지배치도_1230.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=46980184"
+   },
+   {
+    "kind": "동호배치도",
+    "name": "동호배치도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=46950568"
+   },
+   {
+    "kind": "위치도",
+    "name": "위치도_1.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=48239271"
+   },
+   {
+    "kind": "단지배치도",
+    "name": "단지배치도.PNG",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=48238520"
+   },
+   {
+    "kind": "동호배치도",
+    "name": "동호배치도.PNG",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=48238521"
+   },
+   {
+    "kind": "단지조감도",
+    "name": "양산시_양산금산_조감도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=57298928"
+   },
+   {
+    "kind": "단지배치도",
+    "name": "양산시_양산금산_단지배치도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=57298926"
+   },
+   {
+    "kind": "동호배치도",
+    "name": "양산시_양산금산_동호배치도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=57298927"
+   },
+   {
+    "kind": "단지조감도",
+    "name": "양산시_양산소주_조감도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=57298955"
+   },
+   {
+    "kind": "단지배치도",
+    "name": "단지배치도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=57298956"
+   },
+   {
+    "kind": "동호배치도",
+    "name": "양산시_양산소주_동호배치도.jpg",
+    "url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=57298957"
+   }
+  ]
+ }
+]
