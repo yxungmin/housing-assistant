@@ -493,13 +493,10 @@
       확인 중 `0004_provider.sql`이 빈 DB에서 실패하던 것을 고쳤다 — `create or replace view`는 컬럼을 중간에 못 끼운다.
 - [x] 앱 `.env`에 `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY` — 앱이 뷰를 읽고 신고를 올린다.
       테스트 공고 1건으로 신고 왕복(앱 → 서버 → 검수 큐 → FIXED + 처리 문구 → 앱)까지 확인했다.
-- [ ] **로컬 키 복구** — `.env`의 `SUPABASE_URL`·`SUPABASE_SERVICE_ROLE_KEY`가 비어 있고
-      `apps/mobile/.env`가 아예 없다 (2026-09-22 확인). 자격증명 노출 정리 때 지운 것으로 보인다.
-      아래 "보안"의 교체를 먼저 하고, 새 키를 두 파일에 넣는다. 그 전까지 앱은 번들 데이터만 본다.
-- [ ] **`0007`~`0016` 적용** — 아직 아무 DB에도 안 올렸다. 순서: Docker 켜고 `npm run db:check`로
-      빈 DB 전체 재적용을 통과시킨 뒤 Supabase SQL Editor에 번호 순으로 붙여 넣는다.
-      0011·0012·0014·0016이 `app_announcements` 뷰를 다시 만든다. 0012는 `units` 컬럼과 `commute_cache`도 담고 있다.
-      0016은 `maintenance`(K-apt 관리비 단가) 컬럼. Actions에도 `KAPT_API_KEY`(또는 `MOLIT_API_KEY`) secret을 넣어야 수집기가 채운다.
+- [~] **로컬 키 복구** — `SUPABASE_URL`과 앱 `.env`(URL·anon)는 2026-09-24에 채웠다. `SUPABASE_SERVICE_ROLE_KEY` 한 줄만 남음(사용자가 직접).
+- [x] **`0007`~`0016` 적용** (2026-09-24) — 점검해 보니 0007~0014는 이미 올라가 있었고(README 메모가 낡았다), 0015·0016을 SQL Editor로 넣었다.
+      시드(loan_products 3행)도 이미 있다. Redirect URL·Apple(Client ID=번들 id)·Kakao·Google 제공자도 설정돼 있음을 확인.
+      앱 `apps/mobile/.env`에 URL·anon(JWT) 넣음. 새 publishable 키는 Authorization에 실으면 거절돼 헤더를 JWT일 때만 붙이게 고쳤다.
 - [ ] **Edge Function `transit` 배포** — `supabase/README.md` 2-2.
       `functions deploy transit` + `secrets set KAKAO_REST_API_KEY`.
       이것이 되어야 매입임대에서 "직장까지 대중교통 약 N분"이 뜬다. 없으면 직선거리로 되돌아간다.
