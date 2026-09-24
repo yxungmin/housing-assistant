@@ -205,11 +205,11 @@ export interface AnnouncementMatch {
  * "확인 필요"로만 보여서 자격이 되는 사람에게 공고를 숨기게 된다. 그 오류는 아무도 신고하지 않는다.
  * 검수 여부는 화면에서 사실대로 알리고(자동 확인 / 사람 확인), 판정 자체는 있는 값으로 한다.
  */
-function evaluateRule(rule: EligibilityRule, profile: UserProfile): RuleResult {
+function evaluateRule(rule: EligibilityRule, profile: UserProfile, today?: Date): RuleResult {
   const app = applies(rule.applies_to, profile);
   if (app === false) return { rule, status: "MATCH", skipped: true, reason: "내 가구 유형에는 해당하지 않는 조건이에요" };
   if (app === null) return { rule, status: "NEEDS_CHECK", skipped: false, reason: "가구원 수·맞벌이 여부를 입력하면 판별할 수 있어요" };
-  const actual = profileValueFor(rule.category, profile, rule.unit);
+  const actual = profileValueFor(rule.category, profile, rule.unit, today);
   if (actual === undefined || actual === null) {
     return { rule, status: "NEEDS_CHECK", skipped: false, reason: "입력하면 판별할 수 있어요" };
   }
@@ -299,7 +299,11 @@ function marriageIsTheTarget(track: SupplyTrack): SupplyTrack {
   return { ...track, rules };
 }
 
-export function matchTrack(input: SupplyTrack, profile: UserProfile): TrackResult {
+/**
+ * @param today 나이·혼인 기간 같은 날짜 계산의 기준. 안 주면 지금.
+ *   같은 입력이면 같은 결과가 나와야 메모·테스트가 된다 — 엔진 안에서 new Date()를 부르면 날이 바뀔 때 결과가 조용히 바뀐다 (2026-09-24 감사).
+ */
+export function matchTrack(input: SupplyTrack, profile: UserProfile, today?: Date): TrackResult {
   const track = marriageIsTheTarget(input);
   const byGroup = new Map<string, EligibilityRule[]>();
   for (const rule of track.rules) {
@@ -309,7 +313,7 @@ export function matchTrack(input: SupplyTrack, profile: UserProfile): TrackResul
   }
   const groups: GroupResult[] = [];
   for (const group of track.rule_groups) {
-    const rules = markMissingIncomeRow((byGroup.get(group.id) ?? []).map((r) => evaluateRule(r, profile)), profile);
+    const rules = markMissingIncomeRow((byGroup.get(group.id) ?? []).map((r) => evaluateRule(r, profile, today)), profile);
     // applies_to로 건너뛴 룰은 집계에서 제외한다. 그룹 전체가 건너뛰어졌으면 그룹도 제외.
     const counted = rules.filter((r) => !r.skipped);
     if (counted.length === 0 && rules.length > 0) {
@@ -337,7 +341,7 @@ export function matchTrack(input: SupplyTrack, profile: UserProfile): TrackResul
   // 정의되지 않은 그룹을 가리키는 룰은 스키마 검증에서 걸러지지만, 방어적으로 all_of로 취급한다.
   for (const [groupId, rules] of byGroup) {
     if (track.rule_groups.some((g) => g.id === groupId)) continue;
-    const evaluated = rules.map((r) => evaluateRule(r, profile)).filter((r) => !r.skipped);
+    const evaluated = rules.map((r) => evaluateRule(r, profile, today)).filter((r) => !r.skipped);
     if (evaluated.length === 0) continue;
     groups.push({
       group: { id: groupId, mode: "all_of", label: groupId },
@@ -389,6 +393,8 @@ export interface MatchOptions {
   announcement_region?: string;
   /** 공고 제목. 공급 유형(영구임대 등)을 가리는 데 쓴다 — 유형 코드는 영구임대와 장기전세를 한데 묶는다 (statusGuard 참고). */
   announcement_title?: string;
+  /** 나이·혼인 기간 계산의 기준 날짜. 안 주면 지금. 테스트와 메모는 고정값을 준다 */
+  today?: Date;
 }
 
 /**
@@ -681,13 +687,13 @@ export function matchAnnouncement(
   // 빠진 조건은 트랙끼리 비교해야 보인다 — 트랙 하나만 들여다봐서는 없는 것을 알 수 없다
   const missing = missingCategories(extraction);
   const tracks = extraction.tracks
-    .map((t) => matchTrack(t, profile))
+    .map((t) => matchTrack(t, profile, options.today))
     .map((t) => regionGuard(t, profile, options.announcement_region))
     .map(incomeGuard)
     .map((t, i) => siblingGuard(t, missing[i] ?? []))
     .map((t) => statusGuard(t, profile, options.announcement_title))
     // 순위가 자격을 대신한 추출을 막는다 (rank.ts rankGuard)
-    .map((t) => rankGuard(t, profile));
+    .map((t) => rankGuard(t, profile, options.today));
   const byFit = (a: TrackResult, b: TrackResult) => b.summary.matched - a.summary.matched || a.summary.needs_check - b.summary.needs_check;
   const clean = tracks.filter((t) => t.summary.mismatched === 0).sort(byFit);
   // 거주 요건을 확인 못 한 트랙은 후보에서 뺀다.

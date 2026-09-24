@@ -30,11 +30,11 @@ export interface RankEstimate {
   apply_date?: string;
 }
 
-function evaluate(c: RankCondition, profile: UserProfile): Status {
+function evaluate(c: RankCondition, profile: UserProfile, today?: Date): Status {
   const app = applies(c.applies_to, profile);
   if (app === false) return "SKIP";
   if (app === null) return "NEEDS_CHECK";
-  const actual = profileValueFor(c.category, profile, c.unit);
+  const actual = profileValueFor(c.category, profile, c.unit, today);
   if (actual === undefined || actual === null) return "NEEDS_CHECK";
   return compare(actual, c.operator, c.value) ? "MATCH" : "MISMATCH";
 }
@@ -45,21 +45,21 @@ function evaluate(c: RankCondition, profile: UserProfile): Status {
  * 어긋난 것으로 세면 all_of에서 아무도 이 순위가 못 된다. 전부 해당하지 않으면 이 순위가 아니다.
  * 조건이 애초에 없는 순위는 "나머지"라 늘 맞는다.
  */
-function rankStatus(r: PriorityRank, profile: UserProfile): Status {
+function rankStatus(r: PriorityRank, profile: UserProfile, today?: Date): Status {
   if (r.conditions.length === 0) return "MATCH";
-  const s = r.conditions.map((c) => evaluate(c, profile)).filter((x) => x !== "SKIP");
+  const s = r.conditions.map((c) => evaluate(c, profile, today)).filter((x) => x !== "SKIP");
   if (s.length === 0) return "MISMATCH";
   if (r.mode === "any_of") return s.includes("MATCH") ? "MATCH" : s.includes("NEEDS_CHECK") ? "NEEDS_CHECK" : "MISMATCH";
   return s.includes("MISMATCH") ? "MISMATCH" : s.includes("NEEDS_CHECK") ? "NEEDS_CHECK" : "MATCH";
 }
 
 /** 순위 기준이 없는 트랙(추첨만 하는 공급)은 null */
-export function expectedRank(track: Pick<SupplyTrack, "priority_ranks">, profile: UserProfile): RankEstimate | null {
+export function expectedRank(track: Pick<SupplyTrack, "priority_ranks">, profile: UserProfile, today?: Date): RankEstimate | null {
   const ranks = [...(track.priority_ranks ?? [])].sort((a, b) => a.rank - b.rank);
   if (ranks.length === 0) return null;
   const undecided: number[] = [];
   for (const r of ranks) {
-    const s = rankStatus(r, profile);
+    const s = rankStatus(r, profile, today);
     if (s === "MATCH") {
       return { rank: r.rank, label: r.label, certain: undecided.length === 0, undecided, ...(r.apply_date ? { apply_date: r.apply_date } : {}) };
     }
@@ -99,9 +99,9 @@ export const RANK_VS_PAST_LABEL: Record<RankVsPast, string> = {
  * 앞 순위를 입력이 없어 못 가린 사람(certain: false)에게는 얹지 않는다. 입력하면 어느 순위인지 드러난다.
  * 조건 없는 "나머지" 순위가 있는 공고는 누구나 어느 순위엔가 들어가므로 여기에 걸리지 않는다.
  */
-export function rankGuard(track: TrackResult, profile: UserProfile): TrackResult {
+export function rankGuard(track: TrackResult, profile: UserProfile, today?: Date): TrackResult {
   if (!track.track.priority_ranks?.length || track.status_guarded) return track;
-  const est = expectedRank(track.track, profile);
+  const est = expectedRank(track.track, profile, today);
   if (!est || est.rank !== null || !est.certain) return track;
   const guard: RuleResult = {
     rule: {
