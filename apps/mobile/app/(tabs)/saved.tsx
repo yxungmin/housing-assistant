@@ -33,12 +33,20 @@ export default function Saved() {
     [state.profile, state.saved, list],
   );
   const changed = items.filter((m) => unseenChange(state.changes, m.announcement.id));
+  // 마감 7일 뒤 서버가 목록에서 내린 관심 공고. 조용히 사라지면 "관심에 넣었는데 없어졌다"가 된다 — 어디 갔는지 말한다
+  const gone = state.saved.filter((id) => !list.some((a) => a.id === id)).map((id) => state.pinned[id]?.title).filter((t): t is string => !!t);
   // 아직 시작 안 한 공고에 "곧 끝나요"를 띄우지 않는다
   const nearest = items.find((m) => closesWithin(applyPhase(m.announcement), 3));
 
   return (
     <Screen onRefresh={refresh} refreshing={refreshing}>
       <PageTitle title={items.length > 0 ? `관심 공고 ${items.length}개` : "관심 공고"} sub={items.length > 0 ? "알림을 켜면 접수 마감 3일 전에 알려드려요" : undefined} />
+      {gone.length > 0 ? (
+        <Notice tone="info" icon="info">
+          {gone.length === 1 ? `${gone[0]}은(는) 접수가 끝나 목록에서 내려갔어요.` : `관심 공고 ${gone.length}개는 접수가 끝나 목록에서 내려갔어요.`}
+          {state.applied.some((id) => !list.some((a) => a.id === id)) ? " 신청했다고 표시한 공고는 발표일에 알려드려요." : ""}
+        </Notice>
+      ) : null}
       {changed.length > 0 ? (
         <Notice tone="info" icon="bell">
           {changed.length === 1 ? `${changed[0]!.announcement.title} 정보가 바뀌었어요` : `관심 공고 ${changed.length}개의 정보가 바뀌었어요`}

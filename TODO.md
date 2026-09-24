@@ -312,7 +312,10 @@
 - [ ] **번들 82%가 죽은 무게** — announcements.json 1.2 MB(정리 안 하면 690 KB). units 배열이 566 KB이고 014 한 건이 480 KB:
       집 420채가 주소 119곳인데 집마다 nearby·transit 사본을 들고 있다. 주소별로 한 번만 두고 집이 가리키게 바꾸면 크게 준다.
       스키마·lib/units.ts·화면이 같이 바뀌어 결정 필요.
-- [ ] **UX P1** 알림 탭해도 공고가 안 열림(`data.announcementId` 읽는 곳 없음) · 딥링크 콜드스타트 뒤 뒤로가기가 앱 종료(`unstable_settings`, 맨 `router.back()` 6곳) ·
+- [x] **UX P1 (2026-09-24 처리)** 알림 탭→공고 열기 · 딥링크 뒤로가기(`unstable_settings`+`goBackOrHome`) · 토스트를 Screen overlay로 · 시트 키보드 · 중첩 스크롤 ·
+      만료 유료자 가격 표시(`recordFirstMonth`) · 로그인→구독 시트 자동 · 온보딩 백키 · 홈 "기준" 날짜 · 신청 공고 일정 사본(`pinned`)으로 발표 알림 유지.
+      원래 목록 —
+      알림 탭해도 공고가 안 열림(`data.announcementId` 읽는 곳 없음) · 딥링크 콜드스타트 뒤 뒤로가기가 앱 종료(`unstable_settings`, 맨 `router.back()` 6곳) ·
       토스트가 ScrollView 안(화면 밖에 뜸) · 안드로이드 중첩 ScrollView 안 스크롤(집 목록 시트) · 시트 안 키보드가 입력 덮음 ·
       유료 만료자를 "구독 전·첫 달 0원"으로(스토어는 정가) · 로그인→구독 두 번 묻기, "로그인하면 첫 달 0원" 문구 거짓 ·
       하드웨어 백키가 온보딩 진행 버림 · 신청 완료 공고가 목록에서 빠지면 발표일 알림도 사라짐 · 오프라인인데 "오늘 기준"

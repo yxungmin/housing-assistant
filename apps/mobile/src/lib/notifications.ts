@@ -75,12 +75,23 @@ export async function requestNotificationPermission(): Promise<boolean> {
  * 마감과 발표를 한 번에 거는 이유: 예약을 `cancelAll`로 지우고 다시 걸기 때문에
  * 종류별로 나눠 부르면 나중에 부른 쪽이 앞의 것을 지운다.
  */
-export async function syncReminders(
+/**
+ * 예약 갱신은 한 번에 하나만. 켤 때 목록이 번들 → 캐시 → 서버로 세 번 바뀌면서 이 함수가 겹쳐 불렸고,
+ * "전부 지우고 다시 건다"가 겹치면 같은 알림이 두 번 걸릴 수 있었다 (2026-09-24 감사). 앞 것이 끝난 뒤 시작한다.
+ */
+let queue: Promise<unknown> = Promise.resolve();
+export function syncReminders(
   items: ReminderItem[],
   enabled: boolean,
   /** 첫 결제 고지도 같은 예약에 실어야 한다. 따로 걸면 cancelAll에 지워진다 */
   billing: { chargeAt?: string | null; priceText?: string } = {},
 ): Promise<number> {
+  const run = queue.then(() => syncRemindersNow(items, enabled, billing));
+  queue = run.catch(() => 0);
+  return run;
+}
+
+async function syncRemindersNow(items: ReminderItem[], enabled: boolean, billing: { chargeAt?: string | null; priceText?: string }): Promise<number> {
   if (!native) return 0;
   try {
     const Notifications = await mod();

@@ -59,6 +59,21 @@ export interface AppState {
   inbox: AppNotification[];
   /** 목록에 떴던 공고와 아직 안 연 새 공고 (lib/unseen.ts) */
   seen: SeenState;
+  /**
+   * 관심·신청 공고의 일정 사본. 서버는 접수 마감 7일 뒤 공고를 목록에서 내리는데, 당첨자 발표는 보통 그 몇 주 뒤다.
+   * 목록만 보고 알림을 걸면 그때 발표 알림이 조용히 사라졌다 (2026-09-24 감사). 관심·신청을 켤 때의 일정을 여기 남겨 두고
+   * 목록에서 내려간 뒤에도 그걸로 알림을 건다. 관심·신청을 끄면 지운다.
+   */
+  pinned: Record<string, PinnedSchedule>;
+}
+
+/** 알림에 필요한 만큼만 — 프로필도, 조건도 아니다 */
+export interface PinnedSchedule {
+  title: string;
+  apply_end?: string;
+  winner_announce?: string;
+  documents_announce?: string;
+  documents_end?: string;
 }
 
 type Action =
@@ -70,6 +85,8 @@ type Action =
   | { type: "consentSent"; termsVersion: string }
   | { type: "toggleSaved"; id: string }
   | { type: "toggleApplied"; id: string }
+  /** 목록에 있는 관심·신청 공고의 일정을 사본에 맞춘다. 같으면 상태를 바꾸지 않는다 */
+  | { type: "rememberSchedules"; items: Record<string, PinnedSchedule> }
   | { type: "setSubscription"; subscription: Subscription }
   | { type: "setTheme"; pref: ThemePref }
   | { type: "setNotifications"; on: boolean; pushToken?: string | null }
@@ -100,7 +117,14 @@ const initial: AppState = {
   changes: [],
   inbox: [],
   seen: emptySeen,
+  pinned: {},
 };
+
+/** 관심도 신청도 아닌 공고의 사본은 지운다 */
+function prunePinned(pinned: Record<string, PinnedSchedule>, saved: string[], applied: string[]): Record<string, PinnedSchedule> {
+  const keep = Object.fromEntries(Object.entries(pinned).filter(([id]) => saved.includes(id) || applied.includes(id)));
+  return Object.keys(keep).length === Object.keys(pinned).length ? pinned : keep;
+}
 
 function reducer(s: AppState, a: Action): AppState {
   switch (a.type) {
@@ -124,10 +148,24 @@ function reducer(s: AppState, a: Action): AppState {
     case "signOut":
       // 프로필·저장 목록은 기기에 남긴다. 로그아웃이 입력한 걸 지우는 일이 되면 안 된다.
       return { ...s, account: null };
-    case "toggleSaved":
-      return { ...s, saved: s.saved.includes(a.id) ? s.saved.filter((x) => x !== a.id) : [...s.saved, a.id] };
-    case "toggleApplied":
-      return { ...s, applied: s.applied.includes(a.id) ? s.applied.filter((x) => x !== a.id) : [...s.applied, a.id] };
+    case "toggleSaved": {
+      const saved = s.saved.includes(a.id) ? s.saved.filter((x) => x !== a.id) : [...s.saved, a.id];
+      return { ...s, saved, pinned: prunePinned(s.pinned, saved, s.applied) };
+    }
+    case "toggleApplied": {
+      const applied = s.applied.includes(a.id) ? s.applied.filter((x) => x !== a.id) : [...s.applied, a.id];
+      return { ...s, applied, pinned: prunePinned(s.pinned, s.saved, applied) };
+    }
+    case "rememberSchedules": {
+      let changed = false;
+      const pinned = { ...s.pinned };
+      for (const [id, item] of Object.entries(a.items)) {
+        if (JSON.stringify(pinned[id]) === JSON.stringify(item)) continue;
+        pinned[id] = item;
+        changed = true;
+      }
+      return changed ? { ...s, pinned } : s;
+    }
     case "setSubscription": {
       // 첫 달 무료는 한 번뿐이다. 어느 경로로 구독을 바꾸든 여기서 기록을 지킨다 (lib/billing.ts recordFirstMonth) —
       // 호출부마다 챙기게 두면 한 군데만 빠져도 무료 달이 다시 생긴다.
@@ -252,6 +290,8 @@ interface Ctx {
   deleteAccount: () => Promise<void>;
   toggleSaved: (id: string) => void;
   toggleApplied: (id: string) => void;
+  /** 목록에 있는 관심·신청 공고의 일정을 사본에 맞춘다 (알림용) */
+  rememberSchedules: (items: Record<string, PinnedSchedule>) => void;
   setSubscription: (subscription: Subscription) => void;
   setTheme: (pref: ThemePref) => void;
   setNotifications: (on: boolean, pushToken?: string | null) => void;
@@ -288,6 +328,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       // 이 필드가 생기기 전에 깔린 기기에는 applied가 없다
       if (!parsedMeta.applied) parsedMeta.applied = [];
       if (!parsedMeta.seen) parsedMeta.seen = emptySeen;
+      if (!parsedMeta.pinned) parsedMeta.pinned = {};
       // meta가 지워졌어도 첫 달 기록이 남아 있으면 되살린다
       if (firstMonth) {
         const sub = parsedMeta.subscription ?? { status: "none" as const };
@@ -300,8 +341,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (!state.loaded) return;
     void write(KEYS.profile, state.profile ? JSON.stringify(state.profile) : null);
-    const { onboarded, account, saved, applied, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox } = state;
-    writeMeta(JSON.stringify({ onboarded, account, saved, applied, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox }));
+    const { onboarded, account, saved, applied, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox, pinned } = state;
+    writeMeta(JSON.stringify({ onboarded, account, saved, applied, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox, pinned }));
     // 한 번 쓰면 지우지 않는다 — 여기서 null을 쓰면 위 주석의 보호가 통째로 없어진다
     if (subscription.firstMonthUsedAt) void write(KEYS.firstMonth, subscription.firstMonthUsedAt);
   }, [state]);
@@ -466,6 +507,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       agreeTerms: () => dispatch({ type: "agreeTerms", consent: newConsent() }),
       toggleSaved: (id) => dispatch({ type: "toggleSaved", id }),
       toggleApplied: (id) => dispatch({ type: "toggleApplied", id }),
+      rememberSchedules: (items) => dispatch({ type: "rememberSchedules", items }),
       setSubscription: (subscription) => dispatch({ type: "setSubscription", subscription }),
       setTheme: (pref) => dispatch({ type: "setTheme", pref }),
       setNotifications: (on, pushToken) => dispatch({ type: "setNotifications", on, pushToken }),

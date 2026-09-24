@@ -10,7 +10,7 @@ import { changeSummary } from "@/lib/changes";
 import { chargeDate } from "@/lib/billing";
 import { usePrice } from "@/data/price";
 import { notifyChange, setupNotificationHandler, subscribeNotificationTaps, syncReminders } from "@/lib/notifications";
-import { AppStateProvider, useAppState } from "@/store/appState";
+import { AppStateProvider, useAppState, type PinnedSchedule } from "@/store/appState";
 import { TermsUpdateSheet } from "@/components/TermsUpdateSheet";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 
@@ -75,9 +75,9 @@ function Root() {
  * 푸시 토큰이 있으면 내 지역·관심 유형을 서버에 등록한다 (프로필은 보내지 않는다).
  */
 function useReminderSync() {
-  const { state } = useAppState();
+  const { state, rememberSchedules } = useAppState();
   const { list } = useAnnouncements();
-  const { saved, applied, notifications, pushToken, loaded, subscription } = state;
+  const { saved, applied, notifications, pushToken, loaded, subscription, pinned } = state;
   // 첫 결제 3일 전 고지. 체험 중이고 해지하지 않았을 때만 값이 나온다 (chargeDate)
   const chargeAt = chargeDate(subscription);
   // 고지의 금액도 스토어 가격이 먼저다 — 실제로 긁힐 금액을 알려야 고지다
@@ -85,21 +85,29 @@ function useReminderSync() {
   const region = state.profile?.region_code;
   useEffect(() => {
     if (!loaded) return;
-    // 관심(마감)과 신청함(발표)을 한 번에 넘긴다 — 예약은 지우고 다시 거는 방식이라 나눠 부르면 서로를 지운다
-    const items = list
-      .filter((a) => saved.includes(a.id) || applied.includes(a.id))
-      .map((a) => ({
-        id: a.id,
+    // 목록에 있는 관심·신청 공고의 일정을 사본에 남긴다. 목록에서 내려간 뒤에도 발표 알림을 걸 수 있게
+    const snapshots: Record<string, PinnedSchedule> = {};
+    for (const a of list) {
+      if (!saved.includes(a.id) && !applied.includes(a.id)) continue;
+      snapshots[a.id] = {
         title: a.title,
         apply_end: a.apply_end,
         winner_announce: a.extraction.schedule.winner_announce,
         documents_announce: a.extraction.schedule.documents_announce,
         documents_end: a.extraction.schedule.documents_end,
-        saved: saved.includes(a.id),
-        applied: applied.includes(a.id),
-      }));
+      };
+    }
+    if (Object.keys(snapshots).length) rememberSchedules(snapshots);
+
+    // 관심(마감)과 신청함(발표)을 한 번에 넘긴다 — 예약은 지우고 다시 거는 방식이라 나눠 부르면 서로를 지운다.
+    // 목록에 없는 공고(마감 뒤 서버가 내렸다)는 사본으로 건다 — 발표는 마감 몇 주 뒤라 그때 목록에는 없다.
+    const ids = [...new Set([...saved, ...applied])];
+    const items = ids.flatMap((id) => {
+      const s = snapshots[id] ?? pinned[id];
+      return s ? [{ id, ...s, saved: saved.includes(id), applied: applied.includes(id) }] : [];
+    });
     void syncReminders(items, notifications, { chargeAt, priceText: price });
-  }, [loaded, list, saved, applied, notifications, chargeAt, price]);
+  }, [loaded, list, saved, applied, pinned, notifications, chargeAt, price, rememberSchedules]);
   useEffect(() => {
     if (!loaded || !notifications || !pushToken || !region) return;
     void registerPushSubscription(pushToken, [region], ["happy", "national_rental", "purchased_rental", "long_term_rental", "newlywed_hope", "public_sale", "other"]).catch(() => false);
