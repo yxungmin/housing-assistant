@@ -10,7 +10,7 @@ import { SignInButtons } from "@/components/SignIn";
 import { canSeeAnnouncement } from "@/lib/access";
 import { SourceCard } from "@/components/SourceCard";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
-import { animateLayout, LockNote, BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
+import { animateLayout, InfoTip, LockNote, BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
 import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
 import { userFacingNotes } from "@/lib/notes";
@@ -238,19 +238,39 @@ export default function AnnouncementDetail() {
         ) : a.checks?.length ? (
           // 자동 검증에서 걸린 것은 숨기지 않는다. "가격 정보 없음" 같은 것이 여기 뜬다.
           <Notice tone="warn" icon="alert">자동 검증에서 확인할 점 — {a.checks.join(" · ")}. 공고문을 함께 봐 주세요.</Notice>
-        ) : a.status === "AUTO" ? (
-          <Notice tone="info" icon="info">공고문에서 자동으로 옮긴 조건이에요. 사람이 아직 확인하지 않았어요.</Notice>
         ) : null}
+        {/*
+          자동으로 옮긴 공고(AUTO)는 위 배너로 알리지 않는다. 지금은 거의 모든 공고가 AUTO라 파란 배너가 늘 떠 있었고,
+          늘 뜨는 배너는 곧 안 읽힌다 — 그러면 정말 봐야 하는 주황 배너까지 같이 넘긴다.
+          배너 자리는 문제가 있을 때(못 읽음·자동 검증 지적)만 쓰고, 옮긴 방법은 조건 카드 안에서 한 줄로 말한다.
+        */}
 
         {track ? (
           <View style={{ gap: 12 }}>
-            <SectionTitle right="쪽수는 공고문 기준">{track.track.name}</SectionTitle>
+            <SectionTitle>{track.track.name}</SectionTitle>
             <Card style={{ gap: 4, paddingVertical: 12, paddingHorizontal: 16 }}>
               <View style={{ paddingHorizontal: 4, paddingVertical: 8 }}>
                 <T variant="heading">
                   조건 {counts.total}개 중 <T variant="heading" color={colors.primary}>{counts.matched}개 일치</T>
                   {counts.needsCheck ? <T variant="heading" color={colors.text3}> · 확인 {counts.needsCheck}</T> : null}
                 </T>
+                {/*
+                  무엇을 안 했는지가 아니라 무엇을 했고 어떻게 확인하는지를 말한다.
+                  전에는 "사람이 아직 확인하지 않았어요"였다 — 사실이지만 "그럼 믿지 말라는 건가"로 읽혔다.
+                  사실은 줄이지 않는다: 자동으로 옮겼다는 것과 틀릴 수 있다는 것은 (i) 안에 그대로 있다.
+                */}
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 5, marginTop: 6 }}>
+                  <Icon name={a.status === "VERIFIED" ? "check-circle" : "document"} size={14} color={a.status === "VERIFIED" ? colors.primary : colors.text3} />
+                  <Sub tone="3" variant="caption" style={{ flexShrink: 1 }}>
+                    {a.status === "VERIFIED" ? "공고문과 한 줄씩 대조했어요" : "공고문에서 옮긴 조건이에요"}
+                  </Sub>
+                  {a.status === "VERIFIED" ? null : (
+                    <InfoTip
+                      label="조건을 옮긴 방법"
+                      text="공고문을 자동으로 읽어 옮겼어요. 옮기는 과정에서 틀릴 수 있어서 줄마다 공고문 쪽수를 달아 두었어요. 다르면 그 줄을 눌러 알려 주세요. 사람이 공고문과 대조를 마친 공고에는 '한 줄씩 대조했어요'가 붙어요."
+                    />
+                  )}
+                </View>
               </View>
               {track.groups.map((g) => {
                 const rules = g.rules.filter((r) => !r.skipped);
