@@ -54,5 +54,8 @@ jobs:
           # 없으면 꺼짐. 켜지 않으면 목록·신규 판정까지만 하고 LLM 호출이 없다.
           EXTRACTION_ENABLED: ${{ vars.EXTRACTION_ENABLED || 'false' }}
           MAX_ANNOUNCEMENTS_PER_RUN: ${{ vars.MAX_ANNOUNCEMENTS_PER_RUN || '10' }}
+          # 새 공고 푸시. 없으면 꺼짐 — 대상만 센다
+          PUSH_ENABLED: ${{ vars.PUSH_ENABLED || 'false' }}
+          EXPO_ACCESS_TOKEN: ${{ secrets.EXPO_ACCESS_TOKEN }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ] || [ "${{ steps.secrets.outputs.ready }}" = "dry" ]; then npm run collect:dry; else npm run collect; fi

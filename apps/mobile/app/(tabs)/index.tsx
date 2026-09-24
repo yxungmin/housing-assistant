@@ -242,8 +242,9 @@ export default function Home() {
               {outsideService
                 ? `지금은 ${SERVICE_REGION_LABEL} 공고만 모으고 있어요.`
                 : state.notifications
-                  ? "조건에 맞는 공고가 새로 올라오면 알려드릴게요."
-                  : "새 공고 알림을 켜 두면 조건에 맞는 공고가 올라올 때 알려드려요."}
+                  // 푸시는 지역·유형 기준이다 — 소득·자산은 기기에만 있어 서버가 "조건에 맞는지"를 모른다. 아는 만큼만 약속한다
+                  ? "내 지역에 새 공고가 올라오면 알려드릴게요. 맞는지는 열어서 확인해 주세요."
+                  : "새 공고 알림을 켜 두면 내 지역에 공고가 올라올 때 알려드려요."}
             </Sub>
             {!outsideService && !state.notifications ? (
               <PrimaryButton tone="soft" label="알림 켜기" onPress={() => router.push("/profile")} />

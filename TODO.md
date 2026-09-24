@@ -1245,7 +1245,7 @@ LH·SH·GH·HUG 공고를 지도로 보여 주는 앱 하나를 화면 녹화로
 
 - [ ] 스토어 결제 구현 (RevenueCat 또는 react-native-iap) — 지금은 `src/lib/billing.ts`의 로컬 목
 - [ ] 영수증 검증 Edge Function → `subscriptions` 테이블이 진실 원본
-- [ ] 신규 공고 푸시 발송 Edge Function (M7)
+- [x] 신규 공고 푸시 발송 (2026-09-24) — Edge Function이 아니라 수집기가 게시 직후 보낸다(`collector/src/push/expo.ts`). `PUSH_ENABLED=true`일 때만, 100건 묶음, 죽은 토큰(DeviceNotRegistered) 정리
 - [ ] 통근 시간 API (Edge Function 프록시)
 - [ ] Google Play 개발자 등록 ($25 일회성)
 - [ ] Apple Developer Program ($99/년) — iOS를 낼 경우

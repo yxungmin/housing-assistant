@@ -10,7 +10,8 @@
  * 비용은 추출한 공고 수에 비례한다. COLLECT_REGIONS로 지역을 좁히면 그만큼 줄어든다 (기본 서울·경기).
  */
 import { loadEnv, requireEnv } from "./config";
-import { enrichAnnouncement } from "./enrich-announcement";
+import { districtLabel, enrichAnnouncement } from "./enrich-announcement";
+import { newAnnouncementMessage, sendExpoPush } from "./push/expo";
 import { Repo } from "./db/supabase";
 import { LhClient, resolveImages } from "./lh/api";
 import { extractFromText } from "./llm/extract";
@@ -148,9 +149,21 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
     await repo.upsertAnnouncement({ provider: notice.provider, lh_id: notice.external_id, title: notice.title, housing_type: notice.housing_type, region_code: notice.region_code, ...cols });
   }
   log(`  v${version} ${status}${blocking.length ? `: ${blocking.join(" / ")}` : ""}`);
-  if (isNew) {
+  // 새 공고 푸시: 게시된 것만, 그 지역·유형을 구독한 토큰에 한 번. 꺼져 있으면 대상만 센다 (push/expo.ts)
+  if (isNew && !blocking.length) {
     const tokens = await repo.pushTargets(notice.region_code, notice.housing_type);
-    log(`  푸시 대상 ${tokens.length}명 (발송은 검수 VERIFIED 후 — TODO M7)`);
+    if (!env.PUSH_ENABLED) log(`  푸시 대상 ${tokens.length}명 — PUSH_ENABLED=false라 보내지 않음`);
+    else if (tokens.length) {
+      const regionName = districtLabel(notice.region_code, address);
+      const r = await sendExpoPush(tokens.map((t) => newAnnouncementMessage(t, { id: announcementId, title: notice.title, regionName })), { accessToken: env.EXPO_ACCESS_TOKEN }).catch((e: unknown) => {
+        log(`  푸시 실패: ${e instanceof Error ? e.message : String(e)}`);
+        return null;
+      });
+      if (r) {
+        if (r.dead.length) await repo.removePushTokens(r.dead).catch(() => {});
+        log(`  푸시 ${r.sent}명 발송${r.failed ? ` · 실패 ${r.failed}` : ""}${r.dead.length ? ` · 죽은 토큰 ${r.dead.length} 정리` : ""}${r.errors.length ? ` · ${[...new Set(r.errors)].join(", ")}` : ""}`);
+      }
+    }
   }
   return isNew ? "new" : "modified";
 }

@@ -303,4 +303,11 @@ export class Repo {
     if (error) throw error;
     return (data as { expo_token: string }[]).map((d) => d.expo_token);
   }
+
+  /** 죽은 토큰(DeviceNotRegistered)을 지운다. 계속 보내면 Expo가 계정을 제한한다 */
+  async removePushTokens(tokens: string[]): Promise<void> {
+    if (tokens.length === 0) return;
+    const { error } = await this.sb.from("push_subscriptions").delete().in("expo_token", tokens);
+    if (error) throw error;
+  }
 }

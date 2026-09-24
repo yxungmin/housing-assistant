@@ -27,6 +27,16 @@ const Env = z.object({
   /** 서울시 대중교통 환승경로 (공공데이터포털). 통근 시간 계산용 */
   TRANSIT_API_KEY: z.string().optional(),
   /**
+   * 새 공고 푸시 발송 스위치. **기본값은 꺼짐** — 바깥으로 나가는 일은 명시적인 행동이어야 한다.
+   * 꺼져 있으면 대상 수만 로그에 남긴다. 켜려면 .env나 Actions 변수에 PUSH_ENABLED=true.
+   */
+  PUSH_ENABLED: z
+    .string()
+    .default("false")
+    .transform((v) => v.toLowerCase() === "true" || v === "1"),
+  /** Expo Push API 접근 토큰 (선택). 계정에서 "Enhanced Security"를 켰을 때만 필요하다 */
+  EXPO_ACCESS_TOKEN: z.string().optional(),
+  /**
    * 추출 모델. 벤치마크로 바꿔가며 비교한다.
    * 기본은 Opus 5.5 (2026-09-24): 단가가 Opus 5보다 싸고($4/$20 vs $5/$25) 시험 추출 2건에서 품질이 같거나 나았다.
    * 전체 벤치마크는 아직 돌리지 않았다 (TODO).

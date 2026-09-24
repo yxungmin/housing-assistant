@@ -38,7 +38,7 @@
   불일치가 아니라 확인 필요다. 자녀가 0명이라고 답했으면 0명으로 본다. 가산된 상한을 별도 룰로 만들지 않는다.
   v6는 그 밖에 접수 방법(`application`, 인터넷 불가면 "신청하기"를 띄우지 않는다)·서류 일정(`schedule.documents_*`)·거주 기간(트랙 `residence`)을 받는다.
   룰의 `verified`(사람 검수 여부)는 판정에 쓰지 않는다 — 검수 전이라고 숨기면 자격이 되는 사람에게 공고를 감추게 된다. 화면이 사실대로 알린다.
-- `collector` 기관 목록 → PDF → 텍스트/섹션 → Claude 구조화 추출(`llm/extract.ts`) → `autoChecks` → Supabase(`db/supabase.ts`, 버저닝). 기관 어댑터는 `sources.ts` 한 곳(LH는 공공데이터포털 API, SH는 게시판 HTML 파싱 `sh/api.ts`). 수집 범위는 `COLLECT_PROVIDERS`·`COLLECT_REGIONS`(기본 LH,SH / 서울·경기)로 줄여 비용을 통제한다.
+- `collector` 기관 목록 → PDF → 텍스트/섹션 → Claude 구조화 추출(`llm/extract.ts`) → `autoChecks` → Supabase(`db/supabase.ts`, 버저닝) → 게시된 새 공고면 Expo 푸시(`push/expo.ts`, `PUSH_ENABLED` 기본 꺼짐, 죽은 토큰 정리). 기관 어댑터는 `sources.ts` 한 곳(LH는 공공데이터포털 API, SH는 게시판 HTML 파싱 `sh/api.ts`). 수집 범위는 `COLLECT_PROVIDERS`·`COLLECT_REGIONS`(기본 LH,SH / 서울·경기)로 줄여 비용을 통제한다.
 - `supabase/functions/transit` 흩어진 집까지의 대중교통 소요를 카카오에 물어 캐시한다(`commute_cache`).
   앱이 직접 못 부르는 이유는 REST 키를 앱에 넣을 수 없어서고, 미리 계산 못 하는 이유는
   집 주소 176곳 × 시군구 56곳 = 9,856회인데 하루 한도가 1,000회라서다. 고른 집 하나만 부르면 1회다.
