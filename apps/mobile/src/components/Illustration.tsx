@@ -1,4 +1,4 @@
-import Svg, { Circle, Line, Path, Rect } from "react-native-svg";
+import Svg, { Circle, G, Line, Path, Rect } from "react-native-svg";
 import { useTheme } from "@/theme/ThemeProvider";
 
 /**
@@ -30,7 +30,7 @@ export function Illustration({ name, width = 220 }: { name: IllustrationName; wi
     // 집 세 채, 가운데만 켜졌다. 돋보기가 그 집 위에.
     const house = (x: number, roof: string, body: string, win: string) => (
       <>
-        <Path d={`M${x - 32} 96 L${x} 66 L${x + 32} 96 Q${x + 34} 100 ${x + 29} 101 L${x - 29} 101 Q${x - 34} 100 ${x - 32} 96 Z`} fill={roof} />
+        <Path d={`M${x - 32} 96 L${x - 5} 70 Q${x} 65 ${x + 5} 70 L${x + 32} 96 Q${x + 34} 100 ${x + 29} 101 L${x - 29} 101 Q${x - 34} 100 ${x - 32} 96 Z`} fill={roof} />
         <Rect x={x - 26} y={100} width={52} height={44} rx={7} fill={body} />
         <Rect x={x - 8} y={112} width={16} height={16} rx={4} fill={win} />
       </>
@@ -52,7 +52,7 @@ export function Illustration({ name, width = 220 }: { name: IllustrationName; wi
       <Svg {...props}>
         <Rect x={118} y={40} width={20} height={20} rx={10} fill={c.greenSoft} />
         <Path d="M128 52 C96 52 82 80 82 112 L82 128 Q76 138 66 146 Q62 150 68 150 L188 150 Q194 150 190 146 Q180 138 174 128 L174 112 C174 80 160 52 128 52 Z" fill={c.greenSoft} />
-        <Path d="M108 152 Q128 176 148 152 Z" fill={c.green} />
+        <Circle cx={128} cy={158} r={10} fill={c.green} />
         <Rect x={168} y={94} width={80} height={72} rx={12} fill={c.paper} stroke={c.gray} strokeWidth={2} />
         <Path d="M168 106 Q168 94 180 94 L236 94 Q248 94 248 106 L248 118 L168 118 Z" fill={c.green} />
         <Rect x={184} y={86} width={7} height={18} rx={3.5} fill={c.gray} />
@@ -70,14 +70,18 @@ export function Illustration({ name, width = 220 }: { name: IllustrationName; wi
   // saved: 집 카드 하나와 그 오른쪽 모서리에 걸린 빈 책갈피. 카드가 캔버스를 채워야 그림으로 읽힌다 — 처음엔 60%만 써서 아이콘처럼 작았다.
   return (
     <Svg {...props}>
-      <Rect x={52} y={36} width={168} height={134} rx={18} fill={c.paper} stroke={c.gray} strokeWidth={2} />
-      <Path d="M86 92 L136 52 L186 92 Q189 97 183 98 L89 98 Q83 97 86 92 Z" fill={c.green} />
-      <Rect x={96} y={97} width={80} height={48} rx={8} fill={c.greenSoft} />
-      <Rect x={124} y={115} width={24} height={30} rx={4} fill={c.grayDeep} />
-      <Rect x={104} y={110} width={12} height={12} rx={3} fill={c.gray} />
-      <Rect x={156} y={110} width={12} height={12} rx={3} fill={c.gray} />
-      <Rect x={72} y={152} width={70} height={8} rx={4} fill={c.gray} />
-      <Path d="M196 62 L246 62 Q254 62 254 70 L254 168 L221 142 L188 168 L188 70 Q188 62 196 62 Z" fill={c.grayDeep} />
+      {/* 카드만 살짝 기울인다 — 정면으로 놓으면 픽토그램이지 그림이 아니다. 책갈피는 바로 세워 기준이 된다 */}
+      <G rotation={-4} origin="136, 103">
+        <Rect x={52} y={36} width={168} height={134} rx={18} fill={c.paper} stroke={c.gray} strokeWidth={2} />
+        <Path d="M86 92 L131 56 Q136 51 141 56 L186 92 Q189 97 183 98 L89 98 Q83 97 86 92 Z" fill={c.green} />
+        <Rect x={96} y={97} width={80} height={48} rx={8} fill={c.greenSoft} />
+        <Rect x={124} y={115} width={24} height={30} rx={4} fill={c.grayDeep} />
+        <Rect x={104} y={110} width={12} height={12} rx={3} fill={c.gray} />
+        <Rect x={156} y={110} width={12} height={12} rx={3} fill={c.gray} />
+        <Rect x={72} y={152} width={70} height={8} rx={4} fill={c.gray} />
+      </G>
+      <Path d="M196 62 L246 62 Q254 62 254 70 L254 166 Q254 171 250 168 L225 149 Q221 146 217 149 L192 168 Q188 171 188 166 L188 70 Q188 62 196 62 Z" fill={c.grayDeep} />
+      <Path d="M196 62 L246 62 Q254 62 254 70 L254 76 L188 76 L188 70 Q188 62 196 62 Z" fill={c.ink} />
       <Line x1={262} y1={48} x2={268} y2={34} stroke={c.green} strokeWidth={6} strokeLinecap="round" />
       <Line x1={272} y1={66} x2={286} y2={60} stroke={c.green} strokeWidth={6} strokeLinecap="round" />
     </Svg>
