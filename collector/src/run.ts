@@ -9,15 +9,9 @@
  *
  * 비용은 추출한 공고 수에 비례한다. COLLECT_REGIONS로 지역을 좁히면 그만큼 줄어든다 (기본 서울·경기).
  */
-import { regionByCode, type ExtractionOutput } from "@housing/schema";
 import { loadEnv, requireEnv } from "./config";
+import { enrichAnnouncement } from "./enrich-announcement";
 import { Repo } from "./db/supabase";
-import { geocodeAddress } from "./geo/kakao";
-import { isUsable, RentClient } from "./market/rent";
-import { commuteTable } from "./transit/table";
-import { KaptClient } from "./maintenance/kapt";
-import { loadBasisCache } from "./maintenance/basis-cache";
-import { WaitClient } from "./wait/myhome";
 import { LhClient, resolveImages } from "./lh/api";
 import { extractFromText } from "./llm/extract";
 import { extractPdfText, ocrFallback } from "./pdf/extract";
@@ -34,12 +28,6 @@ const repo = dryRun ? null : new Repo(requireEnv(env, "SUPABASE_URL"), requireEn
 
 const regions = env.COLLECT_REGIONS.split(",").map((r) => r.trim()).filter(Boolean);
 
-/** "서울 강서구" — 관리비 지역 평균의 범위를 화면에 적기 위한 라벨. 주소 두 번째 어절이 시·군·구로 끝날 때만 붙인다 (앱 remote.ts와 같은 규칙) */
-function regionLabel(regionCode: string, address?: string): string {
-  const sido = regionByCode(regionCode)?.label ?? regionCode;
-  const token = address?.split(/\s+/)[1];
-  return token && /[시군구]$/.test(token) ? `${sido} ${token}` : sido;
-}
 const providers = env.COLLECT_PROVIDERS.split(",").map((p) => p.trim().toUpperCase()).filter(Boolean);
 
 const log = (msg: string) => console.log(`[${new Date().toISOString()}] ${msg}`);
@@ -148,62 +136,16 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
     source_modified_at: detail.modified_key,
   });
 
-  // 좌표·시세·대기·관리비·통근은 신규 공고에서 1회. 카카오 키가 없으면 좌표에 매이는 것들(시세·통근)만 빠진다.
+  // 좌표·시세·대기·관리비·통근은 신규 공고에서 1회. 번들 스크립트(enrich.ts)와 같은 함수다 (enrich-announcement.ts).
   const address = result.output.address ?? detail.address;
   if (isNew && address) {
-    const geo = env.KAKAO_REST_API_KEY ? await geocodeAddress(address, env.KAKAO_REST_API_KEY).catch(() => null) : null;
-    // 주변 시세: 법정동 앞 5자리 + 대표 전용면적으로 한 번 조회한다.
-    // 실패하거나 표본이 적으면 넣지 않는다 — 몇 건으로 "시세"라고 말하면 거짓말이 된다.
-    const area = representativeArea(result.output);
-    const market =
-      geo?.b_code && area && env.MOLIT_API_KEY
-        ? await new RentClient(env.MOLIT_API_KEY)
-            .summary(geo.b_code.slice(0, 5), area)
-            .then((m) => (isUsable(m) ? m : null))
-            .catch(() => null)
-        : null;
-    if (market) log(`  주변 시세: ${market.deals}건 (전용 ${market.area_from}~${market.area_to}㎡, ${market.from}~${market.to})`);
-
-    // 예비입주자 대기현황: 단지명이 공고 제목·주소에 들어 있을 때만 맞춘다. 못 맞추면 없는 채로 둔다.
-    const waiting = env.MYHOME_API_KEY
-      ? await new WaitClient(env.MYHOME_API_KEY).forAnnouncement(notice.region_code, notice.title, address).catch(() => null)
-      : null;
-    if (waiting) log(`  대기현황: ${waiting.complex} 대기 ${waiting.total_waiting}명 (${waiting.as_of ?? "기준일 미상"})`);
-
-    // 관리비 단가: 단지를 맞추면 K-apt 신고값, 못 맞추면(신축) 같은 구 단지들의 중앙값. 앱이 전용면적을 곱한다.
-    const kaptKey = env.KAPT_API_KEY ?? env.MOLIT_API_KEY;
-    const maintenance =
-      geo?.b_code && kaptKey
-        ? // 단지 기본정보는 저장소의 캐시 파일을 읽는다 (Actions에서는 새로 받은 것을 저장하지 못한다 — enrich가 채워 커밋한다)
-          await new KaptClient(kaptKey, fetch, loadBasisCache())
-            .forAnnouncement({ sigunguCode: geo.b_code.slice(0, 5), district: regionLabel(notice.region_code, address), title: notice.title, complex: detail.complex, address, households: detail.households })
-            .catch(() => null)
-        : null;
-    if (maintenance) log(`  관리비: ${maintenance.basis === "complex" ? `${maintenance.complex} 신고값` : `${maintenance.district} ${maintenance.sample}단지 중앙값`} · 공용 ${maintenance.common_per_m2}원/㎡ (${maintenance.months.join("·")})`);
-
-    // 통근 시간: 수집 대상 시도의 시군구 대표 좌표에서 이 단지까지 미리 계산한다.
-    // 사용자마다 부르면 호출이 사용자 수에 비례하고 직장 위치도 서버로 나가야 한다.
-    const commute = geo
-      ? await commuteTable({ lat: geo.lat, lng: geo.lng }, regions, { kakao: env.KAKAO_REST_API_KEY, seoul: env.TRANSIT_API_KEY })
-      : undefined;
-    if (commute) log(`  통근 시간: 시군구 ${Object.keys(commute).length}곳에서 계산`);
-
-
-    await repo.upsertAnnouncement({
-      provider: notice.provider,
-      lh_id: notice.external_id,
-      title: notice.title,
-      housing_type: notice.housing_type,
-      region_code: notice.region_code,
-      lat: geo?.lat,
-      lng: geo?.lng,
-      transit: geo?.transit,
-      nearby: geo?.nearby,
-      market: market ?? undefined,
-      waiting: waiting ?? undefined,
-      maintenance: maintenance ?? undefined,
-      commute,
-    });
+    const patch = await enrichAnnouncement(
+      { label: notice.title, title: notice.title, region_code: notice.region_code, address, complex: detail.complex, households: detail.households, extraction: result.output },
+      { env, regions, log },
+    );
+    // b_code는 시세·관리비의 시군구를 자르는 데만 쓴다. DB 컬럼이 아니다
+    const { b_code: _bCode, ...cols } = patch;
+    await repo.upsertAnnouncement({ provider: notice.provider, lh_id: notice.external_id, title: notice.title, housing_type: notice.housing_type, region_code: notice.region_code, ...cols });
   }
   log(`  v${version} ${status}${blocking.length ? `: ${blocking.join(" / ")}` : ""}`);
   if (isNew) {
@@ -211,15 +153,6 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
     log(`  푸시 대상 ${tokens.length}명 (발송은 검수 VERIFIED 후 — TODO M7)`);
   }
   return isNew ? "new" : "modified";
-}
-
-/** 시세를 비교할 기준 면적. 공고의 주택형 중 가장 많이 나오는 전용면적을 쓴다 */
-function representativeArea(extraction: ExtractionOutput): number | undefined {
-  const areas = extraction.tracks.flatMap((t) => t.unit_types.map((u) => u.exclusive_area_m2)).filter((a): a is number => typeof a === "number" && a > 0);
-  if (areas.length === 0) return undefined;
-  const counts = new Map<number, number>();
-  for (const a of areas) counts.set(a, (counts.get(a) ?? 0) + 1);
-  return [...counts.entries()].sort((x, y) => y[1] - x[1] || x[0] - y[0])[0]![0];
 }
 
 const sources = [];
