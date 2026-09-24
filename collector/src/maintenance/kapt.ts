@@ -24,6 +24,7 @@
  *   못 맞춘 공고(신축이 대부분) = 같은 구 5단지 × (17항목 + 기본정보 1) + 목록 1 ≈ 91회 — 공용관리비만, 한 달만
  *   개별사용료(전기·난방·수도)는 계절을 타서 단지를 맞춘 경우에만 세 달을 흩어 잡고, 지역 평균에는 넣지 않는다.
  */
+import { portalError } from "../portal";
 import { normalizeComplex } from "../wait/myhome";
 
 const BASE = "https://apis.data.go.kr/1613000";
@@ -296,21 +297,10 @@ export class KaptClient {
     const res = await this.fetchImpl(`${BASE}/${path}?${p.toString()}`);
     const text = await res.text();
     if (!res.ok) throw new KaptError(`HTTP ${res.status}`, path);
-    let payload: unknown;
-    try {
-      payload = JSON.parse(text);
-    } catch {
-      const code = text.match(/<returnReasonCode>(\d+)<\/returnReasonCode>/)?.[1];
-      const msg = text.match(/<returnAuthMsg>([^<]+)<\/returnAuthMsg>|<errMsg>([^<]+)<\/errMsg>/);
-      throw new KaptError(`${msg?.[1] ?? msg?.[2] ?? "응답이 JSON이 아님"}${code ? ` (코드 ${code})` : ""}`, path, code);
-    }
-    // 같은 오류가 JSON으로도 온다: {"OpenAPI_ServiceResponse":{"cmmMsgHeader":{"returnReasonCode":"04",…}}} (2026-09-24 실측, K-apt 서버 장애)
-    const hdr = (payload as { OpenAPI_ServiceResponse?: { cmmMsgHeader?: { returnReasonCode?: string; returnAuthMsg?: string; errMsg?: string } } })?.OpenAPI_ServiceResponse?.cmmMsgHeader;
-    if (hdr) throw new KaptError(`${hdr.returnAuthMsg ?? hdr.errMsg ?? "오류"} (코드 ${hdr.returnReasonCode ?? "?"})`, path, hdr.returnReasonCode);
-    // 정상 응답의 header.resultCode. 00 정상, 03 NODATA(그 달 신고 없음·기본정보 없음 — 오류가 아니다), 나머지는 오류
-    const rc = (payload as { response?: { header?: { resultCode?: string; resultMsg?: string } } })?.response?.header;
-    if (rc?.resultCode && rc.resultCode !== "00" && rc.resultCode !== "03") throw new KaptError(`${rc.resultMsg ?? "오류"} (코드 ${rc.resultCode})`, path, rc.resultCode);
-    return payload;
+    // 오류 껍데기(XML·JSON 둘 다)는 포털 공통 파서(portal.ts)가 본다. 03 NODATA는 오류가 아니다 — 그 달 신고 없음·기본정보 없음.
+    const err = portalError(text, path);
+    if (err) throw new KaptError(err.message.replace(/^포털 /, "").replace(/ — .*$/, ""), path, err.code);
+    return JSON.parse(text) as unknown;
   }
 
   /** 시군구(법정동 앞 5자리)의 단지 전부 */

@@ -77,6 +77,8 @@ export interface Announcement {
   commute?: Record<string, { minutes: number; transfers: number }>;
   /** K-apt 관리비 단가 (원/전용㎡/월). 단지 신고값이거나 같은 구 중앙값. 없으면 예상 주거비가 기본값을 쓴다 */
   maintenance?: Maintenance;
+  /** 서버가 이 행을 마지막으로 바꾼 때. 다시 받을지 판단하는 데만 쓴다 (data/sync.ts) */
+  updated_at?: string;
   /** 기관 사이트의 원문 공고문. 근거로 적은 쪽수를 실제로 열 수 있게 한다 */
   pdf_url?: string;
   /** 기관의 공고 상세 페이지. 공고문 PDF가 없는 공고에도 있다 */

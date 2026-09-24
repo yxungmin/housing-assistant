@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dateRange, dateText, longDate, looseDate } from "../src/lib/format";
+import { dateRange, dateText, longDate, looseDate, manwon } from "../src/lib/format";
 
 describe("날짜 표기", () => {
   it("표에서는 자릿수를 맞춘다", () => {
@@ -22,5 +22,20 @@ describe("날짜 표기", () => {
     expect(looseDate("2027-02")).toBe("2027년 2월");
     expect(looseDate("공가 발생 시 개별 안내")).toBe("공가 발생 시 개별 안내");
     expect(looseDate(undefined)).toBe("-");
+  });
+});
+
+describe("manwon", () => {
+  it("억·만 축약", () => {
+    expect(manwon(11_420_000)).toBe("1,142만 원");
+    expect(manwon(571_200_000)).toBe("5억 7,120만 원");
+    expect(manwon(200_000_000)).toBe("2억 원");
+    expect(manwon(0)).toBe("0원");
+    expect(manwon(4_000)).toBe("4,000원"); // 5천 원 이상은 만 단위로 반올림한다
+  });
+
+  it("만 단위 반올림이 10,000만이 되면 억으로 올린다 — 전에는 '1억 10,000만 원'", () => {
+    expect(manwon(199_996_000)).toBe("2억 원");
+    expect(manwon(99_996_000)).toBe("1억 원");
   });
 });

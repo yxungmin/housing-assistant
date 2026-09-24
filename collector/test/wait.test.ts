@@ -114,9 +114,11 @@ describe("WaitClient", () => {
     expect(url).toContain("signguCode=680");
   });
 
-  it("키가 없어 XML 오류가 와도 빈 배열", async () => {
-    const fake: typeof fetch = async () => new Response("<OpenAPI_ServiceResponse><cmmMsgHeader><errMsg>등록되지 않은 서비스키</errMsg></cmmMsgHeader></OpenAPI_ServiceResponse>", { status: 200 });
-    expect(await new WaitClient("KEY", fake).list("11")).toEqual([]);
+  it("포털 오류(키 미등록·한도 초과)는 던진다 — 빈 배열로 돌리면 '대기자 없음'과 구별이 안 된다", async () => {
+    const fake: typeof fetch = async () => new Response("<OpenAPI_ServiceResponse><cmmMsgHeader><errMsg>등록되지 않은 서비스키</errMsg><returnReasonCode>30</returnReasonCode></cmmMsgHeader></OpenAPI_ServiceResponse>", { status: 200 });
+    await expect(new WaitClient("KEY", fake).list("11")).rejects.toMatchObject({ code: "30" });
+    // 공고 단위 요약은 실패를 "못 맞춤"으로 돌린다 — 수집은 계속 돈다
+    expect(await new WaitClient("KEY", fake).forAnnouncement("11", "x")).toBeNull();
   });
 
   it("공고 하나에 대한 요약을 낸다", async () => {

@@ -5,6 +5,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, type PropsWithChildren } from "react";
 import { AppState as AppLifecycle, Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { readMeta, writeMeta } from "@/data/meta-store";
 import { withDerived } from "@/lib/onboarding";
 import type { UserProfile } from "@housing/schema";
 import { normalizeSubscription, type Subscription } from "@/lib/billing";
@@ -189,6 +190,17 @@ function reducer(s: AppState, a: Action): AppState {
  */
 const KEYS = { profile: "profile.v1", meta: "meta.v1", firstMonth: "first-month.v1" } as const;
 
+/** 깨진 JSON은 null. 객체가 아닌 값(예전 버전이 문자열을 넣었을 수도)도 null */
+function safeParse<T extends object>(text: string | null): T | null {
+  if (!text) return null;
+  try {
+    const v: unknown = JSON.parse(text);
+    return typeof v === "object" && v !== null ? (v as T) : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * 네이티브: SecureStore(암호화). 웹: 개발·시안 확인용으로만 쓰므로 localStorage.
  * 웹은 배포 대상이 아니다 — 민감 프로필은 실제 사용자 기기(네이티브)에서만 저장된다.
@@ -267,8 +279,13 @@ export function AppStateProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     (async () => {
-      const [profile, meta, firstMonth] = await Promise.all([read(KEYS.profile), read(KEYS.meta), read(KEYS.firstMonth)]);
-      const parsedMeta = meta ? (JSON.parse(meta) as Partial<AppState>) : {};
+      const [profile, metaFile, legacyMeta, firstMonth] = await Promise.all([read(KEYS.profile), readMeta(), read(KEYS.meta), read(KEYS.firstMonth)]);
+      // 메타는 파일 저장소로 옮겼다 (data/meta-store.ts). 옛 SecureStore 값이 있으면 이번에 읽어 오고 지운다 — 2 KB 한도에 걸리던 자리다.
+      const meta = metaFile ?? legacyMeta;
+      if (!metaFile && legacyMeta) void write(KEYS.meta, null);
+      // 저장값이 깨져 있으면(중단된 쓰기 등) 빈 상태로 시작한다. 전에는 JSON.parse가 던져 hydrate가 영영 안 오고
+      // 스플래시에 멈췄다 (2026-09-24 감사). 프로필이 깨졸으면 온보딩을 다시 받는 쪽이 멈춘 앱보다 낫다.
+      const parsedMeta = safeParse<Partial<AppState>>(meta) ?? {};
       // 이 필드가 생기기 전에 깔린 기기에는 seen이 없다. 그 경우 다음 목록이 기준선이 된다.
       // 이 필드가 생기기 전에 깔린 기기에는 applied가 없다
       if (!parsedMeta.applied) parsedMeta.applied = [];
@@ -278,7 +295,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
         const sub = parsedMeta.subscription ?? { status: "none" as const };
         parsedMeta.subscription = { ...sub, firstMonthUsedAt: sub.firstMonthUsedAt ?? firstMonth };
       }
-      dispatch({ type: "hydrate", state: { ...parsedMeta, profile: profile ? (JSON.parse(profile) as UserProfile) : null } });
+      dispatch({ type: "hydrate", state: { ...parsedMeta, profile: safeParse<UserProfile>(profile) } });
     })();
   }, []);
 
@@ -286,7 +303,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     if (!state.loaded) return;
     void write(KEYS.profile, state.profile ? JSON.stringify(state.profile) : null);
     const { onboarded, account, saved, applied, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox } = state;
-    void write(KEYS.meta, JSON.stringify({ onboarded, account, saved, applied, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox }));
+    writeMeta(JSON.stringify({ onboarded, account, saved, applied, subscription, themePref, notifications, pushToken, reports, changes, seen, inbox }));
     // 한 번 쓰면 지우지 않는다 — 여기서 null을 쓰면 위 주석의 보호가 통째로 없어진다
     if (subscription.firstMonthUsedAt) void write(KEYS.firstMonth, subscription.firstMonthUsedAt);
   }, [state]);

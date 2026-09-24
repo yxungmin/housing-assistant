@@ -4,6 +4,7 @@ import { Keyboard, Platform, Pressable, ScrollView, TextInput, View } from "reac
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/icon";
+import { manwon } from "@/lib/format";
 import { IncomeHelperSheet } from "@/components/IncomeHelperSheet";
 import { BottomCTA, FadeIn, Header, IconButton, Screen, Sub, T } from "@/components/ui";
 import { currentAnnouncements, matchAll, pickBest } from "@/data/announcements";
@@ -328,13 +329,9 @@ function DurationField({ text, onChange }: { text: string; onChange: (t: string)
   );
 }
 
+/** 입력 중인 금액을 억·만으로 읽어 준다. 표기는 format.manwon 한 곳 — 전에는 여기 복사본이 있어 자리올림 버그를 따로 안고 있었다 */
 function summarizeWon(n: number): string {
-  if (n <= 0) return "";
-  const eok = Math.floor(n / 100_000_000);
-  const man = Math.round((n % 100_000_000) / 10_000);
-  if (eok > 0) return man > 0 ? `${eok}억 ${man.toLocaleString("ko-KR")}만 원` : `${eok}억 원`;
-  if (man > 0) return `${man.toLocaleString("ko-KR")}만 원`;
-  return `${n.toLocaleString("ko-KR")}원`;
+  return n <= 0 ? "" : manwon(n);
 }
 
 function formatDateDigits(d: string): string {

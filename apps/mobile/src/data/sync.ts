@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { currentAnnouncements, setAnnouncements, type Announcement } from "./announcements";
 import { readFeedCache, writeFeedCache } from "./cache";
-import { fetchRemoteAnnouncements, remoteConfigured } from "./remote";
+import { feedVersionKey, fetchFeedVersion, fetchRemoteAnnouncements, remoteConfigured, type FeedVersion } from "./remote";
 import { detectChanges, type ChangeRecord } from "@/lib/changes";
 
 /**
@@ -15,10 +15,18 @@ import { detectChanges, type ChangeRecord } from "@/lib/changes";
  * 서버에서 한 번 받아 반영한다. 앱을 열 때와 사용자가 당겨서 새로고침할 때가 같은 일이다.
  * 실패하면 조용히 돌아간다 — 캐시·번들 데이터로 화면은 그대로 돌고, 사용자가 할 수 있는 일이 없다.
  */
+/** 지금 가진 목록의 판 — 서버 것과 같으면 다시 받지 않는다 (units 수백 채가 들어 있어 전체는 수백 KB다) */
+function localVersion(list: Announcement[]): FeedVersion {
+  const dates = list.map((a) => a.updated_at).filter((d): d is string => !!d);
+  return { count: list.length, latest: dates.length ? dates.sort().at(-1)! : null };
+}
+
 export async function syncAnnouncementsOnce(savedIds: string[], onChanges?: (records: ChangeRecord[]) => void): Promise<boolean> {
   if (!remoteConfigured) return false;
   try {
     const before = currentAnnouncements();
+    // 서버 목록이 그대로면 전체를 받지 않는다. 번들 목록에는 updated_at이 없어 첫 동기화는 늘 받는다.
+    if (before.some((a) => a.updated_at) && feedVersionKey(await fetchFeedVersion()) === feedVersionKey(localVersion(before))) return true;
     const list = await fetchRemoteAnnouncements();
     const syncedAt = new Date().toISOString();
     setAnnouncements(list, "remote", syncedAt);
@@ -46,6 +54,7 @@ export function useAnnouncementSync(ready: boolean, savedIds: string[], onChange
       if (cached && !cancelled && remoteConfigured) setAnnouncements(cached.list, "cache", cached.syncedAt);
       if (!remoteConfigured) return;
       try {
+        if (cached?.list.some((a) => a.updated_at) && feedVersionKey(await fetchFeedVersion()) === feedVersionKey(localVersion(cached.list))) return;
         const list = await fetchRemoteAnnouncements();
         if (cancelled) return;
         const before: Announcement[] = cached?.list ?? [];

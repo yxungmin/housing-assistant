@@ -18,6 +18,8 @@
  * 마이홈 웹에는 있는 hshldCo(총세대수)·lastUpdtDt(기준일시)가 공식 API에는 없다.
  * 그래서 기준일은 우리가 받아온 시각으로 대신하고 화면에도 "기준"이 아니라 "확인"이라고 적는다.
  */
+import { PortalError, portalError } from "../portal";
+
 const BASE = "https://apis.data.go.kr/1613000/HWSPR03";
 
 export interface WaitRow {
@@ -164,14 +166,12 @@ export class WaitClient {
     const p = new URLSearchParams({ serviceKey: this.apiKey, brtcCode, numOfRows: String(rows), pageNo: "1", _type: "json" });
     if (signguCode) p.set("signguCode", signguCode);
     const res = await this.fetchImpl(`${BASE}/moveWaitStsList?${p.toString()}`);
-    if (!res.ok) throw new Error(`대기현황 HTTP ${res.status}`);
+    if (!res.ok) throw new PortalError(`HTTP ${res.status}`, "HWSPR03/moveWaitStsList");
     const text = await res.text();
-    try {
-      return parseWaitRows(JSON.parse(text), new Date().toISOString().slice(0, 10));
-    } catch {
-      // 키가 등록되지 않았을 때 XML 오류가 온다. 시세와 마찬가지로 없으면 그냥 넘어간다.
-      return [];
-    }
+    // 키 미등록·한도 초과는 XML 오류로 온다. 전에는 []로 돌려 "대기자 없음"과 구별이 안 됐다 (2026-09-24 감사). 던진다.
+    const err = portalError(text, "HWSPR03/moveWaitStsList");
+    if (err) throw err;
+    return parseWaitRows(JSON.parse(text), new Date().toISOString().slice(0, 10));
   }
 
   async forAnnouncement(brtcCode: string, title: string, address?: string): Promise<WaitSummary | null> {

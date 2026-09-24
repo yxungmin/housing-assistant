@@ -17,6 +17,8 @@
  *
  * 호출은 수집할 때 법정동·월 단위로 한 번씩만 한다. 사용자 수와 무관하다.
  */
+import { PortalError, portalError, xmlTotalCount } from "../portal";
+
 const BASE = "https://apis.data.go.kr/1613000";
 
 export type RentKind = "apt" | "rowhouse" | "officetel" | "detached";
@@ -153,11 +155,26 @@ export class RentClient {
     private readonly fetchImpl: typeof fetch = fetch,
   ) {}
 
-  async fetchMonth(kind: RentKind, lawdCd: string, dealYmd: string): Promise<RentDeal[]> {
-    const url = `${BASE}/${ENDPOINTS[kind]}?serviceKey=${this.apiKey}&LAWD_CD=${encodeURIComponent(lawdCd)}&DEAL_YMD=${encodeURIComponent(dealYmd)}&numOfRows=1000&pageNo=1`;
-    const res = await this.fetchImpl(url);
-    if (!res.ok) throw new Error(`실거래가 ${kind} HTTP ${res.status}`);
-    return parseRentDeals(await res.text(), kind);
+  /**
+   * 한 달의 거래 전부. totalCount를 보고 페이지를 넘긴다 — 전에는 1페이지(1,000건)만 받아
+   * 거래가 많은 구·달은 잘렸고 중앙값이 앞쪽 표본으로 치우쳤다 (2026-09-24 감사).
+   * 포털 오류(한도 초과 등)는 던진다. 빈 배열로 돌리면 "거래 없음"과 구별이 안 된다.
+   */
+  async fetchMonth(kind: RentKind, lawdCd: string, dealYmd: string, pageSize = 1000, maxPages = 10): Promise<RentDeal[]> {
+    const out: RentDeal[] = [];
+    for (let page = 1; page <= maxPages; page++) {
+      const path = `${ENDPOINTS[kind]}`;
+      const url = `${BASE}/${path}?serviceKey=${this.apiKey}&LAWD_CD=${encodeURIComponent(lawdCd)}&DEAL_YMD=${encodeURIComponent(dealYmd)}&numOfRows=${pageSize}&pageNo=${page}`;
+      const res = await this.fetchImpl(url);
+      if (!res.ok) throw new PortalError(`HTTP ${res.status}`, path);
+      const xml = await res.text();
+      const err = portalError(xml, path);
+      if (err) throw err;
+      out.push(...parseRentDeals(xml, kind));
+      const total = xmlTotalCount(xml);
+      if (total === undefined || page * pageSize >= total) break;
+    }
+    return out;
   }
 
   /**
@@ -171,8 +188,10 @@ export class RentClient {
       for (const ym of months) {
         try {
           deals.push(...(await this.fetchMonth(kind, lawdCd, ym)));
-        } catch {
-          // 한 유형·한 달이 비어도 나머지로 요약한다
+        } catch (e) {
+          // 하루 한도를 넘었으면 남은 달도 다 실패한다 — 반쪽 표본으로 "시세"를 내지 않고 던진다.
+          if (e instanceof PortalError && e.quotaExceeded) throw e;
+          // 그 밖(유형에 거래 없음·일시 오류)은 나머지로 요약한다
         }
       }
     }

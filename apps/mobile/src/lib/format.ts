@@ -9,8 +9,13 @@ export function manwon(n: number | undefined | null): string {
   if (n === undefined || n === null) return "-";
   const v = Math.round(n);
   if (v === 0) return "0원";
-  const eok = Math.floor(v / 100_000_000);
-  const man = Math.round((v % 100_000_000) / 10_000);
+  let eok = Math.floor(v / 100_000_000);
+  let man = Math.round((v % 100_000_000) / 10_000);
+  // 9,999.6만 → 10,000만으로 반올림되면 억으로 올린다. 전에는 "1억 10,000만 원"이 나왔다 (2026-09-24 감사)
+  if (man === 10_000) {
+    eok += 1;
+    man = 0;
+  }
   if (eok > 0) return man > 0 ? `${eok}억 ${man.toLocaleString("ko-KR")}만 원` : `${eok}억 원`;
   if (man > 0) return `${man.toLocaleString("ko-KR")}만 원`;
   return `${v.toLocaleString("ko-KR")}원`;

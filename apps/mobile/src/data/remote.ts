@@ -41,14 +41,51 @@ interface FeedRow {
   past_results: Announcement["past_results"] | null;
   commute: Announcement["commute"] | null;
   maintenance: Announcement["maintenance"] | null;
+  updated_at: string | null;
   extraction: unknown | null;
 }
 
 const headers = () => ({ apikey: KEY!, Authorization: `Bearer ${KEY!}`, "Content-Type": "application/json" });
 
+/** 응답이 없으면 이만큼 기다리고 끊는다. 전에는 제한이 없어 끊긴 연결에서 새로고침 표시가 영영 돌았다 (2026-09-24 감사) */
+export const FEED_TIMEOUT_MS = 10_000;
+
+/** 시간 제한이 있는 fetch. AbortController는 RN·웹 모두 있다 */
+async function fetchWithTimeout(fetchImpl: typeof fetch, url: string, init: RequestInit, ms = FEED_TIMEOUT_MS): Promise<Response> {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    return await fetchImpl(url, { ...init, signal: ctl.signal });
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+/**
+ * 목록이 바뀌었는지 알 수 있는 작은 값: 건수와 가장 최근 updated_at.
+ * 전체(units 수백 채 포함)를 매번 받기 전에 이것만 받아 같으면 건너뛴다.
+ */
+export interface FeedVersion {
+  count: number;
+  latest: string | null;
+}
+export const feedVersionKey = (v: FeedVersion): string => `${v.count}|${v.latest ?? ""}`;
+
+export async function fetchFeedVersion(fetchImpl: typeof fetch = fetch): Promise<FeedVersion> {
+  if (!remoteConfigured) throw new Error("Supabase 미설정");
+  const res = await fetchWithTimeout(fetchImpl, `${URL}/rest/v1/app_announcements?select=updated_at&order=updated_at.desc.nullslast&limit=1`, {
+    headers: { ...headers(), Prefer: "count=exact" },
+  });
+  if (!res.ok) throw new Error(`app_announcements HTTP ${res.status}`);
+  const rows = (await res.json()) as { updated_at: string | null }[];
+  // Content-Range: 0-0/N — 뒤의 N이 전체 건수
+  const total = Number(res.headers.get("content-range")?.split("/")[1]);
+  return { count: Number.isFinite(total) ? total : rows.length, latest: rows[0]?.updated_at ?? null };
+}
+
 export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch): Promise<Announcement[]> {
   if (!remoteConfigured) throw new Error("Supabase 미설정");
-  const res = await fetchImpl(`${URL}/rest/v1/app_announcements?select=*&order=apply_end.asc.nullslast`, { headers: headers() });
+  const res = await fetchWithTimeout(fetchImpl, `${URL}/rest/v1/app_announcements?select=*&order=apply_end.asc.nullslast`, { headers: headers() });
   if (!res.ok) throw new Error(`app_announcements HTTP ${res.status}`);
   const rows = (await res.json()) as FeedRow[];
   const out: Announcement[] = [];
@@ -91,6 +128,7 @@ export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch):
       past_results: r.past_results?.length ? r.past_results : undefined,
       commute: r.commute ?? undefined,
       maintenance: r.maintenance ?? undefined,
+      updated_at: r.updated_at ?? undefined,
       extraction,
     });
   }

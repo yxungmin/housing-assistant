@@ -1,6 +1,7 @@
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate, homelessBasis, homelessBasisReason } from "@housing/engine";
 import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
+import { manwon } from "./format";
 import { parsePlaceLabel, placeFor } from "./places";
 import { REGION_LIST, regionByCode, sigunguValue } from "./regions";
 
@@ -364,14 +365,8 @@ export function withDerived(p: UserProfile): UserProfile {
   return basis ? { ...p, homeless_months: basis.months } : p;
 }
 
-const wonText = (n: number): string => {
-  if (n <= 0) return "0원";
-  const eok = Math.floor(n / 100_000_000);
-  const man = Math.round((n % 100_000_000) / 10_000);
-  if (eok > 0) return man > 0 ? `${eok}억 ${man.toLocaleString("ko-KR")}만 원` : `${eok}억 원`;
-  if (man > 0) return `${man.toLocaleString("ko-KR")}만 원`;
-  return `${n.toLocaleString("ko-KR")}원`;
-};
+/** 억·만 표기는 format.manwon 한 곳. 0 이하는 "0원" */
+const wonText = (n: number): string => (n <= 0 ? "0원" : manwon(n));
 
 const monthsText = (n: number): string => {
   const y = Math.floor(n / 12);

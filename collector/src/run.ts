@@ -123,10 +123,35 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
     log(`  게시 v${version} (자동 확인)${advisory.length ? ` · 알림 ${advisory.length}건: ${advisory.join(" / ")}` : ""}`);
   }
 
-  // 좌표는 신규 공고에서 1회
+  /*
+   * 원문·그림·집 목록은 **버전마다** 다시 쓴다. 전에는 아래 좌표 블록 안에 있어서
+   * (신규 공고 && 카카오 키)일 때만 저장됐다 — 정정공고(v2)가 와도 pdf_url이 v1 공고문을 가리켰고,
+   * 카카오 키가 없는 실행에서는 공고문 링크가 아예 저장되지 않았다 (2026-09-24 감사).
+   */
+  const images = detail.images?.length ? await resolveImages(detail.images) : [];
+  if (images.length) log(`  공고 그림 ${images.length}장: ${[...new Set(images.map((i) => i.kind))].join(", ")}`);
+  await repo.upsertAnnouncement({
+    provider: notice.provider,
+    lh_id: notice.external_id,
+    title: notice.title,
+    housing_type: notice.housing_type,
+    region_code: notice.region_code,
+    notice_date: result.output.schedule.notice_date ?? notice.notice_date,
+    apply_start: detail.apply_start ?? result.output.schedule.apply_start,
+    apply_end: detail.apply_end ?? result.output.schedule.apply_end ?? notice.apply_end,
+    pdf_url: pdfUrl,
+    detail_url: notice.detail_url,
+    // 기관이 준 그림. 주소를 한 번 펼쳐야 그림 파일이 나온다 (lh/api.ts resolveImages).
+    images: images.length ? images : undefined,
+    // 흩어진 집 목록. 좌표는 아직 없다 — 주소마다 한 번 찍는 일은 enrich가 한다.
+    units: detail.units,
+    source_modified_at: detail.modified_key,
+  });
+
+  // 좌표·시세·대기·관리비·통근은 신규 공고에서 1회. 카카오 키가 없으면 좌표에 매이는 것들(시세·통근)만 빠진다.
   const address = result.output.address ?? detail.address;
-  if (isNew && address && env.KAKAO_REST_API_KEY) {
-    const geo = await geocodeAddress(address, env.KAKAO_REST_API_KEY).catch(() => null);
+  if (isNew && address) {
+    const geo = env.KAKAO_REST_API_KEY ? await geocodeAddress(address, env.KAKAO_REST_API_KEY).catch(() => null) : null;
     // 주변 시세: 법정동 앞 5자리 + 대표 전용면적으로 한 번 조회한다.
     // 실패하거나 표본이 적으면 넣지 않는다 — 몇 건으로 "시세"라고 말하면 거짓말이 된다.
     const area = representativeArea(result.output);
@@ -163,24 +188,13 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       : undefined;
     if (commute) log(`  통근 시간: 시군구 ${Object.keys(commute).length}곳에서 계산`);
 
-    const images = detail.images?.length ? await resolveImages(detail.images) : [];
-    if (images.length) log(`  공고 그림 ${images.length}장: ${[...new Set(images.map((i) => i.kind))].join(", ")}`);
+
     await repo.upsertAnnouncement({
       provider: notice.provider,
       lh_id: notice.external_id,
       title: notice.title,
       housing_type: notice.housing_type,
       region_code: notice.region_code,
-      notice_date: result.output.schedule.notice_date ?? notice.notice_date,
-      apply_start: detail.apply_start ?? result.output.schedule.apply_start,
-      apply_end: detail.apply_end ?? result.output.schedule.apply_end ?? notice.apply_end,
-      pdf_url: pdfUrl,
-      detail_url: notice.detail_url,
-      // 기관이 준 그림. 주소를 한 번 펼쳐야 그림 파일이 나온다 (lh/api.ts resolveImages).
-      images: images.length ? images : undefined,
-      // 흩어진 집 목록. 좌표는 아직 없다 — 주소마다 한 번 찍는 일은 enrich가 한다.
-      units: detail.units,
-      source_modified_at: detail.modified_key,
       lat: geo?.lat,
       lng: geo?.lng,
       transit: geo?.transit,
