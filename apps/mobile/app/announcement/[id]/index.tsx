@@ -22,7 +22,8 @@ import { unseenChange } from "@/lib/changes";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { commuteDetail, commuteFor, commuteLines, mapPlace, nearbyLines, openMapTarget, transitLines } from "@/lib/commute";
 import { mapTargets } from "@/lib/maps";
-import { useAppState } from "@/store/appState";
+import { canOpenCost, useAppState } from "@/store/appState";
+import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { useTheme } from "@/theme/ThemeProvider";
 import { radius, space } from "@/theme/tokens";
 
@@ -146,6 +147,17 @@ export default function AnnouncementDetail() {
   const counts = track ? ruleCounts(track) : { matched: 0, needsCheck: 0, total: 0 };
   // 자격과 순위는 다른 질문이다. 순위 기준을 읽은 공고에서만 (engine/rank.ts)
   const rank = track && state.profile ? expectedRank(track.track, state.profile) : null;
+  /*
+   * 예상 순위는 유료다 (2026-09-24 결정). 조건 매칭(되느냐)은 무료, 순위·비용처럼 우리가 계산해 주는 값은 구독.
+   * 잠겼어도 공고 자체의 사실은 가리지 않는다 — 순위별 접수일은 잘못 내면 부적격이라 누구에게나 보여 준다.
+   */
+  const rankLocked = !canOpenCost(state);
+  const [subSheet, setSubSheet] = useState(false);
+  const rankDates = (() => {
+    const byDate = new Map<string, number[]>();
+    for (const r of track?.track.priority_ranks ?? []) if (r.apply_date) byDate.set(r.apply_date, [...(byDate.get(r.apply_date) ?? []), r.rank]);
+    return [...byDate.entries()].map(([d, rs]) => `${rs.sort((x, y) => x - y).join("·")}순위 ${longDate(d)}`).join(" · ");
+  })();
   // "되면 얼마나 살 수 있나". 전에는 notes 글("최장 30년 거주")에 묻혀 있었다
   const res = track?.track.residence;
   const residenceText = res && (res.max_years || res.contract_years)
@@ -312,7 +324,11 @@ export default function AnnouncementDetail() {
               */}
               {rank || selection || residenceText ? (
                 <View style={{ borderTopWidth: 1, borderTopColor: colors.line, marginTop: 8, paddingTop: 14, paddingHorizontal: 4, gap: 10 }}>
-                  {rank ? (
+                  {rank && rankLocked ? (
+                    <Pressable onPress={() => setSubSheet(true)} accessibilityRole="button" accessibilityLabel="예상 순위 보기 — 구독" style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}>
+                      <KeyValue label="예상 순위" value="" redacted strong note="내 순위와 지난 회차 마감 순위 비교는 구독하면 볼 수 있어요" />
+                    </Pressable>
+                  ) : rank ? (
                     <KeyValue
                       label="예상 순위"
                       value={rank.rank ? `${rank.rank}순위` : "해당 순위 없음"}
@@ -320,10 +336,12 @@ export default function AnnouncementDetail() {
                       note={[rank.label, rank.certain ? null : "입력하지 않은 조건이 있어 더 앞 순위일 수 있어요"].filter(Boolean).join(" · ") || undefined}
                     />
                   ) : null}
-                  {rank?.apply_date ? (
+                  {rank && !rankLocked && rank.apply_date ? (
                     <Notice tone="warn" icon="clock">
                       {rank.rank}순위 접수일은 {longDate(rank.apply_date)}이에요. 순위마다 접수일이 달라서 다른 날 접수하면 부적격이 돼요.
                     </Notice>
+                  ) : rankDates ? (
+                    <Notice tone="warn" icon="clock">순위마다 접수일이 달라요 — {rankDates}. 다른 날 접수하면 부적격이 돼요.</Notice>
                   ) : null}
                   {selection ? <Sub tone="3" variant="caption">경쟁이 붙으면 {selection} 순서로 뽑아요.</Sub> : null}
                   {residenceText ? <KeyValue label="살 수 있는 기간" value={residenceText.value} note={residenceText.note} /> : null}
@@ -337,6 +355,7 @@ export default function AnnouncementDetail() {
         ) : null}
 
         <SourceCard pdfUrl={a.pdf_url} detailUrl={a.detail_url} what="위 조건과 임대조건은" />
+        <SubscriptionSheet visible={subSheet} onClose={() => setSubSheet(false)} />
 
         <NoticeImages images={a.images} />
 
@@ -487,7 +506,7 @@ export default function AnnouncementDetail() {
                         ? `${r.households}호 공급 · ${r.applicants.toLocaleString("ko-KR")}명 신청${r.competition ? ` · ${r.competition}대 1` : ""}`
                         : null,
                       // 내 순위를 확실히 알 때만 견준다. 모르는데 "차례 안 옴"이라 하면 거짓 절망이다
-                      rank?.certain && rank.rank && r.closed_rank ? `내 예상 순위(${rank.rank}순위) · ${RANK_VS_PAST_LABEL[rankVsPast(rank.rank, r.closed_rank)]}` : null,
+                      !rankLocked && rank?.certain && rank.rank && r.closed_rank ? `내 예상 순위(${rank.rank}순위) · ${RANK_VS_PAST_LABEL[rankVsPast(rank.rank, r.closed_rank)]}` : null,
                     ].filter(Boolean).join("\n") || undefined
                   }
                 />

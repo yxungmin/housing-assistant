@@ -278,9 +278,26 @@ export function IconTile({ name, tone = "gray", size = 40 }: { name: IconName; t
  * 자리마다 점의 모양이 달라 한 화면 안에서도 제각각이었다. 가림은 한 모양이어야 한다 —
  * BigNumber·KeyValue의 redacted가 모두 이걸 쓴다.
  */
-export function Redacted({ width, height }: { width: number; height: number }) {
+/**
+ * 구독 전에 가려진 값.
+ *
+ * 전에는 회색 막대만 그렸다. 그 모양은 로딩 중 뼈대(skeleton)와 같아서, 사람들이 "아직 안 불러왔나"라고
+ * 기다리다 지나갔다 — 잠긴 것인지가 보이지 않았다(2026-09-24). 자물쇠를 안에 그려 "가렸다"를 말하고,
+ * 자리가 넉넉하면 무엇을 하면 보이는지("구독하면 보여요")까지 적는다.
+ */
+export function Redacted({ width, height, label }: { width: number; height: number; label?: string }) {
   const { colors } = useTheme();
-  return <View accessibilityLabel="가려진 값" style={{ width, height, borderRadius: Math.min(10, height / 2.4), backgroundColor: colors.cardStrong }} />;
+  const icon = Math.round(Math.min(18, height * 0.6));
+  const showLabel = !!label && width >= 120 && height >= 22;
+  return (
+    <View
+      accessibilityLabel={label ? `가려진 값 — ${label}` : "가려진 값"}
+      style={{ width, height, borderRadius: Math.min(10, height / 2.4), backgroundColor: colors.cardStrong, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 }}
+    >
+      <Icon name="lock" size={icon} color={colors.text3} />
+      {showLabel ? <Text style={[type.caption, { color: colors.text3, fontFamily: fonts.medium }]}>{label}</Text> : null}
+    </View>
+  );
 }
 
 /**
@@ -308,7 +325,7 @@ export function BigNumber({ value, unit, label, sub, size = 40, align = "left", 
       {label ? <Sub>{label}</Sub> : null}
       <View style={{ flexDirection: "row", alignItems: redacted ? "center" : "baseline", gap: 6 }}>
         {redacted ? (
-          <Redacted width={size * 3.2} height={size * 0.9} />
+          <Redacted width={size * 3.2} height={size * 0.9} label="구독하면 보여요" />
         ) : (
           <Text style={{ fontFamily: fonts.bold, fontSize: size, lineHeight: size * 1.2, color: colors.text, letterSpacing: -size * 0.035, fontVariant: ["tabular-nums"] }}>{value}</Text>
         )}

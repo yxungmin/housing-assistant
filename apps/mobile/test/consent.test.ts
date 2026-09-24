@@ -61,6 +61,6 @@ describe("약관 판", () => {
   };
 
   it("본문 지문과 판이 함께 고정돼 있다", () => {
-    expect({ version: TERMS_VERSION, fingerprint: fingerprint(TERMS.sections) }).toEqual({ version: "2026-09-24", fingerprint: "53dc48f4" });
+    expect({ version: TERMS_VERSION, fingerprint: fingerprint(TERMS.sections) }).toEqual({ version: "2026-09-24-2", fingerprint: "b116df0a" });
   });
 });
