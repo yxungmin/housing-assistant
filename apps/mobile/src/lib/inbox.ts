@@ -13,6 +13,7 @@
  * 90일이 지나면 버린다. 접수가 끝나고 당첨자 발표까지 지나면 그 알림은 기록일 뿐이고,
  * 무한정 쌓이면 기기 저장소를 계속 먹는다.
  */
+import { isServiceRegion } from "@housing/schema";
 import type { ChangeRecord } from "./changes";
 import { daysUntil } from "./format";
 
@@ -84,6 +85,8 @@ export interface InboxSource {
   id: string;
   title: string;
   apply_end?: string;
+  /** 시도 코드. 있으면 서비스 지역 밖 공고는 "새 공고" 알림에서 뺀다 */
+  region_code?: string;
 }
 
 /** 마감 알림을 만들 기준. 기기 예약 알림과 같은 날수여야 이력과 실제 알림이 어긋나지 않는다 */
@@ -126,6 +129,9 @@ export function syncInbox(
   for (const id of unseenIds) {
     const a = byId.get(id);
     if (!a) continue;
+    // 서비스 지역 밖 공고(홈에서 "다른 지역 공고"로 접힌 것)는 새 공고로 알리지 않는다 —
+    // 실서버 첫 동기화에서 제주·군산·양산이 "새 공고가 올라왔어요"로 7건 중 3건을 차지했다 (2026-09-24). 못 쓰는 공고 알림은 소음이다.
+    if (a.region_code && !isServiceRegion(a.region_code)) continue;
     out.push({
       id: `new:${a.id}`,
       kind: "new",

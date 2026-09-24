@@ -151,3 +151,15 @@ describe("syncInbox", () => {
     expect(syncInbox(list, ["없음"], ["없음"], NOW)).toHaveLength(0);
   });
 });
+
+describe("새 공고 알림의 지역", () => {
+  it("서비스 지역 밖 공고는 새 공고로 알리지 않는다 — 못 쓰는 공고 알림은 소음이다", () => {
+    const list = [
+      { id: "a", title: "서울 공고", region_code: "11" },
+      { id: "b", title: "제주 공고", region_code: "50" },
+      { id: "c", title: "지역 모름" },
+    ];
+    const out = syncInbox(list, [], ["a", "b", "c"]);
+    expect(out.map((n) => n.announcementId)).toEqual(["a", "c"]);
+  });
+});
