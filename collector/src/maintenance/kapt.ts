@@ -261,14 +261,32 @@ export class KaptClient {
     private readonly fetchImpl: typeof fetch = fetch,
     /** 단지 기본정보 캐시. 넘기면 여기서 먼저 찾고, 새로 받은 것은 여기 넣는다 (저장은 부르는 쪽이) */
     private readonly basisCache: BasisCache = new Map(),
+    /**
+     * 일시 오류(04 HTTP_ERROR·5xx) 재시도 간격. K-apt 서버는 몇 초씩 끊긴다 —
+     * 2026-09-24 실측: 76회 성공 뒤 04 한 번, 4분 뒤 정상. 한도 초과(22)·키 오류는 재시도하지 않는다.
+     */
+    private readonly retryDelaysMs: number[] = [2000, 5000, 10000],
   ) {}
+
+  private async get(path: string, params: Record<string, string>): Promise<unknown> {
+    for (let attempt = 0; ; attempt++) {
+      try {
+        return await this.getOnce(path, params);
+      } catch (e) {
+        const transient = e instanceof KaptError && (e.code === "04" || /^HTTP 5/.test(e.message.replace(/^K-apt /, "")));
+        const delay = this.retryDelaysMs[attempt];
+        if (!transient || delay === undefined) throw e;
+        await new Promise((r) => setTimeout(r, delay));
+      }
+    }
+  }
 
   /**
    * 한 번 부른다. 오류는 **던진다** — 조용히 null로 바꾸면 "그 달 신고 없음"·"기본정보 없음"과 구별이 안 된다.
    * 처음에 그렇게 했다가 한도 초과(XML 오류) 응답 24건을 "기본정보 없는 단지"로 캐시에 굳혔다(2026-09-24).
    * 공공데이터포털 오류는 HTTP 200에 XML로 온다(`<returnReasonCode>22</returnReasonCode>` = 하루 한도 초과).
    */
-  private async get(path: string, params: Record<string, string>): Promise<unknown> {
+  private async getOnce(path: string, params: Record<string, string>): Promise<unknown> {
     const p = new URLSearchParams({ serviceKey: this.apiKey, _type: "json", ...params });
     this.calls++;
     const res = await this.fetchImpl(`${BASE}/${path}?${p.toString()}`);

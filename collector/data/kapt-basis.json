@@ -1,4 +1,21 @@
 {
+ "A10020155": {
+  "kapt_code": "A10020155",
+  "name": "강서뉴타워아파트",
+  "households": 0,
+  "private_area_m2": 9901.06,
+  "sale_kind": "분양",
+  "used_from": "2013-01-10"
+ },
+ "A10020494": {
+  "kapt_code": "A10020494",
+  "name": "웰라이빌주상복합관리단",
+  "households": 0,
+  "private_area_m2": 11220.6,
+  "levy_area_m2": 15235.03,
+  "sale_kind": "분양",
+  "used_from": "2000-09-20"
+ },
  "A10021139": {
   "kapt_code": "A10021139",
   "name": "등촌월드메르디앙",
@@ -7,6 +24,51 @@
   "levy_area_m2": 1975190,
   "sale_kind": "분양",
   "used_from": "2002-11-22"
+ },
+ "A10021232": {
+  "kapt_code": "A10021232",
+  "name": "화곡 1동 복지아파트",
+  "households": 104,
+  "private_area_m2": 5609.79,
+  "levy_area_m2": 5609.76,
+  "sale_kind": "분양",
+  "used_from": "1974-12-14"
+ },
+ "A10021290": {
+  "kapt_code": "A10021290",
+  "name": "희훈리치파크아파트",
+  "households": 111,
+  "private_area_m2": 9701.43,
+  "levy_area_m2": 12682.05,
+  "sale_kind": "분양",
+  "used_from": "2002-05-03"
+ },
+ "A10021511": {
+  "kapt_code": "A10021511",
+  "name": "가양우방아파트",
+  "households": 137,
+  "private_area_m2": 10109.43,
+  "levy_area_m2": 13344.425,
+  "sale_kind": "분양",
+  "used_from": "1999-03-02"
+ },
+ "A10021529": {
+  "kapt_code": "A10021529",
+  "name": "비원빌라",
+  "households": 126,
+  "private_area_m2": 5735.88,
+  "levy_area_m2": 10509.36,
+  "sale_kind": "분양",
+  "used_from": "1986-12-24"
+ },
+ "A10021562": {
+  "kapt_code": "A10021562",
+  "name": "강서한강월드메르디앙아파트",
+  "households": 144,
+  "private_area_m2": 12227.76,
+  "levy_area_m2": 15233.04,
+  "sale_kind": "분양",
+  "used_from": "2006-05-25"
  },
  "A10021770": {
   "kapt_code": "A10021770",
@@ -25,6 +87,15 @@
   "levy_area_m2": 13726.98,
   "sale_kind": "분양",
   "used_from": "1993-07-12"
+ },
+ "A10022019": {
+  "kapt_code": "A10022019",
+  "name": "화곡더리브스카이",
+  "households": 140,
+  "private_area_m2": 6977.2396,
+  "levy_area_m2": 14889.038,
+  "sale_kind": "분양",
+  "used_from": "2022-12-21"
  },
  "A10022042": {
   "kapt_code": "A10022042",
@@ -71,6 +142,15 @@
   "sale_kind": "분양",
   "used_from": "2009-12-07"
  },
+ "A10022928": {
+  "kapt_code": "A10022928",
+  "name": "강서금호어울림퍼스티어",
+  "households": 523,
+  "private_area_m2": 28347.88,
+  "levy_area_m2": 39855.36,
+  "sale_kind": "혼합",
+  "used_from": "2023-12-27"
+ },
  "A10023075": {
   "kapt_code": "A10023075",
   "name": "지와인 아파트",
@@ -79,6 +159,15 @@
   "levy_area_m2": 16556.514,
   "sale_kind": "분양",
   "used_from": "2023-06-30"
+ },
+ "A10023515": {
+  "kapt_code": "A10023515",
+  "name": "우장산숲 아이파크",
+  "households": 576,
+  "private_area_m2": 41015.2644,
+  "levy_area_m2": 55412.152,
+  "sale_kind": "분양",
+  "used_from": "2022-12-01"
  },
  "A10023543": {
   "kapt_code": "A10023543",
@@ -98,6 +187,15 @@
   "sale_kind": "임대",
   "used_from": "2022-01-10"
  },
+ "A10024145": {
+  "kapt_code": "A10024145",
+  "name": "우장산역 해링턴타워",
+  "households": 429,
+  "private_area_m2": 13055.38,
+  "levy_area_m2": 28140.06,
+  "sale_kind": "임대",
+  "used_from": "2021-09-03"
+ },
  "A10024353": {
   "kapt_code": "A10024353",
   "name": "염창현대아이파크아파트",
@@ -106,6 +204,24 @@
   "levy_area_m2": 14535.321,
   "sale_kind": "분양",
   "used_from": "2005-07-22"
+ },
+ "A10024367": {
+  "kapt_code": "A10024367",
+  "name": "가양동 강나루 2차현대아파트",
+  "households": 114,
+  "private_area_m2": 9305.06,
+  "levy_area_m2": 11745.8,
+  "sale_kind": "분양",
+  "used_from": "2001-08-29"
+ },
+ "A10024391": {
+  "kapt_code": "A10024391",
+  "name": "태영방송인아파트",
+  "households": 148,
+  "private_area_m2": 12002.4,
+  "levy_area_m2": 16238.916,
+  "sale_kind": "분양",
+  "used_from": "2000-09-29"
  },
  "A10024436": {
   "kapt_code": "A10024436",
@@ -116,6 +232,15 @@
   "sale_kind": "임대",
   "used_from": "2020-12-30"
  },
+ "A10024768": {
+  "kapt_code": "A10024768",
+  "name": "아임2030(청년주택)",
+  "households": 285,
+  "private_area_m2": 4323.26,
+  "levy_area_m2": 9333.18,
+  "sale_kind": "임대",
+  "used_from": "2020-05-01"
+ },
  "A10025049": {
   "kapt_code": "A10025049",
   "name": "염창동길훈아파트",
@@ -124,6 +249,15 @@
   "levy_area_m2": 12363.344,
   "sale_kind": "분양",
   "used_from": "1999-09-30"
+ },
+ "A10025201": {
+  "kapt_code": "A10025201",
+  "name": "서광 프리메라",
+  "households": 75,
+  "private_area_m2": 6330.94,
+  "levy_area_m2": 10942.207,
+  "sale_kind": "분양",
+  "used_from": "2006-06-29"
  },
  "A10025600": {
   "kapt_code": "A10025600",
@@ -134,6 +268,24 @@
   "sale_kind": "혼합",
   "used_from": "2019-03-08"
  },
+ "A10025616": {
+  "kapt_code": "A10025616",
+  "name": "가양보람아파트",
+  "households": 120,
+  "private_area_m2": 9037.25,
+  "levy_area_m2": 11593.2,
+  "sale_kind": "분양",
+  "used_from": "2006-04-27"
+ },
+ "A10025703": {
+  "kapt_code": "A10025703",
+  "name": "삼형그레이스빌아파트",
+  "households": 87,
+  "private_area_m2": 6584.295,
+  "levy_area_m2": 9054.39,
+  "sale_kind": "분양",
+  "used_from": "2001-09-25"
+ },
  "A10027541": {
   "kapt_code": "A10027541",
   "name": "강서쌍용예가아파트",
@@ -142,6 +294,211 @@
   "levy_area_m2": 12457.38,
   "sale_kind": "분양",
   "used_from": "2014-06-11"
+ },
+ "A15701002": {
+  "kapt_code": "A15701002",
+  "name": "우장산에스케이뷰",
+  "households": 203,
+  "private_area_m2": 18559,
+  "levy_area_m2": 22653.7,
+  "sale_kind": "분양",
+  "used_from": "2006-10-26"
+ },
+ "A15701003": {
+  "kapt_code": "A15701003",
+  "name": "우장산아이파크이편한세상",
+  "households": 2517,
+  "private_area_m2": 215891.09,
+  "levy_area_m2": 272834.56,
+  "sale_kind": "분양",
+  "used_from": "2008-01-08"
+ },
+ "A15701004": {
+  "kapt_code": "A15701004",
+  "name": "우장산한화꿈에그린",
+  "households": 187,
+  "private_area_m2": 19102.61,
+  "levy_area_m2": 23107.98,
+  "sale_kind": "분양",
+  "used_from": "2004-11-30"
+ },
+ "A15701005": {
+  "kapt_code": "A15701005",
+  "name": "우장산휴먼빌",
+  "households": 62,
+  "private_area_m2": 5208.315,
+  "sale_kind": ""
+ },
+ "A15701006": {
+  "kapt_code": "A15701006",
+  "name": "명지해드는터",
+  "households": 91,
+  "private_area_m2": 6900.14,
+  "levy_area_m2": 9927.19,
+  "sale_kind": "분양",
+  "used_from": "2005-08-16"
+ },
+ "A15701007": {
+  "kapt_code": "A15701007",
+  "name": "강서힐스테이트아파트",
+  "households": 2603,
+  "private_area_m2": 253958.83,
+  "levy_area_m2": 327242.53,
+  "sale_kind": "분양",
+  "used_from": "2015-08-19"
+ },
+ "A15701601": {
+  "kapt_code": "A15701601",
+  "name": "우장산롯데3차",
+  "households": 206,
+  "private_area_m2": 18514.65,
+  "levy_area_m2": 22445.56,
+  "sale_kind": "분양",
+  "used_from": "2004-08-06"
+ },
+ "A15701602": {
+  "kapt_code": "A15701602",
+  "name": "우장산롯데캐슬",
+  "households": 1164,
+  "private_area_m2": 133365.43,
+  "levy_area_m2": 133365.44,
+  "sale_kind": "분양",
+  "used_from": "2003-09-06"
+ },
+ "A15703001": {
+  "kapt_code": "A15703001",
+  "name": "코오롱하늘채아파트",
+  "households": 200,
+  "private_area_m2": 15141.26,
+  "levy_area_m2": 19161.193,
+  "sale_kind": "분양",
+  "used_from": "2003-11-19"
+ },
+ "A15703002": {
+  "kapt_code": "A15703002",
+  "name": "등촌대동황토방",
+  "households": 241,
+  "private_area_m2": 20245.42,
+  "levy_area_m2": 20245.42,
+  "sale_kind": "분양",
+  "used_from": "2000-07-27"
+ },
+ "A15703004": {
+  "kapt_code": "A15703004",
+  "name": "등촌부영",
+  "households": 712,
+  "private_area_m2": 57415.68,
+  "levy_area_m2": 75318.99,
+  "sale_kind": "분양",
+  "used_from": "1994-12-07"
+ },
+ "A15703005": {
+  "kapt_code": "A15703005",
+  "name": "등촌대동황토방2차아파트",
+  "households": 196,
+  "private_area_m2": 16743.89,
+  "levy_area_m2": 20602.975,
+  "sale_kind": "분양",
+  "used_from": "2003-10-30"
+ },
+ "A15703204": {
+  "kapt_code": "A15703204",
+  "name": "등촌IPARK",
+  "households": 1653,
+  "private_area_m2": 183329.7278,
+  "levy_area_m2": 228718.31,
+  "sale_kind": "분양",
+  "used_from": "2004-01-07"
+ },
+ "A15703301": {
+  "kapt_code": "A15703301",
+  "name": "등촌8단지주공아파트",
+  "households": 445,
+  "private_area_m2": 18623.25,
+  "levy_area_m2": 25288.016,
+  "sale_kind": "분양",
+  "used_from": "1994-11-04"
+ },
+ "A15703302": {
+  "kapt_code": "A15703302",
+  "name": "등촌동성",
+  "households": 457,
+  "private_area_m2": 55640.9,
+  "levy_area_m2": 68147.805,
+  "sale_kind": "분양",
+  "used_from": "1995-11-27"
+ },
+ "A15703303": {
+  "kapt_code": "A15703303",
+  "name": "등촌미주진로",
+  "households": 488,
+  "private_area_m2": 41460.48,
+  "levy_area_m2": 51532.8,
+  "sale_kind": "분양",
+  "used_from": "1994-10-30"
+ },
+ "A15703304": {
+  "kapt_code": "A15703304",
+  "name": "등촌주공2단지",
+  "households": 505,
+  "private_area_m2": 21347.97,
+  "levy_area_m2": 29124.9,
+  "sale_kind": "분양",
+  "used_from": "1995-06-05"
+ },
+ "A15703306": {
+  "kapt_code": "A15703306",
+  "name": "등촌주공10단지",
+  "households": 566,
+  "private_area_m2": 29857.21,
+  "levy_area_m2": 41510.15,
+  "sale_kind": "분양",
+  "used_from": "1995-10-10"
+ },
+ "A15703307": {
+  "kapt_code": "A15703307",
+  "name": "등촌대림아파트",
+  "households": 680,
+  "private_area_m2": 74141.08,
+  "levy_area_m2": 92758.664,
+  "sale_kind": "분양",
+  "used_from": "1995-07-13"
+ },
+ "A15703308": {
+  "kapt_code": "A15703308",
+  "name": "등촌3단지주공아파트",
+  "households": 1016,
+  "private_area_m2": 55426.58,
+  "levy_area_m2": 76127.78,
+  "sale_kind": "분양",
+  "used_from": "1995-10-10"
+ },
+ "A15703309": {
+  "kapt_code": "A15703309",
+  "name": "등촌주공5단지",
+  "households": 1045,
+  "private_area_m2": 55884.44,
+  "levy_area_m2": 77087.75,
+  "sale_kind": "분양",
+  "used_from": "1995-10-10"
+ },
+ "A15703313": {
+  "kapt_code": "A15703313",
+  "name": "등촌주공1단지",
+  "households": 1670,
+  "private_area_m2": 46331.01,
+  "levy_area_m2": 68741.01,
+  "sale_kind": "임대",
+  "used_from": "1994-11-04"
+ },
+ "A15703318": {
+  "kapt_code": "A15703318",
+  "name": "등촌주공11단지",
+  "households": 350,
+  "private_area_m2": 18869.67,
+  "levy_area_m2": 33520.95,
+  "sale_kind": "임대",
+  "used_from": "2004-10-04"
  },
  "A15704001": {
   "kapt_code": "A15704001",
@@ -242,6 +599,78 @@
   "sale_kind": "분양",
   "used_from": "1998-06-29"
  },
+ "A15720001": {
+  "kapt_code": "A15720001",
+  "name": "강서한강자이",
+  "households": 790,
+  "private_area_m2": 73128.8358,
+  "levy_area_m2": 96609.52,
+  "sale_kind": "혼합",
+  "used_from": "2013-09-25"
+ },
+ "A15720101": {
+  "kapt_code": "A15720101",
+  "name": "가양일신건영휴먼빌",
+  "households": 177,
+  "private_area_m2": 14227.695,
+  "levy_area_m2": 17707.607,
+  "sale_kind": "분양",
+  "used_from": "2004-12-23"
+ },
+ "A15770101": {
+  "kapt_code": "A15770101",
+  "name": "화곡2차보람",
+  "households": 187,
+  "private_area_m2": 15175.1,
+  "levy_area_m2": 19247.027,
+  "sale_kind": "분양",
+  "used_from": "2004-11-01"
+ },
+ "A15770102": {
+  "kapt_code": "A15770102",
+  "name": "그랜드아이파크",
+  "households": 159,
+  "private_area_m2": 21076.32,
+  "levy_area_m2": 21076.32,
+  "sale_kind": "분양",
+  "used_from": "2010-06-30"
+ },
+ "A15770801": {
+  "kapt_code": "A15770801",
+  "name": "화곡초록",
+  "households": 626,
+  "private_area_m2": 38601.08,
+  "levy_area_m2": 60760.95,
+  "sale_kind": "분양",
+  "used_from": "1998-11-16"
+ },
+ "A15772901": {
+  "kapt_code": "A15772901",
+  "name": "등촌우성101동",
+  "households": 134,
+  "private_area_m2": 8814.08,
+  "levy_area_m2": 12494.86,
+  "sale_kind": "분양",
+  "used_from": "1992-05-27"
+ },
+ "A15772902": {
+  "kapt_code": "A15772902",
+  "name": "등촌우성102동",
+  "households": 110,
+  "private_area_m2": 9267.83,
+  "levy_area_m2": 13128.32,
+  "sale_kind": "분양",
+  "used_from": "1992-05-27"
+ },
+ "A15774708": {
+  "kapt_code": "A15774708",
+  "name": "가양7단지",
+  "households": 1998,
+  "private_area_m2": 56820.51,
+  "levy_area_m2": 83402.03,
+  "sale_kind": "임대",
+  "used_from": "1992-07-05"
+ },
  "A15776001": {
   "kapt_code": "A15776001",
   "name": "염창강변월드메르디앙",
@@ -277,6 +706,213 @@
   "levy_area_m2": 11958.048,
   "sale_kind": "분양",
   "used_from": "1996-10-05"
+ },
+ "A15776414": {
+  "kapt_code": "A15776414",
+  "name": "등촌주공4단지",
+  "households": 1575,
+  "private_area_m2": 43745.4,
+  "levy_area_m2": 64498.1,
+  "sale_kind": "임대",
+  "used_from": "1995-05-20"
+ },
+ "A15776617": {
+  "kapt_code": "A15776617",
+  "name": "등촌주공6단지",
+  "households": 559,
+  "private_area_m2": 23018.23,
+  "levy_area_m2": 34120.02,
+  "sale_kind": "임대",
+  "used_from": "1995-10-10"
+ },
+ "A15776715": {
+  "kapt_code": "A15776715",
+  "name": "등촌주공7단지",
+  "households": 1146,
+  "private_area_m2": 31403.07,
+  "levy_area_m2": 46408.94,
+  "sale_kind": "임대",
+  "used_from": "1994-11-04"
+ },
+ "A15776916": {
+  "kapt_code": "A15776916",
+  "name": "등촌주공9단지",
+  "households": 1445,
+  "private_area_m2": 43128.9,
+  "levy_area_m2": 62108.98,
+  "sale_kind": "임대",
+  "used_from": "1994-11-04"
+ },
+ "A15780002": {
+  "kapt_code": "A15780002",
+  "name": "가양우성",
+  "households": 414,
+  "private_area_m2": 34625.52,
+  "levy_area_m2": 41891.04,
+  "sale_kind": "분양",
+  "used_from": "1990-10-30"
+ },
+ "A15780401": {
+  "kapt_code": "A15780401",
+  "name": "가양강나루현대",
+  "households": 642,
+  "private_area_m2": 45931.92,
+  "levy_area_m2": 60209.82,
+  "sale_kind": "분양",
+  "used_from": "1999-03-26"
+ },
+ "A15780602": {
+  "kapt_code": "A15780602",
+  "name": "가양한보구암",
+  "households": 359,
+  "private_area_m2": 25802.16,
+  "levy_area_m2": 25802.16,
+  "sale_kind": "분양",
+  "used_from": "1999-02-10"
+ },
+ "A15780603": {
+  "kapt_code": "A15780603",
+  "name": "가양동신대아",
+  "households": 660,
+  "private_area_m2": 86621.4,
+  "levy_area_m2": 103621.32,
+  "sale_kind": "분양",
+  "used_from": "1993-06-17"
+ },
+ "A15780604": {
+  "kapt_code": "A15780604",
+  "name": "한강타운아파트",
+  "households": 990,
+  "private_area_m2": 84140.1,
+  "levy_area_m2": 103088.7,
+  "sale_kind": "분양",
+  "used_from": "1993-06-15"
+ },
+ "A15780605": {
+  "kapt_code": "A15780605",
+  "name": "가양2단지",
+  "households": 1624,
+  "private_area_m2": 66816.8,
+  "levy_area_m2": 97259.32,
+  "sale_kind": "분양",
+  "used_from": "1992-11-18"
+ },
+ "A15780701": {
+  "kapt_code": "A15780701",
+  "name": "가양중앙하이츠",
+  "households": 164,
+  "private_area_m2": 19655.4,
+  "levy_area_m2": 24879.783,
+  "sale_kind": "분양",
+  "used_from": "1999-04-29"
+ },
+ "A15780703": {
+  "kapt_code": "A15780703",
+  "name": "가양대림경동",
+  "households": 540,
+  "private_area_m2": 70956,
+  "levy_area_m2": 83843.1,
+  "sale_kind": "분양",
+  "used_from": "1993-09-17"
+ },
+ "A15780704": {
+  "kapt_code": "A15780704",
+  "name": "가양3단지(강변)",
+  "households": 1556,
+  "private_area_m2": 63616.44,
+  "levy_area_m2": 92155.22,
+  "sale_kind": "분양",
+  "used_from": "1992-12-02"
+ },
+ "A15783701": {
+  "kapt_code": "A15783701",
+  "name": "등촌임광",
+  "households": 168,
+  "private_area_m2": 13843.79,
+  "levy_area_m2": 18481.43,
+  "sale_kind": "분양",
+  "used_from": "2000-05-12"
+ },
+ "A15783703": {
+  "kapt_code": "A15783703",
+  "name": "등촌대림e편한세상",
+  "households": 222,
+  "private_area_m2": 20952.32,
+  "levy_area_m2": 27561.48,
+  "sale_kind": "분양",
+  "used_from": "2002-05-18"
+ },
+ "A15783806": {
+  "kapt_code": "A15783806",
+  "name": "등촌라인",
+  "households": 317,
+  "private_area_m2": 23033.43,
+  "levy_area_m2": 31105.01,
+  "sale_kind": "분양",
+  "used_from": "1997-10-29"
+ },
+ "A15783902": {
+  "kapt_code": "A15783902",
+  "name": "등촌태영",
+  "households": 186,
+  "private_area_m2": 14905.04,
+  "levy_area_m2": 19157.527,
+  "sale_kind": "분양",
+  "used_from": "1998-06-25"
+ },
+ "A15783905": {
+  "kapt_code": "A15783905",
+  "name": "등촌삼성한사랑",
+  "households": 244,
+  "private_area_m2": 18249.92,
+  "levy_area_m2": 24104.66,
+  "sale_kind": "분양",
+  "used_from": "1997-12-17"
+ },
+ "A15783907": {
+  "kapt_code": "A15783907",
+  "name": "한사랑2차삼성아파트(등촌동)",
+  "households": 339,
+  "private_area_m2": 25629.21,
+  "levy_area_m2": 36982.19,
+  "sale_kind": "분양",
+  "used_from": "1999-06-29"
+ },
+ "A15784003": {
+  "kapt_code": "A15784003",
+  "name": "등촌코오롱오투빌1차",
+  "households": 191,
+  "private_area_m2": 14237.81,
+  "levy_area_m2": 18605.4,
+  "sale_kind": "분양",
+  "used_from": "1999-06-14"
+ },
+ "A15784008": {
+  "kapt_code": "A15784008",
+  "name": "등촌서광",
+  "households": 430,
+  "private_area_m2": 30790.31,
+  "levy_area_m2": 39484.28,
+  "sale_kind": "분양",
+  "used_from": "1999-04-01"
+ },
+ "A15784201": {
+  "kapt_code": "A15784201",
+  "name": "등촌현대1차(한마음)",
+  "households": 170,
+  "private_area_m2": 14381.66,
+  "levy_area_m2": 18545.453,
+  "sale_kind": "분양",
+  "used_from": "1995-07-13"
+ },
+ "A15784402": {
+  "kapt_code": "A15784402",
+  "name": "등촌태진아름",
+  "households": 221,
+  "private_area_m2": 17447.79,
+  "levy_area_m2": 22732.53,
+  "sale_kind": "분양",
+  "used_from": "1995-09-15"
  },
  "A15785919": {
   "kapt_code": "A15785919",
@@ -430,5 +1066,50 @@
   "levy_area_m2": 22915.61,
   "sale_kind": "분양",
   "used_from": "1998-07-21"
+ },
+ "A15788203": {
+  "kapt_code": "A15788203",
+  "name": "화곡중앙하이츠",
+  "households": 473,
+  "private_area_m2": 29805.84,
+  "levy_area_m2": 39791.754,
+  "sale_kind": "분양",
+  "used_from": "1988-12-12"
+ },
+ "A15788302": {
+  "kapt_code": "A15788302",
+  "name": "화곡대림아파트",
+  "households": 416,
+  "private_area_m2": 39055.6,
+  "levy_area_m2": 47324.68,
+  "sale_kind": "분양",
+  "used_from": "1992-08-31"
+ },
+ "A15788901": {
+  "kapt_code": "A15788901",
+  "name": "화곡미성",
+  "households": 228,
+  "private_area_m2": 21873.88,
+  "levy_area_m2": 27904.922,
+  "sale_kind": "분양",
+  "used_from": "1987-05-02"
+ },
+ "A15791001": {
+  "kapt_code": "A15791001",
+  "name": "화곡유림노르웨이숲",
+  "households": 225,
+  "private_area_m2": 15836.31,
+  "levy_area_m2": 21272.72,
+  "sale_kind": "분양",
+  "used_from": "2004-09-16"
+ },
+ "A15792602": {
+  "kapt_code": "A15792602",
+  "name": "화곡푸르지오",
+  "households": 2176,
+  "private_area_m2": 263514.45,
+  "levy_area_m2": 345647.72,
+  "sale_kind": "분양",
+  "used_from": "2002-10-31"
  }
 }

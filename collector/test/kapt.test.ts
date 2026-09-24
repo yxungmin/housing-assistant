@@ -218,8 +218,15 @@ describe("KaptClient", () => {
     // 2026-09-24 실측: K-apt 서버 장애 때 JSON으로 온 오류
     const json = (async () => new Response(JSON.stringify({ OpenAPI_ServiceResponse: { cmmMsgHeader: { errMsg: "HTTP_ERROR", returnAuthMsg: "HTTP 에러", returnReasonCode: "04" } } }), { status: 200 })) as typeof fetch;
     const cache = new Map();
-    await expect(new KaptClient("k", json, cache).basis("A1")).rejects.toBeInstanceOf(KaptError);
+    await expect(new KaptClient("k", json, cache, []).basis("A1")).rejects.toBeInstanceOf(KaptError);
     expect(cache.size).toBe(0);
+
+    // 04는 일시 오류라 재시도한다 — 두 번째에 정상이면 그 값을 쓴다
+    let n = 0;
+    const flaky = (async () =>
+      new Response(++n === 1 ? JSON.stringify({ OpenAPI_ServiceResponse: { cmmMsgHeader: { returnReasonCode: "04" } } }) : JSON.stringify(BASIS), { status: 200 })) as typeof fetch;
+    expect((await new KaptClient("k", flaky, new Map(), [0]).basis("A10027875"))?.households).toBe(182);
+    expect(n).toBe(2);
 
     // 정상 껍데기의 NODATA(03)는 오류가 아니다 — 그 단지에 기본정보가 없다는 뜻이고, 그건 캐시한다
     const nodata = (async () => new Response(JSON.stringify({ response: { header: { resultCode: "03", resultMsg: "NODATA_ERROR" }, body: {} } }), { status: 200 })) as typeof fetch;
