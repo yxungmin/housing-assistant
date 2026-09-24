@@ -1029,6 +1029,51 @@
   "sale_kind": "분양",
   "used_from": "1995-12-16"
  },
+ "A15722204": {
+  "kapt_code": "A15722204",
+  "name": "방화동E편한세상",
+  "households": 279,
+  "private_area_m2": 23149.81,
+  "levy_area_m2": 29147.25,
+  "sale_kind": "분양",
+  "used_from": "2003-10-28"
+ },
+ "A15722304": {
+  "kapt_code": "A15722304",
+  "name": "치현마을동일스위트리버아파트",
+  "households": 213,
+  "private_area_m2": 16700.3232,
+  "levy_area_m2": 21414.871,
+  "sale_kind": "분양",
+  "used_from": "2004-12-23"
+ },
+ "A15722306": {
+  "kapt_code": "A15722306",
+  "name": "마곡서광",
+  "households": 284,
+  "private_area_m2": 19699.62,
+  "levy_area_m2": 24792.9,
+  "sale_kind": "분양",
+  "used_from": "1998-08-21"
+ },
+ "A15722307": {
+  "kapt_code": "A15722307",
+  "name": "방화1단지(장미)",
+  "households": 387,
+  "private_area_m2": 19111.8,
+  "levy_area_m2": 26866.73,
+  "sale_kind": "분양",
+  "used_from": "1994-07-29"
+ },
+ "A15722314": {
+  "kapt_code": "A15722314",
+  "name": "방화2단지",
+  "households": 1563,
+  "private_area_m2": 41408.66,
+  "levy_area_m2": 63595.383,
+  "sale_kind": "임대",
+  "used_from": "1993-10-25"
+ },
  "A15728002": {
   "kapt_code": "A15728002",
   "name": "마곡수명산파크6단지",
@@ -1180,6 +1225,15 @@
   "sale_kind": "분양",
   "used_from": "1992-05-27"
  },
+ "A15773501": {
+  "kapt_code": "A15773501",
+  "name": "방화월드메르디앙",
+  "households": 258,
+  "private_area_m2": 20876.18,
+  "levy_area_m2": 26123.5,
+  "sale_kind": "분양",
+  "used_from": "2004-06-07"
+ },
  "A15774708": {
   "kapt_code": "A15774708",
   "name": "가양7단지",
@@ -1260,6 +1314,24 @@
   "levy_area_m2": 62108.98,
   "sale_kind": "임대",
   "used_from": "1994-11-04"
+ },
+ "A15777501": {
+  "kapt_code": "A15777501",
+  "name": "마곡중앙하이츠아파트",
+  "households": 930,
+  "private_area_m2": 46610.1,
+  "levy_area_m2": 65844.87,
+  "sale_kind": "분양",
+  "used_from": "1994-05-14"
+ },
+ "A15778101": {
+  "kapt_code": "A15778101",
+  "name": "방화동성아파트",
+  "households": 686,
+  "private_area_m2": 52310.7,
+  "levy_area_m2": 65560.08,
+  "sale_kind": "분양",
+  "used_from": "1993-12-16"
  },
  "A15779704": {
   "kapt_code": "A15779704",
@@ -1512,6 +1584,123 @@
   "levy_area_m2": 22732.53,
   "sale_kind": "분양",
   "used_from": "1995-09-15"
+ },
+ "A15784601": {
+  "kapt_code": "A15784601",
+  "name": "마곡현대아파트",
+  "households": 202,
+  "private_area_m2": 15711.79,
+  "levy_area_m2": 20234.98,
+  "sale_kind": "분양",
+  "used_from": "1999-12-23"
+ },
+ "A15785002": {
+  "kapt_code": "A15785002",
+  "name": "방화3차우림필유",
+  "households": 187,
+  "private_area_m2": 14858.16,
+  "levy_area_m2": 18693.5,
+  "sale_kind": "분양",
+  "used_from": "2005-06-02"
+ },
+ "A15785005": {
+  "kapt_code": "A15785005",
+  "name": "방화11단지",
+  "households": 1065,
+  "private_area_m2": 29239.8,
+  "levy_area_m2": 43941.766,
+  "sale_kind": "임대",
+  "used_from": "1994-05-21"
+ },
+ "A15785507": {
+  "kapt_code": "A15785507",
+  "name": "마곡현대1차",
+  "households": 337,
+  "private_area_m2": 27662.73,
+  "levy_area_m2": 37828.44,
+  "sale_kind": "분양",
+  "used_from": "1993-11-26"
+ },
+ "A15785601": {
+  "kapt_code": "A15785601",
+  "name": "방화진로",
+  "households": 160,
+  "private_area_m2": 13589.4,
+  "levy_area_m2": 17360,
+  "sale_kind": "분양",
+  "used_from": "1994-09-09"
+ },
+ "A15785605": {
+  "kapt_code": "A15785605",
+  "name": "방화9단지",
+  "households": 250,
+  "private_area_m2": 9960.43,
+  "levy_area_m2": 14461.497,
+  "sale_kind": "임대",
+  "used_from": "1996-09-20"
+ },
+ "A15785608": {
+  "kapt_code": "A15785608",
+  "name": "방화동 개화아파트",
+  "households": 462,
+  "private_area_m2": 52648.2,
+  "levy_area_m2": 64933.68,
+  "sale_kind": "분양",
+  "used_from": "1994-03-31"
+ },
+ "A15785612": {
+  "kapt_code": "A15785612",
+  "name": "방화6단지",
+  "households": 1000,
+  "private_area_m2": 29625.04,
+  "levy_area_m2": 43741.02,
+  "sale_kind": "임대",
+  "used_from": "1994-08-17"
+ },
+ "A15785613": {
+  "kapt_code": "A15785613",
+  "name": "방화5단지",
+  "households": 1372,
+  "private_area_m2": 56194.14,
+  "levy_area_m2": 80344.164,
+  "sale_kind": "분양",
+  "used_from": "1994-08-17"
+ },
+ "A15785703": {
+  "kapt_code": "A15785703",
+  "name": "마곡한숲대림아파트",
+  "households": 206,
+  "private_area_m2": 15321.64,
+  "levy_area_m2": 19519.58,
+  "sale_kind": "분양",
+  "used_from": "1999-08-16"
+ },
+ "A15785709": {
+  "kapt_code": "A15785709",
+  "name": "방화청솔3단지",
+  "households": 488,
+  "private_area_m2": 24088.32,
+  "levy_area_m2": 36319.95,
+  "sale_kind": "분양",
+  "used_from": "1994-07-28"
+ },
+ "A15785710": {
+  "kapt_code": "A15785710",
+  "name": "방화4단지(삼익삼환)",
+  "households": 680,
+  "private_area_m2": 79274.52,
+  "levy_area_m2": 94882.63,
+  "sale_kind": "분양",
+  "used_from": "1994-08-24"
+ },
+ "A15785711": {
+  "kapt_code": "A15785711",
+  "name": "방화2-2 그린",
+  "households": 984,
+  "private_area_m2": 40252.38,
+  "levy_area_m2": 58205.8,
+  "sale_kind": "분양",
+  "used_from": "1993-10-25"
  },
  "A15785919": {
   "kapt_code": "A15785919",

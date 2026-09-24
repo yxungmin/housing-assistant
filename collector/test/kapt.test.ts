@@ -183,6 +183,24 @@ describe("KaptClient", () => {
     expect(again.urls.filter((u) => u.includes("AptBasisInfoServiceV5")).length).toBe(0);
   });
 
+  it("가장 비슷한 단지에 신고값이 없으면 다음으로 가까운 단지로 내려간다 — 소단지는 관리비 신고가 없다", async () => {
+    // 세대수 60·70·80·90·100(신고 없음) · 200·300·400·500·600(신고 있음). 공고 14세대.
+    const rows = Array.from({ length: 10 }, (_, i) => ({ kaptCode: `C${i + 1}`, kaptName: `단지${i + 1}` }));
+    const size: Record<string, number> = Object.fromEntries(rows.map((r, i) => [r.kaptCode, i < 5 ? 60 + i * 10 : (i - 3) * 100]));
+    const { fetch } = fakeFetch((path, q) => {
+      if (path.startsWith("AptListService4")) return { response: { body: { items: rows, totalCount: rows.length } } };
+      if (path.startsWith("AptBasisInfoServiceV5")) {
+        const code = q.get("kaptCode")!;
+        return { response: { body: { item: { kaptCode: code, kaptName: `단지${code}`, privArea: "1000", kaptdaCnt: size[code] } } } };
+      }
+      if (size[q.get("kaptCode")!]! < 150) return empty; // 비의무관리 소단지 — 신고 없음
+      if (path.endsWith("getHsmpLaborCostInfoV3")) return item({ pay: 1_000_000 });
+      return item({ x: 0 });
+    });
+    const info = await new KaptClient("k", fetch, new Map(), [], 0).forAnnouncement({ sigunguCode: "11500", district: "서울 강서구", title: "가로주택", households: 14, now });
+    expect(info).toMatchObject({ basis: "district", sample: 5, sample_households: [200, 600], common_per_m2: 1000 });
+  });
+
   it("기본정보 예산이 모자라면 아는 단지 안에서 고른다", async () => {
     const rows = Array.from({ length: 10 }, (_, i) => ({ kaptCode: `C${i + 1}`, kaptName: `단지${i + 1}` }));
     const { fetch, urls } = fakeFetch((path, q) => {

@@ -2499,7 +2499,21 @@
    "자산 기준·자동차 가액을 읽지 못했어요 (다른 공급 유형에는 있어요)"
   ],
   "complex": "강서염창(가로주택) 통합공공임대주택",
-  "households": 14
+  "households": 14,
+  "maintenance": {
+   "basis": "district",
+   "district": "서울 강서구",
+   "sample": 5,
+   "sample_households": [
+    65,
+    105
+   ],
+   "common_per_m2": 1152,
+   "months": [
+    "2026-07"
+   ],
+   "source": "K-apt 공동주택관리정보시스템"
+  }
  },
  {
   "id": "012",

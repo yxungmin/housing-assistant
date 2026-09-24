@@ -429,7 +429,10 @@ export class KaptClient {
         spent++;
       }
       const known = rows.map((c) => this.basisCache.get(c.kapt_code)).filter((b): b is KaptBasis => !!b);
-      sample = pickBySize(known, households, sampleSize).map((b) => ({ kapt_code: b.kapt_code, name: b.name }));
+      // 가까운 순으로 넉넉히 뽑아 두고 아래에서 신고값이 있는 단지가 sampleSize개 모일 때까지 내려간다.
+      // 목록에는 의무관리대상이 아닌 소단지(60~90세대)도 있는데 그런 곳은 관리비 신고가 없다 —
+      // 14세대 공고(008)에 "가장 비슷한 5단지"를 고정으로 잡았더니 다섯 곳 모두 빈손이었다(2026-09-24).
+      sample = pickBySize(known, households, sampleSize * 3).map((b) => ({ kapt_code: b.kapt_code, name: b.name }));
       bySize = sample.length > 0;
     } else sample = pickDistrictSample(rows, sampleSize);
 
@@ -437,12 +440,15 @@ export class KaptClient {
     const sizes: number[] = [];
     let month: string | null = null;
     for (const c of sample) {
+      if (rates.length >= sampleSize) break;
       const basis = await this.basis(c.kapt_code);
       if (!basis?.private_area_m2) continue;
       // 달은 첫 단지에서 정하고 나머지에 같이 쓴다. 단지마다 찾으면 호출이 배로 든다.
-      month ??= await this.latestMonth(c.kapt_code, now);
-      if (!month) continue;
-      const total = await this.commonTotal(c.kapt_code, month);
+      // 신고가 없는 단지에서 정하려 들면 여섯 달을 다 뒤지고도 못 정한다 — 그 단지는 건너뛰고 다음에서 정한다.
+      const m: string | null = month ?? (await this.latestMonth(c.kapt_code, now));
+      if (!m) continue;
+      month = m;
+      const total = await this.commonTotal(c.kapt_code, m);
       if (total === undefined || total <= 0) continue;
       rates.push(total / basis.private_area_m2);
       if (basis.households) sizes.push(basis.households);
