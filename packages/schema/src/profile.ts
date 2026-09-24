@@ -35,6 +35,11 @@ export const UserProfile = z.object({
   subscription_as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().describe("위 두 값을 입력한 날. 납입 중이면 이후 지난 달수를 더한다"),
   subscription_active: z.boolean().optional().describe("지금도 매달 납입 중인가"),
   cash_on_hand: z.number().int().min(0).optional().describe("보유 현금 (원)"),
+  /**
+   * 2023.3.28 이후 출산·입양한 미성년 자녀 수 (태아 포함). 출산가구는 소득·자산 기준이 10~20%p 올라간다.
+   * 전체 자녀 수(children_count)와 따로 묻는다 — 기준일 이전 자녀는 가산이 없다.
+   */
+  newborn_children: z.number().int().min(0).optional().describe("2023.3.28 이후 출산·입양 미성년 자녀 수 (태아 포함)"),
   statuses: z.array(SpecialStatus).optional().describe("해당하는 계층 자격. 빈 배열 = 해당 없음, undefined = 미입력"),
   workplace: z.object({ label: z.string().optional(), lat: z.number(), lng: z.number() }).optional(),
   /**

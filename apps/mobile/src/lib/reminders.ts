@@ -43,13 +43,17 @@ export interface ReminderItem {
   saved?: boolean;
   /** "신청함"으로 표시했는가 — 발표 알림 대상 */
   applied?: boolean;
+  /** 서류제출 대상자 발표일. 신청한 사람에게 당일 알린다 */
+  documents_announce?: string;
+  /** 서류 제출 마감. 기간 안에 안 내면 탈락이라 하루 전에 알린다 */
+  documents_end?: string;
 }
 
 export interface PlannedReminder {
   id: string;
   /** 결제 고지는 공고와 무관하다 — 그때는 빈 문자열이고 화면 이동도 하지 않는다 */
   announcementId: string;
-  kind: "deadline" | "announce" | "charge";
+  kind: "deadline" | "announce" | "charge" | "documents";
   at: Date;
   title: string;
   body: string;
@@ -131,6 +135,20 @@ export function plannedReminders(
           body: `${it.title} 접수가 ${md(it.apply_end)}에 끝나요.`,
           channel: "deadline",
         });
+      }
+    }
+
+    // 서류 단계. 접수 뒤에 한 번 더 걸러지는 자리라 놓치면 당첨 전에 탈락한다
+    if (it.applied && it.documents_announce) {
+      const when = at(it.documents_announce, 0);
+      if (when && when.getTime() > now.getTime()) {
+        out.push({ id: `documents-announce:${it.id}`, announcementId: it.id, kind: "documents", at: when, title: "오늘 서류제출 대상자 발표예요", body: `${it.title} 서류제출 대상자 발표가 오늘이에요. 대상이면 기간 안에 서류를 내야 해요.`, channel: "announce" });
+      }
+    }
+    if (it.applied && it.documents_end) {
+      const when = at(it.documents_end, 1);
+      if (when && when.getTime() > now.getTime()) {
+        out.push({ id: `documents-end:${it.id}`, announcementId: it.id, kind: "documents", at: when, title: "내일 서류 제출 마감", body: `${it.title} 서류 제출이 ${md(it.documents_end)}에 끝나요. 대상이라면 늦지 않게 내 주세요.`, channel: "announce" });
       }
     }
 

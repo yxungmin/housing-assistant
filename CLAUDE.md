@@ -32,6 +32,9 @@
   순위는 자격과 따로다(`rank.ts`, 스키마 `priority_ranks`·`selection_order`, 추출 v5). 순위 조건을 rules에 넣으면 2순위가 "불일치"로 공고를 잃는다.
   조건이 모두 맞는 첫 순위가 예상 순위이고, 앞 순위를 입력이 없어 못 가렸으면 `certain: false` — 화면은 "더 앞 순위일 수 있어요"라고만 말한다.
   순위별 접수일(`apply_date`)이 있으면 알린다 — 다른 날 접수하면 부적격이다.
+  출산가구 가산은 룰의 `bonuses`(v6). 기본 상한을 넘어도 가산 상한 안이면 맞고, 출산 자녀 수(`newborn_children`)를 모르면
+  불일치가 아니라 확인 필요다. 자녀가 0명이라고 답했으면 0명으로 본다. 가산된 상한을 별도 룰로 만들지 않는다.
+  v6는 그 밖에 접수 방법(`application`, 인터넷 불가면 "신청하기"를 띄우지 않는다)·서류 일정(`schedule.documents_*`)·거주 기간(트랙 `residence`)을 받는다.
   룰의 `verified`(사람 검수 여부)는 판정에 쓰지 않는다 — 검수 전이라고 숨기면 자격이 되는 사람에게 공고를 감추게 된다. 화면이 사실대로 알린다.
 - `collector` 기관 목록 → PDF → 텍스트/섹션 → Claude 구조화 추출(`llm/extract.ts`) → `autoChecks` → Supabase(`db/supabase.ts`, 버저닝). 기관 어댑터는 `sources.ts` 한 곳(LH는 공공데이터포털 API, SH는 게시판 HTML 파싱 `sh/api.ts`). 수집 범위는 `COLLECT_PROVIDERS`·`COLLECT_REGIONS`(기본 LH,SH / 서울·경기)로 줄여 비용을 통제한다.
 - `supabase/functions/transit` 흩어진 집까지의 대중교통 소요를 카카오에 물어 캐시한다(`commute_cache`).

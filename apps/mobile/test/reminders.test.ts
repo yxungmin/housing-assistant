@@ -121,3 +121,17 @@ describe("첫 결제 3일 전 고지", () => {
     expect(plan(new Date(2026, 9, 5).toISOString())[0]?.announcementId).toBe("");
   });
 });
+
+describe('서류 단계 알림', () => {
+  const now = new Date(2026, 9, 1, 12);
+  const item: ReminderItem = { id: 'a', title: '양산 국민임대', applied: true, documents_announce: '2026-10-16', documents_end: '2026-10-23' };
+
+  it('신청한 공고에 서류제출 대상자 발표 당일과 서류 마감 하루 전을 건다', () => {
+    const r = plannedReminders([item], now).filter((x) => x.kind === 'documents');
+    expect(r.map((x) => [x.id, x.at.getDate()])).toEqual([['documents-announce:a', 16], ['documents-end:a', 22]]);
+  });
+
+  it('신청하지 않았으면 걸지 않는다 — 서류 대상인지부터 모른다', () => {
+    expect(plannedReminders([{ ...item, applied: false, saved: true }], now).filter((x) => x.kind === 'documents')).toEqual([]);
+  });
+});

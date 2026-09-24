@@ -78,6 +78,8 @@ function useReminderSync() {
         title: a.title,
         apply_end: a.apply_end,
         winner_announce: a.extraction.schedule.winner_announce,
+        documents_announce: a.extraction.schedule.documents_announce,
+        documents_end: a.extraction.schedule.documents_end,
         saved: saved.includes(a.id),
         applied: applied.includes(a.id),
       }));

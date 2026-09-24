@@ -22,16 +22,23 @@ import { hasSource } from "./source";
 export interface ApplyLink {
   label: string;
   url: string;
+  /** 인터넷 접수를 받지 않는 공고 (현장 접수만). 화면이 따로 알린다 */
+  onsiteOnly?: boolean;
 }
 
 const LH_APPLY = /^https?:\/\/apply\.lh\.or\.kr\//;
 
-export function applyLink(a: Pick<Announcement, "provider" | "detail_url" | "apply_start" | "apply_end">, now = new Date()): ApplyLink | null {
+export function applyLink(
+  a: Pick<Announcement, "provider" | "detail_url" | "apply_start" | "apply_end"> & { extraction?: Pick<Announcement["extraction"], "application"> },
+  now = new Date(),
+): ApplyLink | null {
   const url = a.detail_url;
   if (!url || !hasSource(url)) return null;
   const phase = applyPhase(a, now);
   if (phase.kind === "closed") return null;
   const who = a.provider && a.provider !== "기타" ? a.provider : "기관";
+  // 현장 접수만 받는 공고(2026-09 군산 영구임대: "인터넷 불가")에서 "신청하기"는 틀린 안내다. 공고 페이지만 연다
+  if (a.extraction?.application?.online === false) return { label: `${who} 공고 페이지 열기`, url, onsiteOnly: true };
   if (phase.kind === "open" && LH_APPLY.test(url)) return { label: "LH청약플러스에서 신청하기", url };
   return { label: `${who} 공고 페이지 열기`, url };
 }

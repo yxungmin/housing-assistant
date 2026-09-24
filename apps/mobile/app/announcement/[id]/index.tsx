@@ -146,6 +146,14 @@ export default function AnnouncementDetail() {
   const counts = track ? ruleCounts(track) : { matched: 0, needsCheck: 0, total: 0 };
   // 자격과 순위는 다른 질문이다. 순위 기준을 읽은 공고에서만 (engine/rank.ts)
   const rank = track && state.profile ? expectedRank(track.track, state.profile) : null;
+  // "되면 얼마나 살 수 있나". 전에는 notes 글("최장 30년 거주")에 묻혀 있었다
+  const res = track?.track.residence;
+  const residenceText = res && (res.max_years || res.contract_years)
+    ? {
+        value: res.max_years ? `최장 ${res.max_years}년` : `${res.contract_years}년 계약`,
+        note: [res.max_years && res.contract_years ? `${res.contract_years}년마다 재계약` : null, res.note ?? null].filter(Boolean).join(" · ") || undefined,
+      }
+    : null;
   const selection = track?.track.selection_order?.map((x) => ({ rank: "순위", score: "배점", lottery: "추첨" })[x]).join(" → ");
   const notes = userFacingNotes(a.extraction.notes);
   /**
@@ -236,6 +244,11 @@ export default function AnnouncementDetail() {
           </Notice>
         ) : null}
 
+        {a.extraction.application?.online === false ? (
+          <Notice tone="warn" icon="alert">
+            인터넷 접수를 받지 않는 공고예요. {a.extraction.application.place ? `${a.extraction.application.place}에서 ` : ""}현장 접수만 받아요.
+          </Notice>
+        ) : null}
         {!isReadable(a) ? (
           <Notice tone="warn" icon="alert">공고문에서 조건을 읽지 못했어요. 이 공고는 조건 일치와 비용 계산을 하지 않아요 — 공고문을 직접 봐 주세요.</Notice>
         ) : a.checks?.length ? (
@@ -297,7 +310,7 @@ export default function AnnouncementDetail() {
                 자격 아래에 순위를 둔다. "조건 6개 일치"만 보고 되는 줄 알았다가, 2순위라 차례가 안 오는 공고가 흔하다.
                 앞 순위를 판별하지 못했으면 단정하지 않는다 — "더 앞 순위일 수 있어요"라고 말한다.
               */}
-              {rank || selection ? (
+              {rank || selection || residenceText ? (
                 <View style={{ borderTopWidth: 1, borderTopColor: colors.line, marginTop: 8, paddingTop: 14, paddingHorizontal: 4, gap: 10 }}>
                   {rank ? (
                     <KeyValue
@@ -313,6 +326,7 @@ export default function AnnouncementDetail() {
                     </Notice>
                   ) : null}
                   {selection ? <Sub tone="3" variant="caption">경쟁이 붙으면 {selection} 순서로 뽑아요.</Sub> : null}
+                  {residenceText ? <KeyValue label="살 수 있는 기간" value={residenceText.value} note={residenceText.note} /> : null}
                 </View>
               ) : null}
             </Card>
@@ -464,7 +478,7 @@ export default function AnnouncementDetail() {
               {/* 공급·신청 수는 여기서 본문이다. src로 주면 (i) 뒤에 접혀 눌러야 보인다 */}
               {a.past_results.slice(0, 4).map((r, i) => (
                 <KeyValue
-                  key={`${r.draw_type ?? i}`}
+                  key={`${r.draw_type ?? ""}-${i}`}
                   label={r.draw_type ? `${r.draw_type}형` : "주택형을 못 읽음"}
                   value={r.closed_rank ? `${r.closed_rank}순위 마감` : "마감 순위 모름"}
                   note={
@@ -505,7 +519,7 @@ export default function AnnouncementDetail() {
               />
               {a.waiting.rows.slice(0, 4).map((r, i) => (
                 <KeyValue
-                  key={`${r.unit_type ?? i}`}
+                  key={`${r.unit_type ?? ""}-${i}`}
                   label={r.unit_type ? `${r.unit_type}형` : "주택형을 못 읽음"}
                   value={`${r.waiting.toLocaleString("ko-KR")}명`}
                   src={r.terminated ? `최근 해지 ${r.terminated}건` : undefined}
@@ -525,6 +539,14 @@ export default function AnnouncementDetail() {
             {/* 표 안에서는 자릿수를 맞춘다. 문장 안(알림·고지)에서만 "2026년 9월 17일" 꼴을 쓴다 */}
             <KeyValue label="공고일" value={dateText(a.notice_date)} />
             <KeyValue label="접수" value={dateRange(a.apply_start, a.apply_end)} />
+            {a.extraction.application?.online !== false && a.extraction.application?.onsite_for ? (
+              <Sub tone="3" variant="caption">현장 접수는 {a.extraction.application.onsite_for}만 할 수 있어요.</Sub>
+            ) : null}
+            {/* 접수 뒤에 서류 단계가 따로 있다. 놓치면 당첨 전에 탈락한다 — 그래서 신청함으로 표시하면 알림도 건다 */}
+            {a.extraction.schedule.documents_announce ? <KeyValue label="서류제출 대상자 발표" value={dateText(a.extraction.schedule.documents_announce)} /> : null}
+            {a.extraction.schedule.documents_start || a.extraction.schedule.documents_end ? (
+              <KeyValue label="서류 제출" value={dateRange(a.extraction.schedule.documents_start, a.extraction.schedule.documents_end)} />
+            ) : null}
             {/* 누르기 **전에도** 북마크가 무엇을 하는지 알 수 있어야 한다.
                 누른 뒤에만 알려 주면, 그 기능이 있는 줄 모르는 사람은 영영 안 누른다.
                 이미 담았으면 같은 말을 또 하지 않는다. */}
@@ -569,6 +591,9 @@ export default function AnnouncementDetail() {
                 </Pressable>
                 )}
               </>
+            ) : null}
+            {a.extraction.schedule.contract_start || a.extraction.schedule.contract_end ? (
+              <KeyValue label="계약" value={dateRange(a.extraction.schedule.contract_start, a.extraction.schedule.contract_end)} />
             ) : null}
             {a.extraction.schedule.move_in ? <KeyValue label="입주 예정" value={looseDate(a.extraction.schedule.move_in)} /> : null}
           </Card>

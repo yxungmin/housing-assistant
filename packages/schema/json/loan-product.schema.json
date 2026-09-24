@@ -193,6 +193,28 @@
           "verified": {
             "default": false,
             "type": "boolean"
+          },
+          "bonuses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "newborn_children_min": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991,
+                  "description": "2023.3.28 이후 출산(입양·태아 포함) 미성년 자녀 수가 이 값 이상이면"
+                },
+                "value": {
+                  "type": "number",
+                  "description": "완화된 상한 (원 또는 원/월, 룰의 unit과 같음)"
+                }
+              },
+              "required": [
+                "newborn_children_min",
+                "value"
+              ]
+            }
           }
         },
         "required": [

@@ -1,3 +1,4 @@
+import { regionCodesOf } from "@housing/schema";
 import type { EligibilityRule, RuleCategory, UserProfile } from "@housing/schema";
 import { ageFromBirthDate, monthsBetween, type RuleResult } from "@housing/engine";
 import { REGIONS } from "./onboarding";
@@ -63,7 +64,7 @@ export function ruleTitle(r: EligibilityRule): string {
       if (r.operator === "gte" && num(v) === 0) return "무주택세대구성원";
       return `무주택 기간 ${num(v)}개월 이상`;
     case "residence":
-      if (Array.isArray(v)) return `거주지: ${(v as string[]).map((c) => REGIONS.find((x) => x.value === c)?.label ?? c).join(" · ")}`;
+      if (Array.isArray(v)) return `거주지: ${(v as string[]).map((c) => REGIONS.find((x) => regionCodesOf(x.value).includes(c))?.label ?? c).join(" · ")}`;
       return `거주지 조건`;
     case "subscription":
       if (r.unit === "count") return `청약통장 납입 ${num(v)}회 이상`;
@@ -126,6 +127,12 @@ export function missingStepFor(rule: EligibilityRule, p: UserProfile | null): st
   if (rule.category === "residence" && p.region_code !== undefined && p.region_sigungu === undefined) {
     const vals = Array.isArray(rule.value) ? rule.value : [rule.value];
     if (vals.some((v) => typeof v === "string" && v.length > 2)) return "sigungu";
+  }
+
+  // 가산이 걸린 상한은 출산 자녀 수를 알아야 가린다 (engine NEWBORN_BONUS_REASON). 자녀 수부터 모르면 그것부터 묻는다
+  if (rule.bonuses?.length && p.newborn_children === undefined && p.children_count !== 0) {
+    const has = { income: p.monthly_income, asset: p.total_assets, car_value: p.car_value }[rule.category as "income" | "asset" | "car_value"];
+    if (has !== undefined) return p.children_count === undefined ? "children_count" : "newborn_children";
   }
 
   const missing: Partial<Record<RuleCategory, boolean>> = {

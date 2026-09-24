@@ -118,3 +118,23 @@ describe("예시 정답 (benchmark/fixtures/000.example.json)", () => {
     if (r.success) expect(r.data.tracks[0]!.priority_ranks?.length).toBe(2);
   });
 });
+
+describe("v6 필드", () => {
+  const source = { page: 5, text: "총자산 3억4,500만원 이하 (출산자녀 1명 +10%p)" };
+  const assetRule = (extra: Record<string, unknown>) => ({ group_id: "g", category: "asset", operator: "lte", value: 345000000, unit: "KRW", source, confidence: 1, ...extra });
+
+  it("가산은 숫자 상한(lte) 룰에만 붙는다", () => {
+    expect(EligibilityRule.safeParse(assetRule({ bonuses: [{ newborn_children_min: 1, value: 379000000 }] })).success).toBe(true);
+    expect(EligibilityRule.safeParse(assetRule({ operator: "gte", bonuses: [{ newborn_children_min: 1, value: 1 }] })).success).toBe(false);
+  });
+
+  it("접수 방법·서류 일정·거주 기간을 받는다", () => {
+    const r = ExtractionOutput.safeParse({
+      title: "t", housing_type: "national_rental",
+      schedule: { documents_announce: "2026-10-16", documents_end: "2026-10-23", contract_start: "2027-02-15" },
+      application: { online: false, onsite: true, place: "관리사무소" },
+      tracks: [{ name: "일반", residence: { contract_years: 2, max_years: 30 } }],
+    });
+    expect(r.success).toBe(true);
+  });
+});

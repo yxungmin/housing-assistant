@@ -10,7 +10,8 @@ describe("LlmExtraction → ExtractionOutput", () => {
       title: "t",
       housing_type: "happy",
       address: null,
-      schedule: { notice_date: "2026-09-01", apply_start: null, apply_end: null, winner_announce: null, move_in: null },
+      schedule: { notice_date: "2026-09-01", apply_start: null, apply_end: null, winner_announce: null, move_in: null, documents_announce: null, documents_start: null, documents_end: null, contract_start: null, contract_end: null },
+      application: null,
       tracks: [
         {
           name: "청년",
@@ -18,15 +19,16 @@ describe("LlmExtraction → ExtractionOutput", () => {
           unit_types: [{ name: "26", exclusive_area_m2: null, households: 10 }],
           rule_groups: [{ id: "basic", mode: "all_of", label: "기본" }],
           rules: [
-            { group_id: "basic", category: "age", applies_to: { household_size: null, household_size_min: null, household_size_max: null, income_type: null, marriage: null }, operator: "between", value_json: "[19,39]", unit: "years", source: src, confidence: 0.9 },
-            { group_id: "basic", category: "income", applies_to: { household_size: 1, household_size_min: null, household_size_max: null, income_type: "single", marriage: null }, operator: "lte", value_json: "3,500,000", unit: "KRW_monthly", source: src, confidence: 0.9 },
-            { group_id: "basic", category: "residence", applies_to: { household_size: null, household_size_min: null, household_size_max: null, income_type: null, marriage: null }, operator: "in", value_json: "[\"11\",\"41\"]", unit: "region_code", source: src, confidence: 0.9 },
+            { group_id: "basic", category: "age", applies_to: { household_size: null, household_size_min: null, household_size_max: null, income_type: null, marriage: null }, operator: "between", value_json: "[19,39]", unit: "years", source: src, confidence: 0.9, bonuses: [] },
+            { group_id: "basic", category: "income", applies_to: { household_size: 1, household_size_min: null, household_size_max: null, income_type: "single", marriage: null }, operator: "lte", value_json: "3,500,000", unit: "KRW_monthly", source: src, confidence: 0.9, bonuses: [] },
+            { group_id: "basic", category: "residence", applies_to: { household_size: null, household_size_min: null, household_size_max: null, income_type: null, marriage: null }, operator: "in", value_json: "[\"11\",\"41\"]", unit: "region_code", source: src, confidence: 0.9, bonuses: [] },
           ],
           pricing: [
             { unit_type: "26", tier: null, kind: "rental", deposit: 40000000, monthly_rent: 200000, sale_price: null, conversion: { rate: 0.07, rate_down: 0.035, max_deposit: 60000000, min_deposit: null }, payment_schedule: null, maintenance_estimate: null, source: src },
           ],
           priority_ranks: [],
           selection_order: null,
+          residence: null,
         },
       ],
       notes: [],
@@ -46,10 +48,11 @@ describe("LlmExtraction → ExtractionOutput", () => {
   it("still enforces internal rules (unknown group id fails)", () => {
     const llm = LlmExtraction.parse({
       title: "t", housing_type: "happy", address: null,
-      schedule: { notice_date: null, apply_start: null, apply_end: null, winner_announce: null, move_in: null },
+      schedule: { notice_date: null, apply_start: null, apply_end: null, winner_announce: null, move_in: null, documents_announce: null, documents_start: null, documents_end: null, contract_start: null, contract_end: null },
+      application: null,
       tracks: [{ name: "x", households: null, unit_types: [], rule_groups: [], rules: [
-        { group_id: "missing", category: "age", applies_to: { household_size: null, household_size_min: null, household_size_max: null, income_type: null, marriage: null }, operator: "gte", value_json: "19", unit: null, source: src, confidence: 1 },
-      ], pricing: [], priority_ranks: [], selection_order: null }],
+        { group_id: "missing", category: "age", applies_to: { household_size: null, household_size_min: null, household_size_max: null, income_type: null, marriage: null }, operator: "gte", value_json: "19", unit: null, source: src, confidence: 1, bonuses: [] },
+      ], pricing: [], priority_ranks: [], selection_order: null, residence: null }],
       notes: [],
     });
     expect(toExtractionOutput(llm).success).toBe(false);
@@ -68,17 +71,19 @@ describe("v4에서 줄인 출력 (2026-09-21)", () => {
     title: "t",
     housing_type: "happy" as const,
     address: null,
-    schedule: { notice_date: null, apply_start: null, apply_end: null, winner_announce: null, move_in: null },
+    schedule: { notice_date: null, apply_start: null, apply_end: null, winner_announce: null, move_in: null, documents_announce: null, documents_start: null, documents_end: null, contract_start: null, contract_end: null },
+    application: null,
     tracks: [
       {
         name: "청년",
         households: null,
         unit_types: [{ name: "26", exclusive_area_m2: null, households: null }],
         rule_groups: [{ id: "basic", mode: "all_of" as const, label: "기본" }],
-        rules: [{ group_id: "basic", category: "age", operator: "gte", value_json: "19", unit: "years", source: src, confidence: 0.9, ...rule }],
+        rules: [{ group_id: "basic", category: "age", operator: "gte", value_json: "19", unit: "years", source: src, confidence: 0.9, bonuses: [], ...rule }],
         pricing: [{ unit_type: "26", tier: null, kind: "rental", deposit: 1, monthly_rent: 1, sale_price: null, conversion: null, maintenance_estimate: null, source: src, ...pricing }],
         priority_ranks: [],
         selection_order: null,
+        residence: null,
       },
     ],
     notes: [],
@@ -112,8 +117,9 @@ describe("v4에서 줄인 출력 (2026-09-21)", () => {
 describe("순위 (v5)", () => {
   const withRanks = (priority_ranks: unknown[], selection_order: string[] | null) => ({
     title: "t", housing_type: "national_rental", address: null,
-    schedule: { notice_date: null, apply_start: null, apply_end: null, winner_announce: null, move_in: null },
-    tracks: [{ name: "일반공급", households: null, unit_types: [], rule_groups: [], rules: [], pricing: [], priority_ranks, selection_order }],
+    schedule: { notice_date: null, apply_start: null, apply_end: null, winner_announce: null, move_in: null, documents_announce: null, documents_start: null, documents_end: null, contract_start: null, contract_end: null },
+    application: null,
+    tracks: [{ name: "일반공급", households: null, unit_types: [], rule_groups: [], rules: [], pricing: [], priority_ranks, selection_order, residence: null }],
     notes: [],
   });
 
@@ -141,5 +147,44 @@ describe("순위 (v5)", () => {
   it("같은 순위가 두 번 나오면 거부한다", () => {
     const dup = { rank: 1, label: "x", mode: "all_of", conditions: [], apply_date: null, source: src };
     expect(toExtractionOutput(LlmExtraction.parse(withRanks([dup, dup], null))).success).toBe(false);
+  });
+});
+
+describe("v6: 가산·접수 방법·서류 일정·거주 기간", () => {
+  const llm = (over: Record<string, unknown>) => ({
+    title: "t", housing_type: "national_rental", address: null,
+    schedule: { notice_date: null, apply_start: null, apply_end: null, winner_announce: null, move_in: null, documents_announce: "2026-10-16", documents_start: "2026-10-19", documents_end: "2026-10-23", contract_start: null, contract_end: null },
+    application: { online: false, onsite: true, onsite_for: null, place: "군산나운4 관리사무소", source: src },
+    tracks: [{
+      name: "일반공급", households: null, unit_types: [], rule_groups: [{ id: "basic", mode: "all_of", label: "기본" }],
+      rules: [{ group_id: "basic", category: "asset", applies_to: null, operator: "lte", value_json: "345000000", unit: "KRW", source: src, confidence: 1,
+        bonuses: [{ newborn_children_min: 1, value: 379000000 }, { newborn_children_min: 2, value: 413000000 }] }],
+      pricing: [], priority_ranks: [], selection_order: null,
+      residence: { contract_years: 2, max_years: 30, note: null },
+    }],
+    notes: [],
+    ...over,
+  });
+
+  it("가산·접수 방법·서류 일정·거주 기간을 옮긴다", () => {
+    const out = toExtractionOutput(LlmExtraction.parse(llm({})));
+    expect(out.success).toBe(true);
+    if (!out.success) return;
+    expect(out.data.tracks[0]!.rules[0]!.bonuses).toEqual([{ newborn_children_min: 1, value: 379000000 }, { newborn_children_min: 2, value: 413000000 }]);
+    expect(out.data.application).toEqual({ online: false, onsite: true, place: "군산나운4 관리사무소", source: src });
+    expect(out.data.schedule).toMatchObject({ documents_announce: "2026-10-16", documents_end: "2026-10-23" });
+    expect(out.data.tracks[0]!.residence).toEqual({ contract_years: 2, max_years: 30 });
+  });
+
+  it("비어 있으면 필드를 남기지 않는다", () => {
+    const base = llm({ application: null });
+    base.tracks[0]!.residence = { contract_years: null, max_years: null, note: null } as never;
+    base.tracks[0]!.rules[0]!.bonuses = [];
+    const out = toExtractionOutput(LlmExtraction.parse(base));
+    expect(out.success).toBe(true);
+    if (!out.success) return;
+    expect(out.data.application).toBeUndefined();
+    expect(out.data.tracks[0]!.residence).toBeUndefined();
+    expect(out.data.tracks[0]!.rules[0]!.bonuses).toBeUndefined();
   });
 });

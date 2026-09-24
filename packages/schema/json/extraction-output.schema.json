@@ -43,6 +43,70 @@
         "move_in": {
           "description": "입주 예정 (YYYY-MM 또는 원문 표현)",
           "type": "string"
+        },
+        "documents_announce": {
+          "description": "서류제출 대상자 발표 YYYY-MM-DD",
+          "type": "string"
+        },
+        "documents_start": {
+          "description": "서류 제출 시작 YYYY-MM-DD",
+          "type": "string"
+        },
+        "documents_end": {
+          "description": "서류 제출 마감 YYYY-MM-DD",
+          "type": "string"
+        },
+        "contract_start": {
+          "description": "계약 시작 YYYY-MM-DD",
+          "type": "string"
+        },
+        "contract_end": {
+          "description": "계약 마감 YYYY-MM-DD",
+          "type": "string"
+        }
+      }
+    },
+    "application": {
+      "type": "object",
+      "properties": {
+        "online": {
+          "description": "인터넷·모바일 접수가 되는가",
+          "type": "boolean"
+        },
+        "onsite": {
+          "description": "현장 접수가 되는가",
+          "type": "boolean"
+        },
+        "onsite_for": {
+          "description": "현장 접수가 일부 대상에게만 되면 그 대상 (예: 65세 이상·장애인)",
+          "type": "string",
+          "maxLength": 80
+        },
+        "place": {
+          "description": "현장 접수 장소",
+          "type": "string",
+          "maxLength": 120
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "page": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991,
+              "description": "공고문 PDF 페이지 (1부터)"
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500,
+              "description": "근거가 되는 원문 발췌"
+            }
+          },
+          "required": [
+            "page",
+            "text"
+          ]
         }
       }
     },
@@ -262,6 +326,28 @@
                 "verified": {
                   "default": false,
                   "type": "boolean"
+                },
+                "bonuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "newborn_children_min": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991,
+                        "description": "2023.3.28 이후 출산(입양·태아 포함) 미성년 자녀 수가 이 값 이상이면"
+                      },
+                      "value": {
+                        "type": "number",
+                        "description": "완화된 상한 (원 또는 원/월, 룰의 unit과 같음)"
+                      }
+                    },
+                    "required": [
+                      "newborn_children_min",
+                      "value"
+                    ]
+                  }
                 }
               },
               "required": [
@@ -590,6 +676,26 @@
                 "score",
                 "lottery"
               ]
+            }
+          },
+          "residence": {
+            "type": "object",
+            "properties": {
+              "contract_years": {
+                "description": "한 번 계약 기간 (년)",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "max_years": {
+                "description": "재계약 포함 최장 거주 기간 (년)",
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "note": {
+                "description": "자녀 수 등으로 달라지면 그 조건 (원문 요약)",
+                "type": "string",
+                "maxLength": 120
+              }
             }
           }
         },

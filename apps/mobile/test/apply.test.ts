@@ -30,4 +30,9 @@ describe("applyLink", () => {
   it("기관을 모르면 '기관'이라고 부른다", () => {
     expect(applyLink({ detail_url: sh, apply_end: "2026-09-30" }, now)?.label).toBe("기관 공고 페이지 열기");
   });
+
+  it('현장 접수만 받는 공고에는 신청하기를 띄우지 않는다 — 틀린 안내다', () => {
+    const r = applyLink({ provider: 'LH', detail_url: lh, apply_start: '2026-09-22', apply_end: '2026-09-30', extraction: { application: { online: false, onsite: true } } }, now);
+    expect(r).toEqual({ label: 'LH 공고 페이지 열기', url: lh, onsiteOnly: true });
+  });
 });

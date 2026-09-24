@@ -12,7 +12,7 @@ import { LlmExtraction, toExtractionOutput } from "./llmSchema";
  * 1차: 구조화 출력(output_config.format)으로 스키마를 강제한다.
  * 2차: API가 "문법이 너무 크다"고 거부하면 같은 스키마를 프롬프트에 넣고 JSON 텍스트로 받아 클라이언트에서 검증한다.
  */
-export const EXTRACTION_PROMPT_VERSION = "v5";
+export const EXTRACTION_PROMPT_VERSION = "v6";
 
 const SYSTEM_PROMPT = `당신은 LH 공공주택 모집공고문을 구조화하는 추출기입니다. 판단이나 요약을 하지 않고, 공고문에 적힌 조건과 금액을 주어진 스키마에 그대로 옮깁니다.
 
@@ -31,7 +31,11 @@ const SYSTEM_PROMPT = `당신은 LH 공공주택 모집공고문을 구조화하
 - applies_to는 그 룰이 일부 대상(가구원 수·맞벌이·혼인 상태)에게만 적용될 때만 채웁니다. 모두에게 적용되면 객체째 null입니다.
 - 입주자 선정 순위(1순위·2순위…)가 있으면 그 트랙의 priority_ranks에 순위마다 하나씩 넣습니다. 순위 조건은 rules에 넣지 않습니다 — 순위는 자격이 아니라 선정 순서라, rules에 넣으면 2순위인 사람이 자격이 없는 것으로 판정됩니다. conditions는 룰과 같은 category·operator·value_json으로 쓰고, "제1순위에 해당하지 않는 자"처럼 나머지를 뜻하는 순위는 conditions를 빈 배열로 둡니다. 순위별로 접수일이 따로 정해져 있으면 apply_date에 적습니다(다른 날 접수하면 부적격이 되는 공고가 있습니다). 순위가 주택 면적 등으로 갈리면 해당 주택형의 트랙에 맞는 순위만 넣고 나머지는 notes에 남깁니다.
 - 경쟁 시 선정 순서가 적혀 있으면 selection_order에 순서대로 적습니다: 순위 rank, 배점 score, 추첨 lottery (예: "순위 → 배점 → 추첨" → [rank, score, lottery], 추첨만 → [lottery]). 없으면 null.
-- 순위·선정 순서를 구조화했으면 같은 내용을 notes에 다시 적지 않습니다.
+- 소득·자산·자동차 상한이 출산자녀(2023.3.28 이후 출산·입양, 태아 포함) 수에 따라 올라가면, 기본 상한 룰 하나에 bonuses로 완화된 상한을 붙입니다 (예: 총자산 345000000 이하 + bonuses [{newborn_children_min:1, value:379000000}, {newborn_children_min:2, value:413000000}]). 가산된 상한을 별도 룰로 만들지 않습니다. 가산이 없으면 빈 배열입니다.
+- 접수 방법을 application에 넣습니다: 인터넷·모바일 접수 여부 online, 현장 접수 여부 onsite, 현장 접수가 일부 대상(고령자·장애인 등)에게만 되면 onsite_for, 현장 접수 장소 place. "인터넷 접수 불가, 현장접수만"이면 online false.
+- 서류제출 대상자 발표일은 schedule.documents_announce, 서류 제출 기간은 documents_start·documents_end, 계약 기간은 contract_start·contract_end에 넣습니다.
+- 임대차 계약 기간(년)과 재계약 포함 최장 거주 기간(년)은 트랙의 residence에 넣습니다. 계층별로 다르면 그 트랙의 값을, 자녀 수 등으로 달라지면 note에 요약합니다.
+- 순위·선정 순서·가산·접수 방법·서류 일정·거주 기간을 구조화했으면 같은 내용을 notes에 다시 적지 않습니다.
 - notes는 가장 중요한 것 6개까지만 남깁니다. 더 있으면 중요한 순으로 고릅니다.
 - notes는 앱 사용자에게 "그 밖의 조건"으로 그대로 보입니다. 구조화하지 못한 자격·제한 조건의 공고문 원문 발췌만 넣고, 추출 과정 설명이나 판단 근거("~로 판단함", "스키마에 없어 생성하지 않음", "null로 둠")는 절대 넣지 않습니다.
 - 날짜는 YYYY-MM-DD.`;

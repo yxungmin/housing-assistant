@@ -124,6 +124,12 @@
       "minimum": 0,
       "maximum": 9007199254740991
     },
+    "newborn_children": {
+      "description": "2023.3.28 이후 출산·입양 미성년 자녀 수 (태아 포함)",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
     "statuses": {
       "description": "해당하는 계층 자격. 빈 배열 = 해당 없음, undefined = 미입력",
       "type": "array",

@@ -54,6 +54,17 @@ export const RuleGroup = z.object({
 });
 export type RuleGroup = z.infer<typeof RuleGroup>;
 
+/**
+ * 상한 가산. 공고문은 기본 상한 하나를 적고 "출산자녀 1명 +10%p(총자산 3.79억), 2명 이상 +20%p(4.13억)"을 덧붙인다.
+ * 이걸 모르면 출산가구가 기본 상한으로만 판정돼 **자격이 되는데 "불일치"로 공고를 잃는다** (2026-09 번들 8건 중 4건).
+ * 가장 큰 가산이 이긴다 (newborn_children_min이 큰 쪽). 금액은 공고문 표의 완화된 상한 그대로.
+ */
+export const RuleBonus = z.object({
+  newborn_children_min: z.number().int().min(1).describe("2023.3.28 이후 출산(입양·태아 포함) 미성년 자녀 수가 이 값 이상이면"),
+  value: z.number().describe("완화된 상한 (원 또는 원/월, 룰의 unit과 같음)"),
+});
+export type RuleBonus = z.infer<typeof RuleBonus>;
+
 export const EligibilityRule = z
   .object({
     group_id: z.string().min(1),
@@ -65,8 +76,13 @@ export const EligibilityRule = z
     source: Source,
     confidence: z.number().min(0).max(1),
     verified: z.boolean().default(false),
+    /** 상한 가산 (lte 숫자 룰에만) */
+    bonuses: z.array(RuleBonus).optional(),
   })
   .superRefine((rule, ctx) => {
+    if (rule.bonuses?.length && (rule.operator !== "lte" || typeof rule.value !== "number")) {
+      ctx.addIssue({ code: "custom", path: ["bonuses"], message: "가산은 숫자 상한(lte) 룰에만 붙는다" });
+    }
     const v = rule.value;
     switch (rule.operator) {
       case "between":
@@ -186,6 +202,17 @@ export const SupplyTrack = z
     priority_ranks: z.array(PriorityRank).optional(),
     /** 경쟁 시 선정 순서 (순위 → 배점 → 추첨 …) */
     selection_order: z.array(SelectionStep).optional(),
+    /**
+     * 얼마나 살 수 있나. "계약 2년, 재계약으로 최장 30년" — 결정에 큰 정보인데 전에는 notes 글에 묻혀 있었다.
+     * 계층마다 다르면(청년 10년·고령자 20년) 트랙마다 따로다.
+     */
+    residence: z
+      .object({
+        contract_years: z.number().positive().optional().describe("한 번 계약 기간 (년)"),
+        max_years: z.number().positive().optional().describe("재계약 포함 최장 거주 기간 (년)"),
+        note: z.string().max(120).optional().describe("자녀 수 등으로 달라지면 그 조건 (원문 요약)"),
+      })
+      .optional(),
   })
   .superRefine((track, ctx) => {
     const ranks = (track.priority_ranks ?? []).map((r) => r.rank);
@@ -216,6 +243,15 @@ export const Schedule = z.object({
   apply_end: z.string().optional().describe("접수 종료 YYYY-MM-DD"),
   winner_announce: z.string().optional(),
   move_in: z.string().optional().describe("입주 예정 (YYYY-MM 또는 원문 표현)"),
+  /**
+   * 서류 단계. 접수 뒤 "서류제출 대상자 발표 → 서류 제출"이 따로 있고, 기간 안에 안 내면 탈락이다.
+   * 전에는 notes 글에만 있어 알림을 걸 수 없었다.
+   */
+  documents_announce: z.string().optional().describe("서류제출 대상자 발표 YYYY-MM-DD"),
+  documents_start: z.string().optional().describe("서류 제출 시작 YYYY-MM-DD"),
+  documents_end: z.string().optional().describe("서류 제출 마감 YYYY-MM-DD"),
+  contract_start: z.string().optional().describe("계약 시작 YYYY-MM-DD"),
+  contract_end: z.string().optional().describe("계약 마감 YYYY-MM-DD"),
 });
 export type Schedule = z.infer<typeof Schedule>;
 
@@ -224,11 +260,24 @@ export type Schedule = z.infer<typeof Schedule>;
  * 수집기는 이 결과를 검증한 뒤 announcement_versions / supply_tracks / rule_groups /
  * eligibility_rules / pricing 테이블로 분해해 저장한다.
  */
+/**
+ * 접수 방법. "인터넷 불가, 관리사무소 현장접수만"인 공고가 있다 — 모르고 "청약플러스에서 신청하기"를 띄우면 틀린 안내다.
+ */
+export const Application = z.object({
+  online: z.boolean().optional().describe("인터넷·모바일 접수가 되는가"),
+  onsite: z.boolean().optional().describe("현장 접수가 되는가"),
+  onsite_for: z.string().max(80).optional().describe("현장 접수가 일부 대상에게만 되면 그 대상 (예: 65세 이상·장애인)"),
+  place: z.string().max(120).optional().describe("현장 접수 장소"),
+  source: Source.optional(),
+});
+export type Application = z.infer<typeof Application>;
+
 export const ExtractionOutput = z.object({
   title: z.string().min(1),
   housing_type: HousingType,
   address: z.string().optional().describe("단지 주소 (도로명 또는 지번)"),
   schedule: Schedule,
+  application: Application.optional(),
   tracks: z.array(SupplyTrack).min(1),
   notes: z.array(z.string()).default([]).describe("구조화하지 못한 중요 조건의 원문 발췌"),
 });

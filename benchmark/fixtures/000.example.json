@@ -11,8 +11,12 @@
       "apply_start": "2026-09-15",
       "apply_end": "2026-09-17",
       "winner_announce": "2026-11-20",
-      "move_in": "2027-03"
+      "move_in": "2027-03",
+      "documents_announce": "2026-10-01",
+      "documents_start": "2026-10-05",
+      "documents_end": "2026-10-08"
     },
+    "application": { "online": true, "onsite": true, "onsite_for": "65세 이상 고령자·장애인", "source": { "page": 2, "text": "인터넷 청약을 원칙으로 하며, 고령자·장애인에 한해 현장접수" } },
     "tracks": [
       {
         "name": "신혼부부·한부모가족",
@@ -29,7 +33,7 @@
           { "group_id": "newlywed", "category": "marriage", "applies_to": {}, "operator": "lte", "value": 7, "unit": "years", "source": { "page": 12, "text": "혼인기간 7년 이내" }, "confidence": 1, "verified": true },
           { "group_id": "newlywed", "category": "children", "applies_to": {}, "operator": "lte", "value": 6, "unit": "child_age", "source": { "page": 12, "text": "6세 이하 자녀를 둔 한부모" }, "confidence": 1, "verified": true },
           { "group_id": "basic", "category": "housing", "applies_to": {}, "operator": "gte", "value": 0, "unit": "months", "source": { "page": 11, "text": "무주택세대구성원" }, "confidence": 1, "verified": true },
-          { "group_id": "basic", "category": "asset", "applies_to": {}, "operator": "lte", "value": 345000000, "unit": "KRW", "source": { "page": 18, "text": "총자산 3억 4,500만 원 이하" }, "confidence": 1, "verified": true }
+          { "group_id": "basic", "category": "asset", "applies_to": {}, "operator": "lte", "value": 345000000, "unit": "KRW", "bonuses": [{ "newborn_children_min": 1, "value": 379000000 }, { "newborn_children_min": 2, "value": 413000000 }], "source": { "page": 18, "text": "총자산 3억 4,500만 원 이하" }, "confidence": 1, "verified": true }
         ],
         "pricing": [
           { "unit_type": "36", "kind": "rental", "deposit": 60000000, "monthly_rent": 280000, "conversion": { "rate": 0.06, "max_deposit": 110000000 }, "source": { "page": 9, "text": "36형 보증금 6,000만 원 / 월 28만 원" } }
@@ -38,7 +42,8 @@
           { "rank": 1, "label": "해당 주택건설지역(서울) 거주 또는 소득 근거지", "mode": "all_of", "conditions": [{ "category": "residence", "applies_to": {}, "operator": "in", "value": ["11"], "unit": "region_code" }], "source": { "page": 9, "text": "1순위 : 해당 주택건설지역(서울특별시)이 거주지이거나 소득근거지인 자" } },
           { "rank": 2, "label": "1순위에 해당하지 않는 자", "mode": "all_of", "conditions": [], "source": { "page": 9, "text": "2순위 : 제1순위에 해당되지 않는 자" } }
         ],
-        "selection_order": ["rank", "lottery"]
+        "selection_order": ["rank", "lottery"],
+        "residence": { "contract_years": 2, "max_years": 6, "note": "자녀가 있으면 최장 10년" }
       }
     ],
     "notes": []

@@ -53,6 +53,9 @@ const LlmRule = z.object({
   unit: nstr.describe("KRW_monthly, KRW, years, months, count, child_age, status, minutes, region_code ..."),
   source: LlmSource,
   confidence: z.number().describe("0~1"),
+  bonuses: z
+    .array(z.object({ newborn_children_min: z.number(), value: z.number().describe("완화된 상한") }))
+    .describe("출산자녀 가산으로 상한이 올라가면 그 상한들. 없으면 빈 배열"),
 });
 
 const LlmRuleGroup = z.object({
@@ -112,6 +115,10 @@ const LlmTrack = z.object({
   pricing: z.array(LlmPricing),
   priority_ranks: z.array(LlmRank).describe("입주자 선정 순위. 순위제가 아니면 빈 배열"),
   selection_order: z.array(SelectionStep).nullable().describe("경쟁 시 선정 순서 (예: 순위→배점→추첨이면 [rank,score,lottery]). 공고문에 없으면 null"),
+  residence: z
+    .object({ contract_years: nnum, max_years: nnum, note: nstr.describe("조건별로 다르면 요약. 60자 이내") })
+    .nullable()
+    .describe("계약 기간과 최장 거주 기간. 공고문에 없으면 null"),
 });
 
 export const LlmExtraction = z.object({
@@ -124,7 +131,22 @@ export const LlmExtraction = z.object({
     apply_end: nstr,
     winner_announce: nstr,
     move_in: nstr,
+    documents_announce: nstr.describe("서류제출 대상자 발표"),
+    documents_start: nstr,
+    documents_end: nstr,
+    contract_start: nstr,
+    contract_end: nstr,
   }),
+  application: z
+    .object({
+      online: z.boolean().nullable(),
+      onsite: z.boolean().nullable(),
+      onsite_for: nstr.describe("현장 접수가 일부 대상에게만 되면 그 대상"),
+      place: nstr.describe("현장 접수 장소"),
+      source: LlmSource.nullable(),
+    })
+    .nullable()
+    .describe("접수 방법. 공고문에 없으면 null"),
   tracks: z.array(LlmTrack),
   notes: z.array(z.string()).describe("구조화하지 못한 중요 조건의 원문 발췌. 가장 중요한 것 6개까지만"),
 });
@@ -156,7 +178,23 @@ export function toExtractionOutput(llm: LlmExtraction): ReturnType<typeof Extrac
       apply_end: und(llm.schedule.apply_end),
       winner_announce: und(llm.schedule.winner_announce),
       move_in: und(llm.schedule.move_in),
+      documents_announce: und(llm.schedule.documents_announce),
+      documents_start: und(llm.schedule.documents_start),
+      documents_end: und(llm.schedule.documents_end),
+      contract_start: und(llm.schedule.contract_start),
+      contract_end: und(llm.schedule.contract_end),
     },
+    ...(llm.application
+      ? {
+          application: {
+            online: und(llm.application.online),
+            onsite: und(llm.application.onsite),
+            onsite_for: und(llm.application.onsite_for),
+            place: und(llm.application.place),
+            source: und(llm.application.source),
+          },
+        }
+      : {}),
     tracks: llm.tracks.map((t) => ({
       name: t.name,
       households: und(t.households),
@@ -184,6 +222,7 @@ export function toExtractionOutput(llm: LlmExtraction): ReturnType<typeof Extrac
         source: r.source,
         confidence: Math.min(1, Math.max(0, r.confidence)),
         verified: false,
+        ...(r.bonuses.length ? { bonuses: r.bonuses } : {}),
       })),
       pricing: t.pricing.map((p) => ({
         unit_type: p.unit_type,
@@ -231,6 +270,9 @@ export function toExtractionOutput(llm: LlmExtraction): ReturnType<typeof Extrac
           }
         : {}),
       ...(t.selection_order?.length ? { selection_order: t.selection_order } : {}),
+      ...(t.residence && (t.residence.contract_years !== null || t.residence.max_years !== null)
+        ? { residence: { contract_years: und(t.residence.contract_years), max_years: und(t.residence.max_years), note: und(t.residence.note) } }
+        : {}),
     })),
     notes: llm.notes,
   };

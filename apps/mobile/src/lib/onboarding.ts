@@ -152,12 +152,24 @@ export const STEPS: Step[] = [
   {
     id: "children_count", kind: "count", title: "자녀는 몇 명인가요?", hint: "태아도 포함해요.",
     none: { label: "자녀가 없어요" },
-    apply: (p, v) => ({ ...p, children_count: Number(v), children_ages: Number(v) === 0 ? [] : p.children_ages }), read: (p) => p.children_count ?? null,
+    apply: (p, v) => ({ ...p, children_count: Number(v), children_ages: Number(v) === 0 ? [] : p.children_ages, newborn_children: Number(v) === 0 ? 0 : p.newborn_children }), read: (p) => p.children_count ?? null,
   },
   {
     id: "youngest", kind: "age", title: "가장 어린 자녀는 몇 살인가요?", hint: "6세 이하 자녀가 있으면 신혼부부 계층에 들어갈 수 있어요. 태아는 0.",
     when: (p) => (p.children_count ?? 0) > 0,
     apply: (p, v) => ({ ...p, children_ages: [Number(v)] }), read: (p) => p.children_ages?.[0] ?? null,
+  },
+  {
+    /*
+     * 출산가구 가산 (engine match.ts bonusResult). 2023.3.28 이후 출산·입양한 자녀가 있으면
+     * 소득·자산 상한이 10~20%p 올라간다. 전체 자녀 수와 따로 묻는다 — 기준일 이전 자녀는 가산이 없다.
+     * 첫 온보딩에서는 묻지 않는다. 가산이 걸린 공고에서 "확인 필요" 줄이 이 질문으로 데려온다.
+     */
+    id: "newborn_children", kind: "count", title: "2023년 3월 28일 이후 태어난 자녀는 몇 명인가요?",
+    hint: "입양·태아도 포함해요. 이 자녀가 있으면 소득·자산 기준이 올라가요.",
+    none: { label: "없어요" },
+    when: (p) => (p.children_count ?? 0) > 0,
+    apply: (p, v) => ({ ...p, newborn_children: Number(v) }), read: (p) => p.newborn_children ?? null,
   },
   {
     id: "income_type", kind: "select", title: "두 분 모두 소득이 있나요?", hint: "맞벌이는 소득 상한이 더 높아요.",
@@ -299,6 +311,7 @@ const STEP_LABEL: Record<string, string> = {
   household_size: "가구원 수",
   children_count: "자녀 수",
   youngest: "막내 나이",
+  newborn_children: "2023.3.28 이후 태어난 자녀",
   income_type: "맞벌이 여부",
   annual_income: "가구 연소득",
   total_assets: "총자산",
@@ -326,7 +339,7 @@ export const stepLabel = (s: Step): string => STEP_LABEL[s.id] ?? s.id;
  * 직장이 "그 밖에"로 떨어졌다 (2026-09-22). 테스트가 그걸 잡는다.
  */
 export const CONDITION_GROUPS: { title: string; ids: string[] }[] = [
-  { title: "나와 가구", ids: ["birth_date", "marriage", "marriage_years", "household_size", "children_count", "youngest", "statuses"] },
+  { title: "나와 가구", ids: ["birth_date", "marriage", "marriage_years", "household_size", "children_count", "youngest", "newborn_children", "statuses"] },
   { title: "사는 곳과 직장", ids: ["region", "sigungu", "workplace_place", "workplace_partner_place"] },
   { title: "소득과 자산", ids: ["income_type", "annual_income", "total_assets", "car_value", "debt", "cash"] },
   { title: "주택과 청약", ids: ["homeless", "homeless_months", "homeless_months_manual", "subscription_months", "subscription_active"] },

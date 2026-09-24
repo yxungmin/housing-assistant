@@ -212,7 +212,30 @@ function evaluateRule(rule: EligibilityRule, profile: UserProfile): RuleResult {
     return { rule, status: "NEEDS_CHECK", skipped: false, reason: "입력하면 판별할 수 있어요" };
   }
   const ok = compare(actual, rule.operator, rule.value);
-  return { rule, status: ok ? "MATCH" : "MISMATCH", skipped: false, reason: ok ? "조건이 맞아요" : "조건이 어긋나요" };
+  if (ok) return { rule, status: "MATCH", skipped: false, reason: "조건이 맞아요" };
+  const bonus = bonusResult(rule, profile, actual);
+  if (bonus) return { rule, ...bonus, skipped: false };
+  return { rule, status: "MISMATCH", skipped: false, reason: "조건이 어긋나요" };
+}
+
+/**
+ * 출산가구 가산 (EligibilityRule.bonuses). 기본 상한을 넘었을 때만 본다.
+ *
+ * 출산 자녀 수를 모르면 **불일치로 자르지 않는다.** 가산 상한 안이면 확인 필요로 남긴다 —
+ * 기준일 이후 아이를 낳은 사람은 자격이 되는데, 묻지 않았다는 이유로 공고를 잃으면 안 된다.
+ */
+export const NEWBORN_BONUS_REASON = "2023년 3월 28일 이후 태어난 자녀가 있으면 기준이 올라가요. 자녀 수를 넣으면 판별할 수 있어요";
+
+function bonusResult(rule: EligibilityRule, profile: UserProfile, actual: unknown): Pick<RuleResult, "status" | "reason"> | null {
+  if (!rule.bonuses?.length || typeof actual !== "number") return null;
+  // 자녀가 없다고 답했으면 기준일 이후 출산 자녀도 없다. 그 사람에게 이 질문은 뜨지 않는다 (onboarding when)
+  const newborn = profile.newborn_children ?? (profile.children_count === 0 ? 0 : undefined);
+  if (newborn === undefined) {
+    const best = Math.max(...rule.bonuses.map((b) => b.value));
+    return actual <= best ? { status: "NEEDS_CHECK", reason: NEWBORN_BONUS_REASON } : null;
+  }
+  const caps = rule.bonuses.filter((b) => newborn >= b.newborn_children_min).map((b) => b.value);
+  return caps.length && actual <= Math.max(...caps) ? { status: "MATCH", reason: "출산 가구 가산으로 조건이 맞아요" } : null;
 }
 
 function combine(mode: RuleGroup["mode"], statuses: MatchStatus[]): MatchStatus {
