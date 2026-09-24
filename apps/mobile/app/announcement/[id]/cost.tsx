@@ -10,7 +10,7 @@ import { SignInSheet } from "@/components/SignIn";
 import { SourceCard } from "@/components/SourceCard";
 import { applyLink, openApply } from "@/lib/apply";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
-import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconTile, KeyValue, LockNote, Notice, Redacted, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconTile, KeyValue, LockNote, Redacted, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
 import { getAnnouncement, useAnnouncements, type Announcement } from "@/data/announcements";
@@ -814,7 +814,6 @@ function NearRow({ icon, title, detail }: { icon: IconName; title: string; detai
  * 월세가 37% 차이 난다. 어느 기준으로 계산한 금액인지 모르면 그 숫자를 믿을 수 없다.
  */
 function UnitDetail({ choice, onPick }: { choice: RentalChoice; onPick: () => void }) {
-  const { colors } = useTheme();
   const unit = choice.unit!;
   const rent = choice.rent;
   const facts: { label: string; value: string }[] = [

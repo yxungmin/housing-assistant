@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/icon";
-import { animateLayout, Card, EmptyState, IconTile, PageTitle, Screen, SectionTitle, Sub, T } from "@/components/ui";
+import { animateLayout, Card, EmptyState, IconTile, PageTitle, Screen, Sub, T } from "@/components/ui";
 import { useAnnouncements } from "@/data/announcements";
 import { RETAIN_DAYS, syncInbox, unreadCount, type AppNotification, type NotificationKind } from "@/lib/inbox";
 import { unseenIds } from "@/lib/unseen";

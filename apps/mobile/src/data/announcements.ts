@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { inflateUnits, type ExtractionOutput, type HousingType, type Maintenance, type SupplyUnit, type UnitPlaces, type UserProfile } from "@housing/schema";
-import { matchAnnouncement, ruleCounts, type AnnouncementMatch, type TrackResult } from "@housing/engine";
+import { matchAnnouncement, ruleCounts, type AnnouncementMatch } from "@housing/engine";
 import { parsePlaceLabel, placeFor } from "@housing/schema";
 import raw from "../../data/announcements.json";
 import { distancesTo } from "@/lib/units";

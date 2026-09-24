@@ -87,7 +87,7 @@
 
 ## 명령
 ```bash
-npm test && npm run typecheck        # 커밋 전
+npm run lint && npm test && npm run typecheck   # 커밋 전 (lint: 훅 규칙·안 쓰는 변수)
 npm run inspect -- benchmark/pdfs/001.pdf [--text] [--extract]   # PDF 점검 / 정답 초안
 npm run lh:dump                      # LH API 원본 응답 확인 (LH_API_KEY 필요)
 npm run benchmark                    # 추출 벤치마크 (ANTHROPIC_API_KEY 필요)

@@ -7,7 +7,6 @@ import { Icon } from "@/components/icon";
 import { manwon } from "@/lib/format";
 import { IncomeHelperSheet } from "@/components/IncomeHelperSheet";
 import { BottomCTA, FadeIn, Header, IconButton, Screen, Sub, T } from "@/components/ui";
-import { currentAnnouncements, matchAll, pickBest } from "@/data/announcements";
 import { isComplete, NO_WORKPLACE, STEPS, stepHint, stepLabel, stepOptions, stepTitle, visibleSteps, type Step } from "@/lib/onboarding";
 import { searchPlaces, type PlaceHit } from "@/data/places-search";
 import { useAppState } from "@/store/appState";

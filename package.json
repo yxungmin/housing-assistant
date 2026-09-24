@@ -11,6 +11,7 @@
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
+    "lint": "eslint .",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "schema:json": "npm run json-schema -w @housing/schema",
     "collect": "npm run collect -w @housing/collector",
@@ -44,9 +45,14 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^24.3.0",
+    "eslint": "^10.11.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.12.0",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0",
+    "typescript-eslint": "^8.70.1",
     "vitest": "^3.2.0"
   },
   "allowScripts": {

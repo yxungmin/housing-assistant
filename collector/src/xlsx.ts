@@ -80,7 +80,7 @@ export function readSheet(file: Buffer): string[][] {
       const col = columnIndex(c[1]!);
       const type = /t="([^"]*)"/.exec(c[2]!)?.[1];
       const body = c[3] ?? "";
-      let value = "";
+      let value: string;
       if (type === "s") {
         const idx = Number(/<v>([^<]*)<\/v>/.exec(body)?.[1]);
         value = shared[idx] ?? "";

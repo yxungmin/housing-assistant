@@ -38,7 +38,10 @@ const normNum = (s: string) => norm(s).replace(/,/g, "");
 function amountVariants(n: number): string[] {
   const out = new Set<string>([String(n)]);
   if (n % 1_000 === 0) out.add(String(n / 1_000));
-  if (n % 10_000 === 0) out.add(`${n / 10_000}만`), out.add(String(n / 10_000));
+  if (n % 10_000 === 0) {
+    out.add(`${n / 10_000}만`);
+    out.add(String(n / 10_000));
+  }
   if (n >= 100_000_000) {
     const eok = Math.floor(n / 100_000_000);
     const rest = n % 100_000_000;

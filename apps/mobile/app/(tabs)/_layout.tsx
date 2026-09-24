@@ -4,7 +4,7 @@ import { Icon } from "@/components/icon";
 import { unreadCount } from "@/lib/inbox";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, iconSize, type } from "@/theme/tokens";
+import { iconSize, type } from "@/theme/tokens";
 
 export default function TabLayout() {
   const { colors } = useTheme();

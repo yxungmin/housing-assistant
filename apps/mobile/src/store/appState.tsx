@@ -2,7 +2,7 @@
  * 앱 상태. 프로필(민감)은 SecureStore에만 저장하고 서버로 보내지 않는다.
  * 구독 상태는 billing.ts 어댑터(지금은 로컬 목)로 바뀌고, 저장된 값은 불러올 때 만료 규칙으로 정리한다.
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, type PropsWithChildren } from "react";
+import { createContext, useContext, useEffect, useMemo, useReducer, useRef, type PropsWithChildren } from "react";
 import { AppState as AppLifecycle, Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { readMeta, writeMeta } from "@/data/meta-store";

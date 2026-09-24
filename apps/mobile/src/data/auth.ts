@@ -97,7 +97,7 @@ async function signInWithAppleNative(): Promise<AuthSession> {
     });
   } catch (e) {
     // 사용자가 시트를 닫은 것은 실패가 아니다
-    if ((e as { code?: string })?.code === "ERR_REQUEST_CANCELED") throw new Error(CANCELLED);
+    if ((e as { code?: string })?.code === "ERR_REQUEST_CANCELED") throw new Error(CANCELLED, { cause: e });
     throw e;
   }
   if (!credential.identityToken) throw new Error("Apple이 토큰을 주지 않았어요");

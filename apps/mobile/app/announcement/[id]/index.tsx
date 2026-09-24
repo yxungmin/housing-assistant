@@ -12,7 +12,7 @@ import { canSeeAnnouncement } from "@/lib/access";
 import { SourceCard } from "@/components/SourceCard";
 import { MissingAnnouncement } from "@/components/MissingAnnouncement";
 import { animateLayout, InfoTip, LockNote, BottomCTA, BottomSheet, Card, ConditionRow, Header, IconButton, IconTile, KeyValue, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag, Toast } from "@/components/ui";
-import { getAnnouncement, isReadable, ruleCounts, useAnnouncements, type Nearby } from "@/data/announcements";
+import { getAnnouncement, isReadable, ruleCounts, useAnnouncements } from "@/data/announcements";
 import { inputSummary, missingStepFor, ruleTitle } from "@/lib/conditions";
 import { userFacingNotes } from "@/lib/notes";
 import { isScattered, unitLabel, unitSpec, unitsWithDistance, priceRange, rangeText } from "@/lib/units";

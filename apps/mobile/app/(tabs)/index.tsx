@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/icon";
 import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
-import { commuteKm, getAnnouncement, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
+import { commuteKm, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
 import { housingLabel } from "@/lib/format";
 import { applyPhase, closesWithin, phaseLabel, phaseRank, phaseTone } from "@/lib/phase";
 import { sizeText } from "@/lib/units";

@@ -71,7 +71,6 @@ const rules = list.flatMap((e) => e.tracks.flatMap((t) => t.rules));
 const prices = list.flatMap((e) => e.tracks.flatMap((t) => t.pricing));
 
 const sum = (ns: number[]) => ns.reduce((a, b) => a + b, 0);
-const emptyApplies = rules.filter((r) => !r.applies_to || Object.keys(r.applies_to).length === 0);
 
 /** 항목: 줄일 수 있는 후보와 그 크기 */
 const candidates: [string, number][] = [

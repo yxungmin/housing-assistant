@@ -4,7 +4,7 @@ import { HEALTH_INSURANCE, incomeFromPremium } from "@housing/engine";
 import { BottomSheet, Notice, PrimaryButton, Sub, T } from "./ui";
 import { manwon } from "@/lib/format";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, type } from "@/theme/tokens";
+import { type } from "@/theme/tokens";
 
 /**
  * 소득 입력 도우미: 급여명세서의 건강보험료(본인부담)로 세전 월소득을 역산한다.

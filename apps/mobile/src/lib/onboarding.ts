@@ -2,7 +2,6 @@ import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate, homelessBasis, homelessBasisReason } from "@housing/engine";
 import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
 import { manwon } from "./format";
-import { parsePlaceLabel, placeFor } from "./places";
 import { REGION_LIST, regionByCode, sigunguValue } from "./regions";
 
 /**
