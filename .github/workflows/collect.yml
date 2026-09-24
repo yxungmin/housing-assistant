@@ -50,6 +50,11 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           KAKAO_REST_API_KEY: ${{ secrets.KAKAO_REST_API_KEY }}
+          # 공공데이터포털 키(계정당 하나) — 시세·대기현황·관리비. 없으면 그 보강만 빠진다
+          MOLIT_API_KEY: ${{ secrets.MOLIT_API_KEY }}
+          MYHOME_API_KEY: ${{ secrets.MYHOME_API_KEY }}
+          KAPT_API_KEY: ${{ secrets.KAPT_API_KEY }}
+          TRANSIT_API_KEY: ${{ secrets.TRANSIT_API_KEY }}
           EXTRACTION_MODEL: ${{ vars.EXTRACTION_MODEL || 'claude-opus-5-5' }}
           # 없으면 꺼짐. 켜지 않으면 목록·신규 판정까지만 하고 LLM 호출이 없다.
           EXTRACTION_ENABLED: ${{ vars.EXTRACTION_ENABLED || 'false' }}
