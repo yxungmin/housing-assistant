@@ -270,32 +270,22 @@ export function IconTile({ name, tone = "gray", size = tileSize.md }: { name: Ic
   );
 }
 
-/** 큰 숫자 */
 /**
- * 구독 전 미리보기에서 숫자 자리를 가리는 막대.
+ * 구독 전에 가려진 값 — 값이 있을 자리에 그 값의 글자 크기로 **물음표** 하나와 자물쇠.
  *
- * 전에는 숫자를 "•,•••만"처럼 점으로 바꿨다. 쉼표와 단위가 남아 고장 난 숫자처럼 보였고,
- * 자리마다 점의 모양이 달라 한 화면 안에서도 제각각이었다. 가림은 한 모양이어야 한다 —
- * BigNumber·KeyValue의 redacted가 모두 이걸 쓴다.
+ * 세 번째 모양이다 (2026-09-24 결정).
+ *  1. "•,•••만": 쉼표와 단위가 남아 고장 난 숫자처럼 보였고 자리마다 제각각이었다.
+ *  2. 회색 막대(+자물쇠): 로딩 뼈대(skeleton)와 같아서 "아직 안 불러왔나" 하고 기다리다 지나갔다.
+ *  3. 물음표: 값이 **있는데 모른다**는 뜻이 한 글자에 있다. 배경 면을 깔지 않는다 — 면이 있으면 다시 뼈대로 읽힌다.
+ * BigNumber·KeyValue의 redacted와 화면의 낱개 가림이 모두 이걸 쓴다. 한 화면 안에서 모양이 하나여야 "잠긴 것"으로 읽힌다.
+ * 무엇을 하면 보이는지는 LockNote가 한 번 말한다 — 자리마다 반복하지 않는다.
  */
-/**
- * 구독 전에 가려진 값.
- *
- * 전에는 회색 막대만 그렸다. 그 모양은 로딩 중 뼈대(skeleton)와 같아서, 사람들이 "아직 안 불러왔나"라고
- * 기다리다 지나갔다 — 잠긴 것인지가 보이지 않았다(2026-09-24). 자물쇠를 안에 그려 "가렸다"를 말하고,
- * 자리가 넉넉하면 무엇을 하면 보이는지("구독하면 보여요")까지 적는다.
- */
-export function Redacted({ width, height, label }: { width: number; height: number; label?: string }) {
+export function Redacted({ size }: { /** 가리는 값의 글자 크기. 그 자리에 그 크기로 앉는다 */ size: number }) {
   const { colors } = useTheme();
-  const icon = Math.round(Math.min(18, height * 0.6));
-  const showLabel = !!label && width >= 120 && height >= 22;
   return (
-    <View
-      accessibilityLabel={label ? `가려진 값 — ${label}` : "가려진 값"}
-      style={{ width, height, borderRadius: Math.min(10, height / 2.4), backgroundColor: colors.cardStrong, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 }}
-    >
-      <Icon name="lock" size={icon} color={colors.text3} />
-      {showLabel ? <Text style={[type.caption, { color: colors.text3, fontFamily: fonts.medium }]}>{label}</Text> : null}
+    <View accessibilityLabel="가려진 값 — 구독하면 보여요" style={{ flexDirection: "row", alignItems: "center", gap: Math.round(size * 0.2) }}>
+      <Icon name="lock" size={Math.round(Math.min(18, size * 0.55))} color={colors.text3} />
+      <Text style={{ fontFamily: fonts.bold, fontSize: size, lineHeight: Math.round(size * 1.2), color: colors.text3, letterSpacing: -size * 0.035 }}>?</Text>
     </View>
   );
 }
@@ -318,14 +308,14 @@ export function LockNote({ title, body }: { title: string; body: string }) {
   );
 }
 
-export function BigNumber({ value, unit, label, sub, size = 40, align = "left", redacted }: { value: string; unit?: string; label?: string; sub?: string; size?: number; align?: "left" | "right"; /** 구독 전 미리보기 — 숫자 자리를 막대로 가린다 (Redacted) */ redacted?: boolean }) {
+export function BigNumber({ value, unit, label, sub, size = 40, align = "left", redacted }: { value: string; unit?: string; label?: string; sub?: string; size?: number; align?: "left" | "right"; /** 구독 전 미리보기 — 숫자 자리에 물음표 (Redacted) */ redacted?: boolean }) {
   const { colors } = useTheme();
   return (
     <View style={{ gap: 4, alignItems: align === "right" ? "flex-end" : "flex-start" }}>
       {label ? <Sub>{label}</Sub> : null}
-      <View style={{ flexDirection: "row", alignItems: redacted ? "center" : "baseline", gap: 6 }}>
+      <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
         {redacted ? (
-          <Redacted width={size * 3.2} height={size * 0.9} label="구독하면 보여요" />
+          <Redacted size={size} />
         ) : (
           <Text style={{ fontFamily: fonts.bold, fontSize: size, lineHeight: size * 1.2, color: colors.text, letterSpacing: -size * 0.035, fontVariant: ["tabular-nums"] }}>{value}</Text>
         )}
@@ -635,7 +625,7 @@ export function KeyValue({
    * 43,520,000과 4,352,000은 쉼표 하나 차이인데 열 배가 다르고, 사람은 그 자리에서 잘못 읽는다.
    */
   amount?: number | null;
-  /** 구독 전 미리보기 — 값 자리를 막대로 가린다 (Redacted) */
+  /** 구독 전 미리보기 — 값 자리에 물음표 (Redacted) */
   redacted?: boolean;
 }) {
   const { colors } = useTheme();
@@ -658,7 +648,7 @@ export function KeyValue({
         </View>
         <View style={{ maxWidth: "60%", flexShrink: 1, alignItems: "flex-end", gap: 1 }}>
           {redacted ? (
-            <View style={{ paddingVertical: 2 }}><Redacted width={strong ? 112 : 88} height={strong ? 22 : 18} /></View>
+            <Redacted size={strong ? type.subheading.fontSize : type.bodyMedium.fontSize} />
           ) : (
             lines.map((line, i) => (
               <T key={i} variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold, textAlign: "right" }}>

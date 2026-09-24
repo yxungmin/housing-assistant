@@ -43,7 +43,7 @@ interface RentalChoice {
 import { canOpenCost, useAppState } from "@/store/appState";
 import { accessLevel } from "@/lib/access";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, iconSize, radius, space, tileSize } from "@/theme/tokens";
+import { fonts, iconSize, radius, space, tileSize, type } from "@/theme/tokens";
 
 const STEP = 1_000_000; // 전환보증금은 100만 원 단위 (LH 공고 규정)
 
@@ -317,7 +317,7 @@ export default function Cost() {
           </Pressable>
         </View>
 
-        {/* 미리보기는 구독 뒤 화면과 **같은 모양**이다 — 숫자 자리만 막대로 가린다(Redacted).
+        {/* 미리보기는 구독 뒤 화면과 **같은 모양**이다 — 숫자 자리에만 물음표가 앉는다(Redacted).
             무엇이 잠겼는지는 공고 상세의 로그인 안내와 같은 카드로 한 번만 말한다. */}
         {locked ? (
           <LockNote
@@ -428,7 +428,7 @@ export default function Cost() {
                 <View style={{ alignItems: "flex-end", gap: 2 }}>
                   <Sub tone="3" variant="caption">월 소득 대비</Sub>
                   {locked ? (
-                    <Redacted width={64} height={24} />
+                    <Redacted size={type.heading.fontSize} />
                   ) : (
                     <T variant="heading" numeric color={incomeRatio > 0.3 ? colors.warning : colors.text}>{pct(incomeRatio)}</T>
                   )}
