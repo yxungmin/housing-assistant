@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { iconSize } from "@/theme/tokens";
 import { View } from "react-native";
 import { Icon } from "./icon";
 import { Card, IconTile, Sub, T } from "./ui";
@@ -38,7 +39,7 @@ export function SourceCard({ pdfUrl, detailUrl, what }: { pdfUrl?: string; detai
                 : `${what} 공고문에서 옮긴 것이에요. 공고문 주소가 아직 없어 기관 사이트에서 확인해 주세요.`}
         </Sub>
       </View>
-      {canOpen || canOpenDetail ? <Icon name="right" size={18} color={colors.text4} /> : null}
+      {canOpen || canOpenDetail ? <Icon name="right" size={iconSize.lg} color={colors.text4} /> : null}
     </View>
   );
 

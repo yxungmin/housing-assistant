@@ -5,7 +5,7 @@ import { ImageViewer } from "./ImageViewer";
 import { Card, SectionTitle, Sub, T } from "./ui";
 import type { NoticeImage } from "@/data/announcements";
 import { useTheme } from "@/theme/ThemeProvider";
-import { radius, space } from "@/theme/tokens";
+import { fonts, iconSize, radius, space } from "@/theme/tokens";
 
 /**
  * 기관이 공고에 올린 이미지 (위치도·단지조감도).
@@ -57,8 +57,8 @@ export function NoticeImages({ images }: { images?: NoticeImage[] }) {
                 style={{ width: 240, height: 160, borderRadius: radius.md, backgroundColor: colors.surface }}
               />
               <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-                <T variant="bodyMedium" style={{ fontSize: 14 }}>{img.kind || "이미지"}</T>
-                <Icon name="right" size={14} color={colors.text4} />
+                <T variant="small" style={{ fontFamily: fonts.medium }}>{img.kind || "이미지"}</T>
+                <Icon name="right" size={iconSize.sm} color={colors.text4} />
               </View>
             </Pressable>
           ))}

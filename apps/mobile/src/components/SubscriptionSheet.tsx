@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { iconSize } from "@/theme/tokens";
 import { useRouter } from "expo-router";
 import { Linking, Platform, Pressable, View } from "react-native";
 import { CoffeeMark } from "./CoffeeMark";
@@ -70,7 +71,7 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
       <View style={{ gap: 10 }}>
         {["모든 공고의 필요 현금·월 주거비", "내 예상 순위와 지난 회차 마감 순위 비교", "보증금·월세 조정과 대출 비교", "값이 바뀌면 알림 · 다시 계산"].map((b) => (
           <View key={b} style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
-            <Icon name="check" size={18} color={colors.primary} />
+            <Icon name="check" size={iconSize.lg} color={colors.primary} />
             <T variant="body">{b}</T>
           </View>
         ))}

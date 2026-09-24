@@ -4,7 +4,7 @@ import { Icon } from "@/components/icon";
 import { unreadCount } from "@/lib/inbox";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts } from "@/theme/tokens";
+import { fonts, iconSize, type } from "@/theme/tokens";
 
 export default function TabLayout() {
   const { colors } = useTheme();
@@ -18,7 +18,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.text3,
         tabBarStyle: { backgroundColor: colors.tabBar, borderTopColor: colors.line, height: 84, paddingTop: 8 },
-        tabBarLabelStyle: { fontFamily: fonts.medium, fontSize: 12 },
+        tabBarLabelStyle: type.micro,
         sceneStyle: { backgroundColor: colors.surface },
       }}
     >
@@ -52,5 +52,5 @@ const FILLED = { home: "home-filled", bookmark: "bookmark-filled", user: "user-f
 const tabIcon =
   (name: keyof typeof FILLED) =>
   ({ color, focused }: { color: ColorValue; focused: boolean }) => (
-    <Icon name={focused ? FILLED[name] : name} size={26} color={String(color)} />
+    <Icon name={focused ? FILLED[name] : name} size={iconSize.tab} color={String(color)} />
   );

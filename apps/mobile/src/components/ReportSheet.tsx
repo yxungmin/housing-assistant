@@ -5,7 +5,7 @@ import { REPORT_STATUS_LABEL, type LocalReport } from "@/lib/reports";
 import { hasSource, openSource } from "@/lib/source";
 import { longDate } from "@/lib/format";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, radius } from "@/theme/tokens";
+import { fonts, radius, type } from "@/theme/tokens";
 
 /**
  * 항목 하나의 근거를 펼쳐 보고, 이상하면 신고한다.
@@ -52,7 +52,7 @@ export function ReportSheet({
   return (
     <BottomSheet visible={visible} onClose={onClose}>
       <View style={{ gap: 8 }}>
-        <T variant="title" style={{ fontSize: 22, lineHeight: 30 }}>{title}</T>
+        <T variant="heading">{title}</T>
         {page ? <Sub tone="3" variant="caption">공고문 {page}쪽에서 가져온 내용이에요</Sub> : null}
       </View>
 
@@ -146,9 +146,8 @@ function Field({
         accessibilityLabel={label}
         style={[
           {
+            ...type.body,
             fontFamily: fonts.medium,
-            fontSize: 16,
-            lineHeight: 24,
             color: colors.text,
             backgroundColor: colors.cardSoft,
             borderRadius: radius.md,

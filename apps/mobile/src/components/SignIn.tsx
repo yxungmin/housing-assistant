@@ -6,7 +6,7 @@ import { consentReady, type ConsentValue, type LegalKey } from "@/lib/consent";
 import { PROVIDER_LABEL, shownProviders, signInErrorText, type AuthProvider } from "@/lib/auth";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, radius } from "@/theme/tokens";
+import { fonts, iconSize, radius } from "@/theme/tokens";
 import { BottomSheet, Sub, T } from "./ui";
 
 /**
@@ -113,7 +113,7 @@ function BrandButton({
         opacity: disabled ? 0.4 : pressed ? 0.85 : 1,
       })}
     >
-      {busy ? <ActivityIndicator color={fg} /> : <T style={{ fontFamily: fonts.bold, fontSize: 16, color: fg }}>{label}</T>}
+      {busy ? <ActivityIndicator color={fg} /> : <T variant="bodyMedium" style={{ fontFamily: fonts.bold, color: fg }}>{label}</T>}
     </Pressable>
   );
 }
@@ -188,7 +188,7 @@ function ConsentRow({ on, label, onPress, onView }: { on: boolean; label: string
             borderColor: colors.text4,
           }}
         >
-          {on ? <Icon name="check" size={16} color={colors.onPrimary} /> : null}
+          {on ? <Icon name="check" size={iconSize.md} color={colors.onPrimary} /> : null}
         </View>
         <T variant="body" style={{ flex: 1 }}>{label}</T>
       </Pressable>

@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { ActivityIndicator, Dimensions, FlatList, Image, Modal, Pressable, ScrollView, View } from "react-native";
 import { Icon } from "./icon";
 import { Sub, T } from "./ui";
-import { radius } from "@/theme/tokens";
+import { iconSize, radius } from "@/theme/tokens";
 
 export interface ViewerImage {
   url: string;
@@ -82,7 +82,7 @@ export function ImageViewer({
               backgroundColor: pressed ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.18)",
             })}
           >
-            <Icon name="x" size={20} color="#FFFFFF" />
+            <Icon name="x" size={iconSize.xl} color="#FFFFFF" />
           </Pressable>
         </View>
 

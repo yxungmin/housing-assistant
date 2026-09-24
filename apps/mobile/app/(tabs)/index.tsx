@@ -17,7 +17,7 @@ import { syncAnnouncementsOnce } from "@/data/sync";
 import { LOANS } from "@/data/loans";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, radius } from "@/theme/tokens";
+import { fonts, iconSize, radius, tileSize } from "@/theme/tokens";
 
 /** 직장 근처 필터의 직선거리 상한 (km). 통근 시간 API 연결 전 대체 기준 */
 const NEAR_WORK_KM = 20;
@@ -197,14 +197,14 @@ export default function Home() {
             accessibilityLabel={`${stepLabel(gapStep!)} 입력하기`}
             style={({ pressed }) => ({ flex: 1, flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 14, paddingLeft: 16, opacity: pressed ? 0.7 : 1 })}
           >
-            <IconTile name="check-circle" tone="primary" size={36} />
+            <IconTile name="check-circle" tone="primary" size={tileSize.sm} />
             <View style={{ flex: 1, gap: 2 }}>
-              <T variant="bodyMedium" color={colors.text} style={{ fontSize: 15 }}>
+              <T variant="bodyMedium" color={colors.text}>
                 {stepLabel(gapStep!)}만 넣으면
               </T>
               <Sub tone="2">공고 {gap!.announcements}개의 조건을 더 판별할 수 있어요</Sub>
             </View>
-            <Icon name="right" size={18} color={colors.primary} />
+            <Icon name="right" size={iconSize.lg} color={colors.primary} />
           </Pressable>
           <Pressable
             onPress={() => { animateLayout(); setGapHidden(gap!.stepId); }}
@@ -213,7 +213,7 @@ export default function Home() {
             hitSlop={8}
             style={({ pressed }) => ({ paddingHorizontal: 12, paddingVertical: 16, opacity: pressed ? 0.5 : 1 })}
           >
-            <Icon name="x" size={16} color={colors.text3} />
+            <Icon name="x" size={iconSize.md} color={colors.text3} />
           </Pressable>
         </View>
       ) : null}
@@ -230,8 +230,8 @@ export default function Home() {
         */}
         {matched.length === 0 ? (
           <Card style={{ alignItems: "center", paddingVertical: 28, gap: 10 }}>
-            <IconTile name="bookmark" size={48} />
-            <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>
+            <IconTile name="bookmark" size={tileSize.lg} />
+            <T variant="subheading" style={{ textAlign: "center" }}>
               {outsideService ? `아직 ${regionLabel} 공고는 모으지 않아요` : "지금은 딱 맞는 공고가 없어요"}
             </T>
             <Sub style={{ textAlign: "center" }}>
@@ -324,7 +324,7 @@ export default function Home() {
       </FadeIn>
 
       <View style={{ flexDirection: "row", gap: 8, paddingTop: 8 }}>
-        <Icon name="info" size={16} color={colors.text4} />
+        <Icon name="info" size={iconSize.md} color={colors.text4} />
         <Sub tone="3" variant="caption" style={{ flex: 1 }}>
           지금은 {SERVICE_REGION_LABEL}의 LH·SH 공고만 모으고 있어요. "조건 일치"는 공고문 조건과 입력한 값을 맞춰 본 결과예요. 신청 자격을 보장하지는 않아요.
         </Sub>
@@ -343,7 +343,7 @@ function MoreRow({ label, count, open, onPress }: { label: string; count: number
         <T variant="small" color={colors.text3}>{open ? "접기" : `${count}개`}</T>
         {/* 펼치면 아래를 가리킨다 — 열린 묶음이 이 줄 아래에 있다는 표시 */}
         <View style={{ transform: [{ rotate: open ? "90deg" : "0deg" }] }}>
-          <Icon name="right" size={16} color={colors.text4} />
+          <Icon name="right" size={iconSize.md} color={colors.text4} />
         </View>
       </View>
     </Card>
@@ -416,7 +416,7 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
         <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 7 }}>
           {/* 안 본 공고에 점 하나. 배지를 쓰면 제목을 밀어내고 줄바꿈을 흐트러뜨린다 */}
           {fresh ? <View accessibilityLabel="아직 안 본 공고" style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors.primary, marginTop: 9 }} /> : null}
-          <T variant="subheading" style={{ flex: 1, fontSize: 18, lineHeight: 26 }}>{a.title}</T>
+          <T variant="subheading" style={{ flex: 1 }}>{a.title}</T>
         </View>
         {place ? <Sub tone="3">{place}</Sub> : null}
       </View>

@@ -25,7 +25,7 @@ import { mapTargets } from "@/lib/maps";
 import { canOpenCost, useAppState } from "@/store/appState";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { useTheme } from "@/theme/ThemeProvider";
-import { radius, space } from "@/theme/tokens";
+import { iconSize, radius, space } from "@/theme/tokens";
 
 /** 공고 상세: 조건 체크리스트(근거 쪽), 위치, 일정, 비용 계산 CTA */
 export default function AnnouncementDetail() {
@@ -133,7 +133,7 @@ export default function AnnouncementDetail() {
             <Tag tone="gray">{housingLabel(a)}</Tag>
             {phaseLabel(applyPhase(a)) ? <Tag tone={phaseTone(applyPhase(a))}>{phaseLabel(applyPhase(a))}</Tag> : null}
           </View>
-          <T variant="title" style={{ fontSize: 24, lineHeight: 32 }}>{a.title}</T>
+          <T variant="heading">{a.title}</T>
           <Sub variant="body">{a.address ?? a.region_name}</Sub>
         </View>
         <LockNote
@@ -246,7 +246,7 @@ export default function AnnouncementDetail() {
             <Tag tone="gray">{housingLabel(a)}</Tag>
             {phaseLabel(phase) ? <Tag tone={phaseTone(phase)}>{phaseLabel(phase)}</Tag> : null}
           </View>
-          <T variant="title" style={{ fontSize: 26, lineHeight: 34 }}>{a.title}</T>
+          <T variant="heading">{a.title}</T>
           <Sub variant="body">{a.address ?? a.region_name}{households ? ` · 총 ${households.toLocaleString("ko-KR")}세대` : ""}</Sub>
         </View>
 
@@ -306,7 +306,7 @@ export default function AnnouncementDetail() {
                     <View key={g.group.id} style={{ backgroundColor: colors.surface, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 6, marginVertical: 6 }}>
                       <View style={{ flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 4, paddingTop: 8, paddingBottom: 2 }}>
                         <Sub tone="3" variant="caption">{g.group.label} · 하나만 맞으면 됩니다</Sub>
-                        {g.status === "MATCH" ? <Icon name="check" size={13} color={colors.ok} /> : null}
+                        {g.status === "MATCH" ? <Icon name="check" size={iconSize.sm} color={colors.ok} /> : null}
                       </View>
                       {rules.map((r, i) => (
                         <ConditionRow key={i} status={r.status} title={ruleTitle(r.rule)} why={inputSummary(r.rule, state.profile, r)} page={r.rule.source.page} {...rowReport(r)} {...fillProps(r)} />
@@ -474,7 +474,7 @@ export default function AnnouncementDetail() {
         */}
         {!a.past_results?.length ? (
           <View style={{ flexDirection: "row", gap: 8 }}>
-            <Icon name="info" size={16} color={colors.text4} />
+            <Icon name="info" size={iconSize.md} color={colors.text4} />
             <Sub tone="3" variant="caption" style={{ flex: 1 }}>
               {a.provider === "SH"
                 ? "지난 회차 당첨 커트라인은 SH가 공개하지 않아요. 경쟁률은 공고문에서 확인해 주세요."
@@ -492,7 +492,7 @@ export default function AnnouncementDetail() {
               {(() => {
                 const t = toughest(a.past_results!);
                 const text = t ? pastResultText(t, { several: a.past_results!.length > 1 }) : null;
-                return text ? <T variant="bodyMedium" style={{ fontSize: 15 }}>{text}</T> : null;
+                return text ? <T variant="bodyMedium">{text}</T> : null;
               })()}
               {/* 공급·신청 수는 여기서 본문이다. src로 주면 (i) 뒤에 접혀 눌러야 보인다 */}
               {a.past_results.slice(0, 4).map((r, i) => (
@@ -594,9 +594,9 @@ export default function AnnouncementDetail() {
                     backgroundColor: applied ? colors.primarySoft : pressed ? colors.cardStrong : colors.cardSoft,
                   })}
                 >
-                  <Icon name={applied ? "check-circle" : "bell"} size={20} color={applied ? colors.primary : colors.text2} />
+                  <Icon name={applied ? "check-circle" : "bell"} size={iconSize.xl} color={applied ? colors.primary : colors.text2} />
                   <View style={{ flex: 1, gap: 1 }}>
-                    <T variant="bodyMedium" style={{ fontSize: 15 }}>
+                    <T variant="bodyMedium">
                       {applied ? "발표일에 알려드릴게요" : "신청했다면 발표일에 알려드려요"}
                     </T>
                     <Sub tone="3" variant="caption">
@@ -635,7 +635,7 @@ export default function AnnouncementDetail() {
                 >
                   <T variant="small" color={colors.text2}>{notesOpen ? "접기" : `${Math.min(notes.length, 4) - 2}개 더 보기`}</T>
                   <View style={{ transform: [{ rotate: notesOpen ? "-90deg" : "90deg" }] }}>
-                    <Icon name="right" size={14} color={colors.text3} />
+                    <Icon name="right" size={iconSize.sm} color={colors.text3} />
                   </View>
                 </Pressable>
               ) : null}
@@ -651,7 +651,7 @@ export default function AnnouncementDetail() {
       {/* 한국 사용자는 시세·학군까지 그쪽 앱에서 본다. 좌표만 정확히 넘겨 주고 나머지는 맡긴다. */}
       <BottomSheet visible={mapOpen} onClose={() => setMapOpen(false)}>
         <View style={{ gap: 6 }}>
-          <T variant="title" style={{ fontSize: 20, lineHeight: 28 }}>지도에서 보기</T>
+          <T variant="heading">지도에서 보기</T>
           <Sub tone="3" variant="caption">{a.address ?? a.region_name}</Sub>
         </View>
         <View style={{ gap: 8 }}>
@@ -717,7 +717,7 @@ function Row({
         <T variant="bodyMedium">{title}</T>
         <Sub tone="3" variant="caption">{detail}</Sub>
       </View>
-      {chevron ? <Icon name="right" size={18} color={colors.text4} /> : null}
+      {chevron ? <Icon name="right" size={iconSize.lg} color={colors.text4} /> : null}
     </View>
   );
   return onPress ? (

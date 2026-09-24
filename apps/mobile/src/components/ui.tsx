@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useScrollToTop } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
 import { koreanWon } from "@/lib/format";
-import { fonts, radius, space, type } from "@/theme/tokens";
+import { fonts, iconSize, radius, space, tileSize, type } from "@/theme/tokens";
 import { Icon, type IconName } from "./icon";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -117,7 +117,7 @@ export function Header({ onBack, title, right }: { onBack?: () => void; title?: 
       <View style={{ width: 48, alignItems: "flex-start" }}>
         {onBack ? (
           <Pressable onPress={onBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="뒤로" style={({ pressed }) => ({ padding: 8, borderRadius: radius.pill, backgroundColor: pressed ? colors.cardSoft : "transparent" })}>
-            <Icon name="left" size={26} color={colors.text} />
+            <Icon name="left" size={iconSize.tab} color={colors.text} />
           </Pressable>
         ) : null}
       </View>
@@ -146,7 +146,7 @@ export function IconButton({ name, onPress, label, color, pop }: { name: IconNam
   return (
     <Pressable onPress={onPress} hitSlop={12} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => ({ padding: 8, borderRadius: radius.pill, backgroundColor: pressed ? colors.cardSoft : "transparent" })}>
       <Animated.View style={{ transform: [{ scale }] }}>
-        <Icon name={name} size={24} color={color ?? colors.text} />
+        <Icon name={name} size={iconSize.nav} color={color ?? colors.text} />
       </Animated.View>
     </Pressable>
   );
@@ -196,10 +196,10 @@ export function EmptyState({ icon, title, body, action }: { icon: IconName; titl
   return (
     <View style={{ flexGrow: 1, minHeight: 380, alignItems: "center", justifyContent: "center", paddingHorizontal: 16, paddingBottom: 40, gap: 16 }}>
       <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colors.primarySoft, alignItems: "center", justifyContent: "center" }}>
-        <Icon name={icon} size={32} color={colors.primary} />
+        <Icon name={icon} size={iconSize.hero} color={colors.primary} />
       </View>
       <View style={{ alignItems: "center", gap: 6 }}>
-        <T variant="heading" style={{ fontSize: 18, textAlign: "center" }}>{title}</T>
+        <T variant="subheading" style={{ textAlign: "center" }}>{title}</T>
         <Sub style={{ textAlign: "center", maxWidth: 280 }}>{body}</Sub>
       </View>
       {action ? (
@@ -249,7 +249,7 @@ export function SectionTitle({ children, right, onRight }: PropsWithChildren<{ r
       {right ? (
         <Pressable onPress={onRight} accessibilityRole="button" style={{ flexDirection: "row", alignItems: "center", gap: 2 }}>
           <T variant="small" color={colors.text3}>{right}</T>
-          <Icon name="right" size={14} color={colors.text3} />
+          <Icon name="right" size={iconSize.sm} color={colors.text3} />
         </Pressable>
       ) : null}
     </View>
@@ -257,7 +257,7 @@ export function SectionTitle({ children, right, onRight }: PropsWithChildren<{ r
 }
 
 /** 아이콘 타일: 연한 색 사각형 안에 글리프 (TDS 리스트 아이콘) */
-export function IconTile({ name, tone = "gray", size = 40 }: { name: IconName; tone?: "gray" | "primary" | "warn" | "danger" | "info"; size?: number }) {
+export function IconTile({ name, tone = "gray", size = tileSize.md }: { name: IconName; tone?: "gray" | "primary" | "warn" | "danger" | "info"; size?: number }) {
   const { colors } = useTheme();
   const bg = { gray: colors.cardSoft, primary: colors.primarySoft, warn: colors.warningSoft, danger: colors.dangerSoft, info: colors.infoSoft }[tone];
   const fg = { gray: colors.text2, primary: colors.primary, warn: colors.warning, danger: colors.danger, info: colors.info }[tone];
@@ -310,7 +310,7 @@ export function LockNote({ title, body }: { title: string; body: string }) {
     <Card style={{ gap: 6 }}>
       {/* 제목이 두 줄이 되면 가운데 정렬은 아이콘을 두 줄 사이로 떨어뜨린다. 첫 줄에 붙인다 */}
       <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 8 }}>
-        <View style={{ paddingTop: 2 }}><Icon name="lock" size={18} color={colors.text2} /></View>
+        <View style={{ paddingTop: 2 }}><Icon name="lock" size={iconSize.lg} color={colors.text2} /></View>
         <T variant="bodyMedium" style={{ flex: 1 }}>{title}</T>
       </View>
       <Sub tone="3" variant="caption">{body}</Sub>
@@ -344,8 +344,8 @@ export function Tag({ children, tone = "primary", icon }: PropsWithChildren<{ to
   const fg = { primary: colors.primary, warn: colors.warning, danger: colors.danger, gray: colors.text2, info: colors.info }[tone];
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: bg, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 }}>
-      {icon ? <Icon name={icon} size={12} color={fg} /> : null}
-      <Text {...wordWrap} style={[{ fontFamily: fonts.bold, fontSize: 12, color: fg, lineHeight: 16, letterSpacing: -0.1 }]}>{children}</Text>
+      {icon ? <Icon name={icon} size={iconSize.xs} color={fg} /> : null}
+      <Text {...wordWrap} style={[type.micro, { fontFamily: fonts.bold, color: fg }]}>{children}</Text>
     </View>
   );
 }
@@ -373,9 +373,9 @@ export function Chip({ children, on, count, onPress }: PropsWithChildren<{ on?: 
         opacity: dead ? 0.4 : 1,
         backgroundColor: on ? colors.text : pressed ? colors.cardStrong : colors.cardSoft,
       })}>
-      <Text {...wordWrap} style={[{ fontFamily: fonts.semiBold, fontSize: 14, color: on ? colors.surface : colors.text2, letterSpacing: -0.2 }]}>{children}</Text>
+      <Text {...wordWrap} style={[type.small, { fontFamily: fonts.semiBold, color: on ? colors.surface : colors.text2 }]}>{children}</Text>
       {count === undefined ? null : (
-        <Text style={{ fontFamily: fonts.semiBold, fontSize: 13, color: on ? colors.surface : colors.text3, opacity: on ? 0.7 : 1, fontVariant: ["tabular-nums"] }}>{count}</Text>
+        <Text style={[type.label, { color: on ? colors.surface : colors.text3, opacity: on ? 0.7 : 1, fontVariant: ["tabular-nums"] }]}>{count}</Text>
       )}
     </Pressable>
   );
@@ -412,9 +412,9 @@ export function ConditionRow({
   }[status];
   const inner = (pressed: boolean) => (
     <View style={{ flexDirection: "row", gap: 14, paddingVertical: 10, paddingHorizontal: 4, marginHorizontal: -4, borderRadius: radius.md, alignItems: "flex-start", backgroundColor: pressed ? colors.cardStrong : "transparent" }}>
-      <IconTile name={map.icon} tone={map.tone} size={36} />
+      <IconTile name={map.icon} tone={map.tone} size={tileSize.sm} />
       <View style={{ flex: 1, gap: 2, paddingTop: 1 }}>
-        <T variant="bodyMedium" style={{ fontSize: 15.5 }}>{title}</T>
+        <T variant="bodyMedium">{title}</T>
         {why ? <Sub tone="3" variant="caption">{why}</Sub> : null}
         {/* 누를 수 있는 줄 안에 또 버튼을 두면 버튼 속의 버튼이 된다. 그래서 바깥에서 받는다 (아래 참고) */}
         {flag ? <View style={{ flexDirection: "row", paddingTop: 4 }}><Tag tone="info" icon="info">{flag}</Tag></View> : null}
@@ -435,7 +435,7 @@ export function ConditionRow({
           style={({ pressed }) => ({ alignSelf: "flex-start", marginLeft: 54, marginBottom: 6, paddingVertical: 6, paddingHorizontal: 12, borderRadius: radius.pill, backgroundColor: pressed ? colors.primary : colors.primarySoft })}
         >
           {({ pressed }) => (
-            <Text style={{ fontFamily: fonts.semiBold, fontSize: 13, color: pressed ? colors.onPrimary : colors.primary, letterSpacing: -0.2 }}>{fillLabel}</Text>
+            <Text style={[type.label, { color: pressed ? colors.onPrimary : colors.primary }]}>{fillLabel}</Text>
           )}
         </Pressable>
       </View>
@@ -464,7 +464,7 @@ export function ListRow({ label, sub, value, icon, iconTone, onPress, danger }: 
       </View>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
         {typeof value === "string" ? <T variant="small" color={colors.text3}>{value}</T> : value}
-        {onPress ? <Icon name="right" size={18} color={colors.text4} /> : null}
+        {onPress ? <Icon name="right" size={iconSize.lg} color={colors.text4} /> : null}
       </View>
     </View>
   );
@@ -555,7 +555,7 @@ export function InfoTip({ text, label = "자세히" }: { text: string; label?: s
         style={({ pressed }) => ({ padding: 2, opacity: pressed ? 0.5 : 1 })}
       >
         {/* 열려 있는 동안 (i)도 진해진다. 말풍선과 출발점이 한 쌍으로 보이게. */}
-        <Icon name="info" size={16} color={box ? colors.text2 : colors.text4} />
+        <Icon name="info" size={iconSize.md} color={box ? colors.text2 : colors.text4} />
       </Pressable>
       <Modal visible={box !== null} transparent animationType="none" onRequestClose={close}>
         <Pressable style={{ flex: 1 }} onPress={closeFromBackdrop} accessibilityLabel="닫기">
@@ -720,8 +720,8 @@ export function BottomCTA({ label, onPress, disabled, appear, secondary, seconda
       )}
       {secondary && secondaryLabel ? (
         <Pressable onPress={onSecondary} style={({ pressed }) => ({ paddingVertical: 12, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 4, opacity: pressed ? 0.6 : 1 })} accessibilityRole={secondaryIcon ? "link" : "button"}>
-          <Text {...wordWrap} style={[{ fontFamily: fonts.medium, fontSize: 15, color: secondaryIcon ? colors.text2 : colors.text3 }]}>{secondaryLabel}</Text>
-          {secondaryIcon ? <Icon name={secondaryIcon} size={16} color={colors.text3} /> : null}
+          <Text {...wordWrap} style={[type.small, { fontFamily: fonts.medium, color: secondaryIcon ? colors.text2 : colors.text3 }]}>{secondaryLabel}</Text>
+          {secondaryIcon ? <Icon name={secondaryIcon} size={iconSize.md} color={colors.text3} /> : null}
         </Pressable>
       ) : null}
     </View>
@@ -736,7 +736,7 @@ export function PrimaryButton({ label, onPress, disabled, tone = "primary" }: { 
         const bg = disabled ? colors.cardStrong : tone === "dark" ? colors.text : tone === "soft" ? (pressed ? colors.cardStrong : colors.cardSoft) : pressed ? colors.primaryPressed : colors.primary;
         return { height: 56, borderRadius: 16, backgroundColor: bg, alignItems: "center", justifyContent: "center", opacity: pressed && tone === "dark" ? 0.85 : 1 };
       }}>
-      <Text {...wordWrap} numberOfLines={1} style={[{ fontFamily: fonts.bold, fontSize: 17, letterSpacing: -0.3, color: disabled ? colors.text3 : tone === "dark" ? colors.surface : tone === "soft" ? colors.text : colors.onPrimary }]}>{label}</Text>
+      <Text {...wordWrap} numberOfLines={1} style={[type.subheading, { color: disabled ? colors.text3 : tone === "dark" ? colors.surface : tone === "soft" ? colors.text : colors.onPrimary }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -842,7 +842,7 @@ export function Notice({ tone = "primary", icon, children }: PropsWithChildren<{
   const fg = tone === "warn" ? colors.warning : tone === "info" ? colors.info : colors.primary;
   return (
     <View style={{ flexDirection: "row", gap: 10, alignItems: "center", backgroundColor: bg, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 14 }}>
-      {icon ? <Icon name={icon} size={18} color={fg} /> : null}
+      {icon ? <Icon name={icon} size={iconSize.lg} color={fg} /> : null}
       <T variant="small" color={fg} style={{ flex: 1, fontFamily: fonts.semiBold }}>{children}</T>
     </View>
   );
@@ -902,8 +902,8 @@ export function Toast({ visible, children, tone = "info" }: PropsWithChildren<{ 
           paddingVertical: 14,
         }}
       >
-        <Icon name={tone === "warn" ? "alert" : "bell"} size={18} color={tone === "warn" ? colors.warning : colors.primary} />
-        <Text {...wordWrap} style={{ flex: 1, fontFamily: fonts.medium, fontSize: 14, lineHeight: 20, color: tone === "warn" ? colors.warning : colors.text }}>
+        <Icon name={tone === "warn" ? "alert" : "bell"} size={iconSize.lg} color={tone === "warn" ? colors.warning : colors.primary} />
+        <Text {...wordWrap} style={[type.small, { flex: 1, fontFamily: fonts.medium, color: tone === "warn" ? colors.warning : colors.text }]}>
           {children}
         </Text>
       </View>

@@ -11,7 +11,7 @@ import { isComplete, NO_WORKPLACE, stepHint, stepLabel, stepOptions, stepTitle, 
 import { searchPlaces, type PlaceHit } from "@/data/places-search";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, radius, space } from "@/theme/tokens";
+import { fonts, iconSize, radius, space, type } from "@/theme/tokens";
 
 /**
  * 조건 입력: 한 화면에 질문 하나, 하단 고정 CTA, 뒤로가기 자유.
@@ -130,7 +130,7 @@ export default function Onboarding() {
                     </View>
                     {/* 고른 것에만 체크를 붙인다. 안 고른 것에 흐린 체크가 있으면
                         "이미 선택됨"으로 읽힌다 — 체크는 "됐다"는 뜻이다. */}
-                    {!grid && on ? <Icon name="check" size={20} color={colors.primary} /> : null}
+                    {!grid && on ? <Icon name="check" size={iconSize.xl} color={colors.primary} /> : null}
                   </Pressable>
                 );
               })}
@@ -178,7 +178,7 @@ export default function Onboarding() {
             <Pressable onPress={() => setHelper(true)} accessibilityRole="button" style={({ pressed }) => ({ gap: 6, marginTop: 8, padding: 16, borderRadius: radius.md, backgroundColor: pressed ? colors.cardStrong : colors.cardSoft })}>
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                 <T variant="bodyMedium" color={colors.primary}>건강보험료로 계산하기</T>
-                <Icon name="right" size={18} color={colors.primary} />
+                <Icon name="right" size={iconSize.lg} color={colors.primary} />
               </View>
               <Sub tone="3">{step.helper}</Sub>
             </Pressable>
@@ -263,7 +263,7 @@ function ClearButton({ onPress }: { onPress: () => void }) {
   return (
     <Pressable onPress={onPress} hitSlop={12} accessibilityRole="button" accessibilityLabel="입력 지우기"
       style={({ pressed }) => ({ width: 24, height: 24, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: pressed ? colors.text3 : colors.text4, flexShrink: 0 })}>
-      <Icon name="x" size={14} color={colors.surface} />
+      <Icon name="x" size={iconSize.sm} color={colors.surface} />
     </Pressable>
   );
 }
@@ -291,7 +291,7 @@ function parseDuration(text: string): { years: string; months: string; total: nu
 function DurationField({ text, onChange }: { text: string; onChange: (t: string) => void }) {
   const { colors } = useTheme();
   const { years, months, total } = parseDuration(text);
-  const inputStyle = [{ minWidth: 0, fontFamily: fonts.bold, fontSize: 36, lineHeight: 44, color: colors.text, padding: 0, letterSpacing: -1, fontVariant: ["tabular-nums"] as const }, Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : null];
+  const inputStyle = [{ ...type.display, minWidth: 0, color: colors.text, padding: 0, fontVariant: ["tabular-nums"] as const }, Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : null];
   const setMonths = (t: string) => {
     const d = t.replace(/[^0-9]/g, "").slice(0, 2);
     onChange(`${years}:${d === "" ? "" : String(Math.min(11, Number(d)))}`);
@@ -410,7 +410,7 @@ function PlaceField({
     <View style={{ gap: 10, marginTop: 12 }}>
       {picked ? (
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 16, paddingVertical: 12, borderRadius: radius.md, backgroundColor: colors.primarySoft }}>
-          <Icon name="check" size={18} color={colors.primary} />
+          <Icon name="check" size={iconSize.lg} color={colors.primary} />
           <T variant="bodyMedium" color={colors.primary} style={{ flex: 1 }}>{picked}</T>
         </View>
       ) : null}
@@ -426,7 +426,7 @@ function PlaceField({
         /* paddingVertical로 높이를 만들면 글자가 아래로 치우친다 — Pretendard는 ascent가 커서
            iOS TextInput이 그 여백을 위쪽에 몰아 준다. 높이를 직접 주고 패딩을 0으로 두면
            한 줄짜리 입력은 iOS가 가운데로 맞춘다 (이 파일의 다른 입력들도 padding: 0을 쓴다). */
-        style={{ fontFamily: fonts.medium, fontSize: 17, color: colors.text, backgroundColor: colors.card, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 0, height: 56 }}
+        style={{ ...type.bodyMedium, color: colors.text, backgroundColor: colors.card, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 0, height: 56 }}
       />
 
       {busy ? <Sub tone="3">찾는 중…</Sub> : null}
@@ -458,7 +458,7 @@ function PlaceField({
           <T variant="bodyMedium" color={none ? colors.primary : colors.text}>{noneLabel}</T>
           {noneHint ? <Sub tone="3">{noneHint}</Sub> : null}
         </View>
-        {none ? <Icon name="check" size={20} color={colors.primary} /> : null}
+        {none ? <Icon name="check" size={iconSize.xl} color={colors.primary} /> : null}
       </Pressable>
     </View>
   );

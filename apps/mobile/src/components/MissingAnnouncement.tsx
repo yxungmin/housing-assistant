@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { tileSize } from "@/theme/tokens";
 import { ActivityIndicator, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useAnnouncements } from "@/data/announcements";
@@ -47,7 +48,7 @@ export function MissingAnnouncement() {
   return (
     <Screen header={header}>
       <View style={{ alignItems: "center", paddingTop: 48, gap: 12 }}>
-        <IconTile name="notice" size={56} />
+        <IconTile name="notice" size={tileSize.xl} />
         <T variant="heading" style={{ textAlign: "center" }}>
           지금은 볼 수 없는 공고예요
         </T>

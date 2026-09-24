@@ -4,7 +4,7 @@ import { HEALTH_INSURANCE, incomeFromPremium } from "@housing/engine";
 import { BottomSheet, Notice, PrimaryButton, Sub, T } from "./ui";
 import { manwon } from "@/lib/format";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts } from "@/theme/tokens";
+import { fonts, type } from "@/theme/tokens";
 
 /**
  * 소득 입력 도우미: 급여명세서의 건강보험료(본인부담)로 세전 월소득을 역산한다.
@@ -31,7 +31,7 @@ export function IncomeHelperSheet({ visible, dual, onClose, onApply }: { visible
       {ok ? (
         <View style={{ gap: 4 }}>
           <Sub>세전 가구 월소득 추정</Sub>
-          <T variant="heading" numeric style={{ fontSize: 28 }}>{manwon(result.monthly_income)}</T>
+          <T variant="title" numeric>{manwon(result.monthly_income)}</T>
           <Sub tone="3" variant="caption">건강보험료 ÷ (보험료율 {(result.rate * 100).toFixed(2)}% ÷ 2) · {HEALTH_INSURANCE.year}년 요율 기준</Sub>
         </View>
       ) : (
@@ -59,7 +59,7 @@ function PremiumField({ label, value, onChange, autoFocus }: { label: string; va
           numberOfLines={1}
           selectionColor={colors.primary}
           accessibilityLabel={label}
-          style={[{ flex: 1, minWidth: 0, fontFamily: fonts.bold, fontSize: 28, lineHeight: 36, color: colors.text, padding: 0, letterSpacing: -0.5, fontVariant: ["tabular-nums"] }, Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : null]}
+          style={[{ ...type.title, flex: 1, minWidth: 0, color: colors.text, padding: 0, fontVariant: ["tabular-nums"] }, Platform.OS === "web" ? ({ outlineStyle: "none" } as object) : null]}
         />
         <T variant="bodyMedium" color={colors.text2} style={{ flexShrink: 0 }}>원</T>
       </View>

@@ -8,7 +8,7 @@ import { RETAIN_DAYS, syncInbox, unreadCount, type AppNotification, type Notific
 import { unseenIds } from "@/lib/unseen";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { radius } from "@/theme/tokens";
+import { iconSize, radius, tileSize } from "@/theme/tokens";
 
 const ICON: Record<NotificationKind, "clock" | "alert" | "house"> = { deadline: "clock", change: "alert", new: "house" };
 const TONE: Record<NotificationKind, "warn" | "primary" | "gray"> = { deadline: "warn", change: "warn", new: "primary" };
@@ -103,7 +103,7 @@ export default function Alerts() {
 
       {list.length > 0 ? (
         <View style={{ flexDirection: "row", gap: 8, paddingTop: 8 }}>
-          <Icon name="info" size={16} color={colors.text4} />
+          <Icon name="info" size={iconSize.md} color={colors.text4} />
           <Sub tone="3" variant="caption" style={{ flex: 1 }}>알림은 {RETAIN_DAYS}일 동안 보관하고 그 뒤에는 자동으로 지워져요.</Sub>
         </View>
       ) : null}
@@ -129,9 +129,9 @@ function Row({ n, onOpen, onRemove }: { n: AppNotification; onOpen: () => void; 
         accessibilityLabel={n.announcementId ? n.title : undefined}
         style={({ pressed }) => ({ flex: 1, flexDirection: "row", gap: 12, alignItems: "flex-start", opacity: pressed ? 0.7 : 1 })}
       >
-        <IconTile name={ICON[n.kind]} tone={TONE[n.kind]} size={36} />
+        <IconTile name={ICON[n.kind]} tone={TONE[n.kind]} size={tileSize.sm} />
         <View style={{ flex: 1, gap: 3 }}>
-          <T variant="bodyMedium" style={{ fontSize: 15 }}>{n.title}</T>
+          <T variant="bodyMedium">{n.title}</T>
           <Sub tone="2" lines={3}>{n.body}</Sub>
           <Sub tone="3" variant="caption">{when(n.at)}{n.announcementId ? " · 눌러서 공고 보기" : ""}</Sub>
         </View>
@@ -143,7 +143,7 @@ function Row({ n, onOpen, onRemove }: { n: AppNotification; onOpen: () => void; 
         hitSlop={10}
         style={({ pressed }) => ({ padding: 4, borderRadius: radius.sm, opacity: pressed ? 0.5 : 1 })}
       >
-        <Icon name="x" size={16} color={colors.text4} />
+        <Icon name="x" size={iconSize.md} color={colors.text4} />
       </Pressable>
     </Card>
   );

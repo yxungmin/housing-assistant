@@ -41,7 +41,7 @@ interface RentalChoice {
 import { canOpenCost, useAppState } from "@/store/appState";
 import { accessLevel } from "@/lib/access";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, radius, space } from "@/theme/tokens";
+import { fonts, iconSize, radius, space, tileSize } from "@/theme/tokens";
 
 const STEP = 1_000_000; // 전환보증금은 100만 원 단위 (LH 공고 규정)
 
@@ -272,7 +272,7 @@ export default function Cost() {
       <View style={{ paddingHorizontal: space.screen, gap: space.section }}>
         <View style={{ gap: 16 }}>
           <View style={{ gap: 4 }}>
-            <T variant="heading" style={{ fontSize: 20, lineHeight: 28 }}>{a.title}</T>
+            <T variant="heading">{a.title}</T>
             {bestTrackName ? <Sub tone="3">{bestTrackName}</Sub> : null}
           </View>
           <Pressable onPress={() => setPicker(true)} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: pressed ? colors.cardSoft : colors.card, borderRadius: radius.md, paddingHorizontal: 16, paddingVertical: 14 })}>
@@ -286,7 +286,7 @@ export default function Cost() {
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 4, flexShrink: 0 }}>
               <Sub tone="3">{rentals.length + otherCount}개 중</Sub>
-              <Icon name="right" size={18} color={colors.text4} />
+              <Icon name="right" size={iconSize.lg} color={colors.text4} />
             </View>
           </Pressable>
         </View>
@@ -330,7 +330,7 @@ export default function Cost() {
                 style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start", marginTop: -8, paddingVertical: 6, opacity: pressed ? 0.6 : 1 })}
               >
                 <T variant="small" color={colors.primary} style={{ fontFamily: fonts.semiBold }}>보유 현금 입력하기</T>
-                <Icon name="right" size={14} color={colors.primary} />
+                <Icon name="right" size={iconSize.sm} color={colors.primary} />
               </Pressable>
             ) : null}
             <View style={{ gap: 14 }}>
@@ -368,7 +368,7 @@ export default function Cost() {
                   <View key={p.annual_rate} style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                     <T variant="label" color={colors.text3} style={{ width: 52 }}>연 {(p.annual_rate * 100).toFixed(0)}%</T>
                     <View style={{ flex: 1, gap: 1 }}>
-                      <T variant="bodyMedium" style={{ fontSize: 15 }}>
+                      <T variant="bodyMedium">
                         월 {manwon(p.monthly_total)}
                         {/* 상환액은 원 단위로 적는다. 만 원으로 뭉개면 부족액이 작을 때
                             연 5%와 연 8%가 같은 값으로 보여서, 금리를 나눠 보여 주는 뜻이 없어진다. */}
@@ -524,7 +524,7 @@ export default function Cost() {
                   <T variant="bodyMedium" color={on ? colors.primary : colors.text}>{q.product.name}</T>
                   <Sub tone="3" variant="caption">연 {(q.annual_rate * 100).toFixed(1)}% · 한도 {Math.round(q.product.ltv * 100)}% · 최대 {manwon(q.amount)}</Sub>
                 </View>
-                {on ? <Icon name="check" size={20} color={colors.primary} /> : null}
+                {on ? <Icon name="check" size={iconSize.xl} color={colors.primary} /> : null}
               </Pressable>
             );
           })}
@@ -575,7 +575,7 @@ export default function Cost() {
                       : `${allTracks ? `${r.trackName} · ` : ""}보증금 ${manwon(r.pricing.deposit)} · 월 ${won(r.pricing.monthly_rent)}`}
                   </Sub>
                 </View>
-                {on ? <Icon name="check" size={20} color={colors.primary} /> : null}
+                {on ? <Icon name="check" size={iconSize.xl} color={colors.primary} /> : null}
               </Pressable>
               {/* 집은 한 줄에 다 못 적는다. 층·방·승강기·주변·전체 주소는 여기서 펼쳐 본다. */}
               {picksHouse ? (
@@ -586,7 +586,7 @@ export default function Cost() {
                   hitSlop={8}
                   style={({ pressed }) => ({ paddingHorizontal: 14, paddingVertical: 16, opacity: pressed ? 0.5 : 1 })}
                 >
-                  <Icon name="info" size={18} color={colors.text4} />
+                  <Icon name="info" size={iconSize.lg} color={colors.text4} />
                 </Pressable>
               ) : null}
               </View>
@@ -662,7 +662,7 @@ function Stepper({ icon, label, onPress, disabled }: { icon: IconName; label: st
         backgroundColor: pressed ? colors.cardStrong : colors.cardSoft, opacity: disabled ? 0.4 : 1,
       })}
     >
-      <Icon name={icon} size={16} color={colors.text2} />
+      <Icon name={icon} size={iconSize.md} color={colors.text2} />
       <T variant="small" numeric style={{ fontFamily: fonts.semiBold }}>{label}</T>
     </Pressable>
   );
@@ -757,9 +757,9 @@ function DepositSlider({ value, min, max, step, onChange }: { value: number; min
 function NearRow({ icon, title, detail }: { icon: IconName; title: string; detail: string }) {
   return (
     <View style={{ flexDirection: "row", gap: 14, alignItems: "center" }}>
-      <IconTile name={icon} tone="gray" size={36} />
+      <IconTile name={icon} tone="gray" size={tileSize.sm} />
       <View style={{ flex: 1, gap: 2 }}>
-        <T variant="bodyMedium" style={{ fontSize: 15 }}>{title}</T>
+        <T variant="bodyMedium">{title}</T>
         <Sub tone="3" variant="caption">{detail}</Sub>
       </View>
     </View>
@@ -806,7 +806,7 @@ function UnitDetail({ choice, onPick }: { choice: RentalChoice; onPick: () => vo
           {/* 주소는 길다. 오른쪽 정렬 칸에 넣으면 폭이 모자라 잘리므로 한 줄 아래로 내려 다 보여 준다. */}
           <View style={{ gap: 3 }}>
             <Sub tone="3" variant="caption">주소</Sub>
-            <T variant="bodyMedium" style={{ fontSize: 15 }}>{unit.address}</T>
+            <T variant="bodyMedium">{unit.address}</T>
           </View>
           {facts.map((f) => (
             <KeyValue key={f.label} label={f.label} value={f.value} />

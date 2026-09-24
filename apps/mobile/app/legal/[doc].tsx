@@ -32,7 +32,7 @@ export default function Legal() {
   return (
     <Screen header={<Header onBack={() => router.back()} />}>
       <View style={{ gap: 6, paddingTop: 8 }}>
-        <T variant="display" style={{ fontSize: 26, lineHeight: 36 }}>{legal.title}</T>
+        <T variant="title">{legal.title}</T>
         <Sub tone="3" variant="caption">
           {legal.effectiveAt ? `시행일 ${longDate(legal.effectiveAt)}` : "아직 시행 전 초안이에요"}
         </Sub>
@@ -52,7 +52,7 @@ export default function Legal() {
       <View style={{ gap: 24 }}>
         {legal.sections.map((s) => (
           <View key={s.heading} style={{ gap: 8 }}>
-            <T variant="bodyMedium" style={{ fontSize: 16 }}>{s.heading}</T>
+            <T variant="bodyMedium">{s.heading}</T>
             {s.body.map((line, i) =>
               isBullet(line) ? (
                 <View key={i} style={{ flexDirection: "row", gap: 8 }}>
