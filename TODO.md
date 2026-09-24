@@ -501,7 +501,11 @@
       `functions deploy transit` + `secrets set KAKAO_REST_API_KEY`.
       이것이 되어야 매입임대에서 "직장까지 대중교통 약 N분"이 뜬다. 없으면 직선거리로 되돌아간다.
 - [ ] `supabase/seed/loan_products.sql` 적용
-- [ ] `npm run collect` 실제 실행 → 공고·버전·PDF 저장 확인 (추출이 꺼져 있어 지금은 목록까지만 돈다)
+- [~] **수집기 켜기** (2026-09-24) — GitHub Actions에 Secrets 8개(LH·Supabase URL/service_role·Anthropic·Kakao·MOLIT·MYHOME·TRANSIT)와
+      Variables(`EXTRACTION_ENABLED=false`, `PUSH_ENABLED=false`, `MAX_ANNOUNCEMENTS_PER_RUN=10`)를 넣고 dry run 성공:
+      LH 114건 중 27건 + SH 21건 = 서울·인천·경기 대상 48건. SH "신정도시마을 잔여세대"의 주택 유형 코드가 매핑표에 없어 other.
+      - [ ] `EXTRACTION_ENABLED=true`로 실제 수집 1회 (사용자 결정 — 최대 10건, 약 1.3만 원). 결과 보고 cron·PUSH_ENABLED 결정
+      - [ ] `sh/mapping`에 "잔여세대 입주자모집" 유형 한 줄 추가
 - [ ] 앱 피드 증분 동기화 (`updated_at` 기준) + 지역 필터 — 지금은 매번 전체를 받는다
 
 ## 남은 일 (2026-09-21 작업에서 못 한 것)
