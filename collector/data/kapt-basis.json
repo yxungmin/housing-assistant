@@ -1,4 +1,22 @@
 {
+ "A10019964": {
+  "kapt_code": "A10019964",
+  "name": "마곡엠밸리17단지",
+  "households": 577,
+  "private_area_m2": 77215.74,
+  "levy_area_m2": 77215.74,
+  "sale_kind": "혼합",
+  "used_from": "2026-07-31"
+ },
+ "A10020082": {
+  "kapt_code": "A10020082",
+  "name": "타워힐아파트",
+  "households": 0,
+  "private_area_m2": 4330.3845,
+  "levy_area_m2": 55174144,
+  "sale_kind": "분양",
+  "used_from": "2002-04-29"
+ },
  "A10020155": {
   "kapt_code": "A10020155",
   "name": "강서뉴타워아파트",
@@ -15,6 +33,33 @@
   "levy_area_m2": 15235.03,
   "sale_kind": "분양",
   "used_from": "2000-09-20"
+ },
+ "A10020618": {
+  "kapt_code": "A10020618",
+  "name": "센터스퀘어 발산",
+  "households": 0,
+  "private_area_m2": 20765.27,
+  "levy_area_m2": 48726.46,
+  "sale_kind": "임대",
+  "used_from": "2025-03-27"
+ },
+ "A10020646": {
+  "kapt_code": "A10020646",
+  "name": "우장산동문디이스트아파트",
+  "households": 0,
+  "private_area_m2": 6103.54,
+  "levy_area_m2": 10711.52,
+  "sale_kind": "분양",
+  "used_from": "2023-09-14"
+ },
+ "A10021043": {
+  "kapt_code": "A10021043",
+  "name": "방화스카이포레아파트",
+  "households": 315,
+  "private_area_m2": 12244.81,
+  "levy_area_m2": 20604.24,
+  "sale_kind": "임대",
+  "used_from": "2025-02-07"
  },
  "A10021139": {
   "kapt_code": "A10021139",
@@ -43,6 +88,15 @@
   "sale_kind": "분양",
   "used_from": "2002-05-03"
  },
+ "A10021419": {
+  "kapt_code": "A10021419",
+  "name": "마곡센트레빌아파트",
+  "households": 143,
+  "private_area_m2": 8832.6246,
+  "levy_area_m2": 12309.19,
+  "sale_kind": "분양",
+  "used_from": "2021-09-29"
+ },
  "A10021511": {
   "kapt_code": "A10021511",
   "name": "가양우방아파트",
@@ -70,6 +124,24 @@
   "sale_kind": "분양",
   "used_from": "2006-05-25"
  },
+ "A10021574": {
+  "kapt_code": "A10021574",
+  "name": "마곡나루경남아파트",
+  "households": 140,
+  "private_area_m2": 11833.1,
+  "levy_area_m2": 16442.2,
+  "sale_kind": "분양",
+  "used_from": "1991-05-14"
+ },
+ "A10021698": {
+  "kapt_code": "A10021698",
+  "name": "마곡수명산파크8단지",
+  "households": 115,
+  "private_area_m2": 9725.75,
+  "levy_area_m2": 12177.6,
+  "sale_kind": "분양",
+  "used_from": "2006-11-13"
+ },
  "A10021770": {
   "kapt_code": "A10021770",
   "name": "염창현대2차아파트",
@@ -78,6 +150,15 @@
   "levy_area_m2": 11583,
   "sale_kind": "분양",
   "used_from": "1993-12-23"
+ },
+ "A10021866": {
+  "kapt_code": "A10021866",
+  "name": "강서센트레빌3차",
+  "households": 147,
+  "private_area_m2": 11826.57,
+  "levy_area_m2": 15623.11,
+  "sale_kind": "혼합",
+  "used_from": "2009-09-30"
  },
  "A10021935": {
   "kapt_code": "A10021935",
@@ -114,6 +195,15 @@
   "levy_area_m2": 15768.58,
   "sale_kind": "분양",
   "used_from": "2007-05-31"
+ },
+ "A10022156": {
+  "kapt_code": "A10022156",
+  "name": "더트루엘마곡HQ",
+  "households": 148,
+  "private_area_m2": 7001.2383,
+  "levy_area_m2": 9715.337,
+  "sale_kind": "분양",
+  "used_from": "2024-09-13"
  },
  "A10022233": {
   "kapt_code": "A10022233",
@@ -159,6 +249,15 @@
   "levy_area_m2": 16556.514,
   "sale_kind": "분양",
   "used_from": "2023-06-30"
+ },
+ "A10023292": {
+  "kapt_code": "A10023292",
+  "name": "방화메이빌아파트",
+  "households": 90,
+  "private_area_m2": 4504.689,
+  "levy_area_m2": 6255.36,
+  "sale_kind": "분양",
+  "used_from": "2017-11-23"
  },
  "A10023515": {
   "kapt_code": "A10023515",
@@ -223,6 +322,15 @@
   "sale_kind": "분양",
   "used_from": "2000-09-29"
  },
+ "A10024426": {
+  "kapt_code": "A10024426",
+  "name": "마곡엠밸리9단지",
+  "households": 1529,
+  "private_area_m2": 99425.77,
+  "levy_area_m2": 217527,
+  "sale_kind": "혼합",
+  "used_from": "2021-02-15"
+ },
  "A10024436": {
   "kapt_code": "A10024436",
   "name": "센터스퀘어등촌",
@@ -231,6 +339,15 @@
   "levy_area_m2": 18233.18,
   "sale_kind": "임대",
   "used_from": "2020-12-30"
+ },
+ "A10024505": {
+  "kapt_code": "A10024505",
+  "name": "신마곡 벽산 블루밍",
+  "households": 298,
+  "private_area_m2": 19305.2551,
+  "levy_area_m2": 26467.83,
+  "sale_kind": "혼합",
+  "used_from": "2020-11-26"
  },
  "A10024768": {
   "kapt_code": "A10024768",
@@ -277,6 +394,15 @@
   "sale_kind": "분양",
   "used_from": "2006-04-27"
  },
+ "A10025641": {
+  "kapt_code": "A10025641",
+  "name": "마곡보타닉경남아너스빌아파트",
+  "households": 116,
+  "private_area_m2": 9152.9624,
+  "levy_area_m2": 11769.252,
+  "sale_kind": "분양",
+  "used_from": "2005-06-29"
+ },
  "A10025703": {
   "kapt_code": "A10025703",
   "name": "삼형그레이스빌아파트",
@@ -286,6 +412,51 @@
   "sale_kind": "분양",
   "used_from": "2001-09-25"
  },
+ "A10026879": {
+  "kapt_code": "A10026879",
+  "name": "마곡13단지 힐스테이트마스터 아파트",
+  "households": 1194,
+  "private_area_m2": 91644.575,
+  "levy_area_m2": 123972.25,
+  "sale_kind": "분양",
+  "used_from": "2017-04-10"
+ },
+ "A10027371": {
+  "kapt_code": "A10027371",
+  "name": "마곡엠밸리11단지",
+  "households": 347,
+  "private_area_m2": 22065.91,
+  "levy_area_m2": 31318.28,
+  "sale_kind": "혼합",
+  "used_from": "2016-09-12"
+ },
+ "A10027403": {
+  "kapt_code": "A10027403",
+  "name": "마곡엠밸리12단지",
+  "households": 363,
+  "private_area_m2": 22821.39,
+  "levy_area_m2": 32602.26,
+  "sale_kind": "혼합",
+  "used_from": "2016-09-12"
+ },
+ "A10027433": {
+  "kapt_code": "A10027433",
+  "name": "마곡엠밸리8단지",
+  "households": 531,
+  "private_area_m2": 36403.78,
+  "levy_area_m2": 36403.78,
+  "sale_kind": "혼합",
+  "used_from": "2016-07-22"
+ },
+ "A10027452": {
+  "kapt_code": "A10027452",
+  "name": "마곡엠밸리10단지 아파트",
+  "households": 550,
+  "private_area_m2": 34372.12,
+  "levy_area_m2": 33900,
+  "sale_kind": "혼합",
+  "used_from": "2016-08-09"
+ },
  "A10027541": {
   "kapt_code": "A10027541",
   "name": "강서쌍용예가아파트",
@@ -294,6 +465,24 @@
   "levy_area_m2": 12457.38,
   "sale_kind": "분양",
   "used_from": "2014-06-11"
+ },
+ "A10027687": {
+  "kapt_code": "A10027687",
+  "name": "마곡힐스테이트",
+  "households": 603,
+  "private_area_m2": 48813.8,
+  "levy_area_m2": 65627.15,
+  "sale_kind": "혼합",
+  "used_from": "2017-08-03"
+ },
+ "A10028020": {
+  "kapt_code": "A10028020",
+  "name": "해태아파트",
+  "households": 111,
+  "private_area_m2": 8542.35,
+  "levy_area_m2": 8554.65,
+  "sale_kind": "분양",
+  "used_from": "2000-09-25"
  },
  "A15701002": {
   "kapt_code": "A15701002",
@@ -617,6 +806,335 @@
   "sale_kind": "분양",
   "used_from": "2004-12-23"
  },
+ "A15721001": {
+  "kapt_code": "A15721001",
+  "name": "마곡금호어울림",
+  "households": 180,
+  "private_area_m2": 15799.86,
+  "levy_area_m2": 20397.54,
+  "sale_kind": "분양",
+  "used_from": "2005-11-21"
+ },
+ "A15721003": {
+  "kapt_code": "A15721003",
+  "name": "마곡신안",
+  "households": 253,
+  "private_area_m2": 18770.14,
+  "levy_area_m2": 24379,
+  "sale_kind": "분양",
+  "used_from": "1993-12-23"
+ },
+ "A15721004": {
+  "kapt_code": "A15721004",
+  "name": "마곡한솔솔파크",
+  "households": 258,
+  "private_area_m2": 20052.53,
+  "levy_area_m2": 26110.04,
+  "sale_kind": "분양",
+  "used_from": "2005-02-14"
+ },
+ "A15721005": {
+  "kapt_code": "A15721005",
+  "name": "마곡벽산",
+  "households": 479,
+  "private_area_m2": 38581.59,
+  "levy_area_m2": 38581.59,
+  "sale_kind": "분양",
+  "used_from": "1999-06-25"
+ },
+ "A15721006": {
+  "kapt_code": "A15721006",
+  "name": "마곡엠밸리6단지",
+  "households": 1466,
+  "private_area_m2": 111736.57,
+  "levy_area_m2": 225422.23,
+  "sale_kind": "혼합",
+  "used_from": "2014-06-12"
+ },
+ "A15721007": {
+  "kapt_code": "A15721007",
+  "name": "마곡엠밸리7단지",
+  "households": 1004,
+  "private_area_m2": 95039.65,
+  "levy_area_m2": 183983,
+  "sale_kind": "혼합",
+  "used_from": "2014-06-12"
+ },
+ "A15721008": {
+  "kapt_code": "A15721008",
+  "name": "마곡엠밸리4단지",
+  "households": 420,
+  "private_area_m2": 31093.09,
+  "levy_area_m2": 68416.56,
+  "sale_kind": "혼합",
+  "used_from": "2014-06-20"
+ },
+ "A15721009": {
+  "kapt_code": "A15721009",
+  "name": "마곡엠밸리2단지",
+  "households": 408,
+  "private_area_m2": 32576.7,
+  "levy_area_m2": 70471.21,
+  "sale_kind": "혼합",
+  "used_from": "2014-06-19"
+ },
+ "A15721010": {
+  "kapt_code": "A15721010",
+  "name": "마곡엠밸리14단지",
+  "households": 1270,
+  "private_area_m2": 94181.45,
+  "levy_area_m2": 195141.66,
+  "sale_kind": "혼합",
+  "used_from": "2014-05-29"
+ },
+ "A15721011": {
+  "kapt_code": "A15721011",
+  "name": "마곡엠밸리3단지",
+  "households": 315,
+  "private_area_m2": 24966.15,
+  "levy_area_m2": 58373.23,
+  "sale_kind": "혼합",
+  "used_from": "2014-06-19"
+ },
+ "A15722001": {
+  "kapt_code": "A15722001",
+  "name": "마곡삼성",
+  "households": 170,
+  "private_area_m2": 12039.54,
+  "levy_area_m2": 15741.25,
+  "sale_kind": "분양",
+  "used_from": "1998-01-09"
+ },
+ "A15722003": {
+  "kapt_code": "A15722003",
+  "name": "마곡신안네트빌(1단지)",
+  "households": 285,
+  "private_area_m2": 23265.2509,
+  "levy_area_m2": 31436.78,
+  "sale_kind": "분양",
+  "used_from": "2002-09-13"
+ },
+ "A15722004": {
+  "kapt_code": "A15722004",
+  "name": "마곡푸르지오",
+  "households": 341,
+  "private_area_m2": 28953.59,
+  "levy_area_m2": 36511.203,
+  "sale_kind": "혼합",
+  "used_from": "2008-06-09"
+ },
+ "A15722005": {
+  "kapt_code": "A15722005",
+  "name": "마곡 한진해모로",
+  "households": 354,
+  "private_area_m2": 27022.11,
+  "levy_area_m2": 34318.45,
+  "sale_kind": "분양",
+  "used_from": "2004-05-11"
+ },
+ "A15722007": {
+  "kapt_code": "A15722007",
+  "name": "방화삼성꽃마을",
+  "households": 206,
+  "private_area_m2": 15080.08,
+  "levy_area_m2": 19094.18,
+  "sale_kind": "분양",
+  "used_from": "1997-10-06"
+ },
+ "A15722008": {
+  "kapt_code": "A15722008",
+  "name": "홍익",
+  "households": 65,
+  "private_area_m2": 4627.81,
+  "sale_kind": ""
+ },
+ "A15722009": {
+  "kapt_code": "A15722009",
+  "name": "마곡엠밸리1단지",
+  "households": 237,
+  "private_area_m2": 16133.54,
+  "levy_area_m2": 16133.56,
+  "sale_kind": "혼합",
+  "used_from": "2014-06-19"
+ },
+ "A15722010": {
+  "kapt_code": "A15722010",
+  "name": "마곡엠밸리5단지",
+  "households": 442,
+  "private_area_m2": 40045,
+  "levy_area_m2": 40045,
+  "sale_kind": "혼합",
+  "used_from": "2014-06-26"
+ },
+ "A15722011": {
+  "kapt_code": "A15722011",
+  "name": "방화길훈",
+  "households": 112,
+  "private_area_m2": 6619.36,
+  "levy_area_m2": 9872.74,
+  "sale_kind": "분양",
+  "used_from": "1989-12-28"
+ },
+ "A15722102": {
+  "kapt_code": "A15722102",
+  "name": "개화산동부센트레빌",
+  "households": 205,
+  "private_area_m2": 16095.69,
+  "levy_area_m2": 20386.773,
+  "sale_kind": "분양",
+  "used_from": "2003-02-24"
+ },
+ "A15722104": {
+  "kapt_code": "A15722104",
+  "name": "마곡청구아파트",
+  "households": 209,
+  "private_area_m2": 14772.09,
+  "levy_area_m2": 18742.06,
+  "sale_kind": "분양",
+  "used_from": "1998-02-20"
+ },
+ "A15722106": {
+  "kapt_code": "A15722106",
+  "name": "마곡우림필유아파트",
+  "households": 320,
+  "private_area_m2": 26734.871,
+  "levy_area_m2": 32517.93,
+  "sale_kind": "분양",
+  "used_from": "2003-12-31"
+ },
+ "A15722108": {
+  "kapt_code": "A15722108",
+  "name": "방화동부센트레빌",
+  "households": 407,
+  "private_area_m2": 37418.72,
+  "levy_area_m2": 45263.566,
+  "sale_kind": "분양",
+  "used_from": "2003-11-29"
+ },
+ "A15722201": {
+  "kapt_code": "A15722201",
+  "name": "마곡서광2차아파트",
+  "households": 154,
+  "private_area_m2": 15216.3142,
+  "levy_area_m2": 18545.434,
+  "sale_kind": "분양",
+  "used_from": "2003-06-02"
+ },
+ "A15722203": {
+  "kapt_code": "A15722203",
+  "name": "방화신동아",
+  "households": 224,
+  "private_area_m2": 16038.09,
+  "levy_area_m2": 24302.76,
+  "sale_kind": "분양",
+  "used_from": "1995-12-16"
+ },
+ "A15728002": {
+  "kapt_code": "A15728002",
+  "name": "마곡수명산파크6단지",
+  "households": 399,
+  "private_area_m2": 25558.61,
+  "levy_area_m2": 33359.242,
+  "sale_kind": "혼합",
+  "used_from": "2007-10-19"
+ },
+ "A15728003": {
+  "kapt_code": "A15728003",
+  "name": "마곡수명산파크3단지",
+  "households": 518,
+  "private_area_m2": 43878.56,
+  "levy_area_m2": 56411.695,
+  "sale_kind": "혼합",
+  "used_from": "2007-09-21"
+ },
+ "A15728004": {
+  "kapt_code": "A15728004",
+  "name": "마곡수명산파크2단지",
+  "households": 629,
+  "private_area_m2": 46505.2,
+  "levy_area_m2": 59793.26,
+  "sale_kind": "혼합",
+  "used_from": "2007-07-26"
+ },
+ "A15728005": {
+  "kapt_code": "A15728005",
+  "name": "마곡수명산파크7단지",
+  "households": 643,
+  "private_area_m2": 40735.1,
+  "levy_area_m2": 40735.1,
+  "sale_kind": "혼합",
+  "used_from": "2008-10-01"
+ },
+ "A15728006": {
+  "kapt_code": "A15728006",
+  "name": "마곡수명산파크4단지",
+  "households": 919,
+  "private_area_m2": 61143.58,
+  "levy_area_m2": 82576.72,
+  "sale_kind": "혼합",
+  "used_from": "2008-02-20"
+ },
+ "A15728007": {
+  "kapt_code": "A15728007",
+  "name": "마곡수명산파크5단지",
+  "households": 948,
+  "private_area_m2": 51875.56,
+  "levy_area_m2": 71367.76,
+  "sale_kind": "혼합",
+  "used_from": "2008-06-10"
+ },
+ "A15728008": {
+  "kapt_code": "A15728008",
+  "name": "마곡수명산파크1단지",
+  "households": 1421,
+  "private_area_m2": 82603,
+  "levy_area_m2": 108116.89,
+  "sale_kind": "혼합",
+  "used_from": "2007-11-01"
+ },
+ "A15728009": {
+  "kapt_code": "A15728009",
+  "name": "우장산힐스테이트",
+  "households": 2198,
+  "private_area_m2": 190886.54,
+  "levy_area_m2": 247708.94,
+  "sale_kind": "분양",
+  "used_from": "2005-05-04"
+ },
+ "A15728010": {
+  "kapt_code": "A15728010",
+  "name": "우장산롯데2차",
+  "households": 157,
+  "private_area_m2": 13063.776,
+  "levy_area_m2": 16350.412,
+  "sale_kind": "분양",
+  "used_from": "2003-09-25"
+ },
+ "A15728011": {
+  "kapt_code": "A15728011",
+  "name": "마곡엠밸리15단지",
+  "households": 1171,
+  "private_area_m2": 81229.48,
+  "levy_area_m2": 80249,
+  "sale_kind": "혼합",
+  "used_from": "2014-05-29"
+ },
+ "A15728013": {
+  "kapt_code": "A15728013",
+  "name": "우장산롯데1차",
+  "households": 102,
+  "private_area_m2": 9087.696,
+  "levy_area_m2": 11577.28,
+  "sale_kind": "분양",
+  "used_from": "2002-10-28"
+ },
+ "A15728014": {
+  "kapt_code": "A15728014",
+  "name": "수산오성",
+  "households": 85,
+  "private_area_m2": 7129.2,
+  "sale_kind": ""
+ },
  "A15770101": {
   "kapt_code": "A15770101",
   "name": "화곡2차보람",
@@ -743,6 +1261,15 @@
   "sale_kind": "임대",
   "used_from": "1994-11-04"
  },
+ "A15779704": {
+  "kapt_code": "A15779704",
+  "name": "길성그랑프리텔1차",
+  "households": 194,
+  "private_area_m2": 15380.83,
+  "levy_area_m2": 15380.83,
+  "sale_kind": "분양",
+  "used_from": "2003-12-31"
+ },
  "A15780002": {
   "kapt_code": "A15780002",
   "name": "가양우성",
@@ -823,6 +1350,78 @@
   "levy_area_m2": 92155.22,
   "sale_kind": "분양",
   "used_from": "1992-12-02"
+ },
+ "A15780705": {
+  "kapt_code": "A15780705",
+  "name": "가양4단지",
+  "households": 1998,
+  "private_area_m2": 54858.72,
+  "levy_area_m2": 84256.23,
+  "sale_kind": "임대",
+  "used_from": "1992-11-30"
+ },
+ "A15780806": {
+  "kapt_code": "A15780806",
+  "name": "가양5단지",
+  "households": 2412,
+  "private_area_m2": 66202.8,
+  "levy_area_m2": 101602.06,
+  "sale_kind": "임대",
+  "used_from": "1992-11-30"
+ },
+ "A15780904": {
+  "kapt_code": "A15780904",
+  "name": "가양도시개발공사8단지(임대)",
+  "households": 1110,
+  "private_area_m2": 45520.2,
+  "levy_area_m2": 65266.2,
+  "sale_kind": "임대",
+  "used_from": "1992-11-18"
+ },
+ "A15780905": {
+  "kapt_code": "A15780905",
+  "name": "가양6단지",
+  "households": 1476,
+  "private_area_m2": 72902.7,
+  "levy_area_m2": 104811.48,
+  "sale_kind": "분양",
+  "used_from": "1992-11-18"
+ },
+ "A15781002": {
+  "kapt_code": "A15781002",
+  "name": "가양9-1",
+  "households": 914,
+  "private_area_m2": 37396.8,
+  "levy_area_m2": 53888.19,
+  "sale_kind": "임대",
+  "used_from": "1992-11-18"
+ },
+ "A15781003": {
+  "kapt_code": "A15781003",
+  "name": "가양9-2",
+  "households": 1005,
+  "private_area_m2": 41220,
+  "levy_area_m2": 59860.44,
+  "sale_kind": "분양",
+  "used_from": "1993-02-27"
+ },
+ "A15781201": {
+  "kapt_code": "A15781201",
+  "name": "강서센트레빌4차",
+  "households": 215,
+  "private_area_m2": 17752.08,
+  "levy_area_m2": 22127.36,
+  "sale_kind": "혼합",
+  "used_from": "2009-11-04"
+ },
+ "A15782501": {
+  "kapt_code": "A15782501",
+  "name": "강서월드메르디앙",
+  "households": 160,
+  "private_area_m2": 13883.4323,
+  "levy_area_m2": 17555.61,
+  "sale_kind": "분양",
+  "used_from": "2006-03-30"
  },
  "A15783701": {
   "kapt_code": "A15783701",

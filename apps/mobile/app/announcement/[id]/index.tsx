@@ -326,7 +326,7 @@ export default function AnnouncementDetail() {
                 <View style={{ borderTopWidth: 1, borderTopColor: colors.line, marginTop: 8, paddingTop: 14, paddingHorizontal: 4, gap: 10 }}>
                   {rank && rankLocked ? (
                     <Pressable onPress={() => setSubSheet(true)} accessibilityRole="button" accessibilityLabel="예상 순위 보기 — 구독" style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}>
-                      <KeyValue label="예상 순위" value="" redacted strong note="내 순위와 지난 회차 마감 순위 비교는 구독하면 볼 수 있어요" />
+                      <KeyValue label="예상 순위" value="" redacted redactedText="?순위" strong note="내 순위와 지난 회차 마감 순위 비교는 구독하면 볼 수 있어요" />
                     </Pressable>
                   ) : rank ? (
                     <KeyValue

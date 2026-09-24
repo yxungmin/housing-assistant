@@ -428,7 +428,7 @@ export default function Cost() {
                 <View style={{ alignItems: "flex-end", gap: 2 }}>
                   <Sub tone="3" variant="caption">월 소득 대비</Sub>
                   {locked ? (
-                    <Redacted size={type.heading.fontSize} />
+                    <Redacted size={type.heading.fontSize} text="??%" />
                   ) : (
                     <T variant="heading" numeric color={incomeRatio > 0.3 ? colors.warning : colors.text}>{pct(incomeRatio)}</T>
                   )}

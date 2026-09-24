@@ -271,22 +271,22 @@ export function IconTile({ name, tone = "gray", size = tileSize.md }: { name: Ic
 }
 
 /**
- * 구독 전에 가려진 값 — 값이 있을 자리에 그 값의 글자 크기로 **물음표** 하나와 자물쇠.
+ * 구독 전에 가려진 값 — 값이 있을 자리에 그 값의 글자 크기로, **금액 모양의 자리표시** "?,???만 원".
  *
- * 세 번째 모양이다 (2026-09-24 결정).
- *  1. "•,•••만": 쉼표와 단위가 남아 고장 난 숫자처럼 보였고 자리마다 제각각이었다.
+ * 네 번째 모양이다 (2026-09-24 결정).
+ *  1. "•,•••만": 점이 쉼표와 섞여 고장 난 숫자처럼 보였다.
  *  2. 회색 막대(+자물쇠): 로딩 뼈대(skeleton)와 같아서 "아직 안 불러왔나" 하고 기다리다 지나갔다.
- *  3. 물음표: 값이 **있는데 모른다**는 뜻이 한 글자에 있다. 배경 면을 깔지 않는다 — 면이 있으면 다시 뼈대로 읽힌다.
+ *  3. 물음표 하나(+자물쇠): 금액 같지 않았다 — 무엇이 들어올 자리인지 모양이 말해 주지 않았다.
+ *  4. "?,???만 원": 자릿수·쉼표·단위는 진짜 금액과 같고 숫자만 물음표다. 여기 **금액이** 들어오고 지금은 모른다는 뜻이 한눈에 읽힌다.
+ * 배경 면도 자물쇠도 없다 — 면은 뼈대로 읽히고, 자물쇠는 위 LockNote가 한 번 들면 된다.
  * BigNumber·KeyValue의 redacted와 화면의 낱개 가림이 모두 이걸 쓴다. 한 화면 안에서 모양이 하나여야 "잠긴 것"으로 읽힌다.
- * 무엇을 하면 보이는지는 LockNote가 한 번 말한다 — 자리마다 반복하지 않는다.
  */
-export function Redacted({ size }: { /** 가리는 값의 글자 크기. 그 자리에 그 크기로 앉는다 */ size: number }) {
+export function Redacted({ size, text = "?,???만 원" }: { /** 가리는 값의 글자 크기. 그 자리에 그 크기로 앉는다 */ size: number; /** 자리표시 모양. 큰 숫자는 단위를 따로 붙이므로 "?,???만", 비율은 "??%" */ text?: string }) {
   const { colors } = useTheme();
   return (
-    <View accessibilityLabel="가려진 값 — 구독하면 보여요" style={{ flexDirection: "row", alignItems: "center", gap: Math.round(size * 0.2) }}>
-      <Icon name="lock" size={Math.round(Math.min(18, size * 0.55))} color={colors.text3} />
-      <Text style={{ fontFamily: fonts.bold, fontSize: size, lineHeight: Math.round(size * 1.2), color: colors.text3, letterSpacing: -size * 0.035 }}>?</Text>
-    </View>
+    <Text accessibilityLabel="가려진 값 — 구독하면 보여요" style={{ fontFamily: fonts.bold, fontSize: size, lineHeight: Math.round(size * 1.2), color: colors.text3, letterSpacing: -size * 0.035, fontVariant: ["tabular-nums"] }}>
+      {text}
+    </Text>
   );
 }
 
@@ -315,7 +315,7 @@ export function BigNumber({ value, unit, label, sub, size = 40, align = "left", 
       {label ? <Sub>{label}</Sub> : null}
       <View style={{ flexDirection: "row", alignItems: "baseline", gap: 6 }}>
         {redacted ? (
-          <Redacted size={size} />
+          <Redacted size={size} text="?,???만" />
         ) : (
           <Text style={{ fontFamily: fonts.bold, fontSize: size, lineHeight: size * 1.2, color: colors.text, letterSpacing: -size * 0.035, fontVariant: ["tabular-nums"] }}>{value}</Text>
         )}
@@ -609,6 +609,7 @@ export function KeyValue({
   strong,
   amount,
   redacted,
+  redactedText,
 }: {
   label: string;
   value: string;
@@ -625,8 +626,10 @@ export function KeyValue({
    * 43,520,000과 4,352,000은 쉼표 하나 차이인데 열 배가 다르고, 사람은 그 자리에서 잘못 읽는다.
    */
   amount?: number | null;
-  /** 구독 전 미리보기 — 값 자리에 물음표 (Redacted) */
+  /** 구독 전 미리보기 — 값 자리에 금액 모양 자리표시 (Redacted) */
   redacted?: boolean;
+  /** 금액이 아닌 값의 자리표시 모양 ("?순위"). 기본은 "?,???만 원" */
+  redactedText?: string;
 }) {
   const { colors } = useTheme();
   const reading = redacted ? null : koreanWon(amount);
@@ -648,7 +651,7 @@ export function KeyValue({
         </View>
         <View style={{ maxWidth: "60%", flexShrink: 1, alignItems: "flex-end", gap: 1 }}>
           {redacted ? (
-            <Redacted size={strong ? type.subheading.fontSize : type.bodyMedium.fontSize} />
+            <Redacted size={strong ? type.subheading.fontSize : type.bodyMedium.fontSize} text={redactedText} />
           ) : (
             lines.map((line, i) => (
               <T key={i} variant={strong ? "subheading" : "bodyMedium"} numeric style={{ fontFamily: strong ? fonts.bold : fonts.semiBold, textAlign: "right" }}>
