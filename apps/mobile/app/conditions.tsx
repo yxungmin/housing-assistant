@@ -1,4 +1,5 @@
 import { useRouter } from "expo-router";
+import { goBackOrHome } from "@/lib/nav";
 import { View } from "react-native";
 import { Card, Header, ListRow, PageTitle, Screen, SectionTitle, Sub } from "@/components/ui";
 import { CONDITION_GROUPS, stepDisplay, stepLabel, visibleSteps } from "@/lib/onboarding";
@@ -29,7 +30,7 @@ export default function Conditions() {
 
   // 헤더에 제목을 또 넣지 않는다 — 바로 아래 PageTitle과 겹쳐 같은 말이 두 번 나온다
   return (
-    <Screen header={<Header onBack={() => router.back()} />}>
+    <Screen header={<Header onBack={() => goBackOrHome(router)} />}>
       <PageTitle title="내 조건" sub="항목을 눌러 그것만 고칠 수 있어요. 고치면 공고마다 조건을 바로 다시 맞춰 봐요." />
 
       {[...CONDITION_GROUPS, ...(rest.length ? [{ title: "그 밖에", ids: rest.map((s) => s.id) }] : [])].map((group) => {

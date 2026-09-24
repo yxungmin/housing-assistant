@@ -17,6 +17,28 @@ const mod = () => import("expo-notifications");
 export const notificationsSupported = native;
 
 let handlerSet = false;
+/**
+ * 알림을 눌렀을 때 어느 공고인지. 켜 둔 동안의 탭과, 알림으로 앱을 연 첫 탭(getLastNotificationResponseAsync) 둘 다 본다.
+ * 전에는 data.announcementId를 넣기만 하고 읽는 곳이 없어서 알림을 눌러도 앱이 있던 자리에 열렸다 (2026-09-24 감사).
+ * 같은 알림을 두 번 처리하지 않도록 식별자를 기억한다.
+ */
+export async function subscribeNotificationTaps(onAnnouncement: (id: string) => void): Promise<() => void> {
+  if (!native) return () => {};
+  const Notifications = await mod();
+  let last: string | null = null;
+  const handle = (r: { notification: { request: { identifier: string; content: { data?: Record<string, unknown> } } } } | null) => {
+    if (!r) return;
+    const key = r.notification.request.identifier;
+    if (key === last) return;
+    last = key;
+    const id = r.notification.request.content.data?.announcementId;
+    if (typeof id === "string" && id) onAnnouncement(id);
+  };
+  handle(await Notifications.getLastNotificationResponseAsync());
+  const sub = Notifications.addNotificationResponseReceivedListener(handle);
+  return () => sub.remove();
+}
+
 export async function setupNotificationHandler(): Promise<void> {
   if (!native || handlerSet) return;
   handlerSet = true;

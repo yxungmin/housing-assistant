@@ -136,7 +136,13 @@ export default function Profile() {
             <ListRow
               icon="user"
               label="로그인"
-              sub={sub.status === "trial" || sub.status === "active" ? "로그인하면 다른 기기에서도 구독을 이어서 써요" : "로그인하면 첫 달은 0원이에요"}
+              sub={
+                sub.status === "trial" || sub.status === "active"
+                  ? "로그인하면 다른 기기에서도 구독을 이어서 써요"
+                  : sub.firstMonthUsedAt
+                    ? "로그인하고 구독을 이어서 써요"
+                    : "로그인하면 첫 달 0원 구독을 시작할 수 있어요"
+              }
               onPress={() => setSignInSheet(true)}
             />
           )}

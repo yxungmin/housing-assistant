@@ -122,7 +122,7 @@ function BrandButton({
  * 로그인 시트. 계산을 열려다 막힌 자리에서 쓴다 —
  * 화면을 통째로 갈아치우면 사용자가 보던 공고를 잃는다.
  */
-export function SignInSheet({ visible, onClose, reason }: { visible: boolean; onClose: () => void; reason?: string }) {
+export function SignInSheet({ visible, onClose, onSignedIn, reason }: { visible: boolean; onClose: () => void; /** 로그인이 끝났을 때. 없으면 닫기만 한다 */ onSignedIn?: () => void; reason?: string }) {
   const router = useRouter();
   return (
     <BottomSheet visible={visible} onClose={onClose}>
@@ -132,7 +132,7 @@ export function SignInSheet({ visible, onClose, reason }: { visible: boolean; on
           <Sub variant="body">{reason ?? "맞춤 공고는 내 조건으로 계산해서 보여드려요. 로그인하면 보던 화면으로 바로 돌아와요."}</Sub>
         </View>
         {/* 시트(모달) 위에서는 문서가 가려진다. 닫고 간다 */}
-        <SignInButtons onDone={onClose} onOpenDoc={(doc) => { onClose(); router.push(`/legal/${doc}`); }} />
+        <SignInButtons onDone={() => { onClose(); onSignedIn?.(); }} onOpenDoc={(doc) => { onClose(); router.push(`/legal/${doc}`); }} />
         <Sub tone="3" variant="caption" style={{ textAlign: "center" }}>
           소득·자산처럼 적어 두신 값은 로그인해도 서버로 보내지 않고 이 기기에만 둬요.
         </Sub>

@@ -8,7 +8,7 @@ import * as SecureStore from "expo-secure-store";
 import { readMeta, writeMeta } from "@/data/meta-store";
 import { withDerived } from "@/lib/onboarding";
 import type { UserProfile } from "@housing/schema";
-import { normalizeSubscription, type Subscription } from "@/lib/billing";
+import { normalizeSubscription, recordFirstMonth, type Subscription } from "@/lib/billing";
 import type { ChangeRecord } from "@/lib/changes";
 import {
   addNotifications,
@@ -129,11 +129,9 @@ function reducer(s: AppState, a: Action): AppState {
     case "toggleApplied":
       return { ...s, applied: s.applied.includes(a.id) ? s.applied.filter((x) => x !== a.id) : [...s.applied, a.id] };
     case "setSubscription": {
-      // 첫 달 무료는 한 번뿐이다. 어느 경로로 구독을 바꾸든 여기서 기록을 지킨다 —
+      // 첫 달 무료는 한 번뿐이다. 어느 경로로 구독을 바꾸든 여기서 기록을 지킨다 (lib/billing.ts recordFirstMonth) —
       // 호출부마다 챙기게 두면 한 군데만 빠져도 무료 달이 다시 생긴다.
-      const next = normalizeSubscription(a.subscription);
-      const firstMonthUsedAt = s.subscription.firstMonthUsedAt ?? (next.status === "trial" ? new Date().toISOString() : undefined);
-      return { ...s, subscription: firstMonthUsedAt ? { ...next, firstMonthUsedAt } : next };
+      return { ...s, subscription: recordFirstMonth(s.subscription, a.subscription) };
     }
     case "setTheme":
       return { ...s, themePref: a.pref };

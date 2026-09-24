@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -9,12 +9,15 @@ import { useAnnouncementSync } from "@/data/sync";
 import { changeSummary } from "@/lib/changes";
 import { chargeDate } from "@/lib/billing";
 import { usePrice } from "@/data/price";
-import { notifyChange, setupNotificationHandler, syncReminders } from "@/lib/notifications";
+import { notifyChange, setupNotificationHandler, subscribeNotificationTaps, syncReminders } from "@/lib/notifications";
 import { AppStateProvider, useAppState } from "@/store/appState";
 import { TermsUpdateSheet } from "@/components/TermsUpdateSheet";
 import { ThemeProvider, useTheme } from "@/theme/ThemeProvider";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+/** 알림·딥링크로 상세에 바로 들어와도 스택 아래에 홈을 깐다. 없으면 뒤로가기가 앱을 닫는다 (2026-09-24 감사) */
+export const unstable_settings = { initialRouteName: "(tabs)" };
 void setupNotificationHandler();
 
 function Root() {
@@ -27,6 +30,18 @@ function Root() {
     for (const r of records) void notifyChange(r.announcementId, r.title, changeSummary(r));
   });
   useReminderSync();
+  // 알림을 누르면 그 공고로. 목록이 준비된 뒤에 연다 — 그 전에 밀어 넣으면 "공고를 찾을 수 없어요"가 먼저 뜬다
+  const router = useRouter();
+  useEffect(() => {
+    if (!state.loaded) return;
+    let off: (() => void) | undefined;
+    let gone = false;
+    void subscribeNotificationTaps((id) => router.push(`/announcement/${id}`)).then((o) => (gone ? o() : (off = o)));
+    return () => {
+      gone = true;
+      off?.();
+    };
+  }, [state.loaded, router]);
   // Pretendard 정적 otf (npm pretendard). 키 이름은 src/theme/tokens.ts의 fonts와 같아야 한다.
   const [fontsLoaded, fontError] = useFonts({
     "Pretendard-Regular": require("pretendard/dist/public/static/Pretendard-Regular.otf"),

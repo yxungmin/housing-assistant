@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { Keyboard, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { BackHandler, Keyboard, Platform, Pressable, ScrollView, TextInput, View } from "react-native";
 import type { UserProfile } from "@housing/schema";
 import { ageFromBirthDate } from "@housing/engine";
 import { Icon } from "@/components/icon";
@@ -98,6 +98,19 @@ export default function Onboarding() {
     go(index + 1, step.apply(draft, parsed));
   };
   const onSkip = () => go(index + 1, step.apply(draft, null));
+
+  // 안드로이드 하드웨어 백키는 화면의 뒤로와 같이 한 질문 뒤로 간다. 전에는 화면을 통째로 닫아 답한 것을 다 버렸다 (2026-09-24 감사).
+  // 첫 질문이나 한 항목 고치기에서는 평소대로 화면을 나간다.
+  useFocusEffect(
+    useCallback(() => {
+      const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+        if (only || index === 0) return false;
+        go(index - 1);
+        return true;
+      });
+      return () => sub.remove();
+    }, [only, index]),
+  );
   const toggleMulti = (v: string) => {
     const next = selected.includes(v) ? selected.filter((x) => x !== v) : [...selected, v];
     setDraft((d) => step.apply(d, next.length ? next.join(",") : null));

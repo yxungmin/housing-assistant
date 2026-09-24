@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { goBackOrHome } from "@/lib/nav";
 import { tileSize } from "@/theme/tokens";
 import { ActivityIndicator, View } from "react-native";
 import { useRouter } from "expo-router";
@@ -31,7 +32,7 @@ export function MissingAnnouncement() {
     return () => clearTimeout(t);
   }, [syncing]);
 
-  const back = () => (router.canGoBack() ? router.back() : router.replace("/(tabs)"));
+  const back = () => goBackOrHome(router);
   const header = <Header onBack={back} />;
 
   if (syncing && !gaveUp) {

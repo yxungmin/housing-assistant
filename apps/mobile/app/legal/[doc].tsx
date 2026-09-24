@@ -1,4 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { goBackOrHome } from "@/lib/nav";
 import { View } from "react-native";
 import { Header, Notice, Screen, Sub, T } from "@/components/ui";
 import { bulletText, isBullet, isDraft, LEGAL_DOCS } from "@/legal";
@@ -22,7 +23,7 @@ export default function Legal() {
 
   if (!legal) {
     return (
-      <Screen header={<Header onBack={() => router.back()} title="문서" />}>
+      <Screen header={<Header onBack={() => goBackOrHome(router)} title="문서" />}>
         <Sub>문서를 찾지 못했어요.</Sub>
       </Screen>
     );
@@ -30,7 +31,7 @@ export default function Legal() {
 
   // 헤더에 제목을 또 넣지 않는다 — 바로 아래 큰 제목과 겹쳐 같은 말이 두 번 나온다
   return (
-    <Screen header={<Header onBack={() => router.back()} />}>
+    <Screen header={<Header onBack={() => goBackOrHome(router)} />}>
       <View style={{ gap: 6, paddingTop: 8 }}>
         <T variant="title">{legal.title}</T>
         <Sub tone="3" variant="caption">

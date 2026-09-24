@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { goBackOrHome } from "@/lib/nav";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Constants from "expo-constants";
 import { Pressable, View } from "react-native";
@@ -131,7 +132,7 @@ export default function AnnouncementDetail() {
    */
   if (!canSeeAnnouncement(state)) {
     return (
-      <Screen header={<Header onBack={() => router.back()} />}>
+      <Screen header={<Header onBack={() => goBackOrHome(router)} />}>
         <View style={{ gap: 10, paddingTop: 12 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             {a.provider ? <Tag tone="gray">{a.provider}</Tag> : null}
@@ -224,7 +225,15 @@ export default function AnnouncementDetail() {
   return (
     <Screen
       padded={false}
-      header={<Header onBack={() => router.back()} right={<IconButton pop name={saved ? "bookmark-filled" : "bookmark"} label={saved ? "관심 해제" : "관심 등록"} onPress={() => save()} color={saved ? colors.primary : colors.text} />} />}
+      // 토스트는 스크롤 밖(overlay)에 둔다. 스크롤 안에서는 absolute의 기준이 긴 페이지 전체라 화면 밖에 떴다 (2026-09-24 감사)
+      overlay={
+        <Toast visible={justSaved} tone={state.notifications ? "info" : "warn"}>
+          {state.notifications
+            ? "관심 공고에 담았어요. 접수 마감 3일 전에 알려드릴게요."
+            : "관심 공고에 담았어요. 알림이 꺼져 있어 마감 알림은 못 보내요 — 내 정보에서 켜 주세요."}
+        </Toast>
+      }
+      header={<Header onBack={() => goBackOrHome(router)} right={<IconButton pop name={saved ? "bookmark-filled" : "bookmark"} label={saved ? "관심 해제" : "관심 등록"} onPress={() => save()} color={saved ? colors.primary : colors.text} />} />}
       footer={
         isReadable(a) ? (
           <BottomCTA
@@ -686,13 +695,6 @@ export default function AnnouncementDetail() {
           shown && addReport(draftReport({ announcementId: a.id, announcementTitle: a.title, target: shown.target, message, suggested }))
         }
       />
-      {/* 인라인 알림이 아니라 토스트다. 카드가 생겼다 사라지면 아래 내용이 밀려서
-          읽던 자리를 잃는다. 토스트는 내용 위에 떠서 레이아웃을 건드리지 않는다. */}
-      <Toast visible={justSaved} tone={state.notifications ? "info" : "warn"}>
-        {state.notifications
-          ? "관심 공고에 담았어요. 접수 마감 3일 전에 알려드릴게요."
-          : "관심 공고에 담았어요. 알림이 꺼져 있어 마감 알림은 못 보내요 — 내 정보에서 켜 주세요."}
-      </Toast>
     </Screen>
   );
 }

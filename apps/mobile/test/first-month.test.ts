@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canUseFirstMonthFree, hasAccess, normalizeSubscription, type Subscription } from "../src/lib/billing";
+import { canUseFirstMonthFree, hasAccess, recordFirstMonth, type Subscription } from "../src/lib/billing";
 
 /**
  * 첫 달만 무료다. 로그아웃 후 재로그인, 해지 후 재구독으로 무료 달이 다시 생기면 안 된다.
@@ -22,12 +22,8 @@ describe("canUseFirstMonthFree", () => {
 });
 
 describe("첫 달 무료 기록 유지", () => {
-  /** appState의 setSubscription이 하는 일과 같은 규칙 */
-  const apply = (prev: Subscription, next: Subscription): Subscription => {
-    const n = normalizeSubscription(next);
-    const firstMonthUsedAt = prev.firstMonthUsedAt ?? (n.status === "trial" ? new Date().toISOString() : undefined);
-    return firstMonthUsedAt ? { ...n, firstMonthUsedAt } : n;
-  };
+  /** appState의 setSubscription이 그대로 부르는 함수 — 복사본이 아니다 */
+  const apply = (prev: Subscription, next: Subscription): Subscription => recordFirstMonth(prev, next);
 
   it("무료 달을 시작하면 그 시점을 찍는다", () => {
     const after = apply({ status: "none" }, { status: "trial", expiresAt: inDays(30) });
@@ -49,6 +45,12 @@ describe("첫 달 무료 기록 유지", () => {
     const first = apply({ status: "none" }, { status: "trial", expiresAt: inDays(30) });
     const again = apply({ ...first, status: "expired" }, { status: "trial", expiresAt: inDays(30) });
     expect(again.firstMonthUsedAt).toBe(first.firstMonthUsedAt);
+  });
+
+  it("유료로 쓴 적이 있으면 그것도 기록이다 — 만료 뒤 '첫 달 0원'을 다시 보이지 않는다", () => {
+    const paid = apply({ status: "none" }, { status: "active", expiresAt: inDays(30) });
+    expect(paid.firstMonthUsedAt).toBeDefined();
+    expect(canUseFirstMonthFree({ ...paid, status: "expired" })).toBe(false);
   });
 
   it("무료 달을 쓴 적 없으면 기록을 만들지 않는다", () => {

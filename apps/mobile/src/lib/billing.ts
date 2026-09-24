@@ -88,6 +88,19 @@ export function chargeDate(sub: Subscription): string | null {
 }
 
 /** 첫 달 무료를 아직 쓰지 않았는가. 한 번 쓰면 그 뒤로는 바로 결제다 */
+/**
+ * 구독 상태를 갈아끼우면서 첫 달 기록을 지킨다. appState의 setSubscription이 쓰는 규칙이고 테스트도 이걸 본다 —
+ * 전에는 테스트가 리듀서의 복사본을 검사하고 있어서 리듀서를 고쳐도 테스트가 모르는 상태였다 (2026-09-24 감사).
+ *
+ * 유료(active)로 쓴 적도 기록한다 — 스토어는 그 사람에게 첫 달 0원을 다시 주지 않으므로 우리도 그렇게 보여야 한다.
+ * trial만 기록하면 새 기기에서 구매 복원한 유료 구독자가 만료된 뒤 "구독 전 · 첫 달 0원"이 된다.
+ */
+export function recordFirstMonth(prev: Subscription, next: Subscription, now = new Date()): Subscription {
+  const n = normalizeSubscription(next, now.getTime());
+  const firstMonthUsedAt = prev.firstMonthUsedAt ?? (n.status === "trial" || n.status === "active" ? now.toISOString() : undefined);
+  return firstMonthUsedAt ? { ...n, firstMonthUsedAt } : n;
+}
+
 export function canUseFirstMonthFree(sub: Subscription): boolean {
   return !sub.firstMonthUsedAt;
 }

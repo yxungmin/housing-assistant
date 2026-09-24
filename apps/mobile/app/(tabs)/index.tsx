@@ -45,10 +45,14 @@ export default function Home() {
    * 마감이 걸린 정보라 "지금 최신인가"를 확인할 길이 있어야 한다.
    * 바뀐 값이 있으면 앱을 열 때와 똑같이 알린다.
    */
+  // 새로고침이 실패했으면 말한다. 전에는 조용히 스피너만 사라져서 "지금 최신인가"에 답이 없었다 (2026-09-24 감사)
+  const [refreshFailed, setRefreshFailed] = useState(false);
   const refresh = () => {
     if (refreshing) return;
     setRefreshing(true);
-    void syncAnnouncementsOnce(state.saved, addChanges).finally(() => setRefreshing(false));
+    void syncAnnouncementsOnce(state.saved, addChanges)
+      .then((ok) => setRefreshFailed(!ok))
+      .finally(() => setRefreshing(false));
   };
   const hasWorkplace = !!state.profile?.workplace;
   // 분양이 하나도 없으면 "임대" 칩은 아무것도 걸러 내지 못한다
@@ -158,8 +162,10 @@ export default function Home() {
           <T variant="body" color={colors.text2}>내 조건에 맞는 공고</T>
           <BigNumber value={String(matched.length)} unit="개" size={44} />
           <Sub tone="3">
-            {today.getMonth() + 1}월 {today.getDate()}일 기준 · 전체 공고 {feed.list.length}개
+            {/* 서버에서 받은 때가 기준이다. 오프라인이면 오늘이 아니라 마지막으로 받은 날이다 — 오늘 날짜를 적으면 거짓이 된다 */}
+            {basisLabel(feed.syncedAt, today)} · 전체 공고 {feed.list.length}개
             {newCount > 0 ? ` · 새 공고 ${newCount}개` : ""}
+            {refreshFailed ? " · 새로고침 실패, 이전 목록이에요" : ""}
           </Sub>
         </View>
         {/* 로고가 56이면 "2개"와 무게를 다퉜다. 이 화면의 주인공은 숫자다 */}
@@ -427,4 +433,10 @@ export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => vo
       </View>
     </Card>
   );
+}
+
+/** "9월 24일 기준" — 서버에서 받은 때. 받은 적이 없으면(번들만) 오늘 */
+function basisLabel(syncedAt: string | null, today: Date): string {
+  const d = syncedAt ? new Date(syncedAt) : today;
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 기준`;
 }

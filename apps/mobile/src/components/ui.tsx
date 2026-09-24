@@ -73,7 +73,7 @@ export function FadeIn({ children, style, delay = 0, distance = 12 }: PropsWithC
  * 탭 바는 화면 영역 밖이고 footer는 이 컴포넌트의 형제라 제 자리를 차지한다.
  * 그래서 140은 아무것도 안 가리면서 탭 화면마다 빈 스크롤만 140px씩 만들고 있었다.
  */
-export function Screen({ children, scroll = true, padded = true, style, bottomInset = space.section, header, footer, onRefresh, refreshing }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number; header?: ReactNode; footer?: ReactNode; onRefresh?: () => void; refreshing?: boolean }>) {
+export function Screen({ children, scroll = true, padded = true, style, bottomInset = space.section, header, footer, overlay, onRefresh, refreshing }: PropsWithChildren<{ scroll?: boolean; padded?: boolean; style?: StyleProp<ViewStyle>; bottomInset?: number; header?: ReactNode; footer?: ReactNode; /** 스크롤 밖, 내용 위에 떠 있는 것(토스트). 스크롤 안에 두면 absolute의 기준이 긴 페이지 전체가 되어 화면 밖에 뜬다 */ overlay?: ReactNode; onRefresh?: () => void; refreshing?: boolean }>) {
   const { colors } = useTheme();
   const inner = padded ? { paddingHorizontal: space.screen } : undefined;
   /**
@@ -104,6 +104,7 @@ export function Screen({ children, scroll = true, padded = true, style, bottomIn
       ) : (
         <View style={[{ flex: 1 }, inner]}>{children}</View>
       )}
+      {overlay}
       {footer}
     </SafeAreaView>
   );
@@ -745,6 +746,8 @@ const SHEET_OUT = 200;
  */
 export function BottomSheet({ visible, onClose, children }: PropsWithChildren<{ visible: boolean; onClose: () => void }>) {
   const { colors } = useTheme();
+  // 시트 안에 입력창이 있으면(신고·소득 도우미) 키보드가 보내기 버튼을 덮었다. BottomCTA처럼 키보드 높이만큼 올린다 (2026-09-24 감사)
+  const keyboard = useKeyboardHeight();
   const [mounted, setMounted] = useState(visible);
   const [height, setHeight] = useState(0);
   const anim = useRef(new Animated.Value(visible ? 1 : 0)).current;
@@ -799,6 +802,7 @@ export function BottomSheet({ visible, onClose, children }: PropsWithChildren<{ 
           onLayout={onLayout}
           style={{
             maxHeight: "88%",
+            marginBottom: keyboard,
             backgroundColor: colors.surface,
             borderTopLeftRadius: radius.xl,
             borderTopRightRadius: radius.xl,

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { goBackOrHome } from "@/lib/nav";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { PanResponder, Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
@@ -252,7 +253,7 @@ export default function Cost() {
   if (!a) return <MissingAnnouncement />;
   if (!profile || !chosen || !cost || !scenarioPricing) {
     return (
-      <Screen header={<Header onBack={() => (router.canGoBack() ? router.back() : router.replace("/(tabs)"))} />}>
+      <Screen header={<Header onBack={() => goBackOrHome(router)} />}>
         <T variant="heading" style={{ paddingTop: 20 }}>{!profile ? "먼저 내 조건을 입력해 주세요" : "이 공고는 계산할 임대조건이 없어요"}</T>
       </Screen>
     );
@@ -280,7 +281,7 @@ export default function Cost() {
   return (
     <Screen
       padded={false}
-      header={<Header onBack={() => router.back()} title="예상 주거비" />}
+      header={<Header onBack={() => goBackOrHome(router)} title="예상 주거비" />}
       footer={
         <BottomCTA
           label={
@@ -585,7 +586,7 @@ export default function Cost() {
             ))}
           </View>
         ) : null}
-        <ScrollView style={{ maxHeight: 380 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+        <ScrollView style={{ maxHeight: 380 }} nestedScrollEnabled showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           {rentals.map((r, i) => {
             const on = i === sel;
             return (
@@ -646,7 +647,16 @@ export default function Cost() {
       </BottomSheet>
 
       <SubscriptionSheet visible={subSheet} onClose={() => setSubSheet(false)} onStarted={() => setSubSheet(false)} />
-      <SignInSheet visible={signInSheet} onClose={() => setSignInSheet(false)} reason="이 공고의 예상 주거비는 입력하신 소득·자산으로 계산해요. 로그인하면 첫 달은 0원이에요." />
+      {/* 로그인만으로는 열리지 않는다(구독이 따로다). 전에는 로그인 뒤 잠긴 화면으로 돌아와 버튼을 한 번 더 눌러야 했고,
+          "로그인하면 첫 달 0원"이라 적혀 있었는데 로그인은 무료 달을 시작하지 않는다 (2026-09-24 감사). 이어서 구독 시트를 연다 */}
+      <SignInSheet
+        visible={signInSheet}
+        onClose={() => setSignInSheet(false)}
+        onSignedIn={() => {
+          if (state.subscription.status !== "trial" && state.subscription.status !== "active") setSubSheet(true);
+        }}
+        reason="이 공고의 예상 주거비는 입력하신 소득·자산으로 계산해요. 로그인하고 구독하면 바로 볼 수 있어요."
+      />
       <ReportSheet
         visible={report}
         onClose={() => setReport(false)}
@@ -827,7 +837,7 @@ function UnitDetail({ choice, onPick }: { choice: RentalChoice; onPick: () => vo
         {rent?.tier ? <Sub tone="3">{rent.tier} 기준</Sub> : null}
       </View>
 
-      <ScrollView style={{ maxHeight: 420 }} showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 18, paddingBottom: 8 }}>
+      <ScrollView style={{ maxHeight: 420 }} nestedScrollEnabled showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 18, paddingBottom: 8 }}>
         <Card style={{ gap: 14 }}>
           {/* 주소는 길다. 오른쪽 정렬 칸에 넣으면 폭이 모자라 잘리므로 한 줄 아래로 내려 다 보여 준다. */}
           <View style={{ gap: 3 }}>
