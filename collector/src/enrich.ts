@@ -15,7 +15,7 @@ import { isUsable, RentClient } from "./market/rent";
 import { fromRoot } from "./paths";
 import { LhClient, parseNoticeDetail, pickNoticePdf, resolveImages, type LhImage, type LhNoticeSummary } from "./lh/api";
 import { parseUnitList, pickUnitList } from "./units/list";
-import type { SupplyUnit } from "@housing/schema";
+import { deflateUnits, type SupplyUnit, type UnitPlaces } from "@housing/schema";
 import { shDetailUrl } from "./sh/api";
 import { commuteTable } from "./transit/table";
 import { KaptClient } from "./maintenance/kapt";
@@ -42,6 +42,8 @@ interface Row {
   detail_url?: string;
   images?: LhImage[];
   units?: SupplyUnit[];
+  /** 집 주소별 좌표·역·주변 (schema units.ts). 집마다 사본을 들지 않는다 */
+  unit_places?: UnitPlaces;
   lat?: number;
   lng?: number;
   transit?: unknown;
@@ -86,7 +88,8 @@ async function fillSourceLinks(): Promise<number> {
   }
   const refill = force || linksOnly;
   // 세대수는 관리비 표본(2026-09-24)에 쓰는데 그 전 번들 행에는 없다. 상세 한 번으로 링크와 같이 채운다.
-  const targets = rows.filter((r) => r.provider === "LH" && r.lh_id && !r.lh_id.startsWith("MOCK") && (refill || r.detail_url === undefined || r.households === undefined));
+  // 흩어진 공고(units 있음)는 단지 세대수를 쓰지 않으니 묻지 않는다 — 매입임대 상세에는 HSH_CNT가 없어 매번 다시 물게 됐었다.
+  const targets = rows.filter((r) => r.provider === "LH" && r.lh_id && !r.lh_id.startsWith("MOCK") && (refill || r.detail_url === undefined || (r.households === undefined && !r.units)));
   if (targets.length === 0) return rows.filter((r) => r.provider === "SH" && r.detail_url).length > 0 ? 1 : 0;
   if (!env.LH_API_KEY) {
     console.log(`원문 링크: LH_API_KEY 없음 — ${targets.length}건 건너뜀`);
@@ -116,7 +119,8 @@ async function fillSourceLinks(): Promise<number> {
 
       // 매입임대·전세임대는 집이 흩어져 있고 그 목록이 별도 엑셀 첨부에 있다.
       // 목록이 없으면 이 공고에서 사용자가 고를 수 있는 것이 아무것도 없다.
-      const listFile = pickUnitList(detail.attachments);
+      // 목록은 처음 한 번만 받는다. 매번 새로 받으면 좌표를 붙인 집이 빈 집으로 바뀌고 주소 176곳을 다시 지오코딩했다 (2026-09-24, 매 실행 176회)
+      const listFile = refill || !row.units ? pickUnitList(detail.attachments) : undefined;
       if (listFile) {
         const bytes = await client.download(listFile.url).catch(() => null);
         row.units = bytes ? parseUnitList(Buffer.from(bytes)) : undefined;
@@ -148,8 +152,16 @@ const save = () => writeFileSync(TARGET, JSON.stringify(rows, null, 1));
  * 좌표·시세가 이미 있는 공고에도 주택 목록은 새로 붙기 때문이다.
  */
 async function fillUnitCoords(): Promise<number> {
-  // 좌표는 있는데 주변이 없는 경우도 채운다 — 예전에는 좌표만 쓰고 나머지를 버렸다.
-  const targets = rows.filter((r) => r.units?.length && (force || r.units.some((u) => u.lat === undefined || u.nearby === undefined)));
+  // 옛 번들은 집마다 좌표·주변 사본을 들고 있었다. 주소별 표로 접는다 (schema units.ts). 한 번 접히면 이 줄은 아무 일도 안 한다.
+  for (const r of rows) {
+    if (!r.units?.some((u) => u.lat !== undefined)) continue;
+    const folded = deflateUnits(r.units);
+    r.units = folded.units;
+    r.unit_places = { ...folded.unit_places, ...(r.unit_places ?? {}) };
+    console.log(`${r.id}: 집 ${r.units.length}호의 좌표를 주소 ${Object.keys(r.unit_places).length}곳 표로 접음`);
+  }
+  const missing = (r: Row) => [...new Set((r.units ?? []).map((u) => u.address))].filter((addr) => force || !r.unit_places?.[addr]);
+  const targets = rows.filter((r) => r.units?.length && missing(r).length > 0);
   if (targets.length === 0) return 0;
   if (!env.KAKAO_REST_API_KEY) {
     console.log(`주택 좌표: KAKAO_REST_API_KEY 없음 — ${targets.length}건 건너뜀`);
@@ -158,25 +170,17 @@ async function fillUnitCoords(): Promise<number> {
   let filled = 0;
   for (const row of targets) {
     // 주소 하나에 한 번만 부른다. 같은 건물의 세대는 역·정류장·주변 시설이 같다.
-    const seen = new Map<string, Awaited<ReturnType<typeof geocodeAddress>>>();
-    for (const unit of row.units!) {
-      if (!force && unit.lat !== undefined && unit.nearby !== undefined) continue;
-      let geo = seen.get(unit.address);
-      if (geo === undefined) {
-        geo = await geocodeAddress(unit.address, env.KAKAO_REST_API_KEY).catch(() => null);
-        seen.set(unit.address, geo);
-      }
-      if (geo) {
-        unit.lat = geo.lat;
-        unit.lng = geo.lng;
-        // 이 값들은 좌표와 같은 호출로 이미 와 있다. 버리면 화면에서 다시 부를 일이 생긴다.
-        unit.transit = Object.keys(geo.transit).length > 0 ? geo.transit : undefined;
-        unit.nearby = geo.nearby.length > 0 ? geo.nearby : [];
-      }
+    const places: UnitPlaces = { ...(row.unit_places ?? {}) };
+    let calls = 0;
+    for (const address of missing(row)) {
+      const geo = await geocodeAddress(address, env.KAKAO_REST_API_KEY).catch(() => null);
+      calls++;
+      // 이 값들은 좌표와 같은 호출로 이미 와 있다. 버리면 화면에서 다시 부를 일이 생긴다.
+      if (geo) places[address] = { lat: geo.lat, lng: geo.lng, ...(Object.keys(geo.transit).length > 0 ? { transit: geo.transit } : {}), ...(geo.nearby.length > 0 ? { nearby: geo.nearby } : {}) };
     }
-    const found = row.units!.filter((u) => u.lat !== undefined).length;
-    const withNearby = row.units!.filter((u) => u.nearby?.length).length;
-    console.log(`${row.id}: 주택 좌표 ${found}/${row.units!.length}호 · 주변 ${withNearby}호 (주소 ${seen.size}곳)`);
+    row.unit_places = places;
+    const found = row.units!.filter((u) => places[u.address]).length;
+    console.log(`${row.id}: 주택 좌표 ${found}/${row.units!.length}호 (주소 ${Object.keys(places).length}곳, 호출 ${calls}회)`);
     filled++;
     save();
   }

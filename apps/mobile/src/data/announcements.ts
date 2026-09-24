@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { ExtractionOutput, HousingType, Maintenance, SupplyUnit, UserProfile } from "@housing/schema";
+import { inflateUnits, type ExtractionOutput, type HousingType, type Maintenance, type SupplyUnit, type UnitPlaces, type UserProfile } from "@housing/schema";
 import { matchAnnouncement, ruleCounts, type AnnouncementMatch, type TrackResult } from "@housing/engine";
 import { parsePlaceLabel, placeFor } from "@housing/schema";
 import raw from "../../data/announcements.json";
@@ -90,8 +90,13 @@ export interface Announcement {
    * 단지형 공고에는 없다 — 주소가 하나라 위 lat/lng로 충분하다.
    */
   units?: SupplyUnit[];
+  /** 번들 파일에서 집 좌표를 주소별로 접어 둔 표. 읽을 때 units에 붙이고 나면 화면은 보지 않는다 */
+  unit_places?: UnitPlaces;
   extraction: ExtractionOutput;
 }
+
+/** 번들의 접힌 집 좌표를 집마다 붙인다 (schema units.ts). 화면은 unit.lat만 본다 */
+export const inflateAnnouncement = (a: Announcement): Announcement => (a.units?.length && a.unit_places ? { ...a, units: inflateUnits(a.units, a.unit_places) } : a);
 
 /**
  * 기관이 이미지 파일로 준 그림 (위치도·단지조감도).
@@ -128,7 +133,7 @@ export type AnnouncementSource = "bundled" | "cache" | "remote";
  * 공고 목록 저장소. 번들 JSON으로 시작해 캐시 → Supabase 순으로 교체된다 (sync.ts).
  * 화면은 useAnnouncements()로 구독하고, 아래 순수 함수들은 인자를 안 주면 현재 목록을 쓴다.
  */
-const bundled = raw as unknown as Announcement[];
+const bundled = (raw as unknown as Announcement[]).map(inflateAnnouncement);
 let current: Announcement[] = bundled;
 let snapshot = { list: bundled, source: "bundled" as AnnouncementSource, syncedAt: null as string | null };
 const listeners = new Set<() => void>();

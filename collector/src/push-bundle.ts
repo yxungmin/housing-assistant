@@ -16,7 +16,7 @@
  *   npm run bundle:push -- --apply # 실제로 올린다
  */
 import { readFileSync } from "node:fs";
-import { ExtractionOutput, type HousingType } from "@housing/schema";
+import { ExtractionOutput, inflateUnits, type HousingType, type SupplyUnit, type UnitPlaces } from "@housing/schema";
 import { loadEnv, requireEnv } from "./config";
 import { Repo } from "./db/supabase";
 import { fromRoot } from "./paths";
@@ -44,7 +44,8 @@ interface BundleItem {
   transit?: Record<string, unknown>;
   nearby?: Record<string, unknown>[];
   images?: object[];
-  units?: object[];
+  units?: SupplyUnit[];
+  unit_places?: UnitPlaces;
   market?: object;
   waiting?: object;
   commute?: object;
@@ -91,7 +92,8 @@ async function main(): Promise<void> {
         pdf_url: it.pdf_url,
         detail_url: it.detail_url,
         images: it.images,
-        units: it.units,
+        // 번들은 집 좌표를 주소별로 접어 두지만 DB는 펼친 채다 — Edge Function transit이 unit.lat을 읽는다
+        units: it.units ? inflateUnits(it.units, it.unit_places) : undefined,
         lat: it.lat,
         lng: it.lng,
         transit: it.transit,

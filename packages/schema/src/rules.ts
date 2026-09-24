@@ -430,6 +430,11 @@ export const Announcement = z.object({
    */
   units: z.array(SupplyUnit).optional(),
   /**
+   * 집 목록의 좌표·역·주변을 주소별로 접어 둔 표 (units.ts deflateUnits). **번들 파일에서만** 쓰고
+   * 앱이 읽을 때 집마다 다시 붙인다. DB의 units는 펼친 채다. 집마다 사본을 들고 있으면 번들의 82%가 그 사본이었다.
+   */
+  unit_places: z.record(z.string(), z.object({ lat: z.number(), lng: z.number(), transit: Transit.optional(), nearby: z.array(NearbyPlace).optional() })).optional(),
+  /**
    * 기관이 공고에 이미지로 붙여 둔 것 (위치도·단지조감도 등).
    * 공고문 PDF에서 우리가 뽑은 그림이 아니라 기관이 이미지 파일로 준 것만 넣는다 —
    * 출처가 분명해야 "이건 공고에 있던 그림"이라고 말할 수 있다.
