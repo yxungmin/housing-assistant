@@ -11,6 +11,7 @@ import { topGap } from "@/lib/gaps";
 import { isUnseen, unseenCount, type SeenState } from "@/lib/unseen";
 import { syncAnnouncementsOnce } from "@/data/sync";
 import { AnnouncementCard } from "@/components/AnnouncementCard";
+import { Illustration } from "@/components/Illustration";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
 import { iconSize, radius, tileSize } from "@/theme/tokens";
@@ -231,8 +232,8 @@ export default function Home() {
           알림이 꺼져 있으면 "알려드릴게요"라고 하지 않는다. 실제로 안 가기 때문이다.
         */}
         {matched.length === 0 ? (
-          <Card style={{ alignItems: "center", paddingVertical: 28, gap: 10 }}>
-            <IconTile name="bookmark" size={tileSize.lg} />
+          <Card style={{ alignItems: "center", paddingVertical: 24, gap: 10 }}>
+            <Illustration name="home" width={180} />
             <T variant="subheading" style={{ textAlign: "center" }}>
               {outsideService ? `아직 ${regionLabel} 공고는 모으지 않아요` : "지금은 딱 맞는 공고가 없어요"}
             </T>

@@ -5,7 +5,8 @@
  * 원칙: 흰 화면 + grey50 카드, 헤어라인 대신 간격, 아이콘은 연한 타일 안에, 색은 CTA·상태에만.
  */
 import { useEffect, useRef, useState, type PropsWithChildren, type ReactNode } from "react";
-import { Animated, Dimensions, Easing, Image, Keyboard, LayoutAnimation, Modal, Platform, Pressable, RefreshControl, ScrollView, Text, UIManager, View, type ImageSourcePropType, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
+import { Illustration, type IllustrationName } from "./Illustration";
+import { Animated, Dimensions, Easing, Image, Keyboard, LayoutAnimation, Modal, Platform, Pressable, RefreshControl, ScrollView, Text, UIManager, View, type LayoutChangeEvent, type StyleProp, type TextStyle, type ViewStyle } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useScrollToTop } from "expo-router";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -195,14 +196,14 @@ export function Sub({ children, style, tone = "2", variant = "small", lines }: P
 /**
  * 빈 화면. 아이콘 동그라미 하나로는 "고장 났나"와 "아직 없다"가 구별되지 않았다 (2026-09-24).
  * 그림(illustration)이 있으면 그것을 크게, 없으면 아이콘. 제목은 화면 제목 크기, 행동은 진짜 버튼 하나.
- * 그림은 src/theme/illustrations.ts에서 오고 라이트·다크가 따로다 — 흰 배경용 그림을 어두운 판에 그대로 올리면 판이 뚫린 것처럼 보인다.
+ * 그림은 코드로 그린 SVG(components/Illustration.tsx)라 테마 색을 그대로 쓴다 — PNG였다면 라이트·다크 두 벌과 투명 배경을 챙겨야 했다.
  */
-export function EmptyState({ icon, illustration, title, body, action }: { icon: IconName; illustration?: ImageSourcePropType; title: string; body: string; action?: { label: string; onPress: () => void } }) {
+export function EmptyState({ icon, illustration, title, body, action }: { icon: IconName; illustration?: IllustrationName; title: string; body: string; action?: { label: string; onPress: () => void } }) {
   const { colors } = useTheme();
   return (
     <View style={{ flexGrow: 1, minHeight: 420, alignItems: "center", justifyContent: "center", paddingHorizontal: 16, paddingBottom: 48, gap: 20 }}>
       {illustration ? (
-        <Image source={illustration} accessibilityIgnoresInvertColors style={{ width: 220, height: 160 }} resizeMode="contain" />
+        <Illustration name={illustration} width={220} />
       ) : (
         <View style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: colors.primarySoft, alignItems: "center", justifyContent: "center" }}>
           <Icon name={icon} size={iconSize.hero} color={colors.primary} />

@@ -7,7 +7,6 @@ import { useAnnouncements } from "@/data/announcements";
 import { RETAIN_DAYS, syncInbox, unreadCount, type AppNotification, type NotificationKind } from "@/lib/inbox";
 import { unseenIds } from "@/lib/unseen";
 import { useAppState } from "@/store/appState";
-import { useIllustration } from "@/theme/illustrations";
 import { useTheme } from "@/theme/ThemeProvider";
 import { iconSize, radius, tileSize } from "@/theme/tokens";
 
@@ -43,7 +42,6 @@ export default function Alerts() {
   const router = useRouter();
   const { colors } = useTheme();
   const { state, addNotifications, readNotification, readAllNotifications, removeNotification } = useAppState();
-  const illustration = useIllustration("alerts");
   const feed = useAnnouncements();
 
   const fresh = useMemo(
@@ -86,7 +84,7 @@ export default function Alerts() {
         // 알림은 관심 공고에서 나온다. 관심 공고가 없으면 거기부터, 있으면 거기로 보낸다.
         <EmptyState
           icon="bell"
-          illustration={illustration}
+          illustration="alerts"
           title="아직 받은 알림이 없어요"
           body="관심 공고의 접수 마감이 다가오거나 임대조건이 바뀌면 여기에 남겨 드릴게요."
           action={

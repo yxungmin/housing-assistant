@@ -6,7 +6,6 @@ import { daysUntil, longDate } from "@/lib/format";
 import { applyPhase, closesWithin, phaseRank } from "@/lib/phase";
 import { unseenChange } from "@/lib/changes";
 import { useAppState } from "@/store/appState";
-import { useIllustration } from "@/theme/illustrations";
 import { syncAnnouncementsOnce } from "@/data/sync";
 import { AnnouncementCard } from "@/components/AnnouncementCard";
 import { isUnseen } from "@/lib/unseen";
@@ -14,7 +13,6 @@ import { isUnseen } from "@/lib/unseen";
 /** 관심 공고: D-day 순. 마감 D-3 알림은 기기 예약 알림(M7)으로 붙는다. */
 export default function Saved() {
   const { state, addChanges } = useAppState();
-  const illustration = useIllustration("saved");
   const [refreshing, setRefreshing] = useState(false);
   const refresh = () => {
     if (refreshing) return;
@@ -59,7 +57,7 @@ export default function Saved() {
       {items.length === 0 ? (
         <EmptyState
           icon="bookmark"
-          illustration={illustration}
+          illustration="saved"
           title="아직 관심 공고가 없어요"
           body="공고 오른쪽 위의 관심 버튼을 누르면 여기에 모여요. 접수 마감 3일 전에 알려 드릴게요."
           action={{ label: "공고 둘러보기", onPress: () => router.navigate("/(tabs)") }}
