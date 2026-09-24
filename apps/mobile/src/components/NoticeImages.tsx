@@ -29,14 +29,13 @@ export function NoticeImages({ images }: { images?: NoticeImage[] }) {
   const [broken, setBroken] = useState<string[]>([]);
   const [openAt, setOpenAt] = useState<number | null>(null);
   const shown = (images ?? []).filter((i) => !broken.includes(i.url));
-  const kinds = [...new Set(shown.map((i) => i.kind).filter(Boolean))].join(" · ");
   if (shown.length === 0) return null;
 
   return (
     <View style={{ gap: 12 }}>
-      {/* 제목을 실제 들어 있는 것으로 짓는다 ("위치도·조감도"). 고정 문구를 쓰면
-          들어 있는 게 하나뿐일 때도 여러 종류인 척하게 된다 */}
-      <SectionTitle>{kinds || "단지 이미지"}</SectionTitle>
+      {/* 제목은 공고마다 같게 둔다. 들어 있는 종류로 지었더니("위치도 · 단지배치도 · 동호배치도") 공고마다 제목 길이와 모양이
+          달라 화면이 매번 다르게 보였다. 무엇이 들어 있는지는 그림마다 붙은 이름이 말한다 */}
+      <SectionTitle>단지 이미지</SectionTitle>
       <Card style={{ gap: 12, paddingHorizontal: 0 }}>
         <ScrollView
           horizontal

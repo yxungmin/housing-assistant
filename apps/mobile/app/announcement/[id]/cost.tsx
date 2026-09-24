@@ -317,12 +317,22 @@ export default function Cost() {
                     /* 현금을 입력하지 않았으면 "보유 현금 -으로는"이 된다.
                        모르는 값을 문장에 끼워 넣지 말고, 모른다고 말한다. */
                     ? profile.cash_on_hand === undefined
-                      ? `${manwon(cost.shortfall)}이 필요해요. 보유 현금을 입력하면 얼마가 모자라는지 알려드려요`
+                      ? "보유 현금을 넣으면 얼마가 모자라는지 알려드려요"
                       : `보유 현금 ${manwon(profile.cash_on_hand)}으로는 ${manwon(cost.shortfall)} 부족해요`
                     : `보유 현금 ${manwon(profile.cash_on_hand)}으로 낼 수 있어요`
               }
             />
             </Unmask>
+            {!locked && cost.shortfall > 0 && profile.cash_on_hand === undefined ? (
+              <Pressable
+                onPress={() => router.push("/onboarding?step=cash")}
+                accessibilityRole="button"
+                style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start", marginTop: -8, paddingVertical: 6, opacity: pressed ? 0.6 : 1 })}
+              >
+                <T variant="small" color={colors.primary} style={{ fontFamily: fonts.semiBold }}>보유 현금 입력하기</T>
+                <Icon name="right" size={14} color={colors.primary} />
+              </Pressable>
+            ) : null}
             <View style={{ gap: 14 }}>
               <KeyValue label="임대보증금" value={won(cost.deposit)} amount={cost.deposit} src={`공고문 ${base.source.page}쪽${deposit !== null ? " · 전환 적용" : ""}`} />
               {cost.loan ? (
@@ -382,56 +392,6 @@ export default function Cost() {
           ) : null}
         </View>
 
-        {spot && (spot.transit || spot.nearby?.length) ? (
-          <View style={{ gap: 12 }}>
-            <SectionTitle>이 집 주변</SectionTitle>
-            <Card style={{ gap: 16 }}>
-              {transitLines(spot.transit).map((t) => (
-                <NearRow key={t.title} icon={t.icon} title={t.title} detail={t.detail} />
-              ))}
-              {commute ? (
-                <NearRow
-                  icon="walk"
-                  title={`직장까지 대중교통 약 ${commute.minutes}분${commute.transfers ? ` · 환승 ${commute.transfers}회` : ""}`}
-                  detail={`${state.profile?.workplace?.label ?? "직장"} 기준${commute.fare ? ` · 편도 ${won(commute.fare)}` : ""}`}
-                />
-              ) : commuteLoading ? (
-                <NearRow icon="walk" title="직장까지 걸리는 시간을 알아보고 있어요" detail="몇 초쯤 걸려요" />
-              ) : null}
-              {nearbyLines(spot.nearby).map((n) => (
-                <NearRow key={n.kind} icon={n.icon as IconName} title={n.title} detail={n.detail} />
-              ))}
-              <Sub tone="3" variant="caption">
-                {chosen?.label} 기준이에요. 종류마다 가장 가까운 한 곳만 보여드리고, 역·시설까지는 직선거리예요.
-                {commute ? " 통근 시간은 입력한 직장 위치에서 출발한 대중교통 경로예요." : ""}
-              </Sub>
-            </Card>
-          </View>
-        ) : null}
-
-        {/* 보증금이 싼지 비싼지는 비교 대상이 있어야 안다. 잠그지 않는다 — 보증금 자체가 무료인데
-            싼지 비싼지만 가리면 판단의 절반을 뺏는 셈이다. */}
-        {a.market && a.market.jeonse_median ? (
-          <View style={{ gap: 12 }}>
-            <SectionTitle>주변 시세와 비교</SectionTitle>
-            <Card style={{ gap: 14 }}>
-              <KeyValue label="이 공고 보증금" value={won(cost.deposit)} amount={cost.deposit} strong />
-              <KeyValue
-                label="주변 전세 중앙값"
-                value={won(a.market.jeonse_median)}
-                amount={a.market.jeonse_median}
-                src={`전용 ${a.market.area_from}~${a.market.area_to}㎡ · ${a.market.deals}건`}
-              />
-              {a.market.monthly_rent_median ? (
-                <KeyValue label="주변 월세 중앙값" value={`보증금 ${manwon(a.market.monthly_deposit_median)} / 월 ${won(a.market.monthly_rent_median)}`} />
-              ) : null}
-              <Sub tone="3" variant="caption">
-                {a.market.from.replace("-", ".")}~{a.market.to.replace("-", ".")} {a.market.source}. 공공임대와 민간 전월세는 조건이 달라 그대로 견주기 어려워요.
-              </Sub>
-            </Card>
-          </View>
-        ) : null}
-
         <View style={{ gap: 12 }}>
           <SectionTitle>매달 나가는 돈</SectionTitle>
           <Card style={{ gap: 20 }}>
@@ -464,14 +424,66 @@ export default function Cost() {
             </View>
           </Card>
         </View>
+
+        {/* 돈 이야기(현금 → 매달)를 끊지 않게 비교·주변은 그 뒤에 둔다 */}
+        {/* 보증금이 싼지 비싼지는 비교 대상이 있어야 안다. 잠그지 않는다 — 보증금 자체가 무료인데
+            싼지 비싼지만 가리면 판단의 절반을 뺏는 셈이다. */}
+        {a.market && a.market.jeonse_median ? (
+          <View style={{ gap: 12 }}>
+            <SectionTitle>주변 시세와 비교</SectionTitle>
+            <Card style={{ gap: 14 }}>
+              <KeyValue label="이 공고 보증금" value={won(cost.deposit)} amount={cost.deposit} strong />
+              <KeyValue
+                label="주변 전세 중앙값"
+                value={won(a.market.jeonse_median)}
+                amount={a.market.jeonse_median}
+                src={`전용 ${a.market.area_from}~${a.market.area_to}㎡ · ${a.market.deals}건`}
+              />
+              {a.market.monthly_rent_median ? (
+                <KeyValue label="주변 월세 중앙값" value={`보증금 ${manwon(a.market.monthly_deposit_median)} / 월 ${won(a.market.monthly_rent_median)}`} />
+              ) : null}
+              <Sub tone="3" variant="caption">
+                {a.market.from.replace("-", ".")}~{a.market.to.replace("-", ".")} {a.market.source}. 공공임대와 민간 전월세는 조건이 달라 그대로 견주기 어려워요.
+              </Sub>
+            </Card>
+          </View>
+        ) : null}
+
+        {spot && (spot.transit || spot.nearby?.length) ? (
+          <View style={{ gap: 12 }}>
+            <SectionTitle>이 집 주변</SectionTitle>
+            <Card style={{ gap: 16 }}>
+              {transitLines(spot.transit).map((t) => (
+                <NearRow key={t.title} icon={t.icon} title={t.title} detail={t.detail} />
+              ))}
+              {commute ? (
+                <NearRow
+                  icon="walk"
+                  title={`직장까지 대중교통 약 ${commute.minutes}분${commute.transfers ? ` · 환승 ${commute.transfers}회` : ""}`}
+                  detail={`${state.profile?.workplace?.label ?? "직장"} 기준${commute.fare ? ` · 편도 ${won(commute.fare)}` : ""}`}
+                />
+              ) : commuteLoading ? (
+                <NearRow icon="walk" title="직장까지 걸리는 시간을 알아보고 있어요" detail="몇 초쯤 걸려요" />
+              ) : null}
+              {nearbyLines(spot.nearby).map((n) => (
+                <NearRow key={n.kind} icon={n.icon as IconName} title={n.title} detail={n.detail} />
+              ))}
+              <Sub tone="3" variant="caption">
+                {chosen?.label} 기준이에요. 종류마다 가장 가까운 한 곳만 보여드리고, 역·시설까지는 직선거리예요.
+                {commute ? " 통근 시간은 입력한 직장 위치에서 출발한 대중교통 경로예요." : ""}
+              </Sub>
+            </Card>
+          </View>
+        ) : null}
+
         </FadeIn>
         {/* 가장 큰 숫자를 보여 준 화면인데 여기서 원문으로 갈 길이 없었다 */}
-        <SourceCard pdfUrl={a.pdf_url} what="보증금·월임대료는" />
-        <Pressable onPress={() => setReport(true)} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "flex-start", paddingHorizontal: 4, paddingVertical: 10, opacity: pressed ? 0.6 : 1 })}>
+        <SourceCard pdfUrl={a.pdf_url} detailUrl={a.detail_url} what="보증금·월임대료는" />
+        <Pressable onPress={() => setReport(true)} accessibilityRole="button" style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "flex-start", paddingVertical: 10, opacity: pressed ? 0.6 : 1 })}>
           <Sub tone="3" variant="caption">보증금·월임대료가 공고문과 다른가요?</Sub>
           {priceReport ? <Tag tone="info" icon="info">{REPORT_STATUS_LABEL[priceReport.status]}</Tag> : null}
         </Pressable>
-        <Sub tone="3" variant="caption" style={{ paddingHorizontal: 4 }}>공고문과 {dateText(cost.loan?.as_of_date ?? LOANS[0]!.as_of_date)} 기준 대출 조건으로 계산한 예상값이에요. 실제 계약 조건과 다를 수 있어요.</Sub>
+        <Sub tone="3" variant="caption">공고문과 {dateText(cost.loan?.as_of_date ?? LOANS[0]!.as_of_date)} 기준 대출 조건으로 계산한 예상값이에요. 실제 계약 조건과 다를 수 있어요.</Sub>
       </View>
 
       <BottomSheet visible={scenario} onClose={() => setScenario(false)}>
