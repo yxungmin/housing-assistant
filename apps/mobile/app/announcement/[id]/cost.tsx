@@ -3,7 +3,7 @@ import { goBackOrHome } from "@/lib/nav";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { PanResponder, Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
-import { computeRentalCost, conversionScenario, eligibleLoans, estimateMaintenance, loanLimit, maintenanceSourceLabel, matchAnnouncement, shortfallPlans } from "@housing/engine";
+import { computeRentalCost, conversionScenario, eligibleLoans, estimateMaintenance, loanLimit, maintenanceSourceLabel, shortfallPlans } from "@housing/engine";
 import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SignInSheet } from "@/components/SignIn";
@@ -13,7 +13,7 @@ import { MissingAnnouncement } from "@/components/MissingAnnouncement";
 import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconTile, KeyValue, LockNote, Redacted, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
-import { getAnnouncement, useAnnouncements, type Announcement } from "@/data/announcements";
+import { getAnnouncement, matchFor, useAnnouncements, type Announcement } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
 import { manwon, pct, won, dateText } from "@/lib/format";
 import { compareUnits, UNIT_SORT_LABEL, unitLabel, unitRent, unitsWithDistance, type UnitSort } from "@/lib/units";
@@ -107,7 +107,7 @@ export default function Cost() {
       return { rentals: rows, bestTrackName: "", otherCount: 0 };
     }
 
-    const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code, announcement_title: a.title });
+    const match = matchFor(a, profile);
     const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
     const ordered = [...(best ? [best] : []), ...match.tracks.filter((t) => t !== best)];
     const rows = ordered.flatMap((t) =>

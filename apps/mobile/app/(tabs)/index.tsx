@@ -1,23 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 import { Pressable, View } from "react-native";
 import { Icon } from "@/components/icon";
-import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Notice, PrimaryButton, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
+import { animateLayout, BigNumber, Card, Chip, FadeIn, IconTile, Logo, Notice, PrimaryButton, Screen, SectionTitle, Sub, T } from "@/components/ui";
 import { commuteKm, isReadable, listDistanceKm, matchAll, matching, type Matched, useAnnouncements } from "@/data/announcements";
-import { housingLabel } from "@/lib/format";
-import { applyPhase, closesWithin, phaseLabel, phaseRank, phaseTone } from "@/lib/phase";
-import { sizeText } from "@/lib/units";
-import { isServiceRegion, SERVICE_REGION_LABEL } from "@housing/schema";
+import { applyPhase, closesWithin, phaseRank } from "@/lib/phase";
+import { isServiceRegion, SERVICE_REGION_LABEL, type UserProfile } from "@housing/schema";
 import { REGIONS, stepById, stepLabel } from "@/lib/onboarding";
 import { topGap } from "@/lib/gaps";
-import { commuteFor, commuteShort, nearestHouseShort, splitStation } from "@/lib/commute";
-import { isUnseen, unseenCount } from "@/lib/unseen";
-import { fundsFor, fundsNote } from "@/lib/funds";
+import { isUnseen, unseenCount, type SeenState } from "@/lib/unseen";
 import { syncAnnouncementsOnce } from "@/data/sync";
-import { LOANS } from "@/data/loans";
+import { AnnouncementCard } from "@/components/AnnouncementCard";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
-import { fonts, iconSize, radius, tileSize } from "@/theme/tokens";
+import { iconSize, radius, tileSize } from "@/theme/tokens";
 
 /** 직장 근처 필터의 직선거리 상한 (km). 통근 시간 API 연결 전 대체 기준 */
 const NEAR_WORK_KM = 20;
@@ -149,7 +145,7 @@ export default function Home() {
   const gapStep = gap && state.profile ? stepById(state.profile, gap.stepId) : undefined;
   const [gapHidden, setGapHidden] = useState<string | null>(null);
   const showGap = !!gap && !!gapStep && gapHidden !== gap.stepId;
-  const open = (id: string) => router.push(`/announcement/${id}`);
+  const open = useCallback((id: string) => router.push(`/announcement/${id}`), [router]);
   const toggle = (setter: (f: (v: boolean) => boolean) => void) => () => {
     animateLayout();
     setter((v) => !v);
@@ -225,9 +221,9 @@ export default function Home() {
       ) : null}
 
       <FadeIn delay={120} style={{ gap: 20 }}>
-        {soon.length > 0 ? <Section title="접수 임박" items={soon} onOpen={open} /> : null}
-        {upcoming.length > 0 ? <Section title="곧 접수 시작" items={upcoming} onOpen={open} /> : null}
-        {rest.length > 0 ? <Section title={soon.length || upcoming.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} onOpen={open} /> : null}
+        {soon.length > 0 ? <Section title="접수 임박" items={soon} seen={state.seen} profile={state.profile} onOpen={open} /> : null}
+        {upcoming.length > 0 ? <Section title="곧 접수 시작" items={upcoming} seen={state.seen} profile={state.profile} onOpen={open} /> : null}
+        {rest.length > 0 ? <Section title={soon.length || upcoming.length ? "그 밖의 공고" : "조건에 맞는 공고"} items={rest} seen={state.seen} profile={state.profile} onOpen={open} /> : null}
         {/*
           맞는 공고가 없을 때가 중요하다. 억지로 채우면 추천이 아니라 목록이 된다.
           없다고 말하고, 생기면 알려 주겠다고 하고, 그동안 볼 것을 준다 — 이 셋이 다 있어야
@@ -268,7 +264,7 @@ export default function Home() {
             ) : null}
           </Card>
         ) : null}
-        {pending.length > 0 ? <Section title="공고문을 직접 봐야 하는 공고" items={pending} onOpen={open} /> : null}
+        {pending.length > 0 ? <Section title="공고문을 직접 봐야 하는 공고" items={pending} seen={state.seen} profile={state.profile} onOpen={open} /> : null}
 
         {/*
           접힌 묶음들. 전에는 테두리 없는 글줄이 큰 간격으로 떠 있어 무엇에 딸린 줄인지 보이지 않았다.
@@ -283,7 +279,7 @@ export default function Home() {
                 <Sub tone="3" variant="caption">
                   다른 조건은 어긋나지 않지만, 공고문에서 거주 요건을 읽지 못했어요. 사는 지역이 달라 신청할 수 있는지는 공고문을 확인해 주세요.
                 </Sub>
-                <Section items={farAway} onOpen={open} />
+                <Section items={farAway} seen={state.seen} profile={state.profile} onOpen={open} />
               </>
             ) : null}
           </View>
@@ -302,7 +298,7 @@ export default function Home() {
                 {state.profile?.statuses === undefined ? (
                   <PrimaryButton tone="soft" label="해당하는 계층 알려 주기" onPress={() => router.push("/onboarding?step=statuses")} />
                 ) : null}
-                <Section items={needsTarget} onOpen={open} />
+                <Section items={needsTarget} seen={state.seen} profile={state.profile} onOpen={open} />
               </>
             ) : null}
           </View>
@@ -311,7 +307,7 @@ export default function Home() {
         {others.length > 0 ? (
           <MoreRow label="조건이 맞지 않는 공고" count={others.length} open={showOthers} onPress={toggle(setShowOthers)} />
         ) : null}
-        {showOthers && others.length > 0 ? <Section items={others} onOpen={open} /> : null}
+        {showOthers && others.length > 0 ? <Section items={others} seen={state.seen} profile={state.profile} onOpen={open} /> : null}
 
         {closedList.length > 0 ? (
           <View style={{ gap: 12 }}>
@@ -321,7 +317,7 @@ export default function Home() {
                 <Sub tone="3" variant="caption">
                   접수가 끝나고 일주일 동안 보여드려요. 신청했다면 당첨자 발표 일정을 확인해 보세요.
                 </Sub>
-                <Section items={closedList} onOpen={open} />
+                <Section items={closedList} seen={state.seen} profile={state.profile} onOpen={open} />
               </>
             ) : null}
           </View>
@@ -356,82 +352,12 @@ function MoreRow({ label, count, open, onPress }: { label: string; count: number
   );
 }
 
-function Section({ title, items, onOpen }: { title?: string; items: Matched[]; onOpen: (id: string) => void }) {
+function Section({ title, items, seen, profile, onOpen }: { title?: string; items: Matched[]; seen: SeenState; profile: UserProfile | null; onOpen: (id: string) => void }) {
   return (
     <View style={{ gap: 12 }}>
       {title ? <SectionTitle>{title}</SectionTitle> : null}
-      {items.map((m) => <AnnouncementCard key={m.announcement.id} m={m} onPress={() => onOpen(m.announcement.id)} />)}
+      {items.map((m) => <AnnouncementCard key={m.announcement.id} m={m} fresh={isUnseen(seen, m.announcement.id)} profile={profile} onOpen={onOpen} />)}
     </View>
-  );
-}
-
-export function AnnouncementCard({ m, onPress }: { m: Matched; onPress: () => void }) {
-  const { colors } = useTheme();
-  const { state } = useAppState();
-  const a = m.announcement;
-  const fresh = isUnseen(state.seen, a.id);
-  const phase = applyPhase(a);
-  const phaseText = phaseLabel(phase);
-  const phaseColor = { danger: colors.danger, info: colors.info, gray: colors.text3 }[phaseTone(phase)];
-  const unitLabel = sizeText(a);
-  const status =
-    !isReadable(a)
-      ? { tone: "warn" as const, icon: "alert" as const, text: "조건을 아직 못 읽음" }
-      /*
-       * 확인 필요가 남았으면 초록 체크를 붙이지 않는다.
-       * 체크는 "다 됐다"는 신호인데, 8개 중 4개만 확인된 자리에 붙으면 색이 내용보다
-       * 낙관적이다. 사용자는 글보다 색을 먼저 읽는다.
-       */
-      : m.match?.is_match && m.matched > 0 && !m.needsCheck
-        ? { tone: "primary" as const, icon: "check" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` }
-      : m.match?.is_match && m.matched > 0
-        ? { tone: "gray" as const, icon: "info" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치 · 확인 필요 ${m.needsCheck}개` }
-        : m.match?.is_match
-          ? { tone: "warn" as const, icon: "alert" as const, text: `조건 ${m.needsCheck}개 확인 필요` }
-          : m.match?.region_uncertain
-            ? { tone: "warn" as const, icon: "alert" as const, text: "다른 지역 · 거주 요건 확인 필요" }
-          : m.match?.status_uncertain
-            ? { tone: "warn" as const, icon: "alert" as const, text: "신청 대상 확인 필요" }
-            : { tone: "danger" as const, icon: "x" as const, text: `조건 ${m.total}개 중 ${m.matched}개 일치` };
-  // 직장을 넣었으면 통근이 먼저, 아니면 가장 가까운 역, 그것도 없으면 지역명
-  // 조건이 맞아도 보증금을 못 대면 못 간다. 그 사실만 무료로 알리고 금액은 비용 화면(유료)에서 본다.
-  const funds = useMemo(() => fundsFor(a, state.profile, LOANS), [a, state.profile]);
-  const note = m.match?.is_match ? fundsNote(funds) : null;
-
-  const place = m.nearestHouse
-    ? nearestHouseShort(m.distanceKm, m.distancePartnerKm) ?? a.region_name
-    : commuteShort(
-      m.distanceKm,
-      m.distancePartnerKm,
-      commuteFor(a.commute, state.profile?.workplace?.label),
-      commuteFor(a.commute, state.profile?.workplace_partner?.label),
-    ) ??
-    (a.transit?.nearest_station ? `${splitStation(a.transit.nearest_station).station} 도보 약 ${a.transit.station_walk_min}분` : a.region_name);
-
-  return (
-    <Card onPress={onPress} style={{ gap: 12 }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 6 }}>
-          {/* 기관을 먼저 보여 준다 — 같은 조건이라도 신청처와 절차가 다르다 */}
-          {a.provider ? <Tag tone="gray">{a.provider}</Tag> : null}
-          <Sub tone="3" variant="caption" lines={1} style={{ flex: 1 }}>{housingLabel(a)}{unitLabel ? ` · ${unitLabel}` : ""}</Sub>
-        </View>
-        {phaseText ? <T variant="label" color={phaseColor} style={{ fontFamily: fonts.bold, flexShrink: 0 }}>{phaseText}</T> : null}
-      </View>
-      <View style={{ gap: 4 }}>
-        <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 7 }}>
-          {/* 안 본 공고에 점 하나. 배지를 쓰면 제목을 밀어내고 줄바꿈을 흐트러뜨린다 */}
-          {fresh ? <View accessibilityLabel="아직 안 본 공고" style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: colors.primary, marginTop: 9 }} /> : null}
-          <T variant="subheading" style={{ flex: 1 }}>{a.title}</T>
-        </View>
-        {place ? <Sub tone="3">{place}</Sub> : null}
-      </View>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-        <Tag tone={status.tone} icon={status.icon}>{status.text}</Tag>
-        {/* 조건이 맞는 공고에만 붙인다 — 애초에 자격이 안 되는 공고에서 돈 이야기를 하면 소음이다 */}
-        {note ? <Tag tone="warn" icon="alert">{note}</Tag> : null}
-      </View>
-    </Card>
   );
 }
 

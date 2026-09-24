@@ -7,7 +7,8 @@ import { applyPhase, closesWithin, phaseRank } from "@/lib/phase";
 import { unseenChange } from "@/lib/changes";
 import { useAppState } from "@/store/appState";
 import { syncAnnouncementsOnce } from "@/data/sync";
-import { AnnouncementCard } from "./index";
+import { AnnouncementCard } from "@/components/AnnouncementCard";
+import { isUnseen } from "@/lib/unseen";
 
 /** 관심 공고: D-day 순. 마감 D-3 알림은 기기 예약 알림(M7)으로 붙는다. */
 export default function Saved() {
@@ -22,8 +23,8 @@ export default function Saved() {
   const { list } = useAnnouncements();
   const items = useMemo(
     () =>
-      matchAll(state.profile, list)
-        .filter((m) => state.saved.includes(m.announcement.id))
+      // 관심 공고만 매칭한다 — 전체를 매칭한 뒤 거르면 관심 세 개를 보려고 오십 개를 계산한다
+      matchAll(state.profile, list.filter((a) => state.saved.includes(a.id)))
         // 접수 중 → 접수 전 → 마감, 같은 단계 안에서는 마감이 가까운 순
         .sort(
           (a, b) =>
@@ -61,7 +62,7 @@ export default function Saved() {
           action={{ label: "공고 둘러보기", onPress: () => router.navigate("/(tabs)") }}
         />
       ) : (
-        items.map((m) => <AnnouncementCard key={m.announcement.id} m={m} onPress={() => router.push(`/announcement/${m.announcement.id}`)} />)
+        items.map((m) => <AnnouncementCard key={m.announcement.id} m={m} fresh={isUnseen(state.seen, m.announcement.id)} profile={state.profile} onOpen={(id) => router.push(`/announcement/${id}`)} />)
       )}
     </Screen>
   );

@@ -182,10 +182,33 @@ export interface Matched {
   nearestHouse: boolean;
 }
 
+/**
+ * 공고 × 프로필의 매칭 결과 캐시.
+ *
+ * 홈·관심·상세·예상 주거비가 같은 공고를 같은 프로필로 각자 다시 계산했다 (2026-09-24 감사).
+ * 공고 객체와 프로필 객체는 바뀌지 않는 한 같은 참조라 WeakMap 둘로 잡는다. 프로필을 저장하면 새 객체가 오고,
+ * 목록이 갱신되면 새 공고 객체가 와서 자연히 다시 계산된다. 나이는 날에 달렸으니 날짜 키도 본다.
+ */
+const matchCache = new WeakMap<Announcement, WeakMap<UserProfile, { day: string; match: AnnouncementMatch }>>();
+const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+
+export function matchFor(a: Announcement, profile: UserProfile, today: Date = new Date()): AnnouncementMatch {
+  const day = dayKey(today);
+  let byProfile = matchCache.get(a);
+  if (!byProfile) matchCache.set(a, (byProfile = new WeakMap()));
+  const hit = byProfile.get(profile);
+  if (hit && hit.day === day) return hit.match;
+  const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code, announcement_title: a.title, today });
+  byProfile.set(profile, { day, match });
+  return match;
+}
+
 export function matchAll(profile: UserProfile | null, list: Announcement[] = current): Matched[] {
+  // 사는 곳 좌표는 프로필에서 한 번만 — 공고마다 다시 풀 이유가 없다
+  const at = parsePlaceLabel(profile?.region_sigungu);
+  const home = at ? placeFor(at.regionCode, at.sigungu) : profile?.region_code ? placeFor(profile.region_code) : null;
+  const today = new Date();
   return list.map((a) => {
-    const at = parsePlaceLabel(profile?.region_sigungu);
-    const home = at ? placeFor(at.regionCode, at.sigungu) : profile?.region_code ? placeFor(profile.region_code) : null;
     // 흩어진 공고는 공고 좌표(관할 대표점)가 아니라 가장 가까운 집으로 잰다 (lib/units.ts distancesTo)
     const dist = distancesTo(a, profile?.workplace, profile?.workplace_partner, home);
     const distanceKm = dist.work;
@@ -195,7 +218,7 @@ export function matchAll(profile: UserProfile | null, list: Announcement[] = cur
     if (!isReadable(a) || !profile) {
       return { announcement: a, match: null, matched: 0, needsCheck: 0, total: 0, distanceKm, distancePartnerKm, residenceKm, nearestHouse };
     }
-    const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code, announcement_title: a.title });
+    const match = matchFor(a, profile, today);
     const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
     // 화면에는 규칙 단위로 센다 ("조건 8개 중 7개 일치"). 일치 판정 자체는 엔진의 그룹 단위 결과를 따른다.
     const counts = best ? ruleCounts(best) : { matched: 0, needsCheck: 0, total: 0 };
