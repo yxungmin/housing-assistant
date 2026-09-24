@@ -90,6 +90,13 @@ describe("화면 문구", () => {
   it("점수는 쓰지 않는다 — 공고마다 배점이 달라 비교할 수 없다", () => {
     expect(pastResultText(r())).not.toContain("점");
   });
+
+  it("주택형이 여럿이면 어느 형인지 말한다 — 한 형의 결과를 공고 전체로 읽지 않게", () => {
+    expect(pastResultText(r({ draw_type: "26A" }), { several: true })).toBe("가장 치열했던 26A형은 1순위에서 마감됐어요 (7.2대 1)");
+    expect(pastResultText(r({ draw_type: "26A", closed_rank: undefined }), { several: true })).toBe("가장 치열했던 26A형 경쟁률은 7.2대 1이었어요");
+    // 형 이름을 못 읽었으면 지어내지 않는다
+    expect(pastResultText(r({ draw_type: undefined }), { several: true })).toBe("지난 회차는 1순위에서 마감됐어요 (7.2대 1)");
+  });
 });
 
 describe("대표 주택형", () => {

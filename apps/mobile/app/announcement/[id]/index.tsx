@@ -257,17 +257,17 @@ export default function AnnouncementDetail() {
                 {/*
                   무엇을 안 했는지가 아니라 무엇을 했고 어떻게 확인하는지를 말한다.
                   전에는 "사람이 아직 확인하지 않았어요"였다 — 사실이지만 "그럼 믿지 말라는 건가"로 읽혔다.
-                  사실은 줄이지 않는다: 자동으로 옮겼다는 것과 틀릴 수 있다는 것은 (i) 안에 그대로 있다.
+                  사실은 줄이지 않는다: AI가 옮겼다는 것은 줄에 바로 쓰고(무엇이 옮겼는지 숨기지 않는다), 틀릴 수 있다는 것은 (i) 안에 있다.
                 */}
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 5, marginTop: 6 }}>
                   <Icon name={a.status === "VERIFIED" ? "check-circle" : "document"} size={14} color={a.status === "VERIFIED" ? colors.primary : colors.text3} />
                   <Sub tone="3" variant="caption" style={{ flexShrink: 1 }}>
-                    {a.status === "VERIFIED" ? "공고문과 한 줄씩 대조했어요" : "공고문에서 옮긴 조건이에요"}
+                    {a.status === "VERIFIED" ? "공고문과 한 줄씩 대조했어요" : "AI가 공고문에서 옮긴 조건이에요"}
                   </Sub>
                   {a.status === "VERIFIED" ? null : (
                     <InfoTip
                       label="조건을 옮긴 방법"
-                      text="공고문을 자동으로 읽어 옮겼어요. 옮기는 과정에서 틀릴 수 있어서 줄마다 공고문 쪽수를 달아 두었어요. 다르면 그 줄을 눌러 알려 주세요. 사람이 공고문과 대조를 마친 공고에는 '한 줄씩 대조했어요'가 붙어요."
+                      text="AI가 공고문을 읽고 조건을 옮겼어요. AI는 틀릴 수 있어서 줄마다 공고문 쪽수를 달아 두었어요. 다르면 그 줄을 눌러 알려 주세요. 사람이 공고문과 대조를 마친 공고에는 '한 줄씩 대조했어요'가 붙어요."
                     />
                   )}
                 </View>
@@ -434,7 +434,7 @@ export default function AnnouncementDetail() {
             <Card style={{ gap: 14 }}>
               {(() => {
                 const t = toughest(a.past_results!);
-                const text = t ? pastResultText(t) : null;
+                const text = t ? pastResultText(t, { several: a.past_results!.length > 1 }) : null;
                 return text ? <T variant="bodyMedium" style={{ fontSize: 15 }}>{text}</T> : null;
               })()}
               {/* 공급·신청 수는 여기서 본문이다. src로 주면 (i) 뒤에 접혀 눌러야 보인다 */}
@@ -450,6 +450,10 @@ export default function AnnouncementDetail() {
                   }
                 />
               ))}
+              {/* 숫자를 어떻게 읽는지 바꾸는 말이라 (i)에 접지 않는다 */}
+              <Sub tone="2" variant="caption">
+                "N순위 마감"은 그 순위까지의 신청자만으로 모집이 다 찼다는 뜻이에요. 내 순위가 그보다 뒤면 지난 회차에는 차례가 오지 않았어요.
+              </Sub>
               <Sub tone="3" variant="caption">
                 {a.past_results[0]!.complex}
                 {a.past_results[0]!.announced_at ? ` · ${dateText(a.past_results[0]!.announced_at)} 발표` : ""}

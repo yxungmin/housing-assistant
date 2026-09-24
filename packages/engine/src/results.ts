@@ -111,12 +111,19 @@ export function matchPastResults(
  * 공공임대는 순위제라 "1순위에서 마감"이 내 순위와 직접 비교된다.
  * 순위를 모르면 경쟁률만 말하고, 둘 다 모르면 아무 말도 하지 않는다.
  */
-export function pastResultText(r: PastResult): string | null {
+/**
+ * 주택형이 여럿이면(`several`) 어느 형인지 붙인다. 대표로 가장 치열했던 형을 고르는데(toughest),
+ * "지난 회차는 1순위에서 마감"이라고만 쓰면 공고 전체가 그랬던 것처럼 읽힌다 — 실제로는 한 형만 그랬고
+ * 나머지는 2·3순위에서 마감된 공고가 흔하다.
+ */
+export function pastResultText(r: PastResult, opts: { several?: boolean } = {}): string | null {
   const rate = r.competition !== undefined ? `${r.competition}대 1` : null;
+  const who = opts.several && r.draw_type ? `가장 치열했던 ${r.draw_type}형은` : "지난 회차는";
   if (r.closed_rank !== undefined) {
-    return rate ? `지난 회차는 ${r.closed_rank}순위에서 마감됐어요 (${rate})` : `지난 회차는 ${r.closed_rank}순위에서 마감됐어요`;
+    return rate ? `${who} ${r.closed_rank}순위에서 마감됐어요 (${rate})` : `${who} ${r.closed_rank}순위에서 마감됐어요`;
   }
-  return rate ? `지난 회차 경쟁률은 ${rate}이었어요` : null;
+  if (!rate) return null;
+  return opts.several && r.draw_type ? `가장 치열했던 ${r.draw_type}형 경쟁률은 ${rate}이었어요` : `지난 회차 경쟁률은 ${rate}이었어요`;
 }
 
 /** 여러 주택형이 있으면 가장 치열했던 쪽을 대표로 쓴다 — 낙관적인 값을 앞에 두지 않는다 */
