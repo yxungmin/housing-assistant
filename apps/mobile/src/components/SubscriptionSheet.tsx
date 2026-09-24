@@ -23,20 +23,26 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
   const router = useRouter();
   const { state, setSubscription } = useAppState();
   const [busy, setBusy] = useState(false);
+  /** 결제·복원이 실패했을 때 버튼 아래 한 줄. 전에는 catch가 없어 버튼이 "처리 중"에서 그냥 돌아오고 아무 말이 없었다 (2026-09-24 감사) */
+  const [msg, setMsg] = useState<string | null>(null);
   const price = usePrice().monthly;
   const expired = state.subscription.status === "expired";
   // 첫 달만 무료다. 해지했다 돌아와도 다시 주지 않는다.
   const freeMonth = canUseFirstMonthFree(state.subscription);
 
-  const run = async (fn: () => Promise<typeof state.subscription | null>) => {
+  const run = async (fn: () => Promise<typeof state.subscription | null>, emptyMsg: string) => {
     setBusy(true);
+    setMsg(null);
     try {
       const next = await fn();
       if (next) {
         setSubscription(next);
         onStarted?.();
         onClose();
-      }
+      } else setMsg(emptyMsg);
+    } catch (e) {
+      // 사용자가 스토어 창을 닫은 것은 실패가 아니다 — 조용히 돌아온다. 그 밖(카드 거절·결제 보류·네트워크)은 말한다.
+      if (!isUserCancelled(e)) setMsg(purchaseErrorMessage(e));
     } finally {
       setBusy(false);
     }
@@ -95,8 +101,9 @@ export function SubscriptionSheet({ visible, onClose, onStarted }: { visible: bo
           결제일부터 7일 이내 청약철회할 수 있어요. 그 기간에 주거비 계산을 한 번이라도 쓰면 제한돼요.
         </Sub>
       </Card>
-      <PrimaryButton label={busy ? "처리 중" : freeMonth ? "첫 달 0원으로 시작" : "구독 시작"} disabled={busy} onPress={() => void run(() => (freeMonth ? billing.startTrial() : billing.purchase()))} />
-      <Pressable onPress={() => void run(() => billing.restore())} accessibilityRole="button" style={{ alignItems: "center", paddingVertical: 4 }}>
+      <PrimaryButton label={busy ? "처리 중" : freeMonth ? "첫 달 0원으로 시작" : "구독 시작"} disabled={busy} onPress={() => void run(() => (freeMonth ? billing.startTrial() : billing.purchase()), "결제를 완료하지 못했어요. 잠시 뒤 다시 시도해 주세요.")} />
+      {msg ? <Sub tone="3" variant="caption" style={{ textAlign: "center", color: colors.danger }}>{msg}</Sub> : null}
+      <Pressable onPress={() => void run(() => billing.restore(), "복원할 구매 내역이 없어요.")} accessibilityRole="button" disabled={busy} style={{ alignItems: "center", paddingVertical: 4 }}>
         <T variant="small" color={colors.text3}>이미 구독했다면 구매 복원</T>
       </Pressable>
       {/* App Store 3.1.2는 구매 화면에 이용약관과 개인정보처리방침 링크를 함께 요구한다 */}
@@ -125,12 +132,21 @@ export function SubscriptionManageSheet({ visible, onClose }: { visible: boolean
   const left = daysLeft(sub);
   const label = { none: "구독 전", trial: "첫 달 무료 이용 중", active: "구독 중", expired: "구독 종료" }[sub.status];
 
+  const [busy, setBusy] = useState(false);
   const restore = async () => {
-    const r = await billing.restore();
-    if (r) {
-      setSubscription(r);
-      setMsg("구독을 복원했어요.");
-    } else setMsg("복원할 구매 내역이 없어요.");
+    if (busy) return;
+    setBusy(true);
+    try {
+      const r = await billing.restore();
+      if (r) {
+        setSubscription(r);
+        setMsg("구독을 복원했어요.");
+      } else setMsg("복원할 구매 내역이 없어요.");
+    } catch (e) {
+      if (!isUserCancelled(e)) setMsg(purchaseErrorMessage(e));
+    } finally {
+      setBusy(false);
+    }
   };
   /**
    * 해지는 스토어에서만 된다 (애플·구글 정책). 앱 상태만 바꾸고 "해지했어요"라고 하면
@@ -199,4 +215,18 @@ function statusLine(sub: { status: string; expiresAt?: string; cancelled?: boole
   if (sub.cancelled) return `${day}까지 이용하고 더 결제되지 않아요${rest}`;
   if (sub.status === "trial") return `${day}에 ${amount}이 처음 결제돼요${rest}`;
   return `다음 결제 ${day} · ${amount}${rest}`;
+}
+
+/** RevenueCat은 사용자가 스토어 창을 닫으면 userCancelled가 true인 오류를 던진다. 그건 실패가 아니다 */
+function isUserCancelled(e: unknown): boolean {
+  return typeof e === "object" && e !== null && (e as { userCancelled?: unknown }).userCancelled === true;
+}
+
+/** 스토어 오류를 사람 말로. 메시지를 그대로 보이면 영어 코드가 나온다 */
+function purchaseErrorMessage(e: unknown): string {
+  const raw = e instanceof Error ? e.message : String(e ?? "");
+  if (/network|offline|internet/i.test(raw)) return "인터넷 연결을 확인하고 다시 시도해 주세요.";
+  if (/pending|deferred/i.test(raw)) return "결제가 승인 대기 중이에요. 완료되면 자동으로 열려요.";
+  if (/판매 중인 상품/.test(raw)) return raw;
+  return "결제를 완료하지 못했어요. 잠시 뒤 다시 시도해 주세요.";
 }

@@ -112,6 +112,11 @@ export default function AnnouncementDetail() {
     openAnnouncement(id);
   }, [id, openAnnouncement]);
 
+  // 구독 시트 상태. 아래 두 조기 return(공고 없음·로그인 전)보다 **위**에 있어야 한다 —
+  // 로그인 전 화면에서 로그인하면 같은 컴포넌트가 본 화면으로 바뀌는데, 그때 훅이 하나 늘면
+  // "Rendered more hooks than during the previous render"로 죽는다 (2026-09-24 감사에서 발견).
+  const [subSheet, setSubSheet] = useState(false);
+
   if (!a) return <MissingAnnouncement />;
 
   /*
@@ -152,7 +157,6 @@ export default function AnnouncementDetail() {
    * 잠겼어도 공고 자체의 사실은 가리지 않는다 — 순위별 접수일은 잘못 내면 부적격이라 누구에게나 보여 준다.
    */
   const rankLocked = !canOpenCost(state);
-  const [subSheet, setSubSheet] = useState(false);
   const rankDates = (() => {
     const byDate = new Map<string, number[]>();
     for (const r of track?.track.priority_ranks ?? []) if (r.apply_date) byDate.set(r.apply_date, [...(byDate.get(r.apply_date) ?? []), r.rank]);

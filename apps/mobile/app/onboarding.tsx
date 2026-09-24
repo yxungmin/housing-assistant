@@ -7,7 +7,7 @@ import { Icon } from "@/components/icon";
 import { IncomeHelperSheet } from "@/components/IncomeHelperSheet";
 import { BottomCTA, FadeIn, Header, IconButton, Screen, Sub, T } from "@/components/ui";
 import { currentAnnouncements, matchAll, pickBest } from "@/data/announcements";
-import { isComplete, NO_WORKPLACE, stepHint, stepLabel, stepOptions, stepTitle, visibleSteps, type Step } from "@/lib/onboarding";
+import { isComplete, NO_WORKPLACE, STEPS, stepHint, stepLabel, stepOptions, stepTitle, visibleSteps, type Step } from "@/lib/onboarding";
 import { searchPlaces, type PlaceHit } from "@/data/places-search";
 import { useAppState } from "@/store/appState";
 import { useTheme } from "@/theme/ThemeProvider";
@@ -30,8 +30,19 @@ export default function Onboarding() {
   const [index, setIndex] = useState(0);
   // 첫 온보딩은 핵심만 묻는다. 나머지는 공고를 보다가 필요해질 때 ?step=<id>로 그 자리에서 묻는다.
   const all = useMemo(() => visibleSteps(draft, { coreOnly: !only }), [draft, only]);
-  // 한 항목만 고치는 중이면 그 단계만 남긴다. 없는 id를 받으면 평소대로 전부 보여 준다.
-  const steps = useMemo(() => (only ? all.filter((x) => x.id === only) : all), [all, only]);
+  /*
+   * 한 항목만 고치는 중이면 그 단계만 남긴다.
+   * 그 단계가 지금 조건(when)으로는 숨어 있어도 보여 준다 — 조건 화면의 "지금 입력하기"는 규칙이 요구하는 값을 가리키는데,
+   * 예비신혼부부의 혼인 기간처럼 온보딩의 표시 조건과 어긋날 수 있다. 전에는 빈 목록에서 steps[-1]을 읽어 죽었다(2026-09-24 감사).
+   * 그래도 없는 id면 평소대로 전부 보여 준다.
+   */
+  const steps = useMemo(() => {
+    if (!only) return all;
+    const visible = all.filter((x) => x.id === only);
+    if (visible.length) return visible;
+    const anywhere = STEPS.find((x) => x.id === only);
+    return anywhere ? [anywhere] : all;
+  }, [all, only]);
   const step = steps[Math.min(index, steps.length - 1)]!;
   const value = step.read(draft);
   const [text, setText] = useState<string>(textFor(step, value));
