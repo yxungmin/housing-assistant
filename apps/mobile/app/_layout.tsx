@@ -48,7 +48,6 @@ function Root() {
     "Pretendard-Medium": require("pretendard/dist/public/static/Pretendard-Medium.otf"),
     "Pretendard-SemiBold": require("pretendard/dist/public/static/Pretendard-SemiBold.otf"),
     "Pretendard-Bold": require("pretendard/dist/public/static/Pretendard-Bold.otf"),
-    "Pretendard-ExtraBold": require("pretendard/dist/public/static/Pretendard-ExtraBold.otf"),
   });
   const ready = (fontsLoaded || !!fontError) && state.loaded;
 

@@ -265,6 +265,8 @@ async function write(key: string, value: string | null): Promise<void> {
   }
 }
 
+type AppActions = Omit<Ctx, "state">;
+
 interface Ctx {
   state: AppState;
   setProfile: (profile: UserProfile, onboarded?: boolean) => void;
@@ -311,6 +313,7 @@ interface Ctx {
 }
 
 const AppStateContext = createContext<Ctx | null>(null);
+const ActionsContext = createContext<AppActions | null>(null);
 
 export function AppStateProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(reducer, initial);
@@ -444,9 +447,13 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     };
   }, [state.loaded, state.reports]);
 
-  const value = useMemo<Ctx>(
+  /*
+   * 액션은 한 번만 만든다 — 전부 dispatch(안정)와 모듈 함수만 잡는다. 상태는 따로 준다.
+   * 하나의 값에 상태와 액션을 같이 넣으면 상태가 바뀔 때마다 액션만 쓰는 구독자도 다시 그려진다 (2026-09-24 감사).
+   * 액션만 필요한 곳은 useAppActions()를 쓴다.
+   */
+  const actions = useMemo<AppActions>(
     () => ({
-      state,
       setProfile: (profile, onboarded) => dispatch({ type: "setProfile", profile, onboarded }),
       // 로그인하면 첫 달 무료를 아직 안 썼을 때만 시작한다.
       // 첫 달만 무료다 — 로그아웃 후 다시 들어와도 또 주지 않는다 (setSubscription이 지킨다).
@@ -522,9 +529,21 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       openAnnouncement: (id) => dispatch({ type: "openAnnouncement", id }),
       reset: () => dispatch({ type: "reset" }),
     }),
-    [state],
+    [],
   );
-  return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
+  const value = useMemo<Ctx>(() => ({ state, ...actions }), [state, actions]);
+  return (
+    <ActionsContext.Provider value={actions}>
+      <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>
+    </ActionsContext.Provider>
+  );
+}
+
+/** 액션만. 상태가 바뀌어도 다시 그려지지 않는다 */
+export function useAppActions(): AppActions {
+  const ctx = useContext(ActionsContext);
+  if (!ctx) throw new Error("AppStateProvider 밖에서 useAppActions를 호출했다");
+  return ctx;
 }
 
 export function useAppState(): Ctx {
@@ -536,4 +555,3 @@ export function useAppState(): Ctx {
 /** 계산 화면을 열 수 있는가. 규칙은 lib/access.ts 한 곳에 있고 여기서는 스토어 모양으로 넘겨 줄 뿐이다. */
 export const canOpenCost = (state: AppState): boolean => canOpenCostRule(state);
 
-export const useCanOpenCost = (): boolean => canOpenCost(useAppState().state);

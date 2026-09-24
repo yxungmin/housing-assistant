@@ -15,3 +15,5 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      # 프로필 6,480개 × 번들 공고로 오추천·놓친 추천 (LLM·네트워크 없음). 오추천이 있으면 실패
+      - run: npm run audit:match

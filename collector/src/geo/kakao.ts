@@ -98,14 +98,14 @@ export async function geocodeAddress(address: string, restKey: string, fetchImpl
   };
   const walkMin = (m: number) => Math.round(m / WALK_M_PER_MIN);
 
+  // 역·정류장·카테고리 8종은 서로 무관하다 — 차례로 기다리면 주소 하나에 10회 왕복이다. 한 번에 보낸다 (2026-09-24 감사)
+  const [station, bus, ...found] = await Promise.all([nearest("SW8", 1500), nearest("BS8", 1500), ...NEARBY_CATEGORIES.map((c) => nearest(c.code, c.radius))]);
   const transit: GeoResult["transit"] = {};
-  const station = await nearest("SW8", 1500);
   if (station) {
     transit.nearest_station = station.name;
     transit.station_distance_m = station.distance_m;
     transit.station_walk_min = walkMin(station.distance_m);
   }
-  const bus = await nearest("BS8", 1500);
   if (bus) {
     transit.nearest_bus_stop = bus.name;
     transit.bus_distance_m = bus.distance_m;
@@ -113,10 +113,10 @@ export async function geocodeAddress(address: string, restKey: string, fetchImpl
   }
 
   const nearby: GeoResult["nearby"] = [];
-  for (const c of NEARBY_CATEGORIES) {
-    const found = await nearest(c.code, c.radius);
-    if (found) nearby.push({ kind: c.kind, name: found.name, distance_m: found.distance_m });
-  }
+  NEARBY_CATEGORIES.forEach((c, i) => {
+    const f = found[i];
+    if (f) nearby.push({ kind: c.kind, name: f.name, distance_m: f.distance_m });
+  });
 
   return { b_code: doc.address?.b_code, lat, lng, transit, nearby };
 }

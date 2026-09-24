@@ -21,9 +21,6 @@ export const TRIAL_DAYS = 30;
 /** 만료 후 오프라인 유예 (문서: 캐시된 구독 상태 3일) */
 export const GRACE_DAYS = 3;
 export const PRODUCT_ID = "housing_assistant_monthly_1900";
-/** 첫 결제 며칠 전에 미리 알릴 것인가 */
-export const NOTICE_DAYS_BEFORE_CHARGE = 3;
-
 /** "월 1,900원". 가격을 각 화면에서 따로 만들면 하나를 고칠 때 나머지가 남는다 */
 export const PRICE_TEXT = `월 ${PRICE_KRW.toLocaleString("ko-KR")}원`;
 

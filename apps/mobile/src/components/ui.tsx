@@ -744,7 +744,7 @@ const SHEET_OUT = 200;
  * 딤은 제자리에서 밝기만 바뀌고 패널만 아래에서 올라온다 (Modal의 slide는 딤까지 같이 밀어올려 어색하다).
  * 닫힐 때는 역재생이 끝난 뒤에 언마운트한다.
  */
-export function BottomSheet({ visible, onClose, children }: PropsWithChildren<{ visible: boolean; onClose: () => void }>) {
+export function BottomSheet({ visible, onClose, plain, children }: PropsWithChildren<{ visible: boolean; onClose: () => void; /** 안을 ScrollView로 감싸지 않는다 — 안에 FlatList처럼 스스로 스크롤하는 것이 있을 때 */ plain?: boolean }>) {
   const { colors } = useTheme();
   // 시트 안에 입력창이 있으면(신고·소득 도우미) 키보드가 보내기 버튼을 덮었다. BottomCTA처럼 키보드 높이만큼 올린다 (2026-09-24 감사)
   const keyboard = useKeyboardHeight();
@@ -809,14 +809,18 @@ export function BottomSheet({ visible, onClose, children }: PropsWithChildren<{ 
             transform: [{ translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [height || 520, 0] }) }],
           }}
         >
-          <ScrollView
-            bounces={false}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={{ paddingHorizontal: space.screen, paddingTop: 28, paddingBottom: 32, gap: space.xl }}
-          >
-            {children}
-          </ScrollView>
+          {plain ? (
+            <View style={{ paddingHorizontal: space.screen, paddingTop: 28, paddingBottom: 32, gap: space.xl, maxHeight: "100%" }}>{children}</View>
+          ) : (
+            <ScrollView
+              bounces={false}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={{ paddingHorizontal: space.screen, paddingTop: 28, paddingBottom: 32, gap: space.xl }}
+            >
+              {children}
+            </ScrollView>
+          )}
         </Animated.View>
       </View>
     </Modal>
@@ -825,11 +829,6 @@ export function BottomSheet({ visible, onClose, children }: PropsWithChildren<{ 
 
 export function Row({ children, style, center }: PropsWithChildren<{ style?: StyleProp<ViewStyle>; center?: boolean }>) {
   return <View style={[{ flexDirection: "row", justifyContent: "space-between", alignItems: center ? "center" : "baseline", gap: 10 }, style]}>{children}</View>;
-}
-
-export function Divider({ inset }: { inset?: number }) {
-  const { colors } = useTheme();
-  return <View style={{ height: 1, backgroundColor: colors.line, marginHorizontal: inset ?? 0, opacity: 0.7 }} />;
 }
 
 /** 안내: 연한 면 + 타일 + 한 문장 */

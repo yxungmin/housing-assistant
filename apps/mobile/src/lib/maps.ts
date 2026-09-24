@@ -28,9 +28,6 @@ export interface MapPlace {
   name: string;
 }
 
-/** iOS에서 앱 설치 여부를 물으려면 Info.plist에 등록돼야 하는 스킴 */
-export const MAP_SCHEMES = ["kakaomap", "nmap"] as const;
-
 export function mapTargets(place: MapPlace, appId: string): MapTarget[] {
   const { lat, lng } = place;
   const name = encodeURIComponent(place.name);

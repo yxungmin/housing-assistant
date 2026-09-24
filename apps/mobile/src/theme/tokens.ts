@@ -7,7 +7,7 @@ export interface Colors {
   primary: string; primarySoft: string; onPrimary: string; primaryPressed: string;
   surface: string; card: string; cardSoft: string; cardStrong: string; line: string;
   text: string; text2: string; text3: string; text4: string;
-  warning: string; warningSoft: string; danger: string; dangerSoft: string; ok: string; okSoft: string; info: string; infoSoft: string;
+  warning: string; warningSoft: string; danger: string; dangerSoft: string; ok: string; info: string; infoSoft: string;
   dim: string; tabBar: string;
 }
 
@@ -30,7 +30,6 @@ export const light: Colors = {
   danger: "#F04452",
   dangerSoft: "#FDECEE",
   ok: "#0FB25F",
-  okSoft: "#E6F8EE",
   info: "#3182F6",
   infoSoft: "#E8F3FF",
   dim: "rgba(0, 23, 51, 0.55)",
@@ -56,7 +55,6 @@ export const dark: Colors = {
   danger: "#F36C77",
   dangerSoft: "#3D1E22",
   ok: "#2ED27C",
-  okSoft: "#123A24",
   info: "#5B9CF8",
   infoSoft: "#1A2C45",
   dim: "rgba(0,0,0,0.7)",
@@ -68,7 +66,7 @@ export const dark: Colors = {
  * 좌우는 24였다가 20으로 줄였다(2026-09-24) — 360px 폰에서 숫자·주소 줄이 한 칸씩 더 꺾였고,
  * 20이면 헤더 뒤로 가기 아이콘(12 + 8)과 하단 버튼(xl)의 왼쪽 선이 본문과 한 줄에 선다.
  */
-export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, screen: 20, section: 32, xxl: 40 } as const;
+export const space = { md: 12, lg: 16, xl: 20, screen: 20, section: 32 } as const;
 export const radius = { sm: 8, md: 14, lg: 20, xl: 24, pill: 999 } as const;
 
 export const fonts = {
@@ -76,9 +74,7 @@ export const fonts = {
   medium: "Pretendard-Medium",
   semiBold: "Pretendard-SemiBold",
   bold: "Pretendard-Bold",
-  extraBold: "Pretendard-ExtraBold",
   num: "Pretendard-Bold",
-  numMedium: "Pretendard-SemiBold",
 } as const;
 
 /** 타입 스케일 (TDS 근사): 제목은 크고 자간을 좁게, 본문 16 */

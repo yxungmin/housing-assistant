@@ -294,10 +294,6 @@ export function visibleSteps(p: Partial<UserProfile>, opts: { coreOnly?: boolean
   return STEPS.filter((s) => (!opts.coreOnly || s.core) && (!s.when || s.when(p)));
 }
 
-/** 아직 안 채운 항목 (나중에 공고에서 유도할 때 쓴다) */
-export const pendingSteps = (p: Partial<UserProfile>): Step[] =>
-  visibleSteps(p).filter((s) => !s.core && s.read(p) === null);
-
 /**
  * 목록에 쓰는 짧은 이름. 단계의 title은 질문이라("세전 연소득은 얼마인가요?") 목록에 못 쓴다.
  * 단계 객체마다 label을 더하지 않고 여기 한 표에 모은다 — 단계 정의는 질문에만 집중한다.

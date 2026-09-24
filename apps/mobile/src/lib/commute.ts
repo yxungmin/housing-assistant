@@ -181,17 +181,6 @@ export function mapUrl(a: Pick<Announcement, "lat" | "lng" | "title" | "address"
     : `geo:${a.lat},${a.lng}?q=${a.lat},${a.lng}(${label})`;
 }
 
-export async function openMap(a: Pick<Announcement, "lat" | "lng" | "title" | "address">): Promise<boolean> {
-  const url = mapUrl(a);
-  if (!url) return false;
-  try {
-    await Linking.openURL(url);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 /** 공고의 좌표·이름을 지도에 넘길 꼴로. 이름은 주소가 있으면 주소를 쓴다 — 단지명만으로는 다른 곳이 잡힌다. */
 export function mapPlace(a: Pick<Announcement, "lat" | "lng" | "title" | "address">): MapPlace | null {
   if (a.lat === undefined || a.lng === undefined) return null;

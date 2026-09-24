@@ -30,15 +30,6 @@ export function yearsMonths(months: number | undefined | null): string {
   return r ? `${y}년 ${r}개월` : `${y}년`;
 }
 
-/**
- * 잠긴 값. 자릿수와 쉼표는 남기고 숫자만 가린다 — 빈칸이면 "뭘 사는 건지" 알 수 없고,
- * 자릿수가 보이면 가려진 게 비어 있지 않다는 증거가 된다 (통행료가 아니라 궁금증이 되게).
- * 가짜 숫자를 보여 주지는 않는다.
- */
-export function maskDigits(text: string): string {
-  return text.replace(/\d/g, "•");
-}
-
 export function pct(ratio: number | null | undefined, digits = 1): string {
   if (ratio === null || ratio === undefined) return "-";
   return `${(ratio * 100).toFixed(digits)}%`;
@@ -60,13 +51,6 @@ export function daysUntil(dateIso: string | undefined, now = new Date()): number
 }
 
 // D-n 표시는 lib/phase.ts의 phaseLabel이 한다 — 마감일만 보면 접수 전 공고에도 D-n이 붙는다.
-
-/** "2026-09-30" → "9.30" */
-export function shortDate(iso: string | undefined): string {
-  if (!iso) return "?";
-  const [, m, d] = iso.split("-");
-  return `${Number(m)}.${Number(d)}`;
-}
 
 /** 문장 안에서 쓰는 날짜: "2026년 9월 30일" */
 export function longDate(iso: string | undefined): string {
@@ -118,20 +102,6 @@ export function looseDate(value: string | undefined): string {
 
 // 공급 유형 이름은 엔진 한 곳에 둔다 — 수집기(인스타 대본)도 같은 이름을 써야 한다
 export { HOUSING_LABEL, housingLabel } from "@housing/engine";
-
-export const CATEGORY_LABEL: Record<string, string> = {
-  income: "소득",
-  asset: "총자산",
-  car_value: "자동차",
-  debt: "부채",
-  residence: "거주지",
-  housing: "무주택",
-  marriage: "혼인",
-  children: "자녀",
-  age: "나이",
-  subscription: "청약통장",
-  commute: "통근",
-};
 
 /**
  * 큰 금액을 한글로 읽어 준다: 43,520,000 → "4천3백52만 원".

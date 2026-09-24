@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { goBackOrHome } from "@/lib/nav";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { PanResponder, Pressable, ScrollView, View } from "react-native";
+import { FlatList, PanResponder, Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
 import { computeRentalCost, conversionScenario, displayTrack, eligibleLoans, estimateMaintenance, loanLimit, maintenanceSourceLabel, shortfallPlans } from "@housing/engine";
 import { Icon } from "@/components/icon";
@@ -562,7 +562,7 @@ export default function Cost() {
         ) : null}
       </BottomSheet>
 
-      <BottomSheet visible={picker} onClose={() => setPicker(false)}>
+      <BottomSheet visible={picker} onClose={() => setPicker(false)} plain>
         <View style={{ gap: 4 }}>
           <T variant="heading">{picksHouse ? "어떤 집으로 볼까요?" : "어떤 주택형으로 볼까요?"}</T>
           <Sub tone="3">
@@ -586,8 +586,17 @@ export default function Cost() {
             ))}
           </View>
         ) : null}
-        <ScrollView style={{ maxHeight: 380 }} nestedScrollEnabled showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-          {rentals.map((r, i) => {
+        {/* 집이 수백 채다(014: 420채). 전부 그리면 시트가 열릴 때 멈춘다 — 보이는 줄만 그린다 (2026-09-24 감사). 시트는 plain, 스크롤은 여기서 */}
+        <FlatList
+          data={rentals}
+          keyExtractor={(r, i) => `${r.trackName}-${r.label}-${i}`}
+          style={{ maxHeight: 380 }}
+          contentContainerStyle={{ gap: 8 }}
+          initialNumToRender={12}
+          windowSize={7}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          renderItem={({ item: r, index: i }) => {
             const on = i === sel;
             return (
               <View key={`${r.trackName}-${r.label}-${i}`} style={{ flexDirection: "row", alignItems: "center", borderRadius: radius.md, backgroundColor: on ? colors.primarySoft : colors.card }}>
@@ -618,13 +627,15 @@ export default function Cost() {
               ) : null}
               </View>
             );
-          })}
-          {otherCount > 0 && !allTracks ? (
+          }}
+          ListFooterComponent={
+            otherCount > 0 && !allTracks ? (
             <Pressable onPress={() => { setAllTracks(true); }} accessibilityRole="button" style={{ padding: 14, alignItems: "center" }}>
               <T variant="bodyMedium" color={colors.text2}>다른 공급 유형 주택형 {otherCount}개 더 보기</T>
             </Pressable>
-          ) : null}
-        </ScrollView>
+          ) : null
+          }
+        />
       </BottomSheet>
 
       {/* 닫아도 내보내지 않는다 — 잠긴 화면 그대로 두는 편이 무엇을 사는지 더 잘 보여 준다 */}
