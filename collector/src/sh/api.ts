@@ -1,5 +1,6 @@
 import type { HousingType } from "@housing/schema";
 import { mapHousingType } from "../lh/mapping";
+import { resilientFetch } from "../http";
 
 /**
  * SH 서울주택도시개발공사 공고 수집기.
@@ -203,7 +204,7 @@ export interface ShListOptions {
 }
 
 export class ShClient {
-  constructor(private readonly fetchImpl: typeof fetch = fetch) {}
+  constructor(private readonly fetchImpl: typeof fetch = resilientFetch()) {}
 
   private async get(url: string): Promise<string> {
     const res = await this.fetchImpl(url, { headers: { "user-agent": "Mozilla/5.0 (compatible; housing-assistant/0.1)", referer: BASE } });

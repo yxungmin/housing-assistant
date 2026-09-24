@@ -74,7 +74,7 @@ const HOUSING_TYPES = new Set(["05", "06", "13", "39"]);
 
 export class LhResultClient {
   private cookie = "";
-  constructor(private readonly fetchImpl: typeof fetch = fetch) {}
+  constructor(private readonly fetchImpl: typeof fetch = resilientFetch()) {}
 
   /** 세션 쿠키를 받아 둔다. 없으면 POST가 빈 목록을 준다 */
   private async ensureSession(): Promise<void> {
@@ -144,3 +144,4 @@ export class LhResultClient {
 }
 
 export { parseEntries };
+import { resilientFetch } from "../http";

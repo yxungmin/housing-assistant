@@ -18,6 +18,7 @@
  * "7.2대 1"보다 "1순위에서 마감됐어요"가 내 순위와 직접 비교된다.
  */
 import { readSheet } from "../xlsx";
+import { resilientFetch } from "../http";
 
 const BASE = "https://apply.lh.or.kr/lhapply";
 const UA = "Mozilla/5.0 (compatible; housing-assistant/0.1)";
@@ -106,7 +107,7 @@ export const cutlineFileId = (html: string): string | undefined =>
 
 export class LhCutlineClient {
   private cookie = "";
-  constructor(private readonly fetchImpl: typeof fetch = fetch) {}
+  constructor(private readonly fetchImpl: typeof fetch = resilientFetch()) {}
 
   private async ensureSession(): Promise<void> {
     if (this.cookie) return;

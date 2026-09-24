@@ -19,6 +19,7 @@
  * 그래서 기준일은 우리가 받아온 시각으로 대신하고 화면에도 "기준"이 아니라 "확인"이라고 적는다.
  */
 import { PortalError, portalError } from "../portal";
+import { resilientFetch } from "../http";
 
 const BASE = "https://apis.data.go.kr/1613000/HWSPR03";
 
@@ -158,7 +159,7 @@ export function summarize(rows: WaitRow[]): WaitSummary | null {
 export class WaitClient {
   constructor(
     private readonly apiKey: string,
-    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly fetchImpl: typeof fetch = resilientFetch(),
   ) {}
 
   /** 시도·시군구의 대기현황. 한 번에 다 받아 두고 단지명으로 맞춘다 */

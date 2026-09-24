@@ -1,5 +1,6 @@
 import { mapHousingType, mapRegionCode, normalizeDate } from "./mapping";
 import type { HousingType } from "@housing/schema";
+import { resilientFetch } from "../http";
 
 /**
  * LH 분양임대공고 조회 서비스 (공공데이터포털, 제공기관 코드 B552555).
@@ -182,7 +183,7 @@ async function isImage(url: string, fetchImpl: typeof fetch): Promise<boolean> {
  * 그림으로 확인된 것만 남긴다. 순서는 공고가 준 대로 (위치도 → 조감도 → 배치도) 둔다.
  * 확인하지 못한 것은 버린다 — 화면의 깨진 그림 한 장은 "이 앱이 고장났다"로 읽힌다.
  */
-export async function resolveImages(images: LhImage[], fetchImpl: typeof fetch = fetch): Promise<LhImage[]> {
+export async function resolveImages(images: LhImage[], fetchImpl: typeof fetch = resilientFetch()): Promise<LhImage[]> {
   const out: LhImage[] = [];
   for (const img of images) {
     const url = directImageUrl(img.url);
@@ -255,7 +256,7 @@ export interface ListOptions {
 export class LhClient {
   constructor(
     private readonly apiKey: string,
-    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly fetchImpl: typeof fetch = resilientFetch(),
   ) {}
 
   private async get(path: string, params: Record<string, string | number | undefined>): Promise<unknown> {

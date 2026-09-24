@@ -7,6 +7,7 @@
  * 있는 것만 말한다 (apps/mobile/src/lib/commute.ts).
  */
 import type { NearbyKind } from "@housing/schema";
+import { resilientFetch } from "../http";
 
 export interface GeoResult {
   /** 법정동 코드 10자리. 실거래가 조회에는 앞 5자리를 쓴다 */
@@ -59,7 +60,7 @@ export function addressCandidates(address: string): string[] {
   return out;
 }
 
-export async function geocodeAddress(address: string, restKey: string, fetchImpl: typeof fetch = fetch): Promise<GeoResult | null> {
+export async function geocodeAddress(address: string, restKey: string, fetchImpl: typeof fetch = resilientFetch()): Promise<GeoResult | null> {
   const headers = { Authorization: `KakaoAK ${restKey}` };
   let doc: { x: string; y: string; address?: { b_code?: string } } | undefined;
   for (const query of addressCandidates(address)) {

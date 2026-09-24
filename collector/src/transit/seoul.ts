@@ -77,7 +77,7 @@ export class TransitClient {
 
   constructor(
     private readonly apiKey: string,
-    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly fetchImpl: typeof fetch = resilientFetch(),
   ) {}
 
   private async path(op: string, from: { lat: number; lng: number }, to: { lat: number; lng: number }): Promise<string> {
@@ -123,3 +123,4 @@ export class TransitClient {
 export function commuteText(c: Commute): string {
   return c.transfers > 0 ? `약 ${c.minutes}분 · 환승 ${c.transfers}회` : `약 ${c.minutes}분 · 환승 없음`;
 }
+import { resilientFetch } from "../http";

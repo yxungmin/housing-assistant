@@ -18,6 +18,7 @@
  * 호출은 수집할 때 법정동·월 단위로 한 번씩만 한다. 사용자 수와 무관하다.
  */
 import { PortalError, portalError, xmlTotalCount } from "../portal";
+import { resilientFetch } from "../http";
 
 const BASE = "https://apis.data.go.kr/1613000";
 
@@ -152,7 +153,7 @@ export const isUsable = (m: MarketRent): boolean => m.deals >= MIN_DEALS && m.je
 export class RentClient {
   constructor(
     private readonly apiKey: string,
-    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly fetchImpl: typeof fetch = resilientFetch(),
   ) {}
 
   /**

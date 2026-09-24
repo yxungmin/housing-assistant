@@ -16,6 +16,7 @@
 import { placeFor, REGION_LIST } from "@housing/schema";
 import { KakaoTransitClient } from "./kakao";
 import { TransitClient } from "./seoul";
+import { resilientFetch } from "../http";
 
 export type CommuteTable = Record<string, { minutes: number; transfers: number }>;
 
@@ -27,7 +28,7 @@ export async function commuteTable(
   to: { lat: number; lng: number },
   regionCodes: string[],
   keys: { kakao?: string; seoul?: string },
-  fetchImpl: typeof fetch = fetch,
+  fetchImpl: typeof fetch = resilientFetch(),
 ): Promise<CommuteTable | undefined> {
   const regions = regionCodes.length ? REGION_LIST.filter((r) => regionCodes.includes(r.code)) : REGION_LIST;
   if (regions.length === 0) return undefined;

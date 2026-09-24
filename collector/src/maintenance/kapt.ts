@@ -26,6 +26,7 @@
  */
 import { portalError } from "../portal";
 import { normalizeComplex } from "../wait/myhome";
+import { resilientFetch } from "../http";
 
 const BASE = "https://apis.data.go.kr/1613000";
 
@@ -259,7 +260,7 @@ export class KaptClient {
 
   constructor(
     private readonly apiKey: string,
-    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly fetchImpl: typeof fetch = resilientFetch(),
     /** 단지 기본정보 캐시. 넘기면 여기서 먼저 찾고, 새로 받은 것은 여기 넣는다 (저장은 부르는 쪽이) */
     private readonly basisCache: BasisCache = new Map(),
     /**

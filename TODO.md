@@ -319,7 +319,10 @@
       토스트가 ScrollView 안(화면 밖에 뜸) · 안드로이드 중첩 ScrollView 안 스크롤(집 목록 시트) · 시트 안 키보드가 입력 덮음 ·
       유료 만료자를 "구독 전·첫 달 0원"으로(스토어는 정가) · 로그인→구독 두 번 묻기, "로그인하면 첫 달 0원" 문구 거짓 ·
       하드웨어 백키가 온보딩 진행 버림 · 신청 완료 공고가 목록에서 빠지면 발표일 알림도 사라짐 · 오프라인인데 "오늘 기준"
-- [ ] **개발 P1** enrich.ts·run.ts 보강 단계 60줄 중복(이미 어긋남: preciseDong 가드가 enrich에만) → `enrichAnnouncement()` 하나 ·
+- [x] **개발 P1 (2026-09-24 처리)** `enrichAnnouncement()` 하나로 중복 제거 · ESLint(+react-hooks, CI) · `MatchOptions.today` · 매칭 캐시 `matchFor` + 카드 memo · 공통 fetch `resilientFetch` ·
+      번들 `unit_places`(1.21→0.96 MB). 남은 것: 시군구 라벨 3곳·"보여 줄 트랙" 4곳 통일, 집 목록 가상화(FlatList), 컨텍스트 상태/액션 분리, 테스트 없는 모듈, CI에 audit:match·db:check.
+      원래 목록 —
+      enrich.ts·run.ts 보강 단계 60줄 중복(이미 어긋남: preciseDong 가드가 enrich에만) → `enrichAnnouncement()` 하나 ·
       수집기 fetch 래퍼 없음(타임아웃·재시도·쉼이 kapt에만) · 시군구 라벨 3곳, "보여 줄 트랙" 4곳, 축약 표기 통일 완료 ·
       집 420채 목록 가상화 안 됨 · 컨텍스트 하나라 상태 하나 바뀌면 카드 전부 재렌더 · 매칭 캐시 없음(홈·관심·상세·비용이 따로 계산) ·
       엔진이 `new Date()`를 안에서 부름(`MatchOptions.today` 없음) · 테스트 없는 모듈(remote·sync·cache·appState·notifications, 수집기 geo·transit·db) ·

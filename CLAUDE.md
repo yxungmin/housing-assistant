@@ -119,6 +119,7 @@ npm run pdf:rehost [-- --apply]      # 기관 서버를 가리키는 공고문�
   이런 공고에서는 위치·통근 섹션을 끄고(좌표가 하나일 수 없다) 예상 주거비의 선택 대상이 주택형이 아니라 집이 된다.
 - 단지 그림은 LH 상세의 `dsSbdAhfl`에서 온다(첨부 `dsAhflInfo`와 별개 데이터셋).
   `AHFL_URL`은 그림이 아니라 그림 한 장을 담은 HTML 페이지다. 같은 fileid를 `lhFile.do`에 넣어야 그림 파일이 나온다(`resolveImages`).
+- 수집기 클라이언트의 기본 fetch는 `collector/src/http.ts`의 `resilientFetch()`다 — 시간 제한 15초, 5xx·429·네트워크 오류 2회 재시도. 테스트가 넘기는 가짜 fetch는 그대로 통한다.
 - 공공데이터포털 오류 껍데기(XML·JSON, returnReasonCode 04 장애·22 한도·30 키)는 `collector/src/portal.ts` 한 곳이 읽고 **던진다**.
   시세·대기현황·관리비 클라이언트가 각자 삼키다가 한도 초과를 "자료 없음"으로 저장한 적이 있다(2026-09-24). NODATA(03)만 자료 없음이다.
 - 앱 상태 저장은 둘로 나눈다: 프로필(소득·자산)은 SecureStore, 나머지 메타(관심·구독·본 공고 id…)는 `data/meta-store.ts`(문서 디렉터리 파일, 모아서 쓴다).

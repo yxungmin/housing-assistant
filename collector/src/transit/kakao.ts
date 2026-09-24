@@ -72,7 +72,7 @@ export class KakaoTransitClient {
 
   constructor(
     private readonly restKey: string,
-    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly fetchImpl: typeof fetch = resilientFetch(),
   ) {}
 
   async commute(from: { lat: number; lng: number }, to: { lat: number; lng: number }): Promise<KakaoCommute | null> {
@@ -100,3 +100,4 @@ export class KakaoTransitClient {
     return result;
   }
 }
+import { resilientFetch } from "../http";
