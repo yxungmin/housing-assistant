@@ -327,7 +327,7 @@
       집 420채 목록 가상화 안 됨 · 컨텍스트 하나라 상태 하나 바뀌면 카드 전부 재렌더 · 매칭 캐시 없음(홈·관심·상세·비용이 따로 계산) ·
       엔진이 `new Date()`를 안에서 부름(`MatchOptions.today` 없음) · 테스트 없는 모듈(remote·sync·cache·appState·notifications, 수집기 geo·transit·db) ·
       ESLint 없음(훅 규칙이 P0 크래시를 잡았을 것) · CI가 audit:match·db:check 안 돎
-- [ ] **P2** 데드 export 12개·안 쓰는 아이콘 10개·토큰 6개 · NoticeImages를 expo-image로 · 일회성 스크립트 정리 · 지오코딩 8종 카테고리 병렬화
+- [ ] **P2** 웹 콘솔에 `Encountered two children with the same key, 26` 경고가 남아 있다(어느 화면인지 미확인 — 번들 집 id 중복은 아님) · 데드 export 12개·안 쓰는 아이콘 10개·토큰 6개 · NoticeImages를 expo-image로 · 일회성 스크립트 정리 · 지오코딩 8종 카테고리 병렬화
 
 ## 무료 → 유료 전환
 
