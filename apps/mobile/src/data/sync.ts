@@ -26,7 +26,14 @@ export async function syncAnnouncementsOnce(savedIds: string[], onChanges?: (rec
   try {
     const before = currentAnnouncements();
     // 서버 목록이 그대로면 전체를 받지 않는다. 번들 목록에는 updated_at이 없어 첫 동기화는 늘 받는다.
-    if (before.some((a) => a.updated_at) && feedVersionKey(await fetchFeedVersion()) === feedVersionKey(localVersion(before))) return true;
+    if (before.some((a) => a.updated_at) && feedVersionKey(await fetchFeedVersion()) === feedVersionKey(localVersion(before))) {
+      // 같다는 확인도 동기화다 — 목록은 그대로 두고 "서버와 맞음·지금 확인함"으로 표시한다.
+      // 전에는 여기서 그냥 돌아가서 내 정보가 "마지막 동기화 데이터 (오프라인)"이라고 했다 (2026-09-24 실서버 확인)
+      const syncedAt = new Date().toISOString();
+      setAnnouncements(before, "remote", syncedAt);
+      await writeFeedCache({ syncedAt, list: before });
+      return true;
+    }
     const list = await fetchRemoteAnnouncements();
     const syncedAt = new Date().toISOString();
     setAnnouncements(list, "remote", syncedAt);
@@ -54,7 +61,13 @@ export function useAnnouncementSync(ready: boolean, savedIds: string[], onChange
       if (cached && !cancelled && remoteConfigured) setAnnouncements(cached.list, "cache", cached.syncedAt);
       if (!remoteConfigured) return;
       try {
-        if (cached?.list.some((a) => a.updated_at) && feedVersionKey(await fetchFeedVersion()) === feedVersionKey(localVersion(cached.list))) return;
+        if (cached?.list.some((a) => a.updated_at) && feedVersionKey(await fetchFeedVersion()) === feedVersionKey(localVersion(cached.list))) {
+          if (cancelled) return;
+          const syncedAt = new Date().toISOString();
+          setAnnouncements(cached.list, "remote", syncedAt);
+          await writeFeedCache({ syncedAt, list: cached.list });
+          return;
+        }
         const list = await fetchRemoteAnnouncements();
         if (cancelled) return;
         const before: Announcement[] = cached?.list ?? [];
