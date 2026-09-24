@@ -67,18 +67,19 @@ export function Illustration({ name, width = 220 }: { name: IllustrationName; wi
     );
   }
 
-  // saved: 집 카드 하나와 그 옆에 아직 비어 있는 책갈피.
+  // saved: 집 카드 하나와 그 오른쪽 모서리에 걸린 빈 책갈피. 카드가 캔버스를 채워야 그림으로 읽힌다 — 처음엔 60%만 써서 아이콘처럼 작았다.
   return (
     <Svg {...props}>
-      <Rect x={68} y={54} width={116} height={102} rx={14} fill={c.paper} stroke={c.gray} strokeWidth={2} />
-      <Path d="M92 96 L126 68 L160 96 Q162 100 157 101 L95 101 Q90 100 92 96 Z" fill={c.green} />
-      <Rect x={98} y={100} width={56} height={36} rx={6} fill={c.greenSoft} />
-      <Rect x={118} y={114} width={16} height={22} rx={3} fill={c.grayDeep} />
-      <Rect x={84} y={144} width={62} height={7} rx={3.5} fill={c.gray} />
-      <Path d="M196 78 L246 78 Q252 78 252 84 L252 156 L221 134 L190 156 L190 84 Q190 78 196 78 Z" fill={c.grayDeep} />
-      <Line x1={226} y1={56} x2={228} y2={44} stroke={c.greenSoft} strokeWidth={5} strokeLinecap="round" />
-      <Line x1={244} y1={64} x2={252} y2={56} stroke={c.greenSoft} strokeWidth={5} strokeLinecap="round" />
-      <Line x1={254} y1={82} x2={266} y2={80} stroke={c.greenSoft} strokeWidth={5} strokeLinecap="round" />
+      <Rect x={52} y={36} width={168} height={134} rx={18} fill={c.paper} stroke={c.gray} strokeWidth={2} />
+      <Path d="M86 92 L136 52 L186 92 Q189 97 183 98 L89 98 Q83 97 86 92 Z" fill={c.green} />
+      <Rect x={96} y={97} width={80} height={48} rx={8} fill={c.greenSoft} />
+      <Rect x={124} y={115} width={24} height={30} rx={4} fill={c.grayDeep} />
+      <Rect x={104} y={110} width={12} height={12} rx={3} fill={c.gray} />
+      <Rect x={156} y={110} width={12} height={12} rx={3} fill={c.gray} />
+      <Rect x={72} y={152} width={70} height={8} rx={4} fill={c.gray} />
+      <Path d="M196 62 L246 62 Q254 62 254 70 L254 168 L221 142 L188 168 L188 70 Q188 62 196 62 Z" fill={c.grayDeep} />
+      <Line x1={262} y1={48} x2={268} y2={34} stroke={c.green} strokeWidth={6} strokeLinecap="round" />
+      <Line x1={272} y1={66} x2={286} y2={60} stroke={c.green} strokeWidth={6} strokeLinecap="round" />
     </Svg>
   );
 }

@@ -185,7 +185,8 @@ export default function Home() {
       </View>
 
 
-      {outsideService ? (
+      {/* 맞는 공고가 0개면 아래 빈 카드가 같은 말을 하니 여기서는 접는다 — 같은 문장이 두 번 붙어 있었다 (2026-09-24) */}
+      {outsideService && matched.length > 0 ? (
         <Notice tone="info" icon="info">
           지금은 {SERVICE_REGION_LABEL} 공고만 모으고 있어요. {regionLabel} 공고는 아직 없어요.
         </Notice>
