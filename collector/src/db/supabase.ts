@@ -78,6 +78,8 @@ export class Repo {
     market?: object;
     waiting?: object;
     commute?: object;
+    /** K-apt 관리비 단가 (maintenance/kapt.ts). 못 구하면 없다 */
+    maintenance?: object;
     nearby?: Record<string, unknown>[];
   }): Promise<string> {
     const { data, error } = await this.sb

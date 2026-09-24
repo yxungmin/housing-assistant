@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { PanResponder, Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
-import { computeRentalCost, conversionScenario, eligibleLoans, loanLimit, matchAnnouncement, shortfallPlans } from "@housing/engine";
+import { computeRentalCost, conversionScenario, eligibleLoans, estimateMaintenance, loanLimit, maintenanceSourceLabel, matchAnnouncement, shortfallPlans } from "@housing/engine";
 import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SignInSheet } from "@/components/SignIn";
@@ -12,7 +12,7 @@ import { MissingAnnouncement } from "@/components/MissingAnnouncement";
 import { animateLayout, BigNumber, BottomCTA, BottomSheet, Card, Chip, FadeIn, Header, IconTile, KeyValue, LockNote, Notice, Redacted, PrimaryButton, Row, Screen, SectionTitle, Sub, T, Tag } from "@/components/ui";
 import { ReportSheet } from "@/components/ReportSheet";
 import { draftReport, findReport, REPORT_STATUS_LABEL, type ReportTarget } from "@/lib/reports";
-import { getAnnouncement, useAnnouncements } from "@/data/announcements";
+import { getAnnouncement, useAnnouncements, type Announcement } from "@/data/announcements";
 import { LOANS } from "@/data/loans";
 import { manwon, pct, won, dateText } from "@/lib/format";
 import { compareUnits, UNIT_SORT_LABEL, unitLabel, unitRent, unitsWithDistance, type UnitSort } from "@/lib/units";
@@ -37,6 +37,8 @@ interface RentalChoice {
   km?: number | null;
   /** 이 사람에게 적용되는 임대조건 */
   rent?: UnitRent;
+  /** 전용면적 (㎡). 관리비 추정(K-apt 단가 × 면적)에 쓴다. 없으면 기본값으로 돌아간다 */
+  area_m2?: number;
 }
 import { canOpenCost, useAppState } from "@/store/appState";
 import { accessLevel } from "@/lib/access";
@@ -82,6 +84,7 @@ export default function Cost() {
               unit,
               km,
               rent,
+              area_m2: unit.exclusive_area_m2,
               label: `${unitLabel(unit)}${unit.ho ? ` ${unit.ho}호` : ""}`,
               // 목록 한 줄에 들어갈 만큼만: 거리·크기·보증금. 나머지는 눌러서 본다.
               trackName: [
@@ -106,7 +109,16 @@ export default function Cost() {
     const match = matchAnnouncement(a.extraction, profile, { announcement_region: a.region_code, announcement_title: a.title });
     const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
     const ordered = [...(best ? [best] : []), ...match.tracks.filter((t) => t !== best)];
-    const rows = ordered.flatMap((t) => t.track.pricing.filter((p) => p.kind === "rental").map((p) => ({ label: `${p.unit_type}${p.tier ? ` · ${p.tier}` : ""}`, pricing: p, trackName: t.track.name })));
+    const rows = ordered.flatMap((t) =>
+      t.track.pricing
+        .filter((p) => p.kind === "rental")
+        .map((p) => ({
+          label: `${p.unit_type}${p.tier ? ` · ${p.tier}` : ""}`,
+          pricing: p,
+          trackName: t.track.name,
+          area_m2: t.track.unit_types.find((u) => u.name === p.unit_type)?.exclusive_area_m2,
+        })),
+    );
     const bestRows = rows.filter((r) => r.trackName === best?.track.name);
     return { rentals: allTracks || bestRows.length === 0 ? rows : bestRows, bestTrackName: best?.track.name ?? "", otherCount: rows.length - bestRows.length };
   }, [a, profile, allTracks, houseSort]);
@@ -202,7 +214,21 @@ export default function Cost() {
     const s = conversionScenario(chosen.pricing, deposit);
     return { ...chosen.pricing, deposit: s.deposit, monthly_rent: s.monthly_rent };
   }, [chosen, deposit]);
-  const cost = useMemo(() => (scenarioPricing && profile ? computeRentalCost(scenarioPricing, LOANS, profile, { preferredLoanId: loanId }) : null), [scenarioPricing, profile, loanId]);
+  /*
+   * 관리비. 공고문에 있으면 그 값, 없으면 K-apt 단가(단지 신고값 또는 같은 구 중앙값) × 이 주택형의 전용면적,
+   * 둘 다 없으면 엔진 기본값 10만 원. 어느 쪽인지는 아래 관리비 행이 밝힌다 — 추정을 사실처럼 보이게 하지 않는다.
+   */
+  const maint = useMemo(() => estimateMaintenance(a?.maintenance, chosen?.area_m2), [a?.maintenance, chosen?.area_m2]);
+  const cost = useMemo(
+    () =>
+      scenarioPricing && profile
+        ? computeRentalCost(scenarioPricing, LOANS, profile, {
+            preferredLoanId: loanId,
+            maintenance: maint && a?.maintenance ? { amount: maint.monthly, detail: maintenanceSourceLabel(a.maintenance) } : undefined,
+          })
+        : null,
+    [scenarioPricing, profile, loanId, maint, a?.maintenance],
+  );
   // 부족액을 더 빌렸을 때의 월 부담. 잠겨 있으면 계산하지 않는다 (유료 화면의 값이다).
   const plans = useMemo(
     () =>
@@ -417,8 +443,8 @@ export default function Cost() {
                 label="관리비"
                 value={won(cost.maintenance_estimate)}
                 amount={cost.maintenance_estimate}
-                note={base.maintenance_estimate === undefined ? "공고문에 없어 추정값을 썼어요" : undefined}
-                src={base.maintenance_estimate === undefined ? undefined : `공고문 ${base.source.page}쪽`}
+                note={maintenanceNote(base, a.maintenance, maint)}
+                src={base.maintenance_estimate !== undefined ? `공고문 ${base.source.page}쪽` : a.maintenance && maint ? maintenanceSourceLabel(a.maintenance) : undefined}
               />
               {cost.monthly_debt_payment > 0 ? <KeyValue label="기존 부채 상환" value={won(cost.monthly_debt_payment)} note="부담률 계산에만 넣어요" /> : null}
             </View>
@@ -856,4 +882,20 @@ function UnitDetail({ choice, onPick }: { choice: RentalChoice; onPick: () => vo
       <PrimaryButton label="이 집으로 계산하기" onPress={onPick} />
     </>
   );
+}
+
+/**
+ * 관리비 행의 한 줄. 추정이면 어떻게 추정했는지 말한다.
+ * 단지 신고값이면 공용과 사용료를 갈라 적고(사용료는 실제 사용량에 따라 달라진다),
+ * 지역 중앙값이면 공용만이라는 것과 전기·난방이 빠졌다는 것을 말한다.
+ */
+function maintenanceNote(base: Pricing, info: Announcement["maintenance"], est: ReturnType<typeof estimateMaintenance>): string | undefined {
+  if (base.maintenance_estimate !== undefined) return undefined;
+  if (!info || !est) return "공고문에 없어 추정값을 썼어요";
+  if (est.basis === "complex") {
+    return est.individual !== null
+      ? `이 단지 신고값으로 추정 · 공용 ${manwon(est.common)} + 전기·난방·수도 등 ${manwon(est.individual)} (사용량에 따라 달라요)`
+      : `이 단지 공용관리비 신고값으로 추정 · 전기·난방·수도는 따로예요`;
+  }
+  return `같은 구 ${info.sample ?? ""}개 단지 평균 단가 × 전용 ${est.area_m2.toFixed(1)}㎡ · 전기·난방·수도는 따로예요`;
 }

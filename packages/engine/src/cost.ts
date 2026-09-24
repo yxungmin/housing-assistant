@@ -86,7 +86,12 @@ export interface CostBreakdown {
 }
 
 export interface CostOptions {
-  /** 관리비 기재값이 없을 때 기본값 (원/월). 문서 미결 사항 — 기본 100,000 */
+  /**
+   * 관리비 기재값이 없을 때 쓰는 추정 (원/월)과 그 근거 한 줄.
+   * K-apt 단가 × 전용면적(maintenance.ts estimateMaintenance)에서 온다. 공고문 값이 있으면 그쪽이 이긴다.
+   */
+  maintenance?: { amount: number; detail: string };
+  /** 기재값도 추정도 없을 때 기본값 (원/월). 문서 미결 사항 — 기본 100,000 */
   defaultMaintenance?: number;
   /** 사용자가 고른 대출 상품 id. 없으면 금리가 가장 낮은(같으면 한도가 큰) 적용 가능 상품 */
   preferredLoanId?: string;
@@ -104,7 +109,7 @@ export function computeRentalCost(
   if (pricing.kind !== "rental") throw new Error("V0.1 비용 계산은 임대(rental)만 지원한다");
   const deposit = pricing.deposit ?? 0;
   const rent = pricing.monthly_rent ?? 0;
-  const maintenance = pricing.maintenance_estimate ?? options.defaultMaintenance ?? 100_000;
+  const maintenance = pricing.maintenance_estimate ?? options.maintenance?.amount ?? options.defaultMaintenance ?? 100_000;
 
   const eligible = eligibleLoans(loans, profile);
   const quotes = eligible.map((p) => loanLimit(p, deposit, profile)).filter((q) => q.amount > 0);
@@ -126,8 +131,9 @@ export function computeRentalCost(
   const sources: CostBreakdown["sources"] = [
     { label: "보증금·월임대료", detail: `공고문 ${pricing.source.page}쪽` },
   ];
-  if (pricing.maintenance_estimate === undefined) sources.push({ label: "관리비", detail: "공고문에 없어 추정값 사용" });
-  else sources.push({ label: "관리비", detail: `공고문 ${pricing.source.page}쪽` });
+  if (pricing.maintenance_estimate !== undefined) sources.push({ label: "관리비", detail: `공고문 ${pricing.source.page}쪽` });
+  else if (options.maintenance) sources.push({ label: "관리비", detail: options.maintenance.detail });
+  else sources.push({ label: "관리비", detail: "공고문에 없어 추정값 사용" });
   if (loan) sources.push({ label: "대출", detail: `${loan.product.name} · ${loan.as_of_date} 기준` });
 
   return {

@@ -110,7 +110,7 @@ begin
   select string_agg(c, ', ') into missing
   from unnest(array['id','lh_id','provider','title','housing_type','region_code','status',
                     'notice_date','apply_start','apply_end','pdf_url','detail_url','images',
-                    'lat','lng','transit','nearby','market','waiting','commute','units',
+                    'lat','lng','transit','nearby','market','waiting','commute','units','maintenance',
                     'extraction','checks']) c
   where not exists (
     select 1 from information_schema.columns

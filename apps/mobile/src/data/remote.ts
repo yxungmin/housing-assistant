@@ -40,6 +40,7 @@ interface FeedRow {
   complex: string | null;
   past_results: Announcement["past_results"] | null;
   commute: Announcement["commute"] | null;
+  maintenance: Announcement["maintenance"] | null;
   extraction: unknown | null;
 }
 
@@ -89,6 +90,7 @@ export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch):
       complex: r.complex ?? undefined,
       past_results: r.past_results?.length ? r.past_results : undefined,
       commute: r.commute ?? undefined,
+      maintenance: r.maintenance ?? undefined,
       extraction,
     });
   }

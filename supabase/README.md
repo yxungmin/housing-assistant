@@ -42,6 +42,10 @@
 0010_commute.sql         시군구별 통근 시간표 (단지형)
 0011_source_links.sql    공고 상세 주소·단지 그림
 0012_commute_cache.sql   흩어진 집의 통근 시간 캐시 (매입임대)
+0013_restore_auto_status.sql  뷰의 AUTO 상태 복구
+0014_announcement_complex_results.sql  단지 이름·지난 회차 결과
+0015_terms_consents.sql  약관 동의 기록
+0016_maintenance.sql     K-apt 관리비 단가 (관리비 추정을 10만 원 고정에서 단지·지역 실측으로)
 ```
 
 한 번에 몰아 붙이지 말 것 — 어디서 틀어졌는지 알 수 없다. 각 파일은 `Success. No rows returned`가 나오면 된 것이다.

@@ -94,7 +94,7 @@ npm run benchmark                    # 추출 벤치마크 (ANTHROPIC_API_KEY �
 npm run benchmark:fetch -- --count 10   # LH API에서 공고문 PDF 추가 수집 (LH_API_KEY 필요)
 npm run app:data                     # 초안/정답 → 앱 번들 데이터 (서비스 지역만, --all로 전부)
 npm run app:data -w @housing/collector -- --only 012,008   # 그 공고의 추출 결과만 번들에 갈아 끼움 (enrich 값은 그대로)
-npm run app:enrich [-- --links]      # 번들에 원문 링크·그림·좌표·시세·대기·통근 (LLM 없음, --links는 링크·그림만)
+npm run app:enrich [-- --links]      # 번들에 원문 링크·그림·좌표·시세·대기·관리비·통근 (LLM 없음, --links는 링크·그림만)
 npm run simulate [-- --full]         # 프로필 10종 × 지금 공고로 매칭 점검 (LLM 없음)
 npm run audit:match [-- --matrix]    # 프로필 6,480개 × 공고로 오추천·놓친 추천 감사 (LLM 없음)
 npm run social:script [-- --id 012] [--llm]   # 인스타 릴스 대본·캡션 JSON (--llm은 SOCIAL_COPY_ENABLED=true 필요)
@@ -122,6 +122,10 @@ npm run pdf:rehost [-- --apply]      # 기관 서버를 가리키는 공고문�
 - SH는 공개 API가 없어 게시판 HTML을 파싱한다. 구조가 바뀌면 깨지므로 파서 변경 시 `collector/test/sh.test.ts`의 실제 HTML 조각을 함께 갱신한다.
 - 제품 한 줄: 공고를 찾는 앱이 아니라 "이 공고가 나한테 맞는지 판단하는 앱". 지도·커뮤니티·복지정보는 V0.1에서 만들지 않는다 (`TODO.md`의 제품 포지션).
 - 비용 계산은 임대와 분양 둘 다 V0.1이다. 임대는 `engine/cost.ts`, 분양 납부 계획은 `engine/sale.ts`.
+  관리비는 공고문에 거의 없다. 수집기가 K-apt(`collector/src/maintenance/kapt.ts`)에서 단지 신고값(단지를 맞춘 경우, 세 달 평균)이나
+  같은 구 단지들의 중앙값(한 달, 공용만)을 **전용 1㎡당** 단가로 받아 `Announcement.maintenance`에 두고, 앱이 주택형의 전용면적을 곱한다(`engine/maintenance.ts`).
+  부과면적으로 나누면 전용→공급 비율을 짐작해야 해서 그렇게 하지 않는다. 둘 다 없을 때만 10만 원 기본값. 화면은 어느 쪽 값인지, 어느 달인지 밝힌다.
+  키는 `KAPT_API_KEY`(없으면 `MOLIT_API_KEY` — 공공데이터포털 키는 계정당 하나). 공고 1건에 약 85~90회 호출이라 하루 한도(1,000회)를 보며 돌린다.
   분양 비율은 공고문에서 읽은 payment_schedule만 쓰고 표준 비율을 짐작해 채우지 않는다.
 - 아이콘은 `src/components/icon` 배럴 하나로만 들어온다. 두 가족이 있고 섞지 않는다:
   MONO는 한 가지 색(`currentColor`)이라 쓰는 쪽이 색을 정하고, ASSET은 브랜드 색이 박혀 있어 `color`를 무시한다.

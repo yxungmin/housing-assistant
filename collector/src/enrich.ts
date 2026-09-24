@@ -1,5 +1,5 @@
 /**
- * 번들 데이터(apps/mobile/data/announcements.json)에 원문 링크·단지 이미지·좌표·주변·시세·대기현황·통근을 채운다.
+ * 번들 데이터(apps/mobile/data/announcements.json)에 원문 링크·단지 이미지·좌표·주변·시세·대기현황·관리비·통근을 채운다.
  *   npm run app:enrich
  *
  * Supabase가 붙기 전까지 쓰는 다리다. 수집기(run.ts)는 같은 일을 DB에 하고,
@@ -18,6 +18,7 @@ import { parseUnitList, pickUnitList } from "./units/list";
 import type { SupplyUnit } from "@housing/schema";
 import { shDetailUrl } from "./sh/api";
 import { commuteTable } from "./transit/table";
+import { KaptClient } from "./maintenance/kapt";
 import { WaitClient } from "./wait/myhome";
 
 const TARGET = fromRoot("apps", "mobile", "data", "announcements.json");
@@ -50,6 +51,9 @@ interface Row {
   complex?: string;
   past_results?: unknown;
   commute?: unknown;
+  /** K-apt 관리비 단가 (원/전용㎡/월). 단지 신고값 또는 같은 구 중앙값 */
+  maintenance?: unknown;
+  region_name?: string;
   extraction: { address?: string; tracks: { unit_types: { exclusive_area_m2?: number }[] }[] };
 }
 
@@ -216,7 +220,7 @@ for (const row of rows) {
     console.log(`${row.id}: 주소 없음 — 건너뜀`);
     continue;
   }
-  if (!force && row.lat !== undefined && row.market !== undefined && row.commute !== undefined && (row as Row & { b_code?: string }).b_code !== undefined) {
+  if (!force && row.lat !== undefined && row.market !== undefined && row.commute !== undefined && row.maintenance !== undefined && (row as Row & { b_code?: string }).b_code !== undefined) {
     console.log(`${row.id}: 이미 채워짐 — 건너뜀`);
     continue;
   }
@@ -262,7 +266,19 @@ for (const row of rows) {
     } else console.log(`  대기현황 단지 못 맞춤`);
   }
 
-  // 4) 통근 (시군구 × 이 단지)
+  // 4) 관리비 단가 (K-apt). 단지를 맞추면 그 단지 신고값, 못 맞추면 같은 구 중앙값.
+  //    구가 없는 법정동 코드(서울 전체)면 클라이언트가 스스로 건너뛴다.
+  const kaptKey = env.KAPT_API_KEY ?? env.MOLIT_API_KEY;
+  if ((force || row.maintenance === undefined) && bCode && kaptKey) {
+    const kapt = new KaptClient(kaptKey);
+    const m = await kapt.forAnnouncement({ sigunguCode: bCode.slice(0, 5), district: row.region_name ?? row.region_code, title: row.title, complex: row.complex, address }).catch(() => null);
+    if (m) {
+      row.maintenance = m;
+      console.log(`  관리비 ${m.basis === "complex" ? `${m.complex} 신고값` : `${m.district} ${m.sample}단지 중앙값`} · 공용 ${m.common_per_m2}원/㎡${m.individual_per_m2 ? ` + 사용료 ${m.individual_per_m2}원/㎡` : ""} (${m.months.join("·")}, ${kapt.calls}회)`);
+    } else console.log(`  관리비 단지·지역 표본 없음 (${kapt.calls}회)`);
+  }
+
+  // 5) 통근 (시군구 × 이 단지)
   if ((force || row.commute === undefined) && row.lat !== undefined) {
     const t = await commuteTable({ lat: row.lat, lng: row.lng! }, regions, { kakao: env.KAKAO_REST_API_KEY, seoul: env.TRANSIT_API_KEY }).catch(() => undefined);
     if (t) {

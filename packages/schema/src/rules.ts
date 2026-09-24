@@ -383,6 +383,30 @@ export const SupplyUnit = z.object({
 });
 export type SupplyUnit = z.infer<typeof SupplyUnit>;
 
+/**
+ * 관리비 단가 (K-apt 공동주택관리정보시스템, collector/src/maintenance/kapt.ts).
+ *
+ * 공고문에 관리비가 있는 일은 드물어 예상 주거비가 10만 원으로 고정해 왔다. 여기 단가에 앱이
+ * 주택형의 전용면적을 곱한다(engine/maintenance.ts). 단가는 **전용 1㎡당**이다 — 부과면적(공급면적)으로
+ * 나누면 전용→공급 비율을 짐작해야 하고, 그 짐작은 하지 않는다.
+ *
+ * basis: complex = 단지 이름을 맞춰 그 단지의 신고값(세 달 평균) / district = 같은 구 단지들의 중앙값(한 달, 공용만).
+ * 신축 공고는 단지가 아직 K-apt에 없어 대개 district다. 화면은 어느 쪽인지, 어느 달 값인지 밝힌다.
+ */
+export const Maintenance = z.object({
+  basis: z.enum(["complex", "district"]),
+  complex: z.string().optional().describe("맞춘 K-apt 단지명"),
+  kapt_code: z.string().optional(),
+  households: z.number().int().min(0).optional(),
+  district: z.string().optional().describe('평균의 범위 ("서울 강서구")'),
+  sample: z.number().int().min(1).optional().describe("중앙값에 들어간 단지 수"),
+  common_per_m2: z.number().min(0).describe("공용관리비 (원/전용㎡/월)"),
+  individual_per_m2: z.number().min(0).optional().describe("개별사용료 — 난방·전기·수도 등 (원/전용㎡/월). 단지를 맞춘 경우에만"),
+  months: z.array(z.string().regex(/^\d{4}-\d{2}$/)).min(1).describe("표본 달"),
+  source: z.string(),
+});
+export type Maintenance = z.infer<typeof Maintenance>;
+
 export const Announcement = z.object({
   id: z.string().uuid(),
   lh_id: z.string().min(1),
@@ -501,6 +525,7 @@ export const Announcement = z.object({
    *  - 직장 위치가 서버로 나가지 않는다. 앱은 표에서 찾아보기만 한다.
    */
   commute: z.record(z.string(), z.object({ minutes: z.number(), transfers: z.number() })).optional(),
+  maintenance: Maintenance.optional(),
   updated_at: z.string(),
 });
 export type Announcement = z.infer<typeof Announcement>;

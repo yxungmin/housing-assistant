@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { ExtractionOutput, HousingType, SupplyUnit, UserProfile } from "@housing/schema";
+import type { ExtractionOutput, HousingType, Maintenance, SupplyUnit, UserProfile } from "@housing/schema";
 import { matchAnnouncement, ruleCounts, type AnnouncementMatch, type TrackResult } from "@housing/engine";
 import { parsePlaceLabel, placeFor } from "@housing/schema";
 import raw from "../../data/announcements.json";
@@ -75,6 +75,8 @@ export interface Announcement {
   past_results?: PastResult[];
   /** 시군구 대표 좌표에서 여기까지 대중교통 소요. 키는 "서울 마포구" */
   commute?: Record<string, { minutes: number; transfers: number }>;
+  /** K-apt 관리비 단가 (원/전용㎡/월). 단지 신고값이거나 같은 구 중앙값. 없으면 예상 주거비가 기본값을 쓴다 */
+  maintenance?: Maintenance;
   /** 기관 사이트의 원문 공고문. 근거로 적은 쪽수를 실제로 열 수 있게 한다 */
   pdf_url?: string;
   /** 기관의 공고 상세 페이지. 공고문 PDF가 없는 공고에도 있다 */

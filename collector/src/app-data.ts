@@ -31,6 +31,7 @@ interface Meta {
   market?: Record<string, unknown>;
   waiting?: Record<string, unknown>;
   commute?: Record<string, { minutes: number; transfers: number }>;
+  maintenance?: Record<string, unknown>;
 }
 
 /**

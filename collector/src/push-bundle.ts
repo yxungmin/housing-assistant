@@ -48,6 +48,7 @@ interface BundleItem {
   market?: object;
   waiting?: object;
   commute?: object;
+  maintenance?: object;
   checks?: string[];
   extraction: unknown;
 }
@@ -97,6 +98,7 @@ async function main(): Promise<void> {
         market: it.market,
         waiting: it.waiting,
         commute: it.commute,
+        maintenance: it.maintenance,
         nearby: it.nearby,
       });
 

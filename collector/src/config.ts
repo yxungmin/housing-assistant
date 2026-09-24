@@ -19,6 +19,11 @@ const Env = z.object({
   MOLIT_API_KEY: z.string().optional(),
   /** 마이홈포털 예비입주자 대기현황 (공공데이터포털) */
   MYHOME_API_KEY: z.string().optional(),
+  /**
+   * K-apt 관리비 (공공데이터포털, 활용신청 4건: 단지 목록·기본정보·공용관리비·개별사용료).
+   * 공공데이터포털 키는 계정당 하나라 MOLIT_API_KEY와 같은 값이다. 비어 있으면 MOLIT_API_KEY를 쓴다.
+   */
+  KAPT_API_KEY: z.string().optional(),
   /** 서울시 대중교통 환승경로 (공공데이터포털). 통근 시간 계산용 */
   TRANSIT_API_KEY: z.string().optional(),
   /**

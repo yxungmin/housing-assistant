@@ -9,12 +9,13 @@
  *
  * 비용은 추출한 공고 수에 비례한다. COLLECT_REGIONS로 지역을 좁히면 그만큼 줄어든다 (기본 서울·경기).
  */
-import type { ExtractionOutput } from "@housing/schema";
+import { regionByCode, type ExtractionOutput } from "@housing/schema";
 import { loadEnv, requireEnv } from "./config";
 import { Repo } from "./db/supabase";
 import { geocodeAddress } from "./geo/kakao";
 import { isUsable, RentClient } from "./market/rent";
 import { commuteTable } from "./transit/table";
+import { KaptClient } from "./maintenance/kapt";
 import { WaitClient } from "./wait/myhome";
 import { LhClient, resolveImages } from "./lh/api";
 import { extractFromText } from "./llm/extract";
@@ -31,6 +32,13 @@ const dryRun = process.argv.includes("--dry-run") || extractionOff;
 const repo = dryRun ? null : new Repo(requireEnv(env, "SUPABASE_URL"), requireEnv(env, "SUPABASE_SERVICE_ROLE_KEY"), env.PDF_BUCKET);
 
 const regions = env.COLLECT_REGIONS.split(",").map((r) => r.trim()).filter(Boolean);
+
+/** "서울 강서구" — 관리비 지역 평균의 범위를 화면에 적기 위한 라벨. 주소 두 번째 어절이 시·군·구로 끝날 때만 붙인다 (앱 remote.ts와 같은 규칙) */
+function regionLabel(regionCode: string, address?: string): string {
+  const sido = regionByCode(regionCode)?.label ?? regionCode;
+  const token = address?.split(/\s+/)[1];
+  return token && /[시군구]$/.test(token) ? `${sido} ${token}` : sido;
+}
 const providers = env.COLLECT_PROVIDERS.split(",").map((p) => p.trim().toUpperCase()).filter(Boolean);
 
 const log = (msg: string) => console.log(`[${new Date().toISOString()}] ${msg}`);
@@ -136,6 +144,16 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       : null;
     if (waiting) log(`  대기현황: ${waiting.complex} 대기 ${waiting.total_waiting}명 (${waiting.as_of ?? "기준일 미상"})`);
 
+    // 관리비 단가: 단지를 맞추면 K-apt 신고값, 못 맞추면(신축) 같은 구 단지들의 중앙값. 앱이 전용면적을 곱한다.
+    const kaptKey = env.KAPT_API_KEY ?? env.MOLIT_API_KEY;
+    const maintenance =
+      geo?.b_code && kaptKey
+        ? await new KaptClient(kaptKey)
+            .forAnnouncement({ sigunguCode: geo.b_code.slice(0, 5), district: regionLabel(notice.region_code, address), title: notice.title, complex: detail.complex, address })
+            .catch(() => null)
+        : null;
+    if (maintenance) log(`  관리비: ${maintenance.basis === "complex" ? `${maintenance.complex} 신고값` : `${maintenance.district} ${maintenance.sample}단지 중앙값`} · 공용 ${maintenance.common_per_m2}원/㎡ (${maintenance.months.join("·")})`);
+
     // 통근 시간: 수집 대상 시도의 시군구 대표 좌표에서 이 단지까지 미리 계산한다.
     // 사용자마다 부르면 호출이 사용자 수에 비례하고 직장 위치도 서버로 나가야 한다.
     const commute = geo
@@ -167,6 +185,7 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
       nearby: geo?.nearby,
       market: market ?? undefined,
       waiting: waiting ?? undefined,
+      maintenance: maintenance ?? undefined,
       commute,
     });
   }
