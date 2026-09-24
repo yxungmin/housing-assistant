@@ -4,8 +4,7 @@
  *  - push_subscriptions: 푸시 토큰 + 관심 지역·유형 등록 (RLS: 익명 insert/update만)
  * 사용자 프로필은 절대 보내지 않는다. 설정은 apps/mobile/.env 의 EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY.
  */
-import { ExtractionOutput, type HousingType } from "@housing/schema";
-import { regionByCode } from "@/lib/regions";
+import { ExtractionOutput, regionNameOf, type HousingType } from "@housing/schema";
 import { toPayload, type LocalReport, type ReportStatus } from "@/lib/reports";
 import type { Announcement, Nearby, Transit } from "./announcements";
 
@@ -96,10 +95,6 @@ export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch):
     const extraction: ExtractionOutput = readable
       ? parsed!.data
       : { title: r.title, housing_type: r.housing_type, schedule: {}, tracks: [{ name: "-", unit_types: [], rule_groups: [], rules: [], pricing: [] }], notes: [] };
-    const sido = regionByCode(r.region_code)?.label ?? r.region_code;
-    // 주소의 두 번째 어절이 언제나 시군구는 아니다. SH 공고는 "서울특별시 일원(단지별 소재지 상이)"처럼 온다.
-    const token = extraction.address?.split(/\s+/)[1];
-    const sigungu = token && /[시군구]$/.test(token) ? token : undefined;
     out.push({
       id: r.id,
       lh_id: r.lh_id,
@@ -107,7 +102,7 @@ export async function fetchRemoteAnnouncements(fetchImpl: typeof fetch = fetch):
       title: r.title,
       housing_type: r.housing_type,
       region_code: r.region_code,
-      region_name: sigungu ? `${sido} ${sigungu}` : sido,
+      region_name: regionNameOf(r.region_code, extraction.address),
       status: readable ? (r.status === "VERIFIED" ? "VERIFIED" : "AUTO") : "UNVERIFIED",
       checks: r.checks?.length ? r.checks : undefined,
       notice_date: r.notice_date ?? extraction.schedule.notice_date,

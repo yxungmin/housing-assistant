@@ -3,7 +3,7 @@ import { goBackOrHome } from "@/lib/nav";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { PanResponder, Pressable, ScrollView, View } from "react-native";
 import type { Pricing } from "@housing/schema";
-import { computeRentalCost, conversionScenario, eligibleLoans, estimateMaintenance, loanLimit, maintenanceSourceLabel, shortfallPlans } from "@housing/engine";
+import { computeRentalCost, conversionScenario, displayTrack, eligibleLoans, estimateMaintenance, loanLimit, maintenanceSourceLabel, shortfallPlans } from "@housing/engine";
 import { Icon } from "@/components/icon";
 import { SubscriptionSheet } from "@/components/SubscriptionSheet";
 import { SignInSheet } from "@/components/SignIn";
@@ -108,7 +108,7 @@ export default function Cost() {
     }
 
     const match = matchFor(a, profile);
-    const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
+    const best = displayTrack(match);
     const ordered = [...(best ? [best] : []), ...match.tracks.filter((t) => t !== best)];
     const rows = ordered.flatMap((t) =>
       t.track.pricing

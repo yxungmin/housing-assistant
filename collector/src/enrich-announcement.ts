@@ -9,7 +9,7 @@
  * 이미 있는 값은 건너뛴다(force가 아니면). 어느 단계도 다음 단계를 막지 않는다 — 좌표만 예외다(시세·통근의 전제).
  */
 import type { UnitPlaces } from "@housing/schema";
-import { regionByCode } from "@housing/schema";
+import { regionNameOf } from "@housing/schema";
 import type { Env } from "./config";
 import { geocodeAddress } from "./geo/kakao";
 import { loadBasisCache, saveBasisCache } from "./maintenance/basis-cache";
@@ -68,11 +68,7 @@ export function representativeArea(extraction: EnrichInput["extraction"]): numbe
  * "서울 강서구" — 관리비 지역 평균의 범위를 화면에 적기 위한 라벨.
  * 주소 두 번째 어절이 시·군·구로 끝날 때만 붙인다 (앱 remote.ts와 같은 규칙). SH 공고는 "서울특별시 일원(…)"처럼 온다.
  */
-export function districtLabel(regionCode: string, address?: string): string {
-  const sido = regionByCode(regionCode)?.label ?? regionCode;
-  const token = address?.split(/\s+/)[1];
-  return token && /[시군구]$/.test(token) ? `${sido} ${token}` : sido;
-}
+export const districtLabel = (regionCode: string, address?: string): string => regionNameOf(regionCode, address);
 
 export async function enrichAnnouncement(input: EnrichInput, deps: EnrichDeps): Promise<EnrichPatch> {
   const { env, regions, force = false } = deps;

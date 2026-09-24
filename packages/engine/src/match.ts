@@ -679,6 +679,14 @@ function permanentRentalGuard(track: TrackResult, profile: UserProfile, title: s
   };
 }
 
+/**
+ * 화면에 보여 줄 트랙. 어긋난 조건이 없는 최선(best_track)이 있으면 그것, 없으면 맞은 조건이 가장 많은 트랙 —
+ * 조건이 안 맞는 공고도 "어디가 안 맞는지"는 보여 줘야 한다. 홈 카드·상세·예상 주거비·시뮬레이션이 같은 규칙을 쓴다.
+ */
+export function displayTrack(match: AnnouncementMatch): TrackResult | undefined {
+  return match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
+}
+
 export function matchAnnouncement(
   extraction: Pick<ExtractionOutput, "tracks">,
   profile: UserProfile,

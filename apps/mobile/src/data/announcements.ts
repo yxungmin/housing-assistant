@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { inflateUnits, type ExtractionOutput, type HousingType, type Maintenance, type SupplyUnit, type UnitPlaces, type UserProfile } from "@housing/schema";
-import { matchAnnouncement, ruleCounts, type AnnouncementMatch } from "@housing/engine";
+import { displayTrack, matchAnnouncement, ruleCounts, type AnnouncementMatch } from "@housing/engine";
 import { parsePlaceLabel, placeFor } from "@housing/schema";
 import raw from "../../data/announcements.json";
 import { distancesTo } from "@/lib/units";
@@ -219,7 +219,7 @@ export function matchAll(profile: UserProfile | null, list: Announcement[] = cur
       return { announcement: a, match: null, matched: 0, needsCheck: 0, total: 0, distanceKm, distancePartnerKm, residenceKm, nearestHouse };
     }
     const match = matchFor(a, profile, today);
-    const best = match.best_track ?? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0];
+    const best = displayTrack(match);
     // 화면에는 규칙 단위로 센다 ("조건 8개 중 7개 일치"). 일치 판정 자체는 엔진의 그룹 단위 결과를 따른다.
     const counts = best ? ruleCounts(best) : { matched: 0, needsCheck: 0, total: 0 };
     const { matched, needsCheck, total } = counts;

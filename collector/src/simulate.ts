@@ -13,7 +13,7 @@
  *  3. 빈칸 — "확인 필요"만 잔뜩 나오는 프로필이 있는가. 그런 사람에게 이 앱은 아무 말도 못 한 셈이다.
  */
 import { readFileSync } from "node:fs";
-import { haversineKm, matchAnnouncement, ruleCounts } from "@housing/engine";
+import { displayTrack, haversineKm, matchAnnouncement, ruleCounts } from "@housing/engine";
 import { placeFor, type UserProfile } from "@housing/schema";
 import { fromRoot } from "./paths";
 
@@ -177,7 +177,7 @@ for (const { name, profile } of PROFILES) {
 
   for (const row of readable) {
     const result = matchAnnouncement(row.extraction as never, profile, { announcement_region: row.region_code, announcement_title: row.title });
-    const best = result.best_track ?? [...result.tracks].sort((a, b) => b.summary.matched - a.summary.matched)[0];
+    const best = displayTrack(result);
     const counts = best ? ruleCounts(best) : { matched: 0, needsCheck: 0, total: 0 };
     const km = listKm(row, profile);
     if (result.is_match) {

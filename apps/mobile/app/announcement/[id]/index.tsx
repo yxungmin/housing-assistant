@@ -3,7 +3,7 @@ import { goBackOrHome } from "@/lib/nav";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import Constants from "expo-constants";
 import { Pressable, View } from "react-native";
-import { expectedRank, haversineKm, RANK_VS_PAST_LABEL, rankVsPast, type RuleResult, pastResultText, toughest } from "@housing/engine";
+import { displayTrack, expectedRank, haversineKm, RANK_VS_PAST_LABEL, rankVsPast, type RuleResult, pastResultText, toughest } from "@housing/engine";
 import { Icon, type IconName } from "@/components/icon";
 import { ReportSheet } from "@/components/ReportSheet";
 import { NoticeImages } from "@/components/NoticeImages";
@@ -59,7 +59,7 @@ export default function AnnouncementDetail() {
   const distancePartnerKm = to(state.profile?.workplace_partner);
 
   const match = useMemo(() => (a && isReadable(a) && state.profile ? matchFor(a, state.profile) : null), [a, state.profile]);
-  const track = match?.best_track ?? (match ? [...match.tracks].sort((x, y) => y.summary.matched - x.summary.matched)[0] ?? null : null);
+  const track = match ? displayTrack(match) ?? null : null;
   // 흩어진 공고는 임대조건이 공고문 본문이 아니라 주택 목록에 집마다 붙어 있다.
   // 목록을 읽었으면 계산할 수 있다 — 고르는 단위가 주택형이 아니라 집일 뿐이다.
   const hasUnitPricing = !!a?.units?.some((u) => u.deposit !== undefined);

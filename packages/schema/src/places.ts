@@ -147,6 +147,18 @@ export function placeFor(regionCode: string, sigungu?: string): Place | null {
   return { label: sigungu ? `${region.label} ${sigungu}` : region.label, lat: c[0], lng: c[1] };
 }
 
+/**
+ * "서울 강서구" — 시도 라벨 + 주소의 시군구 어절.
+ * 주소의 두 번째 어절이 언제나 시군구는 아니다. SH 공고는 "서울특별시 일원(단지별 소재지 상이)"처럼 와서
+ * 그대로 쓰면 "서울 일원(단지별"이 된다. 시·군·구로 끝나는 어절만 쓴다.
+ * 앱(remote.ts)·번들(app-data.ts)·수집기(enrich-announcement.ts) 세 곳이 각자 들고 있던 규칙이다 (2026-09-24 감사).
+ */
+export function regionNameOf(regionCode: string, address?: string, fallbackSido?: string): string {
+  const sido = regionByCode(regionCode)?.label ?? fallbackSido ?? regionCode;
+  const token = address?.split(/s+/)[1];
+  return token && /[시군구]$/.test(token) ? `${sido} ${token}` : sido;
+}
+
 /** "서울 마포구" 라벨 → 시도 코드·시군구 (프로필 workplace.label 역파싱) */
 export function parsePlaceLabel(label: string | undefined): { regionCode: string; sigungu?: string } | null {
   if (!label) return null;

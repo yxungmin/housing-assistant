@@ -6,7 +6,7 @@
  */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { ExtractionOutput, SERVICE_REGION_LABEL, SERVICE_REGIONS, type HousingType } from "@housing/schema";
+import { ExtractionOutput, regionNameOf, SERVICE_REGION_LABEL, SERVICE_REGIONS, type HousingType } from "@housing/schema";
 import { advisoryChecks, autoChecks, blockingChecks } from "./validate/autoChecks";
 import type { PdfMeta } from "./fetch-pdfs";
 import { fromRoot } from "./paths";
@@ -70,17 +70,14 @@ const SIDO: Record<string, string> = {
 };
 
 function metaFromApi(m: PdfMeta): Meta {
-  const sido = SIDO[m.region_code] ?? m.region_name;
-  // 주소의 두 번째 어절이 언제나 시군구는 아니다. SH 공고는 "서울특별시 일원(단지별 소재지 상이)"처럼 와서
-  // 그대로 쓰면 지역 이름이 "서울 일원(단지별"이 된다. 시·군·구로 끝나는 어절만 쓴다.
-  const token = m.address?.split(/\s+/)[1];
-  const sigungu = token && /[시군구]$/.test(token) ? token : undefined;
+  // 시군구 라벨 규칙은 schema places.ts 한 곳 (앱·수집기와 같다)
+  const regionName = regionNameOf(m.region_code, m.address, SIDO[m.region_code] ?? m.region_name);
   return {
     provider: m.provider,
     pdf_url: m.pdf_url,
     lh_id: m.lh_id,
     region_code: m.region_code,
-    region_name: sigungu ? `${sido} ${sigungu}` : sido,
+    region_name: regionName,
     apply_start: m.apply_start,
     apply_end: m.apply_end,
     ...MANUAL_COORDS[m.id],
