@@ -44,7 +44,11 @@ interface FeedRow {
   extraction: unknown | null;
 }
 
-const headers = () => ({ apikey: KEY!, Authorization: `Bearer ${KEY!}`, "Content-Type": "application/json" });
+/**
+ * 익명 요청 헤더. 옛 anon 키는 JWT라 Authorization에도 실어야 anon 역할이 되고,
+ * 새 publishable 키(sb_publishable_…)는 apikey만 받는다 — Bearer에 넣으면 JWT가 아니라며 거절된다 (2026-09-24).
+ */
+const headers = () => ({ apikey: KEY!, ...(KEY!.startsWith("eyJ") ? { Authorization: `Bearer ${KEY!}` } : {}), "Content-Type": "application/json" });
 
 /** 응답이 없으면 이만큼 기다리고 끊는다. 전에는 제한이 없어 끊긴 연결에서 새로고침 표시가 영영 돌았다 (2026-09-24 감사) */
 export const FEED_TIMEOUT_MS = 10_000;
