@@ -95,6 +95,8 @@ export interface MaintenanceInfo {
   district?: string;
   /** 평균에 들어간 단지 수 */
   sample?: number;
+  /** 표본 단지의 세대수 범위 [최소, 최대]. 공고 세대수와 비슷한 단지로 골랐을 때만 */
+  sample_households?: [number, number];
   /** 공용관리비 단가 (원/전용㎡/월). 표본 달의 평균 */
   common_per_m2: number;
   /** 개별사용료 단가 (원/전용㎡/월). 단지를 맞춘 경우에만 */
@@ -197,8 +199,9 @@ export function matchKaptComplex(rows: KaptComplex[], keys: { complex?: string; 
 }
 
 /**
- * 지역 평균의 표본 단지. 공공임대와 관리 방식이 비슷한 단지(임대·주공·휴먼시아 등)를 먼저 고르고
- * 모자라면 목록 순서대로 채운다. 모두 부르면 강서구만 212단지라 그럴 수 없다.
+ * 지역 평균의 표본 단지 — 공고 세대수를 모를 때의 예비 규칙.
+ * 공공임대와 관리 방식이 비슷한 단지(임대·주공·휴먼시아 등)를 먼저 고르고 모자라면 목록 순서대로 채운다.
+ * 이 규칙은 옛 주공 소단지로 쏠린다(008 실측: 등촌주공 넷, 2026-09-24). 세대수를 알면 아래 pickBySize를 쓴다.
  */
 export function pickDistrictSample(rows: KaptComplex[], size = 5): KaptComplex[] {
   const rental = /임대|주공|휴먼시아|LH|SH|국민|행복|공공|엠밸리|천왕|마곡/i;
@@ -207,11 +210,47 @@ export function pickDistrictSample(rows: KaptComplex[], size = 5): KaptComplex[]
   return [...first, ...rest].slice(0, size);
 }
 
+/**
+ * 공고 세대수와 비슷한 단지. 관리비 ㎡당 단가는 단지 크기에 가장 크게 좌우된다 —
+ * 경비·청소·승강기는 세대가 나눠 내는 고정비라 소단지가 비싸고 대단지가 싸다.
+ * 비율로 잰다(|ln(h/목표)|): 200세대 공고에 100세대와 400세대가 같은 거리다. 전용면적합이 없는 단지는 뺀다(분모다).
+ */
+export function pickBySize(candidates: KaptBasis[], households: number, size = 5): KaptBasis[] {
+  return candidates
+    .filter((b) => b.private_area_m2 && b.households && b.households > 0)
+    .map((b) => ({ b, d: Math.abs(Math.log(b.households! / households)) }))
+    .sort((x, y) => x.d - y.d || x.b.kapt_code.localeCompare(y.b.kapt_code))
+    .slice(0, size)
+    .map((x) => x.b);
+}
+
+/**
+ * 단지 기본정보 캐시. 세대수·전용면적합은 바뀌지 않는 값인데 목록 API에는 없어서 단지마다 한 번 물어야 한다
+ * (강서구 212단지 = 212회). 파일로 남겨 두면(collector/data/kapt-basis.json, 커밋) 구마다 한 번만 든다.
+ * null은 "물어봤는데 없더라" — 다시 묻지 않는다.
+ */
+export type BasisCache = Map<string, KaptBasis | null>;
+
 const median = (xs: number[]): number => {
   const s = [...xs].sort((a, b) => a - b);
   const mid = Math.floor(s.length / 2);
   return s.length % 2 ? s[mid]! : (s[mid - 1]! + s[mid]!) / 2;
 };
+
+export class KaptError extends Error {
+  constructor(
+    message: string,
+    readonly path: string,
+    /** 공공데이터포털 returnReasonCode. 22 = 하루 한도 초과, 30 = 키 미등록 */
+    readonly code?: string,
+  ) {
+    super(`K-apt ${message} — ${path}`);
+  }
+  /** 오늘은 더 불러도 소용없는 오류인가 */
+  get quotaExceeded(): boolean {
+    return this.code === "22";
+  }
+}
 
 export class KaptClient {
   /** 이번 실행에서 부른 횟수. 하루 한도를 보며 돌린다 */
@@ -220,20 +259,36 @@ export class KaptClient {
   constructor(
     private readonly apiKey: string,
     private readonly fetchImpl: typeof fetch = fetch,
+    /** 단지 기본정보 캐시. 넘기면 여기서 먼저 찾고, 새로 받은 것은 여기 넣는다 (저장은 부르는 쪽이) */
+    private readonly basisCache: BasisCache = new Map(),
   ) {}
 
+  /**
+   * 한 번 부른다. 오류는 **던진다** — 조용히 null로 바꾸면 "그 달 신고 없음"·"기본정보 없음"과 구별이 안 된다.
+   * 처음에 그렇게 했다가 한도 초과(XML 오류) 응답 24건을 "기본정보 없는 단지"로 캐시에 굳혔다(2026-09-24).
+   * 공공데이터포털 오류는 HTTP 200에 XML로 온다(`<returnReasonCode>22</returnReasonCode>` = 하루 한도 초과).
+   */
   private async get(path: string, params: Record<string, string>): Promise<unknown> {
     const p = new URLSearchParams({ serviceKey: this.apiKey, _type: "json", ...params });
     this.calls++;
     const res = await this.fetchImpl(`${BASE}/${path}?${p.toString()}`);
-    if (!res.ok) throw new Error(`K-apt HTTP ${res.status} (${path})`);
     const text = await res.text();
+    if (!res.ok) throw new KaptError(`HTTP ${res.status}`, path);
+    let payload: unknown;
     try {
-      return JSON.parse(text);
+      payload = JSON.parse(text);
     } catch {
-      // 키가 등록되지 않았거나 서비스가 없으면 XML 오류가 온다. 관리비는 있으면 좋은 값이라 조용히 넘어간다.
-      return null;
+      const code = text.match(/<returnReasonCode>(\d+)<\/returnReasonCode>/)?.[1];
+      const msg = text.match(/<returnAuthMsg>([^<]+)<\/returnAuthMsg>|<errMsg>([^<]+)<\/errMsg>/);
+      throw new KaptError(`${msg?.[1] ?? msg?.[2] ?? "응답이 JSON이 아님"}${code ? ` (코드 ${code})` : ""}`, path, code);
     }
+    // 같은 오류가 JSON으로도 온다: {"OpenAPI_ServiceResponse":{"cmmMsgHeader":{"returnReasonCode":"04",…}}} (2026-09-24 실측, K-apt 서버 장애)
+    const hdr = (payload as { OpenAPI_ServiceResponse?: { cmmMsgHeader?: { returnReasonCode?: string; returnAuthMsg?: string; errMsg?: string } } })?.OpenAPI_ServiceResponse?.cmmMsgHeader;
+    if (hdr) throw new KaptError(`${hdr.returnAuthMsg ?? hdr.errMsg ?? "오류"} (코드 ${hdr.returnReasonCode ?? "?"})`, path, hdr.returnReasonCode);
+    // 정상 응답의 header.resultCode. 00 정상, 03 NODATA(그 달 신고 없음·기본정보 없음 — 오류가 아니다), 나머지는 오류
+    const rc = (payload as { response?: { header?: { resultCode?: string; resultMsg?: string } } })?.response?.header;
+    if (rc?.resultCode && rc.resultCode !== "00" && rc.resultCode !== "03") throw new KaptError(`${rc.resultMsg ?? "오류"} (코드 ${rc.resultCode})`, path, rc.resultCode);
+    return payload;
   }
 
   /** 시군구(법정동 앞 5자리)의 단지 전부 */
@@ -248,7 +303,11 @@ export class KaptClient {
   }
 
   async basis(kaptCode: string): Promise<KaptBasis | null> {
-    return parseBasis(await this.get("AptBasisInfoServiceV5/getAphusBassInfoV5", { kaptCode }));
+    const cached = this.basisCache.get(kaptCode);
+    if (cached !== undefined) return cached;
+    const b = parseBasis(await this.get("AptBasisInfoServiceV5/getAphusBassInfoV5", { kaptCode }));
+    this.basisCache.set(kaptCode, b);
+    return b;
   }
 
   /** 한 달의 항목 합계. 모든 항목에 item이 없으면 undefined (신고 전인 달) */
@@ -318,11 +377,42 @@ export class KaptClient {
 
   /**
    * 같은 시군구 단지들의 공용관리비 단가 중앙값. 단지를 못 맞춘 공고(대개 신축)에 쓴다.
+   *
+   * 공고 세대수(households)를 알면 세대수가 비슷한 단지를 고른다 — 단가를 가장 크게 가르는 것이 단지 크기다.
+   * 그러려면 구 안의 모든 단지 기본정보가 필요한데(목록에는 세대수가 없다) 단지마다 1회라 캐시에 없는 것만
+   * basisBudget까지 새로 묻는다. 예산이 모자라면 아는 단지 안에서 고른다 — 다음 실행이 이어서 채운다.
+   * 세대수를 모르면 이름 규칙(pickDistrictSample)으로 돌아간다.
    * 3단지가 안 되면 null — 한두 단지로 "지역 평균"이라 하면 거짓이다.
    */
-  async forDistrict(rows: KaptComplex[], district: string, now: Date = new Date(), sampleSize = 5): Promise<MaintenanceInfo | null> {
-    const sample = pickDistrictSample(rows, sampleSize);
+  async forDistrict(
+    rows: KaptComplex[],
+    district: string,
+    opts: { households?: number; now?: Date; sampleSize?: number; basisBudget?: number } = {},
+  ): Promise<MaintenanceInfo | null> {
+    const { households, now = new Date(), sampleSize = 5, basisBudget = 250 } = opts;
+    let sample: KaptComplex[];
+    let bySize = false;
+    if (households && households > 0) {
+      let spent = 0;
+      for (const c of rows) {
+        if (this.basisCache.has(c.kapt_code)) continue;
+        if (spent >= basisBudget) break;
+        try {
+          await this.basis(c.kapt_code);
+        } catch (e) {
+          // 한도 초과·서버 장애면 더 물어도 소용없다. 아는 단지 안에서 고르고, 관리비 호출이 계속 실패하면 거기서 던진다.
+          if (e instanceof KaptError) break;
+          throw e;
+        }
+        spent++;
+      }
+      const known = rows.map((c) => this.basisCache.get(c.kapt_code)).filter((b): b is KaptBasis => !!b);
+      sample = pickBySize(known, households, sampleSize).map((b) => ({ kapt_code: b.kapt_code, name: b.name }));
+      bySize = sample.length > 0;
+    } else sample = pickDistrictSample(rows, sampleSize);
+
     const rates: number[] = [];
+    const sizes: number[] = [];
     let month: string | null = null;
     for (const c of sample) {
       const basis = await this.basis(c.kapt_code);
@@ -333,12 +423,14 @@ export class KaptClient {
       const total = await this.commonTotal(c.kapt_code, month);
       if (total === undefined || total <= 0) continue;
       rates.push(total / basis.private_area_m2);
+      if (basis.households) sizes.push(basis.households);
     }
     if (rates.length < 3 || !month) return null;
     return {
       basis: "district",
       district,
       sample: rates.length,
+      sample_households: bySize && sizes.length === rates.length ? [Math.min(...sizes), Math.max(...sizes)] : undefined,
       common_per_m2: Math.round(median(rates)),
       months: [monthLabel(month)],
       source: KAPT_SOURCE,
@@ -350,7 +442,16 @@ export class KaptClient {
    * sigunguCode는 법정동 코드 앞 5자리(지오코딩의 b_code). "1100000000"(서울 전체)처럼
    * 구가 없는 코드면 null — 서울 전체 평균은 어떤 집의 관리비도 아니다.
    */
-  async forAnnouncement(input: { sigunguCode: string; district: string; title: string; complex?: string; address?: string; now?: Date }): Promise<MaintenanceInfo | null> {
+  async forAnnouncement(input: {
+    sigunguCode: string;
+    district: string;
+    title: string;
+    complex?: string;
+    address?: string;
+    /** 공고 단지의 세대수 (LH 상세 HSH_CNT). 지역 표본을 비슷한 크기로 고르는 기준 */
+    households?: number;
+    now?: Date;
+  }): Promise<MaintenanceInfo | null> {
     if (!/^\d{5}$/.test(input.sigunguCode) || input.sigunguCode.endsWith("000")) return null;
     const rows = await this.listComplexes(input.sigunguCode);
     if (rows.length === 0) return null;
@@ -359,6 +460,6 @@ export class KaptClient {
       const info = await this.forComplex(hit, input.now);
       if (info) return info;
     }
-    return this.forDistrict(rows, input.district, input.now);
+    return this.forDistrict(rows, input.district, { households: input.households, now: input.now });
   }
 }

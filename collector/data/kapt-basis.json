@@ -1,0 +1,434 @@
+{
+ "A10021139": {
+  "kapt_code": "A10021139",
+  "name": "등촌월드메르디앙",
+  "households": 145,
+  "private_area_m2": 10935.75,
+  "levy_area_m2": 1975190,
+  "sale_kind": "분양",
+  "used_from": "2002-11-22"
+ },
+ "A10021770": {
+  "kapt_code": "A10021770",
+  "name": "염창현대2차아파트",
+  "households": 106,
+  "private_area_m2": 8321.14,
+  "levy_area_m2": 11583,
+  "sale_kind": "분양",
+  "used_from": "1993-12-23"
+ },
+ "A10021935": {
+  "kapt_code": "A10021935",
+  "name": "염창삼성한아름아파트",
+  "households": 140,
+  "private_area_m2": 11885.56,
+  "levy_area_m2": 13726.98,
+  "sale_kind": "분양",
+  "used_from": "1993-07-12"
+ },
+ "A10022042": {
+  "kapt_code": "A10022042",
+  "name": "염창대림아파트",
+  "households": 122,
+  "private_area_m2": 9285.03,
+  "levy_area_m2": 11143.129,
+  "sale_kind": "분양",
+  "used_from": "1999-10-26"
+ },
+ "A10022108": {
+  "kapt_code": "A10022108",
+  "name": "염창동강변코아루아파트",
+  "households": 130,
+  "private_area_m2": 12460.58,
+  "levy_area_m2": 15768.58,
+  "sale_kind": "분양",
+  "used_from": "2007-05-31"
+ },
+ "A10022233": {
+  "kapt_code": "A10022233",
+  "name": "등촌2차보람아파트",
+  "households": 101,
+  "private_area_m2": 7714.15,
+  "levy_area_m2": 602075.1,
+  "sale_kind": "분양",
+  "used_from": "2002-06-14"
+ },
+ "A10022348": {
+  "kapt_code": "A10022348",
+  "name": "등촌동코오롱오투빌2차아파트",
+  "households": 105,
+  "private_area_m2": 9040.03,
+  "levy_area_m2": 11206.73,
+  "sale_kind": "분양",
+  "used_from": "2002-12-02"
+ },
+ "A10022537": {
+  "kapt_code": "A10022537",
+  "name": "염창힐스테이트아파트",
+  "households": 135,
+  "private_area_m2": 11438.635,
+  "levy_area_m2": 11438.635,
+  "sale_kind": "분양",
+  "used_from": "2009-12-07"
+ },
+ "A10023075": {
+  "kapt_code": "A10023075",
+  "name": "지와인 아파트",
+  "households": 136,
+  "private_area_m2": 9233.526,
+  "levy_area_m2": 16556.514,
+  "sale_kind": "분양",
+  "used_from": "2023-06-30"
+ },
+ "A10023543": {
+  "kapt_code": "A10023543",
+  "name": "가양역두산위브아파트",
+  "households": 220,
+  "private_area_m2": 13350.49,
+  "levy_area_m2": 17271.08,
+  "sale_kind": "분양",
+  "used_from": "2022-03-11"
+ },
+ "A10023934": {
+  "kapt_code": "A10023934",
+  "name": "엘크루발산아파트",
+  "households": 252,
+  "private_area_m2": 4524.96,
+  "levy_area_m2": 9993.07,
+  "sale_kind": "임대",
+  "used_from": "2022-01-10"
+ },
+ "A10024353": {
+  "kapt_code": "A10024353",
+  "name": "염창현대아이파크아파트",
+  "households": 136,
+  "private_area_m2": 11353.36,
+  "levy_area_m2": 14535.321,
+  "sale_kind": "분양",
+  "used_from": "2005-07-22"
+ },
+ "A10024436": {
+  "kapt_code": "A10024436",
+  "name": "센터스퀘어등촌",
+  "households": 500,
+  "private_area_m2": 12164.04,
+  "levy_area_m2": 18233.18,
+  "sale_kind": "임대",
+  "used_from": "2020-12-30"
+ },
+ "A10025049": {
+  "kapt_code": "A10025049",
+  "name": "염창동길훈아파트",
+  "households": 115,
+  "private_area_m2": 9743.52,
+  "levy_area_m2": 12363.344,
+  "sale_kind": "분양",
+  "used_from": "1999-09-30"
+ },
+ "A10025600": {
+  "kapt_code": "A10025600",
+  "name": "e편한세상 염창",
+  "households": 499,
+  "private_area_m2": 36155.82,
+  "levy_area_m2": 46901.58,
+  "sale_kind": "혼합",
+  "used_from": "2019-03-08"
+ },
+ "A10027541": {
+  "kapt_code": "A10027541",
+  "name": "강서쌍용예가아파트",
+  "households": 152,
+  "private_area_m2": 12456.4357,
+  "levy_area_m2": 12457.38,
+  "sale_kind": "분양",
+  "used_from": "2014-06-11"
+ },
+ "A15704001": {
+  "kapt_code": "A15704001",
+  "name": "염창2차한화꿈에그린",
+  "households": 163,
+  "private_area_m2": 12477.45,
+  "levy_area_m2": 12477.45,
+  "sale_kind": "분양",
+  "used_from": "2006-04-27"
+ },
+ "A15704002": {
+  "kapt_code": "A15704002",
+  "name": "염창 일신건영휴먼빌아파트",
+  "households": 166,
+  "private_area_m2": 13747.4,
+  "levy_area_m2": 17793.6,
+  "sale_kind": "분양",
+  "used_from": "2004-11-19"
+ },
+ "A15704003": {
+  "kapt_code": "A15704003",
+  "name": "염창월드메르디앙",
+  "households": 168,
+  "private_area_m2": 13017.72,
+  "levy_area_m2": 16449.582,
+  "sale_kind": "분양",
+  "used_from": "2004-07-01"
+ },
+ "A15704006": {
+  "kapt_code": "A15704006",
+  "name": "염창우성3차",
+  "households": 196,
+  "private_area_m2": 16650.48,
+  "levy_area_m2": 22677.69,
+  "sale_kind": "분양",
+  "used_from": "1993-01-15"
+ },
+ "A15704007": {
+  "kapt_code": "A15704007",
+  "name": "염창1차보람더하임아파트",
+  "households": 202,
+  "private_area_m2": 19018.04,
+  "levy_area_m2": 19018.04,
+  "sale_kind": "혼합",
+  "used_from": "2008-01-10"
+ },
+ "A15704009": {
+  "kapt_code": "A15704009",
+  "name": "염창벽산늘푸른",
+  "households": 206,
+  "private_area_m2": 14780.69,
+  "levy_area_m2": 18959.2,
+  "sale_kind": "분양",
+  "used_from": "1998-11-05"
+ },
+ "A15704015": {
+  "kapt_code": "A15704015",
+  "name": "염창롯데캐슬",
+  "households": 284,
+  "private_area_m2": 29634.6924,
+  "levy_area_m2": 37331.69,
+  "sale_kind": "분양",
+  "used_from": "2005-03-28"
+ },
+ "A15704017": {
+  "kapt_code": "A15704017",
+  "name": "염창강변성원",
+  "households": 297,
+  "private_area_m2": 23812.89,
+  "levy_area_m2": 30345,
+  "sale_kind": "분양",
+  "used_from": "2001-06-30"
+ },
+ "A15704023": {
+  "kapt_code": "A15704023",
+  "name": "강변힐스테이트",
+  "households": 417,
+  "private_area_m2": 34161.24,
+  "levy_area_m2": 44500.89,
+  "sale_kind": "분양",
+  "used_from": "2005-06-28"
+ },
+ "A15704025": {
+  "kapt_code": "A15704025",
+  "name": "염창강변한솔솔파크",
+  "households": 455,
+  "private_area_m2": 38635.07,
+  "levy_area_m2": 49288.27,
+  "sale_kind": "분양",
+  "used_from": "2005-09-23"
+ },
+ "A15704028": {
+  "kapt_code": "A15704028",
+  "name": "염창동아1차",
+  "households": 778,
+  "private_area_m2": 63830.79,
+  "levy_area_m2": 82539.18,
+  "sale_kind": "분양",
+  "used_from": "1998-06-29"
+ },
+ "A15776001": {
+  "kapt_code": "A15776001",
+  "name": "염창강변월드메르디앙",
+  "households": 164,
+  "private_area_m2": 15071.4559,
+  "levy_area_m2": 14806,
+  "sale_kind": "분양",
+  "used_from": "2010-03-30"
+ },
+ "A15776002": {
+  "kapt_code": "A15776002",
+  "name": "태진드림피아",
+  "households": 65,
+  "private_area_m2": 5248.27,
+  "levy_area_m2": 130,
+  "sale_kind": "분양",
+  "used_from": "2003-03-28"
+ },
+ "A15776003": {
+  "kapt_code": "A15776003",
+  "name": "이너스내안에",
+  "households": 105,
+  "private_area_m2": 7771.77,
+  "levy_area_m2": 7603.77,
+  "sale_kind": "분양",
+  "used_from": "2004-09-24"
+ },
+ "A15776004": {
+  "kapt_code": "A15776004",
+  "name": "현대3",
+  "households": 127,
+  "private_area_m2": 8942.08,
+  "levy_area_m2": 11958.048,
+  "sale_kind": "분양",
+  "used_from": "1996-10-05"
+ },
+ "A15785919": {
+  "kapt_code": "A15785919",
+  "name": "염창우성1차",
+  "households": 339,
+  "private_area_m2": 25713.64,
+  "levy_area_m2": 34265.023,
+  "sale_kind": "분양",
+  "used_from": "1990-11-09"
+ },
+ "A15786104": {
+  "kapt_code": "A15786104",
+  "name": "삼성하나로",
+  "households": 178,
+  "private_area_m2": 12640.92,
+  "levy_area_m2": 18404.36,
+  "sale_kind": "분양",
+  "used_from": "1994-02-22"
+ },
+ "A15786111": {
+  "kapt_code": "A15786111",
+  "name": "염창극동",
+  "households": 249,
+  "private_area_m2": 19522.605,
+  "levy_area_m2": 25657.6,
+  "sale_kind": "분양",
+  "used_from": "2000-05-27"
+ },
+ "A15786116": {
+  "kapt_code": "A15786116",
+  "name": "염창금호",
+  "households": 290,
+  "private_area_m2": 20585.04,
+  "levy_area_m2": 26419.824,
+  "sale_kind": "분양",
+  "used_from": "1999-04-02"
+ },
+ "A15786118": {
+  "kapt_code": "A15786118",
+  "name": "염창한마음삼성",
+  "households": 330,
+  "private_area_m2": 24267.6,
+  "levy_area_m2": 32649,
+  "sale_kind": "분양",
+  "used_from": "1995-07-08"
+ },
+ "A15786213": {
+  "kapt_code": "A15786213",
+  "name": "염창무학",
+  "households": 273,
+  "private_area_m2": 20786.7,
+  "levy_area_m2": 28483.32,
+  "sale_kind": "분양",
+  "used_from": "1999-03-31"
+ },
+ "A15786222": {
+  "kapt_code": "A15786222",
+  "name": "염창태진한솔",
+  "households": 356,
+  "private_area_m2": 26754.82,
+  "levy_area_m2": 34294.203,
+  "sale_kind": "분양",
+  "used_from": "1994-10-05"
+ },
+ "A15786227": {
+  "kapt_code": "A15786227",
+  "name": "염창동아3차",
+  "households": 570,
+  "private_area_m2": 41219.48,
+  "levy_area_m2": 54072.703,
+  "sale_kind": "분양",
+  "used_from": "1999-01-18"
+ },
+ "A15786312": {
+  "kapt_code": "A15786312",
+  "name": "염창극동상록수",
+  "households": 256,
+  "private_area_m2": 18869.01,
+  "levy_area_m2": 25452.22,
+  "sale_kind": "분양",
+  "used_from": "1999-10-27"
+ },
+ "A15786314": {
+  "kapt_code": "A15786314",
+  "name": "염창태영송화",
+  "households": 277,
+  "private_area_m2": 21604.56,
+  "levy_area_m2": 28867.28,
+  "sale_kind": "분양",
+  "used_from": "1999-11-11"
+ },
+ "A15786321": {
+  "kapt_code": "A15786321",
+  "name": "염창관음삼성",
+  "households": 350,
+  "private_area_m2": 27028.98,
+  "levy_area_m2": 35379.26,
+  "sale_kind": "분양",
+  "used_from": "1997-08-01"
+ },
+ "A15786405": {
+  "kapt_code": "A15786405",
+  "name": "염창우성2차",
+  "households": 186,
+  "private_area_m2": 14737.92,
+  "levy_area_m2": 19141.152,
+  "sale_kind": "분양",
+  "used_from": "1992-05-20"
+ },
+ "A15786408": {
+  "kapt_code": "A15786408",
+  "name": "삼정그린코아",
+  "households": 206,
+  "private_area_m2": 19580.431,
+  "levy_area_m2": 26305.574,
+  "sale_kind": "분양",
+  "used_from": "2001-05-31"
+ },
+ "A15786420": {
+  "kapt_code": "A15786420",
+  "name": "염창신동아",
+  "households": 348,
+  "private_area_m2": 25128.12,
+  "levy_area_m2": 32102.4,
+  "sale_kind": "분양",
+  "used_from": "1995-12-13"
+ },
+ "A15786424": {
+  "kapt_code": "A15786424",
+  "name": "염창한화꿈에그린",
+  "households": 422,
+  "private_area_m2": 35503.96,
+  "levy_area_m2": 46699.44,
+  "sale_kind": "분양",
+  "used_from": "2005-04-01"
+ },
+ "A15786426": {
+  "kapt_code": "A15786426",
+  "name": "염창현대1차",
+  "households": 498,
+  "private_area_m2": 42076.03,
+  "levy_area_m2": 57996.81,
+  "sale_kind": "분양",
+  "used_from": "1994-04-21"
+ },
+ "A15786510": {
+  "kapt_code": "A15786510",
+  "name": "염창한강동아(2차)",
+  "households": 212,
+  "private_area_m2": 17376.77,
+  "levy_area_m2": 22915.61,
+  "sale_kind": "분양",
+  "used_from": "1998-07-21"
+ }
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { KaptClient, matchKaptComplex, parseBasis, parseComplexList, pickDistrictSample, shiftMonth, sumCostItem, type KaptComplex } from "../src/maintenance/kapt";
+import { KaptClient, KaptError, matchKaptComplex, parseBasis, parseComplexList, pickDistrictSample, shiftMonth, sumCostItem, type KaptComplex } from "../src/maintenance/kapt";
 
 /** 2026-09-24 실응답 (강서구 목록 3건) */
 const LIST = {
@@ -151,6 +151,51 @@ describe("KaptClient", () => {
     expect(urls.length).toBe(1 + 5 * 18 + 1);
   });
 
+  it("공고 세대수를 알면 구 안의 모든 단지 기본정보를 받아 비슷한 크기로 고른다 — 캐시에 남는다", async () => {
+    // 10단지, 세대수 100·200·…·1000. 공고 350세대 → 비율로 가까운 300·400·200·500·600 (|ln| 순)
+    const rows = Array.from({ length: 10 }, (_, i) => ({ kaptCode: `C${i + 1}`, kaptName: `단지${i + 1}` }));
+    const size: Record<string, number> = Object.fromEntries(rows.map((r, i) => [r.kaptCode, (i + 1) * 100]));
+    const cache = new Map();
+    const { fetch, urls } = fakeFetch((path, q) => {
+      if (path.startsWith("AptListService4")) return { response: { body: { items: rows, totalCount: rows.length } } };
+      if (path.startsWith("AptBasisInfoServiceV5")) {
+        const code = q.get("kaptCode")!;
+        return { response: { body: { item: { kaptCode: code, kaptName: `단지${code}`, privArea: "1000", kaptdaCnt: size[code] } } } };
+      }
+      if (path.endsWith("getHsmpLaborCostInfoV3")) return item({ pay: size[q.get("kaptCode")!]! * 1000 }); // 단가 = 세대수 (원/㎡)
+      return item({ x: 0 });
+    });
+    const info = await new KaptClient("k", fetch, cache).forAnnouncement({ sigunguCode: "11500", district: "서울 강서구", title: "신축", households: 350, now });
+    expect(info).toMatchObject({ basis: "district", sample: 5, sample_households: [200, 600], common_per_m2: 400 });
+    // 기본정보는 10단지 모두 한 번씩만 (표본 5단지도 캐시에서 다시 읽는다) + 목록 1 + 최신 달 1 + 5 × 17
+    expect(urls.filter((u) => u.includes("AptBasisInfoServiceV5")).length).toBe(10);
+    expect(urls.length).toBe(1 + 10 + 1 + 5 * 17);
+    expect(cache.size).toBe(10);
+
+    // 두 번째 실행은 캐시로 기본정보 호출이 0
+    const again = fakeFetch((path, q) => {
+      if (path.startsWith("AptListService4")) return { response: { body: { items: rows, totalCount: rows.length } } };
+      if (path.startsWith("AptBasisInfoServiceV5")) throw new Error("캐시가 있으면 기본정보를 다시 묻지 않는다");
+      if (path.endsWith("getHsmpLaborCostInfoV3")) return item({ pay: size[q.get("kaptCode")!]! * 1000 });
+      return item({ x: 0 });
+    });
+    await new KaptClient("k", again.fetch, cache).forAnnouncement({ sigunguCode: "11500", district: "서울 강서구", title: "신축", households: 350, now });
+    expect(again.urls.filter((u) => u.includes("AptBasisInfoServiceV5")).length).toBe(0);
+  });
+
+  it("기본정보 예산이 모자라면 아는 단지 안에서 고른다", async () => {
+    const rows = Array.from({ length: 10 }, (_, i) => ({ kaptCode: `C${i + 1}`, kaptName: `단지${i + 1}` }));
+    const { fetch, urls } = fakeFetch((path, q) => {
+      if (path.startsWith("AptListService4")) return { response: { body: { items: rows, totalCount: rows.length } } };
+      if (path.startsWith("AptBasisInfoServiceV5")) return { response: { body: { item: { kaptCode: q.get("kaptCode"), kaptName: "x", privArea: "1000", kaptdaCnt: 300 } } } };
+      if (path.endsWith("getHsmpLaborCostInfoV3")) return item({ pay: 1_000_000 });
+      return item({ x: 0 });
+    });
+    const info = await new KaptClient("k", fetch, new Map()).forDistrict(rows.map((r) => ({ kapt_code: r.kaptCode, name: r.kaptName })), "서울 강서구", { households: 300, now, basisBudget: 4 });
+    expect(info?.sample).toBe(4);
+    expect(urls.filter((u) => u.includes("AptBasisInfoServiceV5")).length).toBe(4);
+  });
+
   it("표본이 3단지가 안 되면 지역 평균을 내지 않는다", async () => {
     const { fetch } = fakeFetch((path, q) => {
       if (path.startsWith("AptListService4")) return { response: { body: { items: [{ kaptCode: "P", kaptName: "가" }, { kaptCode: "Q", kaptName: "나" }], totalCount: 2 } } };
@@ -166,9 +211,36 @@ describe("KaptClient", () => {
     expect(urls).toEqual([]);
   });
 
-  it("XML 오류(키 미등록)가 와도 던지지 않는다", async () => {
-    const f = (async () => new Response("<OpenAPI_ServiceResponse><cmmMsgHeader><errMsg>SERVICE ERROR</errMsg></cmmMsgHeader></OpenAPI_ServiceResponse>", { status: 200 })) as typeof fetch;
-    expect(await new KaptClient("k", f).forAnnouncement({ sigunguCode: "11500", district: "서울 강서구", title: "x", now })).toBeNull();
+  it("포털 오류는 던진다 — XML도 JSON도. 오류를 '자료 없음'으로 캐시에 굳히지 않는다", async () => {
+    const xml = (async () => new Response("<OpenAPI_ServiceResponse><cmmMsgHeader><errMsg>SERVICE ERROR</errMsg><returnAuthMsg>LIMITED_NUMBER_OF_SERVICE_REQUESTS_EXCEEDS_ERROR</returnAuthMsg><returnReasonCode>22</returnReasonCode></cmmMsgHeader></OpenAPI_ServiceResponse>", { status: 200 })) as typeof fetch;
+    await expect(new KaptClient("k", xml).listComplexes("11500")).rejects.toMatchObject({ code: "22", quotaExceeded: true });
+
+    // 2026-09-24 실측: K-apt 서버 장애 때 JSON으로 온 오류
+    const json = (async () => new Response(JSON.stringify({ OpenAPI_ServiceResponse: { cmmMsgHeader: { errMsg: "HTTP_ERROR", returnAuthMsg: "HTTP 에러", returnReasonCode: "04" } } }), { status: 200 })) as typeof fetch;
+    const cache = new Map();
+    await expect(new KaptClient("k", json, cache).basis("A1")).rejects.toBeInstanceOf(KaptError);
+    expect(cache.size).toBe(0);
+
+    // 정상 껍데기의 NODATA(03)는 오류가 아니다 — 그 단지에 기본정보가 없다는 뜻이고, 그건 캐시한다
+    const nodata = (async () => new Response(JSON.stringify({ response: { header: { resultCode: "03", resultMsg: "NODATA_ERROR" }, body: {} } }), { status: 200 })) as typeof fetch;
+    expect(await new KaptClient("k", nodata, cache).basis("A2")).toBeNull();
+    expect(cache.get("A2")).toBeNull();
+  });
+
+  it("기본정보를 받는 도중 오류가 나면 아는 단지 안에서 고른다", async () => {
+    const rows = Array.from({ length: 6 }, (_, i) => ({ kaptCode: `C${i + 1}`, kaptName: `단지${i + 1}` }));
+    let basisCalls = 0;
+    const { fetch } = fakeFetch((path, q) => {
+      if (path.startsWith("AptListService4")) return { response: { body: { items: rows, totalCount: rows.length } } };
+      if (path.startsWith("AptBasisInfoServiceV5")) {
+        if (++basisCalls > 3) return { OpenAPI_ServiceResponse: { cmmMsgHeader: { returnReasonCode: "22" } } };
+        return { response: { body: { item: { kaptCode: q.get("kaptCode"), kaptName: "x", privArea: "1000", kaptdaCnt: 300 } } } };
+      }
+      if (path.endsWith("getHsmpLaborCostInfoV3")) return item({ pay: 1_000_000 });
+      return item({ x: 0 });
+    });
+    const info = await new KaptClient("k", fetch, new Map()).forAnnouncement({ sigunguCode: "11500", district: "서울 강서구", title: "x", households: 300, now });
+    expect(info?.sample).toBe(3);
   });
 });
 

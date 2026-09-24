@@ -35,5 +35,5 @@ export function maintenanceSourceLabel(info: Maintenance): string {
   const months = info.months.map((m) => `${m.slice(0, 4)}.${Number(m.slice(5, 7))}월`).join("·");
   return info.basis === "complex"
     ? `${info.complex ?? "이 단지"} 관리비 신고값 · ${months} · ${info.source}`
-    : `${info.district ?? "같은 구"} ${info.sample ?? ""}개 단지 단가 중앙값 · ${months} · ${info.source}`;
+    : `${info.district ?? "같은 구"} ${info.sample ?? ""}개 단지${info.sample_households ? `(${info.sample_households[0].toLocaleString()}~${info.sample_households[1].toLocaleString()}세대, 이 공고와 비슷한 크기)` : ""} 단가 중앙값 · ${months} · ${info.source}`;
 }

@@ -16,6 +16,7 @@ import { geocodeAddress } from "./geo/kakao";
 import { isUsable, RentClient } from "./market/rent";
 import { commuteTable } from "./transit/table";
 import { KaptClient } from "./maintenance/kapt";
+import { loadBasisCache } from "./maintenance/basis-cache";
 import { WaitClient } from "./wait/myhome";
 import { LhClient, resolveImages } from "./lh/api";
 import { extractFromText } from "./llm/extract";
@@ -148,8 +149,9 @@ async function processNotice(notice: CollectedNotice): Promise<"new" | "modified
     const kaptKey = env.KAPT_API_KEY ?? env.MOLIT_API_KEY;
     const maintenance =
       geo?.b_code && kaptKey
-        ? await new KaptClient(kaptKey)
-            .forAnnouncement({ sigunguCode: geo.b_code.slice(0, 5), district: regionLabel(notice.region_code, address), title: notice.title, complex: detail.complex, address })
+        ? // 단지 기본정보는 저장소의 캐시 파일을 읽는다 (Actions에서는 새로 받은 것을 저장하지 못한다 — enrich가 채워 커밋한다)
+          await new KaptClient(kaptKey, fetch, loadBasisCache())
+            .forAnnouncement({ sigunguCode: geo.b_code.slice(0, 5), district: regionLabel(notice.region_code, address), title: notice.title, complex: detail.complex, address, households: detail.households })
             .catch(() => null)
         : null;
     if (maintenance) log(`  관리비: ${maintenance.basis === "complex" ? `${maintenance.complex} 신고값` : `${maintenance.district} ${maintenance.sample}단지 중앙값`} · 공용 ${maintenance.common_per_m2}원/㎡ (${maintenance.months.join("·")})`);

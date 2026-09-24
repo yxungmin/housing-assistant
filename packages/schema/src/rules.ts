@@ -400,6 +400,7 @@ export const Maintenance = z.object({
   households: z.number().int().min(0).optional(),
   district: z.string().optional().describe('평균의 범위 ("서울 강서구")'),
   sample: z.number().int().min(1).optional().describe("중앙값에 들어간 단지 수"),
+  sample_households: z.tuple([z.number(), z.number()]).optional().describe("표본 단지 세대수 [최소, 최대]. 공고 세대수와 비슷한 단지로 골랐을 때만"),
   common_per_m2: z.number().min(0).describe("공용관리비 (원/전용㎡/월)"),
   individual_per_m2: z.number().min(0).optional().describe("개별사용료 — 난방·전기·수도 등 (원/전용㎡/월). 단지를 맞춘 경우에만"),
   months: z.array(z.string().regex(/^\d{4}-\d{2}$/)).min(1).describe("표본 달"),

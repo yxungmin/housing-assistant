@@ -897,5 +897,6 @@ function maintenanceNote(base: Pricing, info: Announcement["maintenance"], est: 
       ? `이 단지 신고값으로 추정 · 공용 ${manwon(est.common)} + 전기·난방·수도 등 ${manwon(est.individual)} (사용량에 따라 달라요)`
       : `이 단지 공용관리비 신고값으로 추정 · 전기·난방·수도는 따로예요`;
   }
-  return `같은 구 ${info.sample ?? ""}개 단지 평균 단가 × 전용 ${est.area_m2.toFixed(1)}㎡ · 전기·난방·수도는 따로예요`;
+  const who = info.sample_households ? `세대수 비슷한 같은 구 ${info.sample ?? ""}개 단지` : `같은 구 ${info.sample ?? ""}개 단지`;
+  return `${who} 평균 단가 × 전용 ${est.area_m2.toFixed(1)}㎡ · 전기·난방·수도는 따로예요`;
 }

@@ -38,6 +38,8 @@ export interface ResolvedNotice {
    * SH는 게시판 HTML이라 이 값이 없다.
    */
   complex?: string;
+  /** 단지 세대수 (LH 상세 dsSbd.HSH_CNT). 관리비 지역 표본을 비슷한 크기로 고르는 기준 */
+  households?: number;
   apply_start?: string;
   apply_end?: string;
   correction_reason?: string;
@@ -95,6 +97,7 @@ function toLhNotice(client: LhClient, n: LhNoticeSummary): CollectedNotice {
         modified_key: `${list_key}|${detail.correction_reason ?? ""}`,
         address: detail.address,
         complex: detail.complex_name,
+        households: detail.households,
         apply_start: detail.apply_start,
         apply_end: detail.apply_end ?? n.apply_end,
         correction_reason: detail.correction_reason,

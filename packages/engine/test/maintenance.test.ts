@@ -28,5 +28,6 @@ describe("estimateMaintenance", () => {
   it("근거 문구는 어느 단지·어느 달인지 밝힌다", () => {
     expect(maintenanceSourceLabel(complex)).toBe("동문디이스트 관리비 신고값 · 2025.11월·2026.3월·2026.7월 · K-apt 공동주택관리정보시스템");
     expect(maintenanceSourceLabel(district)).toBe("서울 강서구 5개 단지 단가 중앙값 · 2026.7월 · K-apt 공동주택관리정보시스템");
+    expect(maintenanceSourceLabel({ ...district, sample_households: [180, 1200] })).toBe("서울 강서구 5개 단지(180~1,200세대, 이 공고와 비슷한 크기) 단가 중앙값 · 2026.7월 · K-apt 공동주택관리정보시스템");
   });
 });

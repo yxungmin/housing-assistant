@@ -19,6 +19,7 @@ import type { SupplyUnit } from "@housing/schema";
 import { shDetailUrl } from "./sh/api";
 import { commuteTable } from "./transit/table";
 import { KaptClient } from "./maintenance/kapt";
+import { loadBasisCache, saveBasisCache } from "./maintenance/basis-cache";
 import { WaitClient } from "./wait/myhome";
 
 const TARGET = fromRoot("apps", "mobile", "data", "announcements.json");
@@ -49,6 +50,8 @@ interface Row {
   waiting?: unknown;
   /** 공급기관이 부르는 단지 이름. 지난 회차 결과를 이을 때 쓴다 */
   complex?: string;
+  /** 단지 세대수 (LH 상세). 관리비 지역 표본을 비슷한 크기로 고르는 기준 */
+  households?: number;
   past_results?: unknown;
   commute?: unknown;
   /** K-apt 관리비 단가 (원/전용㎡/월). 단지 신고값 또는 같은 구 중앙값 */
@@ -82,7 +85,8 @@ async function fillSourceLinks(): Promise<number> {
     if (r.provider === "SH" && r.lh_id && (force || linksOnly || r.detail_url === undefined)) r.detail_url = shDetailUrl(r.lh_id);
   }
   const refill = force || linksOnly;
-  const targets = rows.filter((r) => r.provider === "LH" && r.lh_id && !r.lh_id.startsWith("MOCK") && (refill || r.detail_url === undefined));
+  // 세대수는 관리비 표본(2026-09-24)에 쓰는데 그 전 번들 행에는 없다. 상세 한 번으로 링크와 같이 채운다.
+  const targets = rows.filter((r) => r.provider === "LH" && r.lh_id && !r.lh_id.startsWith("MOCK") && (refill || r.detail_url === undefined || r.households === undefined));
   if (targets.length === 0) return rows.filter((r) => r.provider === "SH" && r.detail_url).length > 0 ? 1 : 0;
   if (!env.LH_API_KEY) {
     console.log(`원문 링크: LH_API_KEY 없음 — ${targets.length}건 건너뜀`);
@@ -101,6 +105,8 @@ async function fillSourceLinks(): Promise<number> {
     row.detail_url = summary.detail_url;
     const detail = await client.getNoticeDetail(summary).then(parseNoticeDetail).catch(() => null);
     if (detail) {
+      row.complex ??= detail.complex_name;
+      row.households ??= detail.households;
       // 기관이 준 주소를 그대로 쓴다. 우리 Storage에 올리는 것은 Supabase를 붙일 때 한다.
       row.pdf_url = pickNoticePdf(detail.attachments)?.url ?? row.pdf_url;
       // 주소를 한 번 펼쳐야 앱이 그림으로 띄울 수 있다 (resolveImages 주석 참고)
@@ -117,7 +123,7 @@ async function fillSourceLinks(): Promise<number> {
         if (row.units?.length === 0) row.units = undefined;
       }
     }
-    console.log(`${row.id}: 상세 링크 · 공고문 ${row.pdf_url ? "있음" : "없음"} · 이미지 ${row.images?.length ?? 0}장${row.units ? ` · 주택목록 ${row.units.length}호` : ""}`);
+    console.log(`${row.id}: 상세 링크 · 공고문 ${row.pdf_url ? "있음" : "없음"} · 이미지 ${row.images?.length ?? 0}장${row.households ? ` · ${row.households}세대` : ""}${row.units ? ` · 주택목록 ${row.units.length}호` : ""}`);
     filled++;
   }
   return filled;
@@ -270,11 +276,19 @@ for (const row of rows) {
   //    구가 없는 법정동 코드(서울 전체)면 클라이언트가 스스로 건너뛴다.
   const kaptKey = env.KAPT_API_KEY ?? env.MOLIT_API_KEY;
   if ((force || row.maintenance === undefined) && bCode && kaptKey) {
-    const kapt = new KaptClient(kaptKey);
-    const m = await kapt.forAnnouncement({ sigunguCode: bCode.slice(0, 5), district: row.region_name ?? row.region_code, title: row.title, complex: row.complex, address }).catch(() => null);
+    const basisCache = loadBasisCache();
+    const kapt = new KaptClient(kaptKey, fetch, basisCache);
+    const m = await kapt
+      .forAnnouncement({ sigunguCode: bCode.slice(0, 5), district: row.region_name ?? row.region_code, title: row.title, complex: row.complex, address, households: row.households })
+      .catch((e: unknown) => {
+        console.log(`  관리비 조회 실패: ${e instanceof Error ? e.message : String(e)}`);
+        return null;
+      });
+    // 단지 기본정보는 안 바뀌는 값이라 파일에 남긴다. 실패했어도 그때까지 받은 것은 저장한다 — 호출은 하루 한도가 있는 자원이다.
+    saveBasisCache(basisCache);
     if (m) {
       row.maintenance = m;
-      console.log(`  관리비 ${m.basis === "complex" ? `${m.complex} 신고값` : `${m.district} ${m.sample}단지 중앙값`} · 공용 ${m.common_per_m2}원/㎡${m.individual_per_m2 ? ` + 사용료 ${m.individual_per_m2}원/㎡` : ""} (${m.months.join("·")}, ${kapt.calls}회)`);
+      console.log(`  관리비 ${m.basis === "complex" ? `${m.complex} 신고값` : `${m.district} ${m.sample}단지 중앙값${m.sample_households ? ` (${m.sample_households[0]}~${m.sample_households[1]}세대, 공고 ${row.households}세대)` : ""}`} · 공용 ${m.common_per_m2}원/㎡${m.individual_per_m2 ? ` + 사용료 ${m.individual_per_m2}원/㎡` : ""} (${m.months.join("·")}, ${kapt.calls}회)`);
     } else console.log(`  관리비 단지·지역 표본 없음 (${kapt.calls}회)`);
   }
 

@@ -2477,7 +2477,7 @@
    }
   },
   "detail_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=2015122300020753&ccrCnntSysDsCd=03&uppAisTpCd=06&aisTpCd=48&mi=1026",
-  "pdf_url": "https://tomybypxvhrkwvfnthva.supabase.co/storage/v1/object/public/announcement-pdfs/LH/2015122300020753/v1.pdf",
+  "pdf_url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=68630902",
   "images": [
    {
     "kind": "위치도",
@@ -2498,16 +2498,8 @@
   "checks": [
    "자산 기준·자동차 가액을 읽지 못했어요 (다른 공급 유형에는 있어요)"
   ],
-  "maintenance": {
-   "basis": "district",
-   "district": "서울 강서구",
-   "sample": 4,
-   "common_per_m2": 2328,
-   "months": [
-    "2026-07"
-   ],
-   "source": "K-apt 공동주택관리정보시스템"
-  }
+  "complex": "강서염창(가로주택) 통합공공임대주택",
+  "households": 14
  },
  {
   "id": "012",
@@ -3307,7 +3299,7 @@
    }
   },
   "detail_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=2015122300020750&ccrCnntSysDsCd=03&uppAisTpCd=13&aisTpCd=26&mi=1026",
-  "pdf_url": "https://tomybypxvhrkwvfnthva.supabase.co/storage/v1/object/public/announcement-pdfs/LH/2015122300020750/v1.pdf",
+  "pdf_url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=68650345",
   "units": [
    {
     "id": "서울특별시 강동구 구천면로 317(암사동,광채빌라) 광채빌라 403",
@@ -10262,7 +10254,7 @@
    ]
   },
   "detail_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=2015122300020759&ccrCnntSysDsCd=03&uppAisTpCd=13&aisTpCd=26&mi=1026",
-  "pdf_url": "https://tomybypxvhrkwvfnthva.supabase.co/storage/v1/object/public/announcement-pdfs/LH/2015122300020759/v1.pdf",
+  "pdf_url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=68646610",
   "units": [
    {
     "id": "서울특별시 강남구 논현로12길 23-5(개포동,T&K개포) T&K개포 204",
@@ -28582,7 +28574,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -28662,7 +28654,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -28742,7 +28734,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -28822,7 +28814,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -28902,7 +28894,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -28982,7 +28974,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -29062,7 +29054,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -29142,7 +29134,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -29222,7 +29214,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -29302,7 +29294,7 @@
      },
      {
       "kind": "hospital",
-      "name": "회기센트럴이비인후과의원",
+      "name": "제이치과의원 회기점",
       "distance_m": 114
      },
      {
@@ -30013,8 +30005,8 @@
      },
      {
       "kind": "mart",
-      "name": "이마트에브리데이 휘경자이점",
-      "distance_m": 926
+      "name": "롯데마트 청량리점",
+      "distance_m": 695
      },
      {
       "kind": "convenience",
@@ -30093,8 +30085,8 @@
      },
      {
       "kind": "mart",
-      "name": "이마트에브리데이 휘경자이점",
-      "distance_m": 926
+      "name": "롯데마트 청량리점",
+      "distance_m": 695
      },
      {
       "kind": "convenience",
@@ -30173,8 +30165,8 @@
      },
      {
       "kind": "mart",
-      "name": "이마트에브리데이 휘경자이점",
-      "distance_m": 926
+      "name": "롯데마트 청량리점",
+      "distance_m": 695
      },
      {
       "kind": "convenience",
@@ -48791,7 +48783,7 @@
    "notes": []
   },
   "detail_url": "https://apply.lh.or.kr/lhapply/apply/wt/wrtanc/selectWrtancInfo.do?panId=0000061175&ccrCnntSysDsCd=02&uppAisTpCd=39&aisTpCd=39&mi=1027",
-  "pdf_url": "https://tomybypxvhrkwvfnthva.supabase.co/storage/v1/object/public/announcement-pdfs/LH/0000061175/v1.pdf",
+  "pdf_url": "https://apply.lh.or.kr/lhapply/lhFile.do?fileid=68663246",
   "images": [
    {
     "kind": "",
