@@ -150,12 +150,17 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, household_size: Number(v) }), read: (p) => p.household_size ?? null,
   },
   {
-    id: "children_count", kind: "count", title: "자녀는 몇 명인가요?", hint: "태아도 포함해요.",
+    /*
+     * 부부·한부모에게는 첫 온보딩에서 묻는다 (2026-09-26). 한부모는 자녀가 곧 자격이고, 부부는 신혼(6세 이하)·다자녀 공급이
+     * 자녀 수로 갈린다. 전에는 나중 질문이라 그 사람들의 핵심 공고가 첫 목록에서 "확인 필요"로만 떴다. 미혼에게는 묻지 않는다.
+     */
+    id: "children_count", core: true, kind: "count", title: "자녀는 몇 명인가요?", hint: "태아도 포함해요.",
+    when: (p) => p.marriage === "married" || p.marriage === "single_parent",
     none: { label: "자녀가 없어요" },
     apply: (p, v) => ({ ...p, children_count: Number(v), children_ages: Number(v) === 0 ? [] : p.children_ages, newborn_children: Number(v) === 0 ? 0 : p.newborn_children }), read: (p) => p.children_count ?? null,
   },
   {
-    id: "youngest", kind: "age", title: "가장 어린 자녀는 몇 살인가요?", hint: "6세 이하 자녀가 있으면 신혼부부 계층에 들어갈 수 있어요. 태아는 0.",
+    id: "youngest", core: true, kind: "age", title: "가장 어린 자녀는 몇 살인가요?", hint: "6세 이하 자녀가 있으면 신혼부부 계층에 들어갈 수 있어요. 태아는 0.",
     when: (p) => (p.children_count ?? 0) > 0,
     apply: (p, v) => ({ ...p, children_ages: [Number(v)] }), read: (p) => p.children_ages?.[0] ?? null,
   },
@@ -172,7 +177,8 @@ export const STEPS: Step[] = [
     apply: (p, v) => ({ ...p, newborn_children: Number(v) }), read: (p) => p.newborn_children ?? null,
   },
   {
-    id: "income_type", kind: "select", title: "두 분 모두 소득이 있나요?", hint: "맞벌이는 소득 상한이 더 높아요.",
+    // 부부에게는 첫 온보딩에서 묻는다 — 소득표의 어느 줄을 볼지가 여기서 갈린다 (맞벌이 상한이 더 높다)
+    id: "income_type", core: true, kind: "select", title: "두 분 모두 소득이 있나요?", hint: "맞벌이는 소득 상한이 더 높아요.",
     when: isCouple,
     options: [{ value: "dual", label: "맞벌이" }, { value: "single", label: "외벌이" }],
     apply: (p, v) => ({ ...p, income_type: v as UserProfile["income_type"] }), read: (p) => p.income_type ?? null,

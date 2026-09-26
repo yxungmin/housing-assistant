@@ -34,18 +34,41 @@ describe("단계 표들이 최신인가", () => {
 });
 
 describe("첫 온보딩은 핵심만 묻는다", () => {
-  it("core는 아홉 개다 — 목록이 쓸모 있어지는 최소치 + 해당 계층 + 내 직장", () => {
+  it("core는 아홉 개 + 부부·한부모에게만 붙는 셋 — 목록이 쓸모 있어지는 최소치 + 해당 계층 + 내 직장", () => {
     expect(STEPS.filter((s) => s.core).map((s) => s.id)).toEqual([
       "region",
       "birth_date",
       "marriage",
       "household_size",
+      "children_count",
+      "youngest",
+      "income_type",
       "annual_income",
       "total_assets",
       "statuses",
       "homeless",
       "workplace_place",
     ]);
+  });
+
+  it("미혼 청년은 여전히 아홉 문항 — 자녀·맞벌이는 묻지 않는다", () => {
+    const ids = visibleSteps({ region_code: "11", marriage: "single", household_size: 1 }, { coreOnly: true }).map((s) => s.id);
+    expect(ids).toEqual(["region", "birth_date", "marriage", "household_size", "annual_income", "total_assets", "statuses", "homeless", "workplace_place"]);
+  });
+
+  it("부부는 자녀 수·맞벌이를, 자녀가 있으면 막내 나이까지 첫 온보딩에서 묻는다 — 신혼(6세 이하)·다자녀 공급이 여기서 갈린다", () => {
+    const couple = visibleSteps({ region_code: "41", marriage: "married", household_size: 4, children_count: 2 }, { coreOnly: true }).map((s) => s.id);
+    expect(couple).toContain("children_count");
+    expect(couple).toContain("youngest");
+    expect(couple).toContain("income_type");
+    expect(couple.indexOf("youngest")).toBe(couple.indexOf("children_count") + 1);
+  });
+
+  it("한부모는 자녀를 묻고 맞벌이는 묻지 않는다 — 자녀가 곧 자격이다", () => {
+    const ids = visibleSteps({ region_code: "11", marriage: "single_parent", household_size: 2, children_count: 1 }, { coreOnly: true }).map((s) => s.id);
+    expect(ids).toContain("children_count");
+    expect(ids).toContain("youngest");
+    expect(ids).not.toContain("income_type");
   });
 
   it("해당 계층 선택지가 엔진이 아는 계층을 전부 담는다 — 빠지면 그 계층인 사람이 영영 대상이 못 된다", async () => {
